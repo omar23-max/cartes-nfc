@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Créer ma carte NFC</title>
+  <meta name="description" content="Créez votre carte de visite digitale NFC en 5 étapes : secteur, modèle, couleurs, contenu, publication.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/card.css">
+  <link rel="stylesheet" href="css/card-plus.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="brand-mk"></span><span class="brand-n">Studio Carte NFC</span><span class="badge">Site test</span></div>
+    <nav class="steps" id="steps" aria-label="Étapes"></nav>
+    <div id="uisw"></div>
+    <button class="b sm ghost reset" data-act="reset" title="Tout recommencer"></button>
+  </header>
+  <main id="main"></main>
+  <div id="modal" class="modal"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/sectors.js"></script>
+  <script src="js/media.js"></script>
+  <script src="js/extras.js"></script>
+  <script src="js/locale-na.js"></script>
+  <script src="js/locale-na-en.js"></script>
+  <script src="js/i18n-en.js"></script>
+  <script src="js/i18n-app-en.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Carte de visite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/card.css">
+  <link rel="stylesheet" href="css/card-plus.css">
+  <style>
+    html, body { margin: 0; min-height: 100%; }
+    body { background: #e9e8e4; }
+    #app { max-width: 480px; min-height: 100vh; margin: 0 auto; display: flex; flex-direction: column; }
+    #app > .vc { flex: 1; }
+    @media (min-width: 520px) { #app { box-shadow: 0 0 60px rgba(0,0,0,.12); } }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/sectors.js"></script>
+  <script src="js/media.js"></script>
+  <script src="js/extras.js"></script>
+  <script src="js/locale-na.js"></script>
+  <script src="js/locale-na-en.js"></script>
+  <script src="js/i18n-en.js"></script>
+  <script src="js/render.js"></script>
+  <script>
+    /* Affiche la carte enregistrée dans l’assistant, ou une démo : view.html?s=artisans&d=d3&c=1 */
+    (function () {
+      const q = new URLSearchParams(location.search);
+      const find = (id) => NFC.SECTORS.find((s) => s.id === id && s.active);
+      let m = null;
+      if (q.get('s') && find(q.get('s'))) {
+        const s = find(q.get('s'));
+        const en = q.get('lang') === 'en'; m = { card: (en && s.demoEn) || s.demo, sec: s, d: q.get('d') || s.rec, pal: s.palettes[+q.get('c') || 0], lang: en ? 'en' : 'fr' };
+      } else {
+        try {
+          const S = JSON.parse(localStorage.getItem('nfc-studio-v6'));
+          const s = find(S.sectorId);
+          if (s) {
+            const bi = !!(S.bili && S.bili[s.id]);
+            /* Carte bilingue : la langue du téléphone du visiteur choisit la version affichée */
+            const want = q.get('lang') || (bi ? ((navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'fr') : S.lang);
+            const cardOf = (l) => S.cards[l === 'en' ? s.id + ':en' : s.id] || (l === 'en' && s.demoEn) || s.demo;
+            const en = want === 'en';
+            m = { card: cardOf(en ? 'en' : 'fr'), sec: s, d: S.design || s.rec, pal: s.palettes[S.palette] || s.palettes[0], link: 'https://votre-site.com/c/' + S.id, lang: en ? 'en' : 'fr', bilingual: bi };
+            VC.onLangSwitch = (l) => { if (l === m.lang) return; m.card = cardOf(l); m.lang = l; draw(); };
+          }
+        } catch (e) { /* pas de brouillon : démo par défaut */ }
+      }
+      if (!m) { const s = find('artisans'); m = { card: s.demo, sec: s, d: 'd1', pal: s.palettes[0] }; }
+      function draw() { document.getElementById('app').innerHTML = VC.render(m); document.documentElement.lang = m.lang; }
+      draw();
+      VC.idb.loadAll().then(() => { if (Object.keys(window.NFC_BLOBS).length) draw(); });
+      document.body.style.background = m.d === 'd5' ? '#050506' : '';
+      document.title = (m.card.identity.name || 'Carte de visite') + ' · Carte de visite';
+      VC.bind(document, () => m);
+    })();
+  </script>
+</body>
+</html>
