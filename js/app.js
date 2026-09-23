@@ -22,7 +22,12 @@
     return r;
   }
   function load() {
-    try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return s; } catch (e) { /* stockage indisponible */ }
+    try {
+      const s = JSON.parse(localStorage.getItem(KEY));
+      /* Ancienne palette créée par l’IA : on revient à une palette du secteur */
+      if (s && typeof s.palette !== 'number') { s.palette = 0; delete s.ai; }
+      if (s && s.v === 1) return s;
+    } catch (e) { /* stockage indisponible */ }
     return fresh();
   }
   function save() {
