@@ -5,6 +5,16 @@
 
   const TYPOS = ['moderne', 'serif', 'editorial', 'mono'];
   const DENS = ['compacte', 'standard', 'aeree'];
+  /* Six axes qui changent l’allure de la carte, au-delà des couleurs */
+  const AXES = {
+    mode: ['clair', 'sombre'],
+    accent: ['doux', 'plein', 'contour'],
+    sections: ['majuscule', 'serif', 'numerote', 'ligne', 'discret'],
+    photo: ['arrondi', 'carre', 'cercle', 'nb', 'duotone'],
+    motif: ['aucun', 'points', 'grille', 'diagonale'],
+    frame: ['carte', 'plat', 'contour'],
+  };
+  const pick = (k, v, d) => (AXES[k].includes(v) ? v : d);
   const MOODS = [
     ['chaleureux', 'Chaleureux', 'Warm'],
     ['sobre', 'Sobre et pro', 'Clean & pro'],
@@ -50,14 +60,29 @@
   };
 
   /* Une palette toujours lisible : texte sur fond, blanc sur couleur principale */
-  function safePal(p) {
+  function safePal(p, dark) {
     const g = (v, d) => hex(v) || d;
     const o = {
       name: String(p.name || 'Palette sur mesure').slice(0, 30),
-      p: g(p.p, '#1e3a8a'), a: g(p.a, '#3b82f6'), bg: g(p.bg, '#f5f5f2'),
-      sf: g(p.sf, '#ffffff'), tx: g(p.tx, '#15151a'), mu: g(p.mu, '#6b6a70'), ln: g(p.ln, '#e4e2dc'),
+      p: g(p.p, dark ? '#7dd3fc' : '#1e3a8a'), a: g(p.a, '#3b82f6'), bg: g(p.bg, dark ? '#101014' : '#f5f5f2'),
+      sf: g(p.sf, dark ? '#1a1a20' : '#ffffff'), tx: g(p.tx, dark ? '#f4f4f5' : '#15151a'),
+      mu: g(p.mu, dark ? '#a1a1ab' : '#6b6a70'), ln: g(p.ln, dark ? '#2b2b33' : '#e4e2dc'),
     };
+    if (dark) {
+      /* Carte sombre : fond profond, surfaces à peine plus claires, texte clair, couleur vive */
+      if (lum(o.bg) > 0.18) o.bg = mix(o.bg, '#0b0b0f', 0.82);
+      if (ratio(o.sf, o.bg) > 1.6 || lum(o.sf) > 0.3) o.sf = mix(o.bg, '#ffffff', 0.07);
+      o.ln = mix(o.bg, '#ffffff', 0.14);
+      o.tx = fix(lum(o.tx) < 0.5 ? mix(o.tx, '#ffffff', 0.9) : o.tx, o.bg, 9, false);
+      o.mu = fix(lum(o.mu) < 0.3 ? mix(o.mu, '#ffffff', 0.55) : o.mu, o.bg, 3.6, false);
+      /* Le texte des boutons est blanc : la couleur principale doit rester assez foncée */
+      o.p = fix(o.p, '#ffffff', 3.2, true);
+      if (ratio(o.p, o.bg) < 2.2) o.p = mix(o.p, '#ffffff', 0.25);
+      if (ratio(o.a, o.bg) < 2.5) o.a = mix(o.a, '#ffffff', 0.4);
+      return o;
+    }
     if (lum(o.bg) < 0.5) { o.bg = mix(o.bg, '#ffffff', 0.86); o.sf = '#ffffff'; }
+    if (lum(o.sf) < 0.7) o.sf = mix(o.sf, '#ffffff', 0.85);
     o.tx = fix(o.tx, o.bg, 8, true);
     o.p = fix(o.p, o.sf, 4.5, true);
     o.mu = fix(o.mu, o.bg, 3.4, true);
@@ -74,25 +99,38 @@
     naturel: { h: 142, s: 0.4, l: 0.3, typo: 'editorial', dens: 'aeree', r: 16, d: ['d3', 'd4', 'd6'] },
     creatif: { h: 276, s: 0.6, l: 0.45, typo: 'editorial', dens: 'standard', r: 20, d: ['d8', 'd5', 'd9'] },
   };
+  /* Trois directions volontairement opposées : claire et posée, sombre et affirmée, graphique */
+  const DIRS = [
+    { nom: 'Clair et posé', mode: 'clair', accent: 'doux', sections: 'ligne', photo: 'arrondi', motif: 'aucun', frame: 'carte', dens: 'aeree', r: 18, dh: 0 },
+    { nom: 'Sombre et affirmé', mode: 'sombre', accent: 'plein', sections: 'numerote', photo: 'nb', motif: 'aucun', frame: 'plat', dens: 'standard', r: 6, dh: 150 },
+    { nom: 'Graphique', mode: 'clair', accent: 'contour', sections: 'serif', photo: 'duotone', motif: 'points', frame: 'contour', dens: 'compacte', r: 24, dh: 35 },
+  ];
   function localTheme(ans, i) {
     const cfg = MOOD_CFG[ans.mood] || MOOD_CFG.sobre;
+    const dir = DIRS[i % 3];
     const base = hex(ans.color);
-    const h = base ? hsl(base)[0] : cfg.h + i * 14;
-    const s = base ? Math.max(0.3, hsl(base)[1]) : cfg.s;
-    const p = base && i === 0 ? base : fromHsl(h + (i - 1) * 8, s, cfg.l + i * 0.04);
+    const h0 = base ? hsl(base)[0] : cfg.h;
+    const h = i === 0 || base ? h0 : h0 + dir.dh;
+    const sat = base ? Math.max(0.35, hsl(base)[1]) : cfg.s;
+    const dark = dir.mode === 'sombre';
+    const p = base && i === 0 ? base : fromHsl(h, sat, dark ? 0.46 : cfg.l);
     return {
-      name: ['Sur mesure', 'Variante claire', 'Variante contrastée'][i] || 'Sur mesure',
+      name: dir.nom,
       design: cfg.d[i % cfg.d.length],
-      typo: i === 2 ? TYPOS[(TYPOS.indexOf(cfg.typo) + 1) % TYPOS.length] : cfg.typo,
-      density: i === 1 ? 'standard' : cfg.dens,
-      radius: [cfg.r, Math.max(0, cfg.r - 10), cfg.r + 6][i % 3],
-      why: 'Proposition locale : couleur, typographie et mise en page choisies d’après votre ambiance.',
+      typo: [cfg.typo, 'mono', 'editorial'][i] || cfg.typo,
+      density: dir.dens,
+      radius: dir.r,
+      mode: dir.mode, accent: dir.accent, sections: dir.sections, photo: dir.photo, motif: dir.motif, frame: dir.frame,
+      why: ['Fond clair, beaucoup d’air, couleur discrète.', 'Fond sombre, couleur pleine, photos en noir et blanc.', 'Contours, titres à empattements et photos teintées.'][i],
       pal: safePal({
-        name: ['Sur mesure', 'Variante claire', 'Variante contrastée'][i] || 'Sur mesure',
-        p, a: fromHsl(h + 28, Math.min(0.9, s + 0.12), Math.min(0.7, cfg.l + 0.28)),
-        bg: fromHsl(h, 0.16, 0.965), sf: '#ffffff',
-        tx: fromHsl(h, 0.24, 0.1), mu: fromHsl(h, 0.1, 0.42), ln: fromHsl(h, 0.16, 0.9),
-      }),
+        name: dir.nom,
+        p, a: fromHsl(h + 28, Math.min(0.9, sat + 0.12), dark ? 0.62 : Math.min(0.7, cfg.l + 0.28)),
+        bg: dark ? fromHsl(h, 0.22, 0.07) : fromHsl(h, 0.14, 0.97),
+        sf: dark ? fromHsl(h, 0.18, 0.12) : '#ffffff',
+        tx: dark ? fromHsl(h, 0.08, 0.95) : fromHsl(h, 0.24, 0.1),
+        mu: dark ? fromHsl(h, 0.1, 0.68) : fromHsl(h, 0.1, 0.42),
+        ln: dark ? fromHsl(h, 0.16, 0.2) : fromHsl(h, 0.16, 0.9),
+      }, dark),
     };
   }
 
@@ -112,8 +150,22 @@ ${prev ? `Propositions précédentes (à faire évoluer) : ${JSON.stringify(prev
 Mises en page disponibles :
 ${DESIGN_LIST()}
 
-Donne 3 propositions VRAIMENT différentes (mise en page, couleurs et typographie distinctes).
-Chaque palette doit être lisible : fond très clair, texte presque noir, couleur principale foncée car du texte blanc s’affiche dessus.
+Les autres réglages, à faire varier d’une proposition à l’autre :
+- mode : carte claire ou carte sombre ;
+- accent : couleur en aplat discret (doux), en aplat plein (plein), ou en contours seuls (contour) ;
+- sections : titres en petites majuscules, à empattements, numérotés, soulignés d’un filet, ou très discrets ;
+- photo : angles arrondis, carrés, ronds, noir et blanc, ou teintées de votre couleur (duotone) ;
+- motif : fond uni, points, grille ou diagonales très légères ;
+- frame : blocs en cartes, à plat séparés par un filet, ou en contours.
+
+Donne 3 propositions VRAIMENT différentes, jamais trois variantes de la même carte :
+- proposition 1 : claire et posée ;
+- proposition 2 : SOMBRE (mode "sombre"), couleur pleine, plus affirmée ;
+- proposition 3 : graphique, avec un parti pris net (contours, motif, photos traitées).
+Les 3 mises en page ("design") doivent être différentes, ainsi que la typographie, les titres de section, le traitement des photos et la forme des blocs.
+
+Palette claire : fond très clair, texte presque noir, couleur principale foncée car du texte blanc s’affiche dessus.
+Palette sombre : fond très foncé (luminosité < 12 %), surfaces à peine plus claires, texte presque blanc, couleur principale assez foncée pour porter du texte blanc.
 ${ans.content ? `Rédige aussi les textes, en français ET en anglais, à la première personne, concrets, sans superlatifs creux. Marché : Canada et États-Unis, prix en dollars.` : 'Ne rédige aucun texte : omets la clé "content".'}
 
 Format exact :
@@ -122,7 +174,13 @@ Format exact :
   "design": "d1 à d10",
   "typo": "moderne | serif | editorial | mono",
   "density": "compacte | standard | aeree",
-  "radius": 0 à 24,
+  "radius": 0 à 26,
+  "mode": "clair | sombre",
+  "accent": "doux | plein | contour",
+  "sections": "majuscule | serif | numerote | ligne | discret",
+  "photo": "arrondi | carre | cercle | nb | duotone",
+  "motif": "aucun | points | grille | diagonale",
+  "frame": "carte | plat | contour",
   "why": "une phrase expliquant le choix, en français",
   "pal": {"name":"nom de la palette","p":"#hex","a":"#hex","bg":"#hex","sf":"#hex","tx":"#hex","mu":"#hex","ln":"#hex"}${ans.content ? `,
   "content": {
@@ -138,17 +196,50 @@ Format exact :
     const out = await sample.json(prompt(sec, ans, 'fr', prev, feedback), { modelTier: 'default' });
     const props = (out && out.props) || [];
     if (!props.length) return null;
-    return props.slice(0, 3).map((t) => ({
-      name: String(t.nom || t.name || 'Sur mesure').slice(0, 40),
-      design: (NFC.DESIGNS || []).some((d) => d.id === t.design) ? t.design : sec.rec,
-      typo: TYPOS.includes(t.typo) ? t.typo : 'moderne',
-      density: DENS.includes(t.density) ? t.density : 'standard',
-      radius: Math.max(0, Math.min(26, +t.radius || 14)),
-      why: String(t.why || '').slice(0, 220),
-      pal: safePal(t.pal || {}),
-      content: t.content || null,
-    }));
+    const list = props.slice(0, 3).map((t, i) => {
+      const mode = pick('mode', t.mode, i === 1 ? 'sombre' : 'clair');
+      return {
+        name: String(t.nom || t.name || 'Sur mesure').slice(0, 40),
+        design: (NFC.DESIGNS || []).some((d) => d.id === t.design) ? t.design : sec.rec,
+        typo: TYPOS.includes(t.typo) ? t.typo : 'moderne',
+        density: DENS.includes(t.density) ? t.density : 'standard',
+        radius: Math.max(0, Math.min(26, t.radius == null ? 14 : +t.radius)),
+        mode,
+        accent: pick('accent', t.accent, 'doux'),
+        sections: pick('sections', t.sections, 'majuscule'),
+        photo: pick('photo', t.photo, 'arrondi'),
+        motif: pick('motif', t.motif, 'aucun'),
+        frame: pick('frame', t.frame, 'carte'),
+        why: String(t.why || '').slice(0, 220),
+        pal: safePal(t.pal || {}, mode === 'sombre'),
+        content: t.content || null,
+      };
+    });
+    return diversify(list, sec);
   }
 
-  window.NFC_AI = { MOODS, TYPOS, DENS, ask, localTheme, safePal, hasAI: () => !!(window.claude && window.claude.use) };
+  /* L’IA propose parfois trois fois la même chose : on écarte les doublons */
+  function diversify(list, sec) {
+    const all = (NFC.DESIGNS || []).map((d) => d.id);
+    const used = [];
+    list.forEach((t, i) => {
+      if (used.includes(t.design)) {
+        const free = all.filter((d) => !used.includes(d) && d !== sec.rec);
+        t.design = free[i % free.length] || t.design;
+      }
+      used.push(t.design);
+    });
+    ['accent', 'sections', 'photo', 'frame'].forEach((k) => {
+      if (list.length === 3 && list[0][k] === list[1][k] && list[1][k] === list[2][k]) {
+        list.forEach((t, i) => { t[k] = AXES[k][i % AXES[k].length]; });
+      }
+    });
+    if (list.length === 3 && !list.some((t) => t.mode === 'sombre')) {
+      list[1].mode = 'sombre';
+      list[1].pal = safePal(list[1].pal, true);
+    }
+    return list;
+  }
+
+  window.NFC_AI = { MOODS, TYPOS, DENS, AXES, ask, localTheme, safePal, hasAI: () => !!(window.claude && window.claude.use) };
 })();

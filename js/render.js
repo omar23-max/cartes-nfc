@@ -602,7 +602,9 @@
     const th = m.theme || null;
     const style = `--p:${pal.p};--a:${pal.a};--bg0:${pal.bg};--sf0:${pal.sf};--tx0:${pal.tx};--mu0:${pal.mu};--ln0:${pal.ln}`
       + (th && th.radius != null ? `;--r:${th.radius}px` : '');
-    const thCls = th ? ` th th-${th.typo || 'moderne'} thd-${th.density || 'standard'}` : '';
+    const thCls = th ? ` th th-${th.typo || 'moderne'} thd-${th.density || 'standard'}`
+      + ` thm-${th.mode || 'clair'} tha-${th.accent || 'doux'} ths-${th.sections || 'majuscule'}`
+      + ` thp-${th.photo || 'arrondi'} thmo-${th.motif || 'aucun'} thf-${th.frame || 'carte'}` : '';
     const shareBtn = `<button type="button" class="vc-shb" data-vc="sharemenu" aria-haspopup="menu">${ic('share', 16)}<span>Partager</span>${ic('chevd', 14)}</button>`;
     const langBtn = m.bilingual ? `<div class="vc-lang" role="group" aria-label="Language / Langue"><button type="button" data-vc="lang" data-v="fr" class="${LG === 'fr' ? 'on' : ''}" aria-pressed="${LG === 'fr'}" lang="fr" title="Français">FR</button><button type="button" data-vc="lang" data-v="en" class="${LG === 'en' ? 'on' : ''}" aria-pressed="${LG === 'en'}" lang="en" title="English">EN</button></div>` : '';
     return toEn(`<div class="vc vc-${d}${m.bilingual ? ' bili' : ''}${thCls}" lang="${LG}" style="${style}"><div class="vc-tr">${langBtn}${shareBtn}</div>${header(m)}${quick(m)}<main class="vc-body">${body}</main>${footer(m)}${sticky(m)}</div>`);
