@@ -47,6 +47,7 @@
     link: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
     dots: '<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
     telegram: '<path d="m22 3-9.5 18-2.5-7.5L2.5 11z"/><path d="m22 3-12 10.5"/>',
+    sparkle: '<path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 14l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/><path d="M5 15l.7 1.6 1.6.7-1.6.7L5 19.6l-.7-1.6-1.6-.7 1.6-.7z"/>',
     upload: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/>',
   };
   const SOC = [['linkedin', 'LinkedIn'], ['instagram', 'Instagram'], ['facebook', 'Facebook'], ['tiktok', 'TikTok'], ['youtube', 'YouTube'], ['x', 'X (Twitter)'], ['threads', 'Threads'], ['pinterest', 'Pinterest'], ['snapchat', 'Snapchat']];
@@ -597,10 +598,14 @@
       const inner = S[def.type](def, b, m);
       if (inner) body += wrap(b.title ? Object.assign({}, def, { title: b.title }) : def, inner, ctx);
     });
-    const style = `--p:${pal.p};--a:${pal.a};--bg0:${pal.bg};--sf0:${pal.sf};--tx0:${pal.tx};--mu0:${pal.mu};--ln0:${pal.ln}`;
+    /* Thème généré : typographie, arrondi et densité s’ajoutent par-dessus le modèle choisi */
+    const th = m.theme || null;
+    const style = `--p:${pal.p};--a:${pal.a};--bg0:${pal.bg};--sf0:${pal.sf};--tx0:${pal.tx};--mu0:${pal.mu};--ln0:${pal.ln}`
+      + (th && th.radius != null ? `;--r:${th.radius}px` : '');
+    const thCls = th ? ` th th-${th.typo || 'moderne'} thd-${th.density || 'standard'}` : '';
     const shareBtn = `<button type="button" class="vc-shb" data-vc="sharemenu" aria-haspopup="menu">${ic('share', 16)}<span>Partager</span>${ic('chevd', 14)}</button>`;
     const langBtn = m.bilingual ? `<div class="vc-lang" role="group" aria-label="Language / Langue"><button type="button" data-vc="lang" data-v="fr" class="${LG === 'fr' ? 'on' : ''}" aria-pressed="${LG === 'fr'}" lang="fr" title="Français">FR</button><button type="button" data-vc="lang" data-v="en" class="${LG === 'en' ? 'on' : ''}" aria-pressed="${LG === 'en'}" lang="en" title="English">EN</button></div>` : '';
-    return toEn(`<div class="vc vc-${d}${m.bilingual ? ' bili' : ''}" lang="${LG}" style="${style}"><div class="vc-tr">${langBtn}${shareBtn}</div>${header(m)}${quick(m)}<main class="vc-body">${body}</main>${footer(m)}${sticky(m)}</div>`);
+    return toEn(`<div class="vc vc-${d}${m.bilingual ? ' bili' : ''}${thCls}" lang="${LG}" style="${style}"><div class="vc-tr">${langBtn}${shareBtn}</div>${header(m)}${quick(m)}<main class="vc-body">${body}</main>${footer(m)}${sticky(m)}</div>`);
   }
 
   /* ---------- vCard ---------- */
