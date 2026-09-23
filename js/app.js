@@ -233,12 +233,9 @@
   const uiSwitch = () => `<div class="seg ui-sw" role="group" aria-label="${ui() === 'en' ? 'Site language' : 'Langue du site'}">${ic('globe', 15)}<button type="button" class="${ui() === 'fr' ? 'on' : ''}" data-act="ui" data-v="fr" lang="fr" title="Site en français">FR</button><button type="button" class="${ui() === 'en' ? 'on' : ''}" data-act="ui" data-v="en" lang="en" title="Site in English">EN</button></div>`;
   const mdl = (d = S.design, p = S.palette) => {
     const s = sec();
-    const th = p === 'ai' && S.ai ? S.ai : null;
-    return { card: card() || demoOf(s), sec: s, d: d || (th ? th.design : s.rec), pal: th ? th.pal : s.palettes[p] || s.palettes[0], link: link(), lang: lang(), bilingual: bili(), theme: th };
+    return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: s.palettes[p] || s.palettes[0], link: link(), lang: lang(), bilingual: bili() };
   };
   const designOf = (id) => DESIGNS.find((d) => d.id === id);
-  /* Palette affichée : celle du secteur, ou celle créée par l’IA */
-  const palOf = () => (S.palette === 'ai' && S.ai ? S.ai.pal : sec().palettes[S.palette] || sec().palettes[0]);
   const code = (d = S.design) => `${sec().code}-${String(d || sec().rec).toUpperCase()}`;
 
   const getP = (o, path) => path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);
@@ -470,16 +467,7 @@
       ${back(1, 'Changer de secteur')}
       ${langSwitch()}
       ${head('Choisissez votre modèle', `${DESIGNS.length} mises en page pour <b>${s.name}</b>. Faites défiler chaque miniature pour voir toute la carte, puis cliquez pour la choisir. Vous pourrez en changer à tout moment sans perdre vos informations.`)}
-      <div class="tpls">${cards}
-        <div class="tpl ai-tpl ${S.palette === 'ai' && S.ai ? 'sel' : ''}" role="button" tabindex="0" data-act="aiopen" aria-label="Créer mon modèle avec l’IA">
-          <div class="tpl-view ai-view">${S.ai ? `<div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(S.ai.design, 'ai'), { thumb: true }))}</div></div></div>` : `<span class="ai-ic">${ic('sparkle', 28)}</span>`}</div>
-          <div class="tpl-meta">
-            <div class="tpl-top"><span class="tpl-n">${S.ai ? 'Votre modèle sur mesure' : 'Aucun ne me plaît'}</span><span class="rec ai-b">IA</span></div>
-            <p>${S.ai ? esc(S.ai.why || 'Créé pour votre activité.') : 'Répondez à trois questions : l’IA crée une mise en page, des couleurs et vos textes, rien qu’à vous.'}</p>
-            <div class="tpl-foot"><span class="tpl-code">SUR MESURE</span><span class="tpl-go">${S.ai ? 'Reprendre' : 'Créer avec l’IA'} ${ic('arrow', 14)}</span></div>
-          </div>
-        </div>
-      </div>
+      <div class="tpls">${cards}</div>
     </section>`;
   }
 
@@ -497,11 +485,7 @@
       ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 5 palettes pensées pour votre secteur.`)}
       <div class="split">
         <div class="side">
-          <div class="pals">${S.ai ? `<button class="pal ai-pal ${S.palette === 'ai' ? 'sel' : ''}" data-act="palette" data-i="ai">
-            <span class="sw"><i style="background:${S.ai.pal.p}"></i><i style="background:${S.ai.pal.a}"></i><i style="background:${S.ai.pal.bg}"></i></span>
-            <span class="pal-n">${esc(S.ai.pal.name)}</span><span class="rec ai-b">IA</span>
-            <span class="pal-ck">${ic('check', 16)}</span></button>` : ''}${pals}</div>
-          <button class="b sm ghost ai-again" data-act="aiopen">${ic('sparkle', 15)}${S.ai ? 'Modifier avec l’IA' : 'Créer une palette avec l’IA'}</button>
+          <div class="pals">${pals}</div>
           <p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>
           <button class="b pri lg" data-act="go" data-n="4">Remplir ma carte ${ic('arrow', 18)}</button>
         </div>
@@ -512,7 +496,7 @@
 
   /* ---------- Étape 4 : contenu ---------- */
   function step4() {
-    const s = sec(), p = palOf();
+    const s = sec(), p = s.palettes[S.palette];
     return `<section class="wrap wide">
       <div class="ed-bar">
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
@@ -958,110 +942,12 @@
 
   function exportJSON() {
     if (window.NFC_SANDBOX) { toast('Aperçu en ligne : l’export sera disponible sur la version finale.'); return; }
-    const data = { modele: code(), secteur: sec().name, design: designOf(S.design).name, palette: palOf(), theme: S.ai || null, lien: link(), carte: card() };
+    const data = { modele: code(), secteur: sec().name, design: designOf(S.design).name, palette: sec().palettes[S.palette], lien: link(), carte: card() };
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
     a.download = `carte-${code()}-${S.id}.json`;
     document.body.appendChild(a); a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
-  }
-
-  /* ---------- Créer un modèle sur mesure avec l’IA ---------- */
-  let aiAns = { job: '', mood: 'sobre', color: '', content: true };
-  let aiProps = [], aiBusy = false, aiErr = '';
-
-  function openAI() {
-    const s = sec();
-    if (!aiAns.job) aiAns.job = (card() && card().identity && card().identity.role) || s.ex.replace(/…$/, '');
-    aiProps = []; aiErr = '';
-    $('#modal').classList.add('on');
-    drawAI();
-  }
-  function drawAI() {
-    const AI = window.NFC_AI;
-    const moods = AI.MOODS.map(([k, fr]) => `<button type="button" class="chip-b ${aiAns.mood === k ? 'on' : ''}" data-act="aimood" data-v="${k}">${fr}</button>`).join('');
-    const body = aiProps.length ? `
-      <div class="ai-props">${aiProps.map((p, i) => `
-        <div class="ai-p">
-          <div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(p.design, 0), { thumb: true, pal: p.pal, theme: p }))}</div></div></div>
-          <div class="ai-p-m"><span class="ai-p-n">${esc(p.name)}</span><p>${esc(p.why)}</p>
-            <button class="b pri sm" data-act="aipick" data-i="${i}">Choisir ${ic('arrow', 15)}</button></div>
-        </div>`).join('')}</div>
-      <div class="f ai-fb"><span class="f-l">Une retouche ? Demandez-la en un mot</span>
-        <div class="linkrow"><input id="aifb" type="text" placeholder="plus sombre, plus classique, moins de couleur…">
-          <button class="b sm" data-act="aigen">${ic('reset', 15)}Régénérer</button></div></div>
-      <button type="button" class="linkish" data-act="aiback">Revenir aux questions</button>`
-      : `
-      <div class="f"><label class="f-l" for="aijob">Votre activité, en une phrase</label>
-        <input id="aijob" type="text" value="${esc(aiAns.job)}" placeholder="Ex. Barbier, coupes classiques et rasage à l’ancienne"></div>
-      <div class="f"><span class="f-l">L’ambiance que vous voulez</span><div class="chips-b">${moods}</div></div>
-      <div class="f"><span class="f-l">Une couleur imposée ? Facultatif</span>
-        <div class="ai-col"><input id="aicol" type="color" value="${aiAns.color || '#2f55d4'}" aria-label="Couleur"><input id="aicolx" type="text" value="${esc(aiAns.color)}" placeholder="Aucune préférence"></div></div>
-      <label class="ck"><input type="checkbox" id="aitxt" ${aiAns.content ? 'checked' : ''}><span>Rédiger aussi mes textes : présentation, prestations, mots-clés</span></label>
-      ${aiErr ? `<p class="ai-err">${esc(aiErr)}</p>` : ''}
-      <button class="b pri lg" data-act="aigen" ${aiBusy ? 'disabled' : ''}>${ic('sparkle', 17)}${aiBusy ? 'Création en cours…' : 'Créer 3 propositions'}</button>
-      <p class="muted small">${window.NFC_AI.hasAI() ? 'Créé par l’IA d’après vos réponses. Tout reste modifiable ensuite.' : 'Sans IA sur ce site : les propositions sont créées localement à partir de vos réponses.'}</p>`;
-    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
-      <div class="md ai-md" role="dialog" aria-modal="true" aria-labelledby="ai-t">
-        <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
-        <h2 id="ai-t">Créer mon modèle avec l’IA</h2>
-        <p>${aiProps.length ? 'Trois directions, avec vos vraies informations. Choisissez, puis modifiez tout à la main.' : 'Trois questions suffisent. Vous garderez la main sur chaque détail.'}</p>
-        ${aiBusy ? `<div class="ai-load">${[0, 1, 2].map(() => '<span class="ai-sk"></span>').join('')}<p>L’IA dessine vos trois cartes…</p></div>` : body}
-      </div>`;
-    icons();
-  }
-  function readAI() {
-    const j = $('#aijob'), c = $('#aicolx'), t = $('#aitxt');
-    if (j) aiAns.job = j.value.trim();
-    if (c) aiAns.color = c.value.trim();
-    if (t) aiAns.content = t.checked;
-  }
-  async function aiGenerate() {
-    readAI();
-    const fb = $('#aifb') ? $('#aifb').value.trim() : '';
-    aiBusy = true; aiErr = ''; drawAI();
-    const s = sec();
-    let out = null;
-    try {
-      out = await window.NFC_AI.ask(s, aiAns, aiProps.length ? aiProps.map((p) => ({ design: p.design, typo: p.typo, pal: p.pal })) : null, fb);
-    } catch (e) {
-      aiErr = 'L’IA n’a pas répondu. Nouvel essai, ou propositions créées localement.';
-    }
-    if (!out) out = [0, 1, 2].map((i) => window.NFC_AI.localTheme(aiAns, i));
-    aiProps = out; aiBusy = false;
-    drawAI();
-  }
-  /* Textes rédigés par l’IA : appliqués à la version de la carte dans chaque langue */
-  function applyAIContent(c) {
-    const s = sec();
-    ['fr', 'en'].forEach((l) => {
-      const t = c[l];
-      const key = l === 'en' ? s.id + ':en' : s.id;
-      if (!t || !S.cards[key]) return;
-      const cd = S.cards[key];
-      if (t.role) cd.identity.role = t.role;
-      if (t.specialty) cd.identity.specialty = t.specialty;
-      let text = 0, list = 0, tags = 0;
-      s.blocks.forEach((def) => {
-        const b = cd.blocks[def.key];
-        if (!b) return;
-        if (def.type === 'text' && !text && t.about) { b.text = t.about; text = 1; }
-        if (def.type === 'list' && !list && Array.isArray(t.services) && t.services.length) {
-          b.items = t.services.slice(0, 6).map((x) => ({ t: String(x.t || ''), d: String(x.d || ''), p: def.price ? String(x.p || '') : '' }));
-          list = 1;
-        }
-        if (def.type === 'tags' && !tags && t.tags) { b.tags = String(t.tags); tags = 1; }
-      });
-    });
-  }
-  function applyAI(i) {
-    const p = aiProps[i];
-    if (!p) return;
-    S.ai = p; S.design = p.design; S.palette = 'ai';
-    ensureCard();
-    if (p.content) applyAIContent(p.content);
-    save(); closeModal(); go(3);
-    toast(p.content ? 'Modèle et textes créés. Tout reste modifiable.' : 'Modèle sur mesure créé. Tout reste modifiable.');
   }
 
   /* ---------- Toast ---------- */
@@ -1083,11 +969,6 @@
       case 'go': go(+t.dataset.n); break;
       case 'sector': pickSector(t.dataset.id); break;
       case 'other': openOther(); break;
-      case 'aiopen': openAI(); break;
-      case 'aimood': aiAns.mood = t.dataset.v; drawAI(); break;
-      case 'aigen': aiGenerate(); break;
-      case 'aipick': applyAI(+t.dataset.i); break;
-      case 'aiback': aiProps = []; drawAI(); break;
       case 'hasqr':
         if (t.dataset.v === 'yes') openScan();
         else { if (hasQR()) S.id = rid(); S.qr = null; save(); render(); window.scrollTo(0, 0); }
@@ -1102,11 +983,7 @@
       case 'other-pick': closeModal(); pickSector(t.dataset.id, true); break;
       case 'modal-close': closeModal(); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
-      case 'palette':
-        S.palette = t.dataset.i === 'ai' ? 'ai' : +t.dataset.i;
-        if (S.palette === 'ai' && S.ai) S.design = S.ai.design;
-        save(); render();
-        break;
+      case 'palette': S.palette = +t.dataset.i; save(); render(); break;
       case 'grp': {
         const el = t.closest('.grp'), id = t.dataset.id;
         el.classList.toggle('open');

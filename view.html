@@ -47,9 +47,7 @@
             const want = q.get('lang') || (bi ? ((navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'fr') : S.lang);
             const cardOf = (l) => S.cards[l === 'en' ? s.id + ':en' : s.id] || (l === 'en' && s.demoEn) || s.demo;
             const en = want === 'en';
-            /* Modèle créé par l’IA : sa palette et son thème remplacent ceux du secteur */
-            const th = S.palette === 'ai' && S.ai ? S.ai : null;
-            m = { card: cardOf(en ? 'en' : 'fr'), sec: s, d: S.design || (th ? th.design : s.rec), pal: th ? th.pal : s.palettes[S.palette] || s.palettes[0], theme: th, link: 'https://votre-site.com/c/' + S.id, lang: en ? 'en' : 'fr', bilingual: bi };
+            m = { card: cardOf(en ? 'en' : 'fr'), sec: s, d: S.design || s.rec, pal: s.palettes[S.palette] || s.palettes[0], link: 'https://votre-site.com/c/' + S.id, lang: en ? 'en' : 'fr', bilingual: bi };
             VC.onLangSwitch = (l) => { if (l === m.lang) return; m.card = cardOf(l); m.lang = l; draw(); };
           }
         } catch (e) { /* pas de brouillon : démo par défaut */ }

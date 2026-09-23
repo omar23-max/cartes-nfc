@@ -246,14 +246,3 @@
 
 /* Essentiel sans nom d’entreprise en haut : on réserve la place du bouton « Partager » au-dessus du nom */
 .vc-d1 .hd:not(:has(.hd-top)) { padding-top: 58px; }
-
-/* ---------- Thèmes générés : typographie, densité ---------- */
-.vc.th-serif h1, .vc.th-serif h2, .vc.th-serif h3, .vc.th-serif .sec-t, .vc.th-serif .nm { font-family: "Cormorant Garamond", Georgia, serif; letter-spacing: 0; }
-.vc.th-serif h1 { font-weight: 600; }
-.vc.th-editorial h1, .vc.th-editorial h2, .vc.th-editorial h3, .vc.th-editorial .sec-t { font-family: Fraunces, Georgia, serif; font-weight: 600; letter-spacing: -.01em; }
-.vc.th-mono h1, .vc.th-mono .sec-t, .vc.th-mono .kicker, .vc.th-mono .role { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; letter-spacing: -.02em; }
-.vc.th-mono .sec-t { text-transform: uppercase; font-size: 11.5px; }
-.vc.thd-compacte .sec { padding-top: 18px; padding-bottom: 18px; }
-.vc.thd-compacte .vc-body { gap: 2px; }
-.vc.thd-aeree .sec { padding-top: 40px; padding-bottom: 40px; }
-.vc.thd-aeree .sec-t { margin-bottom: 18px; }
