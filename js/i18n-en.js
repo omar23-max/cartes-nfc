@@ -20,6 +20,7 @@ window.NFC_EN_UI = {
   'Le lieu': 'The place', 'En séance': 'In session', 'En images': 'In pictures', 'Photos': 'Photos', 'Sélection': 'Selected work', 'Séries': 'Series',
   'Projets': 'Projects', 'Projets récents': 'Recent projects', 'Biens à la vente': 'Properties for sale', 'Chambres': 'Rooms', 'Expériences': 'Experiences',
   'Collection': 'Collection', 'Contenus phares': 'Top content', 'Véhicules à vendre': 'Vehicles for sale', 'L’équipe': 'The team',
+  'Avis Google': 'Google reviews',
   'Le chef': 'The chef', 'Animations et soirées': 'Events & live music',
   'Zone d’intervention': 'Service area', 'Zone desservie': 'Service area', 'Mon secteur': 'My area', 'Qualifications & garanties': 'Licenses & guarantees',
   'Garanties': 'Guarantees', 'Compétences': 'Skills', 'Langues parlées': 'Languages spoken', 'Langues': 'Languages', 'Animaux accueillis': 'Pets we welcome',

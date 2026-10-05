@@ -719,6 +719,9 @@
       make: (en) => blk('reviews', en ? 'Customer reviews' : 'Avis clients', { items: [
         { n: en ? 'Sarah M.' : 'Julie M.', r: en ? 'Customer since 2023' : 'Cliente depuis 2023', t: en ? 'Fast, friendly and professional. Highly recommend!' : 'Rapide, souriant et professionnel. Je recommande sans hésiter !', s: 5 },
         { n: en ? 'David L.' : 'Marc L.', r: en ? 'Verified customer' : 'Client vérifié', t: en ? 'Great value and excellent advice.' : 'Excellent rapport qualité-prix et de très bons conseils.', s: 5 }] }) },
+    { id: 'google', g: 'trust', ic: 'star', n: ['Avis Google', 'Google reviews'], d: ['Votre note Google et un bouton « Laisser un avis ».', 'Your Google rating and a “Leave a review” button.'],
+      make: (en) => blk('greviews', en ? 'Google reviews' : 'Avis Google', { rating: en ? '4.8' : '4,8', count: '52', reviewUrl: 'https://g.page/r/example/review', mapsUrl: 'https://maps.google.com/',
+        text: en ? 'Your review helps us grow. Thank you!' : 'Votre avis nous aide à grandir. Merci !' }) },
     { id: 'stats', g: 'trust', ic: 'trending-up', n: ['Chiffres clés', 'Key figures'], d: ['Années d’expérience, clients, note moyenne…', 'Years of experience, customers, rating…'],
       make: (en) => blk('stats', en ? 'Key figures' : 'En quelques chiffres', { items: [
         { v: en ? '12 yrs' : '12 ans', l: en ? 'of experience' : 'd’expérience' }, { v: '500+', l: en ? 'happy customers' : 'clients satisfaits' }, { v: en ? '4.9/5' : '4,9/5', l: en ? 'average rating' : 'note moyenne' }] }) },
@@ -756,12 +759,13 @@
       if (id === 'faq') return d.type === 'list' && /question|faq/i.test(d.title || '');
       if (id === 'services') return (d.type === 'list' && d.price) || d.type === 'menu';
       if (id === 'text') return false;
+      if (id === 'google') return d.type === 'greviews' || s.blocks.some((b) => b.type === 'greviews');
       if (id === 'gallery' || id === 'imgcar') return d.type === id || d.type === 'gallery';
       return d.type === id;
     });
   }
   const CAT_SUGGEST_BY = { boutiques: ['products'], producteurs: ['products'], restaurant: ['products'], influence: ['products'], coaching: ['products'] };
-  const CAT_SUGGEST = ['reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
+  const CAT_SUGGEST = ['google', 'reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
   const catTile = (x, en) => `<button type="button" class="as-t" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`;
   function catGroups(en) {
     return CAT_GROUPS.map(([g, fr, eng]) => `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${CAT.filter((x) => x.g === g).map((x) => catTile(x, en)).join('')}</div></div>`).join('');
@@ -881,6 +885,12 @@
           <div class="items">${(c.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.cats.${ci}.items.${i}.t`, 'Plat', 'strong')}${mini(`${base}.cats.${ci}.items.${i}.d`, 'Description')}${mini(`${base}.cats.${ci}.items.${i}.p`, 'Prix', 'price')}${mini(`${base}.cats.${ci}.items.${i}.b`, 'Mention (Signature, Végé…)')}</div>${del(`${base}.cats.${ci}.items`, i)}</div>`).join('')}</div>
           ${add(`${base}.cats.${ci}.items`, 'item', 'Ajouter un plat')}</div>`).join('')}${add(base + '.cats', 'cat', 'Ajouter une rubrique')}
           ${area('Note en bas de la carte', base + '.note', { rows: 2, ph: 'Allergies, taxes, provenance des produits…' })}`;
+      case 'greviews':
+        return `<div class="row2">${inp('Note Google (sur 5)', base + '.rating', { ph: '4,8' })}${inp('Nombre d’avis', base + '.count', { ph: '124' })}</div>
+          ${inp('Lien « Laisser un avis »', base + '.reviewUrl', { ph: 'https://g.page/r/…/review', hint: 'Dans votre profil d’entreprise Google : « Demander des avis », puis copiez le lien.' })}
+          ${inp('Lien de votre fiche Google', base + '.mapsUrl', { ph: 'https://maps.google.com/…', hint: 'Cherchez votre commerce sur Google Maps, puis « Partager » et « Copier le lien ».' })}
+          ${area('Petit mot pour vos clients', base + '.text', { rows: 2, ph: 'Votre avis nous aide à grandir. Merci !' })}
+          <p class="f-h">Pensez à mettre votre note à jour de temps en temps.</p>`;
       case 'chef':
         return `<div class="it">${thumbF(base + '.photo')}<div class="it-f">${mini(base + '.name', 'Nom du chef', 'strong')}${mini(base + '.role', 'Titre (ex. Chef propriétaire)', 'full')}</div></div>
           ${area('Présentation', base + '.text', { rows: 4 })}

@@ -366,3 +366,16 @@
 .vc .cv-d { font-size: 14px; color: var(--tx); }
 .vc .mi-b { white-space: nowrap; display: inline-block; }
 .vc-d10 .menu-x .mi, .vc-d10 .chef-cv { text-align: left; }
+
+/* ---------- Avis Google ---------- */
+.vc .gr { padding: 18px; border: 1px solid var(--ln); border-radius: var(--r); background: var(--sf); text-align: center; }
+.vc .gr-top { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.vc .g-logo { width: 26px; height: 26px; flex: none; }
+.vc .gr-n { font-size: 30px; font-weight: 700; line-height: 1; color: var(--tx); }
+.vc .gr-st { position: relative; display: inline-block; font-size: 20px; line-height: 1; letter-spacing: 2px; }
+.vc .gr-st-b { color: var(--ln); }
+.vc .gr-st-f { position: absolute; left: 0; top: 0; overflow: hidden; white-space: nowrap; color: #fbbc05; }
+.vc .gr-c { margin-top: 6px; font-size: 13px; color: var(--mu); }
+.vc .gr-t { margin-top: 10px; font-size: 14px; color: var(--tx); }
+.vc .gr-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+.vc .gr-btns .btn { justify-content: center; }
