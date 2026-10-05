@@ -516,6 +516,7 @@
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
         <div class="ed-links">
           ${langSwitch()}
+          <button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>
           <button class="b sm" data-act="go" data-n="2">Changer de modèle</button>
           <button class="b sm" data-act="go" data-n="3">Changer de couleurs</button>
         </div>
@@ -686,7 +687,13 @@
     { id: 'form', g: 'actions', ic: 'send', n: ['Formulaire de demande', 'Request form'], d: ['Devis, réservation ou question : vous recevez un email.', 'Quotes, bookings or questions, sent to your inbox.'],
       make: (en, pics, c) => blk('form', en ? 'Request a quote' : 'Demande de soumission', { email: (c.contact || {}).email || '', files: true,
         text: en ? 'Tell me what you need, and I’ll get back to you within 24 hours.' : 'Décrivez votre besoin, je vous réponds sous 24 h.' }) },
-    { id: 'action', g: 'actions', ic: 'shopping-bag', n: ['Bouton vers un lien', 'Link button'], d: ['Boutique en ligne, bon cadeau, promotion…', 'Online shop, gift card, promotion…'],
+    { id: 'products', g: 'actions', ic: 'shopping-bag', n: ['Produits', 'Products'], d: ['Photo, prix et bouton Commander par SMS ou email.', 'Photo, price and an Order button by text or email.'],
+      make: (en, pics) => blk('products', en ? 'Shop' : 'Nos produits', { order: 'sms', phone: '', email: '', shopUrl: '', text: '',
+        items: pics.slice(0, 4).map((x, i) => ({
+          t: (en ? ['Signature item', 'Gift box', 'New arrival', 'Best seller'] : ['Produit vedette', 'Coffret cadeau', 'Nouveauté', 'Meilleure vente'])[i],
+          d: en ? 'A short product description' : 'Une courte description du produit',
+          p: (en ? ['$35', '$59', '$24', '$42'] : ['35 $', '59 $', '24 $', '42 $'])[i], img: x.src, url: '' })) }) },
+    { id: 'action', g: 'actions', ic: 'external-link', n: ['Bouton vers un lien', 'Link button'], d: ['Boutique en ligne, bon cadeau, promotion…', 'Online shop, gift card, promotion…'],
       make: (en) => blk('action', en ? 'Online shop' : 'Boutique en ligne', { label: '', url: 'https://example.com',
         text: en ? 'Order online and pick up in store.' : 'Commandez en ligne et récupérez en boutique.' }, { cta: en ? 'Visit the shop' : 'Voir la boutique', icon: 'bag' }) },
     { id: 'links', g: 'actions', ic: 'link', n: ['Liens et documents', 'Links & documents'], d: ['Brochure, grille tarifaire, portfolio…', 'Brochure, price list, portfolio…'],
@@ -709,6 +716,7 @@
       return d.type === id;
     });
   }
+  const CAT_SUGGEST_BY = { boutiques: ['products'], producteurs: ['products'], restaurant: ['products'], influence: ['products'], coaching: ['products'] };
   const CAT_SUGGEST = ['reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
   const catTile = (x, en) => `<button type="button" class="as-t" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`;
   function catGroups(en) {
@@ -716,13 +724,32 @@
   }
   function addSecHTML() {
     const en = ui() === 'en';
-    const sug = CAT_SUGGEST.filter((id) => !catPresent(id)).slice(0, 3).map(catOf);
+    const sug = (CAT_SUGGEST_BY[S.sectorId] || []).concat(CAT_SUGGEST).filter((id) => !catPresent(id)).slice(0, 3).map(catOf);
     return `<div class="add-sec">
       <span class="f-l">${ic('plus', 15)}${en ? 'Add a section' : 'Ajouter une section'}</span>
       ${sug.length ? `<div class="as-g as-sug"><span class="as-h">${en ? 'Suggested for you' : 'Suggérées pour vous'}</span><div class="as-grid">${sug.map((x) => catTile(x, en)).join('')}</div></div>` : ''}
       <div class="as-all">${catGroups(en)}</div>
       <button type="button" class="b as-more" data-act="addcat">${ic('plus', 16)}${en ? `See all sections (${CAT.length})` : `Voir toutes les sections (${CAT.length})`}</button>
     </div>`;
+  }
+  /* Éditer avec l’IA : maquette de l’assistant (activé plus tard côté serveur, la clé IA ne doit jamais être dans le navigateur) */
+  function openAI() {
+    const en = ui() === 'en';
+    const chips = en
+      ? ['Rewrite my bio', 'Translate my card into French', 'Create a FAQ', 'Shorten my texts', 'Suggest colors from my logo']
+      : ['Réécrire ma présentation', 'Traduire ma carte en anglais', 'Créer une FAQ', 'Raccourcir mes textes', 'Proposer des couleurs depuis mon logo'];
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md ai-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${en ? 'Close' : 'Fermer'}">${ic('x')}</button>
+        <h2 id="md-t"><span class="ai-badge"><i data-lucide="sparkles"></i></span>${en ? 'Edit with AI' : 'Éditer avec l’IA'}</h2>
+        <p>${en ? 'Describe what you want to change, and the assistant updates your card for you.' : 'Décrivez ce que vous voulez changer : l’assistant modifie votre carte pour vous.'}</p>
+        <div class="ai-chips">${chips.map((c) => `<button type="button" class="ai-chip" data-act="aichip" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+        <textarea class="ai-in" rows="3" placeholder="${en ? 'E.g. Add a section with my prices for haircuts and beard trims' : 'Ex. : Ajoute une section avec mes tarifs coupe homme et barbe'}"></textarea>
+        <div class="ai-foot"><span class="ai-soon">${ic('clock', 14)}${en ? 'Coming soon: the AI assistant will be enabled with the online version.' : 'Bientôt disponible : l’assistant sera activé avec la version en ligne.'}</span>
+          <button class="b pri" type="button" disabled>${ic('send', 16)}${en ? 'Send' : 'Envoyer'}</button></div>
+      </div>`;
+    $('#modal').classList.add('on');
+    icons();
   }
   /* Téléphone : le catalogue complet s’ouvre dans un panneau qui monte du bas */
   function openCatalog() {
@@ -868,6 +895,15 @@
           <label class="ck"><input type="checkbox" data-path="${base}.files" ${b.files || b.photos ? 'checked' : ''}><span>Permettre au visiteur de joindre des fichiers (PDF, JPG, PNG)</span></label>`;
       case 'tags':
         return `${inp('Éléments', base + '.tags', { hint: 'Séparez-les par des virgules.' })}${def.withText ? inp('Précision', base + '.text') : ''}`;
+      case 'products': {
+        const mode = b.order === 'email' ? 'email' : 'sms';
+        return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it">${thumbF(p + '.img')}<div class="it-f">${mini(p + '.t', 'Nom du produit', 'strong')}${mini(p + '.d', 'Description courte')}${mini(p + '.p', 'Prix (ex. 35 $)', 'price')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'card', 'Ajouter un produit')}
+          <div class="f"><span class="f-l">Comment vos clients commandent-ils ?</span><div class="seg">${[['sms', 'Par SMS'], ['email', 'Par email']].map(([v, l]) => `<button type="button" class="${mode === v ? 'on' : ''}" data-act="bkmode" data-path="${base}.order" data-v="${v}">${l}</button>`).join('')}</div>
+          <span class="f-h">Le bouton « Commander » ouvre un message déjà rédigé avec le nom et le prix du produit. Le paiement en ligne arrivera avec la boutique.</span></div>
+          ${mode === 'sms' ? inp('Numéro qui reçoit les commandes', base + '.phone', { type: 'tel', ph: card().contact.phone || '', hint: 'Vide = votre téléphone.' }) : inp('Adresse qui reçoit les commandes', base + '.email', { type: 'email', ph: card().contact.email || '', hint: 'Vide = votre email.' })}
+          ${inp('Lien vers votre boutique complète (facultatif)', base + '.shopUrl', { ph: 'https://…', hint: 'Ajoute un bouton « Voir toute la boutique » sous les produits.' })}
+          ${area('Texte d’accompagnement', base + '.text', { rows: 2 })}`;
+      }
       case 'links':
         return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f two">${mini(`${base}.items.${i}.label`, 'Intitulé', 'strong')}${mini(`${base}.items.${i}.url`, 'Lien https://…')}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'link', 'Ajouter un lien')}`;
       case 'video':
@@ -1203,6 +1239,8 @@
         break;
       }
       case 'addcat': openCatalog(); break;
+      case 'aiedit': openAI(); break;
+      case 'aichip': { const ta = $('.ai-in'); if (ta) { ta.value = t.dataset.v; ta.focus(); } break; }
       case 'omove': {
         const o = VC.sectionOrder(card(), sec(), S.design), i = o.indexOf(t.dataset.k), j = i + +t.dataset.d;
         if (i < 0 || j < 0 || j >= o.length) break;

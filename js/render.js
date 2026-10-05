@@ -563,6 +563,25 @@
       if (!items.length) return '';
       return `<div class="links">${items.map((x) => `<a class="lk" href="${esc(url(x.url))}" target="_blank" rel="noopener"><span class="lk-ic">${ic('file', 18)}</span><span class="lk-l">${esc(x.label)}</span>${ic('arrowur', 16)}</a>`).join('')}</div>`;
     },
+    /* Produits : photo, nom, prix et bouton Commander (SMS ou email pré-rédigé) ; lien vers la boutique complète */
+    products(def, b, m) {
+      const items = (b.items || []).filter((x) => x.t);
+      if (!items.length) return '';
+      const c = m.card.contact || {}, mode = b.order === 'email' ? 'email' : 'sms';
+      const phone = tel(b.phone || c.phone), email = b.email || c.email;
+      const href = (x) => {
+        const what = x.t + (x.p ? ` (${x.p})` : '');
+        const msg = L2(`Bonjour, je souhaite commander : ${what}. Merci !`, `Hi, I’d like to order: ${what}. Thank you!`);
+        if (mode === 'email' && email) return `mailto:${email}?subject=${encodeURIComponent(L2('Commande : ', 'Order: ') + x.t)}&body=${encodeURIComponent(msg)}`;
+        if (phone) return `sms:${phone}?&body=${encodeURIComponent(msg)}`;
+        return email ? `mailto:${email}?subject=${encodeURIComponent(L2('Commande : ', 'Order: ') + x.t)}&body=${encodeURIComponent(msg)}` : '';
+      };
+      const label = b.label || L2('Commander', 'Order');
+      return `${b.text ? `<p class="txt">${nl(b.text)}</p>` : ''}<div class="prods">${items.map((x) => {
+        const h = href(x);
+        return `<div class="pd">${x.img ? `<div class="pd-im"><img src="${img(x.img, m)}" alt="" loading="lazy"></div>` : ''}<div class="pd-b"><div class="pd-t">${esc(x.t)}</div>${x.d ? `<div class="pd-d">${esc(x.d)}</div>` : ''}<div class="pd-f">${x.p ? `<span class="pd-p">${esc(x.p)}</span>` : '<span></span>'}${h ? `<a class="pd-btn" href="${esc(h)}">${ic(mode === 'email' ? 'mail' : 'sms', 14)}<span>${esc(label)}</span></a>` : ''}</div></div></div>`;
+      }).join('')}</div>${b.shopUrl ? `<a class="btn ghost pd-shop" href="${esc(url(b.shopUrl))}" target="_blank" rel="noopener">${ic('bag', 18)}<span>${L2('Voir toute la boutique', 'See the full shop')}</span></a>` : ''}`;
+    },
     video(def, b, m) {
       if (!b.url && !b.src) return '';
       const cover = img(b.cover || 'ph:photo|', m);
