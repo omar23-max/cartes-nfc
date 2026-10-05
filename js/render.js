@@ -334,6 +334,23 @@
       return `<header class="hd">${co ? `<p class="p10-co">${co}</p>` : ''}<div class="p10-arch">${hasFace ? `<img src="${av}" alt="">` : `<span>${esc(initials)}</span>`}</div><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<p class="p10-orn" aria-hidden="true"><i></i>◆<i></i></p>${spec ? `<p class="spec">${spec}</p>` : ''}</header>`;
     }
 
+    /* ---------- Mises en page beauté (passe-partout) ---------- */
+    if (d === 'd11') {
+      return `<header class="hd"><div class="s11-cover">${media}</div><div class="s11-id"><img class="av" src="${av}" alt=""><p class="s11-co">${co || esc(sec.name)}</p><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<span class="s11-line" aria-hidden="true"></span>${spec ? `<p class="spec">${spec}</p>` : ''}</div></header>`;
+    }
+    if (d === 'd12') {
+      return `<header class="hd"><div class="p12-oval"><img src="${av}" alt=""></div>${co ? `<p class="p12-co">${co}</p>` : ''}<h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}${spec ? `<div class="p12-chips">${spec.split(' · ').map((x) => `<span>${x}</span>`).join('')}</div>` : ''}</header>`;
+    }
+    if (d === 'd13') {
+      return `<header class="hd"><div class="b13"><div class="b13-img">${media}</div><div class="b13-id">${co ? `<p class="b13-co">${co}</p>` : ''}<h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<img class="av" src="${av}" alt=""></div></div>${spec ? `<p class="spec b13-spec">${spec}</p>` : ''}</header>`;
+    }
+    if (d === 'd14') {
+      return `<header class="hd"><div class="v14-bg">${media}<div class="v14-shade"></div></div><div class="v14-id"><img class="av" src="${av}" alt="">${co ? `<p class="v14-co">${co}</p>` : ''}<h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}${spec ? `<p class="spec">${spec}</p>` : ''}</div></header>`;
+    }
+    if (d === 'd15') {
+      return `<header class="hd"><div class="g15-halo" aria-hidden="true"><i></i><i></i><i></i></div><div class="g15-card"><img class="av" src="${av}" alt=""><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}${spec ? `<p class="spec">${spec}</p>` : ''}${co ? `<p class="g15-co">${co}</p>` : ''}</div></header>`;
+    }
+
     if (d === 'd2') {
       const portrait = sec.establishment ? cover : id.photo ? img(id.photo, m) : '';
       return `<header class="hd"><p class="kicker">${logo ? `<img class="lg" src="${logo}" alt="">` : ''}<span>${co || esc(sec.name)}</span></p><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}${spec ? `<p class="spec">${spec}</p>` : ''}${portrait ? `<div class="portrait"><img src="${portrait}" alt=""></div>` : ''}</header>`;

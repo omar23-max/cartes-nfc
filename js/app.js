@@ -36,11 +36,18 @@
     catch (e) { toast('Stockage du navigateur plein : retirez quelques photos.'); }
   }
 
-  const sec = () => SECTORS.find((s) => s.id === S.sectorId);
+  /* Secteur choisi, vu à travers le métier choisi (exemple, couleurs et photos du métier) */
+  const baseSec = () => SECTORS.find((s) => s.id === S.sectorId);
+  const prof = () => NFC.profileOf(baseSec(), S.prof);
+  const sec = () => { const b = baseSec(), p = prof(); return p ? NFC.withProfile(b, p) : b; };
+  /* Clé des cartes enregistrées : secteur + métier (chaque métier garde sa propre carte) */
+  const kid = () => { const p = prof(); return S.sectorId + (p ? '~' + p.id : ''); };
+  const mediaNow = () => { const p = prof(); return (p && p.media) || (NFC.MEDIA || {})[S.sectorId] || {}; };
+  const profName = (p) => (p ? p.n[ui() === 'en' ? 1 : 0] : '');
   /* Langue de la carte : celle choisie, sinon celle du site */
   /* Langue de la carte : celle du site, sauf carte bilingue où l’on choisit la version à modifier */
   const lang = () => (bili() && (S.lang === 'en' || S.lang === 'fr') ? S.lang : ui());
-  const ckey = (id = S.sectorId) => (lang() === 'en' ? id + ':en' : id);
+  const ckey = (id = kid()) => (lang() === 'en' ? id + ':en' : id);
   const demoOf = (s) => (lang() === 'en' && s.demoEn ? s.demoEn : s.demo);
   const card = () => S.cards[ckey()];
   const bili = () => !!(S.bili && S.bili[S.sectorId]);
@@ -66,7 +73,7 @@
     if (!s || S.cards[ckey()]) return;
     S.cards[ckey()] = clone(demoOf(s));
     /* La nouvelle version reprend les photos et vidéos de l’autre */
-    const other = S.cards[lang() === 'en' ? s.id : s.id + ':en'];
+    const other = S.cards[lang() === 'en' ? kid() : kid() + ':en'];
     if (other) mirrorMedia(other, S.cards[ckey()], lang() === 'en');
     normSocials(S.cards[ckey()]);
   };
@@ -147,7 +154,7 @@
   function syncMedia() {
     const s = sec();
     if (!s) return;
-    const a = S.cards[ckey()], b = S.cards[lang() === 'en' ? s.id : s.id + ':en'];
+    const a = S.cards[ckey()], b = S.cards[lang() === 'en' ? kid() : kid() + ':en'];
     if (a && b) mirrorMedia(a, b, lang() !== 'en');
   }
   /* Textes par défaut proposés dans l’éditeur, dans la langue de la carte */
@@ -241,7 +248,9 @@
     const s = sec();
     return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: s.palettes[p] || s.palettes[0], link: link(), lang: lang(), bilingual: bili() };
   };
-  const designOf = (id) => DESIGNS.find((d) => d.id === id);
+  const designOf = (id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id) || DESIGNS[0];
+  /* Mises en page proposées : les 10 communes + celles propres au secteur (ex. beauté) */
+  const designsNow = () => DESIGNS.concat((sec() && sec().designs) || []);
   const code = (d = S.design) => `${sec().code}-${String(d || sec().rec).toUpperCase()}`;
 
   const getP = (o, path) => path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);
@@ -338,8 +347,36 @@
   /* Photo d’arrière-plan de chaque secteur : la couverture de sa carte d’exemple */
   const bgOf = (s) => ((NFC.MEDIA || {})[s.id] || {}).cover || (s.demo && s.demo.identity && s.demo.identity.cover) || '';
 
+  /* ---------- Étape 1 bis : le métier, pour les secteurs qui en proposent plusieurs ---------- */
+  let profPick = false;
+  function stepProf() {
+    const b = baseSec(), cur = prof(), en = ui() === 'en';
+    const tiles = b.profiles.map((p) => `
+      <button class="tile has-bg ${cur && cur.id === p.id && S.design ? 'sel' : ''}" data-act="profile" data-id="${p.id}" style="background-image:url('${(p.media && p.media.cover) || ''}')">
+        <span class="tile-top"><span class="tile-ic"><i data-lucide="${p.icon}"></i></span></span>
+        <span class="tile-n">${p.n[en ? 1 : 0]}</span>
+        <span class="tile-ex">${p.ex[en ? 1 : 0]}</span>
+      </button>`).join('');
+    return `<section class="wrap">
+      <button class="back" data-act="profback">${ic('arrowl', 16)}${en ? 'Change industry' : 'Changer de secteur'}</button>
+      ${head(en ? 'What is your profession?' : 'Quel est votre métier ?', en ? `${b.profiles.length} profiles for <b>${b.name}</b>, each with its own example, colors and photos. Everything stays customizable.` : `${b.profiles.length} métiers pour <b>${b.name}</b>, chacun avec son exemple, ses couleurs et ses photos. Tout reste personnalisable.`)}
+      <div class="tiles">${tiles}</div>
+    </section>`;
+  }
+  function pickProfile(pid) {
+    const b = baseSec();
+    S.prof = S.prof || {};
+    if ((S.prof[b.id] || b.profiles[0].id) !== pid) S.design = null;
+    S.prof[b.id] = pid;
+    profPick = false;
+    S.palette = 0;
+    ensureCard();
+    go(2);
+  }
+
   function step1() {
     if (S.qr === undefined) return step0();
+    if (profPick && baseSec() && baseSec().profiles) return stepProf();
     const tiles = SECTORS.map((s) => `
       <button class="tile ${s.active ? '' : 'soon'} ${S.sectorId === s.id ? 'sel' : ''} ${bgOf(s) ? 'has-bg' : ''}" data-act="sector" data-id="${s.id}"${bgOf(s) ? ` style="background-image:url('${bgOf(s)}')"` : ''}>
         <span class="tile-top"><span class="tile-ic"><i data-lucide="${s.icon}"></i></span><span class="tile-code">${s.code}</span>${s.active ? '' : '<span class="tile-b">Bientôt</span>'}</span>
@@ -350,11 +387,6 @@
       ${head('Quel est votre secteur d’activité ?', 'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.')}
       ${qrNote()}
       <div class="tiles">${tiles}
-        <button class="tile other" data-act="other">
-          <span class="tile-top"><span class="tile-ic"><i data-lucide="circle-help"></i></span></span>
-          <span class="tile-n">Je ne trouve pas mon secteur</span>
-          <span class="tile-ex">Répondez à une question, nous vous orientons vers le bon modèle.</span>
-        </button>
       </div>
     </section>`;
   }
@@ -366,6 +398,7 @@
       return;
     }
     if (S.sectorId !== id) { S.sectorId = id; S.design = null; }
+    if (s.profiles && !fromOther) { profPick = true; S.step = 1; save(); render(); window.scrollTo(0, 0); return; }
     ensureCard();
     if (fromOther) toast(`Nous vous proposons « ${s.name} ». Tout reste personnalisable.`);
     go(2);
@@ -479,7 +512,7 @@
   /* ---------- Étape 2 : modèle ---------- */
   function step2() {
     const s = sec();
-    const cards = DESIGNS.map((d) => `
+    const cards = designsNow().map((d) => `
       <div class="tpl ${S.design === d.id ? 'sel' : ''}" role="button" tabindex="0" aria-label="Choisir le modèle ${d.name}" data-act="design" data-id="${d.id}">
         <div class="tpl-view"><div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(d.id), { thumb: true }))}</div></div></div>
           <button type="button" class="tpl-zoom" data-act="fullpreview" data-id="${d.id}" aria-label="Aperçu plein écran du modèle ${d.name}">${ic('eye', 15)}Aperçu</button></div>
@@ -490,9 +523,9 @@
         </div>
       </div>`).join('');
     return `<section class="wrap">
-      ${back(1, 'Changer de secteur')}
+      ${back(1, 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
       ${langSwitch()}
-      ${head('Choisissez votre modèle', `${DESIGNS.length} mises en page pour <b>${s.name}</b>. Faites défiler chaque miniature pour voir toute la carte, puis cliquez pour la choisir. Vous pourrez en changer à tout moment sans perdre vos informations.`)}
+      ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Faites défiler chaque miniature pour voir toute la carte, puis cliquez pour la choisir. Vous pourrez en changer à tout moment sans perdre vos informations.`)}
       <div class="tpls">${cards}</div>
     </section>`;
   }
@@ -525,7 +558,7 @@
     const s = sec(), p = s.palettes[S.palette];
     return `<section class="wrap wide">
       <div class="ed-bar">
-        <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
+        <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
         <div class="ed-links">
           ${langSwitch()}
           <button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>
@@ -819,7 +852,7 @@
 
   /* Nouvelle section pré-remplie avec des médias d’exemple, pour voir tout de suite le rendu */
   function newSection(t) {
-    const m = (NFC.MEDIA || {})[S.sectorId] || {};
+    const m = mediaNow();
     const pics = (m.gallery || []).map((x) => ({ src: x.src, cap: x.cap }))
       .concat((m.cards || []).map((src) => ({ src, cap: '' })));
     if (!pics.length && m.cover) pics.push({ src: m.cover, cap: '' });
@@ -1133,6 +1166,9 @@
     switch (a) {
       case 'go': go(+t.dataset.n); break;
       case 'sector': pickSector(t.dataset.id); break;
+      case 'profile': pickProfile(t.dataset.id); break;
+      case 'profpick': profPick = true; go(1); break;
+      case 'profback': profPick = false; render(); window.scrollTo(0, 0); break;
       case 'other': openOther(); break;
       case 'hasqr':
         if (t.dataset.v === 'yes') openScan();
@@ -1238,7 +1274,7 @@
       case 'addsec': {
         const cs = card().custom || (card().custom = []), item = catOf(t.dataset.t);
         if (!item) break;
-        const m = (NFC.MEDIA || {})[S.sectorId] || {};
+        const m = mediaNow();
         const pics = (m.gallery || []).map((x) => ({ src: x.src, cap: x.cap })).concat((m.cards || []).map((src) => ({ src, cap: '' })));
         const ns = Object.assign(item.make ? item.make(lang() === 'en', pics, card()) : newSection(t.dataset.t), { cid: rid(), on: true });
         cs.push(ns);
