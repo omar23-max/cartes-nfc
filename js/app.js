@@ -485,7 +485,7 @@
         <span class="pal-n">${p.name}</span>
         <span class="pal-ck">${ic('check', 16)}</span>
       </button>`).join('');
-    return `<section class="wrap">
+    return `<section class="wrap s3w">
       ${back(2, 'Changer de modèle')}
       ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 6 palettes pensées pour votre secteur.`)}
       <div class="split s3">

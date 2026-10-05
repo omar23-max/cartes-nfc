@@ -166,6 +166,18 @@ svg.lucide { width: 22px; height: 22px; }
 .pals .pal-n { min-width: 0; font-size: 13.5px; line-height: 1.2; overflow-wrap: anywhere; }
 .pals .pal-ck { display: none; }
 .pals .pal.sel { box-shadow: 0 0 0 1.5px var(--ink); }
+/* Étape 3 : titre et couleurs remontés pour laisser voir la carte */
+.s3w { margin-top: -14px; }
+.s3w .back { margin-bottom: 4px; }
+.s3w .sh { margin-bottom: 14px; }
+.s3w .sh h1 { margin-bottom: 4px; }
+@media (max-width: 900px) {
+  .s3w { margin-top: -18px; }
+  .s3w .back { margin-bottom: 0; padding-block: 4px; }
+  .s3w .sh { margin-bottom: 12px; }
+  .s3w .sh h1 { font-size: 22px; }
+  .s3w .sh p { font-size: 14px; }
+}
 .side > .b.lg { align-self: flex-start; }
 .pv-col { display: flex; flex-direction: column; align-items: center; }
 .pv-col.stick { position: sticky; top: 84px; }
