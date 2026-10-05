@@ -524,7 +524,7 @@
     return `<section class="wrap">
       ${back(1, 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
       ${langSwitch()}
-      ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Touchez-en une pour la choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.`)}
+      ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Cliquez pour choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.`)}
       <div class="tpls">${cards}</div>
     </section>`;
   }
