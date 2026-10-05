@@ -501,14 +501,14 @@
     demo: {
       primary: 'shop',
       identity: id('Atelier Grace', 'Bijoux faits main', 'Argent recyclé · Pièces uniques', '', 'L’établi', 'ph:logo'),
-      contact: ct('06 90 80 70 60', 'hello@atelier-solene.fr', 'atelier-solene.fr'),
+      contact: ct('06 90 80 70 60', 'hello@atelier-grace.fr', 'atelier-grace.fr'),
       socials: so({ instagram: 'https://instagram.com/', tiktok: 'https://tiktok.com/' }),
       blocks: {
         about: text('Des bijoux sobres et durables, façonnés un à un dans mon atelier lyonnais à partir d’argent 100 % recyclé.'),
         collection: cards([['Bague Onde', 'Argent 925 recyclé', '68 €'], ['Créoles Lune', 'Martelées à la main', '85 €'], ['Collier Galet', 'Pièce unique', '120 €']]),
         craft: text('Chaque pièce est sciée, soudée et polie à la main. Comptez 2 à 4 heures de travail par bijou.', false),
         shop: act('Visiter la boutique', EX, 'Livraison offerte dès 60 €.'),
-        surmesure: form('hello@atelier-solene.fr', 'Alliances, cadeaux, gravures : décrivez la pièce dont vous rêvez.', true, false),
+        surmesure: form('hello@atelier-grace.fr', 'Alliances, cadeaux, gravures : décrivez la pièce dont vous rêvez.', true, false),
         gallery: gal(['L’établi', 'Polissage', 'Bague Onde', 'Emballage'], false),
         location: loc('14 rue Burdeau, 69001 Lyon', 'Atelier-boutique sur les pentes de la Croix-Rousse'),
         hours: hours([['Mercredi – Samedi', '11h – 19h'], ['Dimanche – Mardi', 'Sur rendez-vous']]),

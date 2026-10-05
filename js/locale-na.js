@@ -53,7 +53,7 @@
       'identity.role': 'Courtière immobilière résidentielle',
       'identity.specialty': 'Plateau-Mont-Royal · Ventes et évaluations',
       'identity.company': 'Parker Immobilier',
-      'contact.phone': '+1 514 555-0167', 'contact.whatsapp': '+1 514 555-0167', 'contact.email': 'olivia@parkerimmo.ca', 'contact.website': 'fontaineimmo.ca',
+      'contact.phone': '+1 514 555-0167', 'contact.whatsapp': '+1 514 555-0167', 'contact.email': 'olivia@parkerimmo.ca', 'contact.website': 'parkerimmo.ca',
       'blocks.about.text': 'Installée sur le Plateau depuis 10 ans, je connais chaque rue, chaque copropriété et les prix réels du quartier.\nJe vous accompagne de l’évaluation jusqu’à la signature chez le notaire, avec une seule interlocutrice du début à la fin.',
       'blocks.biens.items': [
         { t: 'Condo 5 ½ · 1 100 pi²', d: 'Plateau-Mont-Royal · Balcon · 3e étage', p: '589 000 $', img: 'media/immobilier/15851.jpg', url: '' },
@@ -106,7 +106,7 @@
     coaching: {
       'identity.role': 'Entraîneur personnel certifié',
       'identity.specialty': 'Perte de poids · Remise en forme',
-      'contact.phone': '+1 514 555-0107', 'contact.whatsapp': '+1 514 555-0107', 'contact.email': 'kevin@murphycoaching.ca', 'contact.website': 'leroycoaching.ca',
+      'contact.phone': '+1 514 555-0107', 'contact.whatsapp': '+1 514 555-0107', 'contact.email': 'kevin@murphycoaching.ca', 'contact.website': 'murphycoaching.ca',
       'blocks.about.text': 'Ancien athlète, j’entraîne depuis 9 ans des personnes qui veulent reprendre le sport sans se blesser.\nChaque programme part de votre niveau réel, de votre horaire et de vos objectifs : perte de poids, renforcement ou préparation d’un marathon.',
       'blocks.programmes.items': L([['Séance individuelle', '1 h · à domicile ou au gym', '75 $'], ['Forfait 10 séances', 'Suivi nutrition inclus', '690 $'], ['Petit groupe', '4 personnes maximum', '30 $ / pers.'], ['Programme en ligne', '12 semaines · application + visio', '199 $']]),
       'blocks.planning.rows': H([['Lundi', 'Cross-training · 18 h 30'], ['Mercredi', 'Renforcement · 12 h 15'], ['Samedi', 'Course au parc · 9 h']]),
@@ -147,7 +147,7 @@
     evenementiel: {
       'identity.role': 'Planificatrice de mariages',
       'identity.specialty': 'Mariages sur mesure dans les Laurentides',
-      'contact.phone': '+1 450 555-0163', 'contact.whatsapp': '+1 450 555-0163', 'contact.email': 'ashley@collinsevents.ca', 'contact.website': 'duboisevents.ca',
+      'contact.phone': '+1 450 555-0163', 'contact.whatsapp': '+1 450 555-0163', 'contact.email': 'ashley@collinsevents.ca', 'contact.website': 'collinsevents.ca',
       'blocks.formules.items': L([['Coordination du jour J', 'Présence de 10 h à minuit', 'dès 1 800 $'], ['Organisation partielle', 'Lieu, traiteur et décor', 'dès 4 500 $'], ['Organisation complète', 'De A à Z, sur 12 mois', 'Sur soumission']]),
       'blocks.dispo.text': 'Indiquez la date, le lieu envisagé, le nombre d’invités et votre budget : je vous confirme ma disponibilité sous 48 h.',
       'blocks.reviews.items': R([['Emma & Liam', 'Mariage à Mont-Tremblant', 'Nous avons profité de chaque minute. Tout était parfait.'], ['Sarah & Nathan', 'Mariage au domaine', 'Ashley a géré chaque imprévu sans que nous le voyions.']]),

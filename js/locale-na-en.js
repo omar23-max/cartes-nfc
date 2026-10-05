@@ -308,9 +308,91 @@
     return v;
   };
 
+  /* ---- Version anglaise = marché américain ----
+     Chaque secteur est situé dans une ville des États-Unis : adresses, quartiers, zones d’intervention, indicatif téléphonique.
+     Les domaines .ca deviennent .com. La version française garde ses exemples canadiens. */
+  const US = {
+    sante: { tel: '617', rep: [
+      ['the Université de Montréal', 'Tufts University'], ['cliniquedeserables', 'mapledentalboston'],
+      ['4210 Saint-Denis Street, Montreal, QC H2J 2K8', '4210 Beacon Street, Boston, MA 02215'],
+      ['Mont-Royal metro · Street parking · Wheelchair accessible', 'Green Line (T) nearby · Street parking · Wheelchair accessible']] },
+    conseil: { tel: '212', rep: [
+      ['RRSPs, TFSAs', '401(k)s, IRAs'], ['RRSP, TFSA, mutual funds, GICs', '401(k), IRA, mutual funds, CDs'], ['RRSP / RRIF withdrawals', '401(k) / IRA withdrawals'],
+      ['our RRSPs', 'our 401(k)s'], ['HEC Montréal · FP Canada', 'NYU Stern · CFP Board'], ['banquehorizon', 'horizonbank'],
+      ['1000 De La Gauchetière Street West, Suite 2400, Montreal, QC H3B 4W5', '1000 Avenue of the Americas, Suite 2400, New York, NY 10036'],
+      ['Bonaventure metro · Indoor parking · Wheelchair accessible', '42nd St–Bryant Park subway · Garage parking · Wheelchair accessible']] },
+    pro: { tel: '312', rep: [
+      ['B2B logistics · Canada – U.S.', 'B2B logistics · U.S. – Canada'], ['between Canada and the U.S.', 'between the U.S. and Canada'],
+      ['200 Bay Street, Suite 1800, Toronto, ON M5J 2J2', '200 West Madison Street, Suite 1800, Chicago, IL 60606']] },
+    freelance: { tel: '512', rep: [['small businesses in Quebec and the U.S.', 'small businesses across the U.S.']] },
+    immobilier: { tel: '718', rep: [
+      ['Plateau-Mont-Royal, Mile End, Rosemont, Outremont', 'Park Slope, Prospect Heights, Carroll Gardens, Windsor Terrace'],
+      ['Based in the Plateau', 'Based in Park Slope'], ['Sellers in the Plateau', 'Sellers in Park Slope'], ['Plateau-Mont-Royal', 'Park Slope'],
+      ['Laval · ', 'Bay Ridge · '], ['parkerimmo', 'parkerhomes']] },
+    archi: { tel: '215', rep: [['Montreal’s old plexes and houses', 'Philadelphia’s old rowhouses'], ['Plateau-Mont-Royal', 'Fishtown']] },
+    artisans: { tel: '773', rep: [
+      ['Montreal, Laval, Longueuil, Brossard, Boucherville', 'Chicago, Evanston, Oak Park, Skokie, Cicero'],
+      ['on the island of Montreal', 'within Chicago city limits'], ['plomberiewalsh', 'walshplumbing']], reviews: ['Evanston', 'Lincoln Park'] },
+    beaute: { tel: '323', rep: [
+      ['312 Saint-Paul Street West, Montreal, QC H2Y 2A3', '1312 Sunset Boulevard, Los Angeles, CA 90026'],
+      ['Square-Victoria metro · Old Montreal', 'Echo Park · Street parking']] },
+    coaching: { tel: '303', rep: [
+      ['La Fontaine Park, Montreal, QC H2L 3M9', 'Washington Park, Denver, CO 80209'],
+      ['Meet at the park chalet, Sherbrooke Street side', 'Meet at the boathouse, Downing Street side'], ['Montreal Marathon', 'Denver Marathon']] },
+    restaurant: { tel: '415', rep: [
+      ['Quebec tomatoes', 'Heirloom tomatoes'], ['opentable.ca/r/le-comptoir-des-halles-montreal', 'opentable.com/r/le-comptoir-des-halles-san-francisco'],
+      ['4521 Saint-Laurent Boulevard, Montreal, QC H2T 1R2', '4521 Valencia Street, San Francisco, CA 94110'],
+      ['Patio · Wheelchair accessible · Mont-Royal metro', 'Patio · Wheelchair accessible · 24th St BART']] },
+    producteurs: { tel: '802', rep: [
+      ['on Île d’Orléans', 'in the Champlain Valley'], ['Old Port Market, Quebec City', 'Burlington Farmers Market'],
+      ['1234 Chemin Royal, Saint-Laurent-de-l’Île-d’Orléans, QC G0A 3Z0', '1234 Route 7, Charlotte, VT 05445'], ['quatresaisons', 'fourseasonsfarm'], ['ferme@', 'hello@']] },
+    evenementiel: { tel: '845', rep: [['in the Laurentians', 'in the Hudson Valley'], ['Wedding in Mont-Tremblant', 'Wedding in Rhinebeck']] },
+    portfolio: { tel: '206', rep: [] },
+    musique: { tel: '504', rep: [
+      ['Upstairs Jazz Bar, Montreal', 'The Blue Room, New Orleans'], ['Le Grand Théâtre, Quebec City', 'Riverside Theater, Nashville'], ['Hôtel Le Germain', 'The Ellis Hotel']] },
+    influence: { tel: '310', rep: [
+      ['in Quebec and across North America', 'across the U.S.'], ['audience in Canada', 'audience in the U.S.'],
+      ['IGA, Air Canada, Le Creuset, HelloFresh', 'Whole Foods, Delta, Le Creuset, HelloFresh'], ['Tourisme Québec', 'Visit California']] },
+    hebergement: { tel: '413', rep: [
+      ['Auberge des Érables', 'The Maple Inn'], ['In the heart of the Eastern Townships', 'In the heart of the Berkshires'], ['Lake Massawippi', 'Stockbridge Bowl'],
+      ['airbnb.ca/rooms/auberge-des-erables', 'airbnb.com/rooms/the-maple-inn'], ['aubergedeserables', 'themapleinn'],
+      ['45 Chemin du Lac, North Hatley, QC J0B 2C0', '45 Lake Road, Lenox, MA 01240'],
+      ['1 hr 30 from Montreal · 20 min from Sherbrooke', '2 hrs 30 from New York City · 15 min from Pittsfield']] },
+    tourisme: { tel: '207', rep: [
+      ['Quebec City, Charlevoix & the St. Lawrence', 'Bar Harbor, Acadia & the Maine coast'], ['Born in Quebec City', 'Born in Bar Harbor'],
+      ['the lanes of Old Quebec', 'the lanes of old Bar Harbor'], ['the whales of the St. Lawrence', 'the whales of the Gulf of Maine'],
+      ['the landscapes of Charlevoix', 'the landscapes of Acadia'], ['Tadoussac', 'Frenchman Bay'], ['Old Quebec food tour', 'Bar Harbor food tour'],
+      ['Charlevoix hike', 'Acadia hike'], ['Old Quebec · ', 'Downtown Bar Harbor · '], ['Old Quebec tour', 'Bar Harbor tour'],
+      ['we saw Quebec City', 'we saw Bar Harbor'], ['fleuvedecouvertes', 'coastdiscoveries']] },
+    animaux: { tel: '512', rep: [
+      ['Montreal, Laval, Longueuil, Brossard', 'Austin, Round Rock, Cedar Park, Pflugerville'], ['within 25 km (15 miles)', 'within 15 miles'], ['poilsetpattes', 'pawsandwhiskers']] },
+    boutiques: { tel: '503', rep: [
+      ['Made in Montreal', 'Made in Portland'], ['my Mile End studio', 'my Alberta Arts studio'],
+      ['Free shipping in Canada and the U.S. on orders over $100.', 'Free U.S. shipping on orders over $100.'],
+      ['5334 Saint-Laurent Boulevard, Montreal, QC H2T 1S1', '5334 NE Alberta Street, Portland, OR 97211'], ['Studio-shop in the Mile End', 'Studio-shop in the Alberta Arts District']] },
+    auto: { tel: '214', rep: [
+      ['45,000 km (28,000 mi)', '28,000 mi'], ['58,000 km (36,000 mi)', '36,000 mi'],
+      ['1800 Chemin de Chambly, Longueuil, QC J4J 3X9', '1800 Garland Road, Dallas, TX 75218']] },
+  };
+  const usa = (v, u) => {
+    if (typeof v === 'string') {
+      const x = u.rep.reduce((s, [a, b]) => s.split(a).join(b), v);
+      return x.replace(/\+1 (514|438|450|418|819|416) /g, '+1 ' + u.tel + ' ').replace(/\b([a-z0-9-]+)\.ca\b/g, '$1.com').replace(/\bbonjour@/g, 'hello@');
+    }
+    if (Array.isArray(v)) return v.map((x) => usa(x, u));
+    if (v && typeof v === 'object') { const o = {}; for (const k in v) o[k] = usa(v[k], u); return o; }
+    return v;
+  };
+
   NFC.SECTORS.forEach((s) => {
     if (!s.demo) return;
-    const en = tr(clone(s.demo));
+    let en = tr(clone(s.demo));
+    const u = US[s.id];
+    if (u) {
+      en = usa(en, u);
+      const rv = en.blocks && en.blocks.reviews;
+      if (u.reviews && rv && rv.items) u.reviews.forEach((r, i) => { if (rv.items[i]) rv.items[i].r = r; });
+    }
     /* Boutons, messages SMS et listes de choix : on laisse les valeurs par défaut, traduites automatiquement */
     Object.values(en.blocks || {}).forEach((b) => { if (b && typeof b === 'object') { if ('label' in b) b.label = ''; if ('smsLabel' in b) b.smsLabel = ''; if ('tpl' in b) b.tpl = ''; } });
     s.demoEn = en;
