@@ -286,6 +286,21 @@ svg.lucide { width: 22px; height: 22px; }
 .add-sec { display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1.5px dashed var(--acc); border-radius: var(--r); background: var(--acc-s); }
 .add-sec .f-l { display: flex; align-items: center; gap: 6px; color: var(--acc); font-size: 14px; }
 .add-sec-b { display: flex; flex-wrap: wrap; gap: 8px; }
+/* Catalogue de sections : tuiles icône + nom + description, par groupes */
+.add-sec { gap: 14px; }
+.as-g { display: flex; flex-direction: column; gap: 8px; }
+.as-h { font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--mut); }
+.as-sug .as-h { color: var(--acc); }
+.as-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 8px; }
+.as-t { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; row-gap: 2px; align-items: center; padding: 10px 12px; text-align: left; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--ink); cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+.as-t:hover { border-color: var(--acc); box-shadow: 0 0 0 1px var(--acc); }
+.as-ic { grid-row: span 2; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--acc-s); color: var(--acc); }
+.as-ic svg { width: 18px; height: 18px; }
+.as-n { font-size: 14px; font-weight: 600; line-height: 1.2; }
+.as-d { font-size: 12px; line-height: 1.3; color: var(--mut); }
+.as-more { display: none; }
+.sheet-b { display: flex; flex-direction: column; gap: 16px; }
+.md.sheet { width: min(720px, 100%); max-height: 86vh; overflow-y: auto; }
 .demo-tag { font-size: 12px; font-weight: 600; color: #9a6400; background: #fdf3dc; padding: 4px 8px; border-radius: 6px; }
 .it-f.rev-f { grid-template-columns: 1fr 1fr 110px; }
 .it-f.rev-f .mini.strong { grid-column: auto; }
@@ -548,3 +563,17 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   body.pv-full .ed-grid.tab-view #pv { width: 100%; height: 100%; min-height: 0; border-radius: 0; }
   body.pv-full .ed-grid.tab-view .pv-hint { display: none; }
 }
+
+/* Téléphone : suggestions dans l’éditeur, catalogue complet dans un panneau qui monte du bas ; pas de second bouton Publier */
+@media (max-width: 900px) {
+  .as-all { display: none; }
+  .as-more { display: inline-flex; justify-content: center; }
+  .as-grid { grid-template-columns: 1fr; }
+  .ed-foot { display: none; }
+  .modal.on:has(.sheet) { place-items: end stretch; padding: 0; }
+  .md.sheet { width: 100%; max-height: 88vh; padding: 22px 16px calc(20px + env(safe-area-inset-bottom, 0px)); border-radius: 20px 20px 0 0; animation: sheet-up .22s ease-out; }
+  .md.sheet .as-grid { grid-template-columns: 1fr 1fr; }
+  .md.sheet .as-t { grid-template-columns: 1fr; align-content: start; align-items: start; }
+  .md.sheet .as-ic { grid-row: auto; margin-bottom: 4px; }
+}
+@keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }

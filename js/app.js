@@ -639,6 +639,105 @@
     return body;
   }
 
+  /* ---------- Catalogue « Ajouter une section » ----------
+     Tous les types que la carte sait afficher, quel que soit le secteur. Chaque section arrive pré-remplie d’un exemple
+     dans la langue de la carte. g = groupe, n/d = nom et description (fr, en). */
+  const CAT_GROUPS = [['content', 'Contenu', 'Content'], ['trust', 'Confiance', 'Trust'], ['actions', 'Actions', 'Actions'], ['media', 'Photos et vidéos', 'Photos & videos']];
+  const blk = (type, title, data, extra) => ({ type: 'block', added: true, title: '', def: Object.assign({ type, title }, extra || {}), data: Object.assign({ on: true }, data) });
+  const CAT = [
+    { id: 'text', g: 'content', ic: 'file-text', n: ['Texte libre', 'Free text'], d: ['Une actualité, votre démarche, une offre du moment.', 'News, your approach, a current offer.'] },
+    { id: 'services', g: 'content', ic: 'list', n: ['Services et tarifs', 'Services & pricing'], d: ['Vos prestations avec leurs prix.', 'What you offer, with prices.'],
+      make: (en) => blk('list', en ? 'Services & pricing' : 'Services et tarifs', { items: [
+        { t: 'Consultation', d: en ? '30 minutes, in person or by video' : '30 minutes, sur place ou en visio', p: en ? '$60' : '60 $' },
+        { t: en ? 'Standard package' : 'Forfait essentiel', d: en ? 'Our most popular option' : 'La formule la plus demandée', p: en ? 'from $150' : 'dès 150 $' },
+        { t: en ? 'Custom project' : 'Projet sur mesure', d: en ? 'Free quote within 24 hours' : 'Soumission gratuite sous 24 h', p: en ? 'Custom quote' : 'Sur soumission' }] }, { price: true }) },
+    { id: 'faq', g: 'content', ic: 'circle-help', n: ['Questions fréquentes', 'FAQ'], d: ['Répondez d’avance aux questions de vos clients.', 'Answer your customers’ questions up front.'],
+      make: (en) => blk('list', en ? 'FAQ' : 'Questions fréquentes', { items: en ? [
+        { t: 'What are your turnaround times?', d: 'Usually within 48 hours. For emergencies, call me directly.' },
+        { t: 'Do you travel to clients?', d: 'Yes, within 15 miles of my shop.' },
+        { t: 'Which payment methods do you accept?', d: 'Credit card, Zelle and cash.' }] : [
+        { t: 'Quels sont vos délais ?', d: 'En général sous 48 heures. Pour une urgence, appelez-moi directement.' },
+        { t: 'Vous déplacez-vous ?', d: 'Oui, dans un rayon de 25 km autour de mon atelier.' },
+        { t: 'Quels modes de paiement acceptez-vous ?', d: 'Carte de crédit, virement Interac et comptant.' }] }) },
+    { id: 'hours', g: 'content', ic: 'clock', n: ['Horaires', 'Hours'], d: ['Vos jours et heures d’ouverture.', 'Your opening days and hours.'],
+      make: (en) => blk('hours', en ? 'Hours' : 'Horaires', { note: '', rows: en
+        ? [{ d: 'Monday – Friday', h: '9 a.m. – 5 p.m.' }, { d: 'Saturday', h: '10 a.m. – 2 p.m.' }, { d: 'Sunday', h: 'Closed' }]
+        : [{ d: 'Lundi – vendredi', h: '9 h – 17 h' }, { d: 'Samedi', h: '10 h – 14 h' }, { d: 'Dimanche', h: 'Fermé' }] }) },
+    { id: 'location', g: 'content', ic: 'map-pin', n: ['Adresse et plan', 'Address & map'], d: ['Votre adresse avec un plan Google Maps.', 'Your address with a Google map.'],
+      make: (en) => blk('location', en ? 'Find us' : 'Nous trouver', { map: true,
+        address: en ? '123 Main Street, Boston, MA 02108' : '123, rue Principale, Montréal (Québec) H2X 1Y4',
+        access: en ? 'Parking nearby · Wheelchair accessible' : 'Stationnement à proximité · Accès fauteuil roulant' }) },
+    { id: 'cards', g: 'content', ic: 'layout-grid', n: ['Fiches avec photo', 'Photo cards'], d: ['Équipe, projets ou produits, chacun avec sa photo.', 'Team, projects or products, each with a photo.'],
+      make: (en, pics) => blk('cards', en ? 'Our work' : 'Nos réalisations', { items: pics.slice(0, 3).map((x, i) => ({
+        t: x.cap || (en ? 'Project ' : 'Réalisation ') + (i + 1), d: en ? 'A short description of this project' : 'Une courte description de ce projet', p: '', img: x.src, url: '' })) }) },
+    { id: 'reviews', g: 'trust', ic: 'star', n: ['Avis clients', 'Customer reviews'], d: ['Deux ou trois témoignages pour rassurer.', 'Two or three testimonials that build trust.'],
+      make: (en) => blk('reviews', en ? 'Customer reviews' : 'Avis clients', { items: [
+        { n: en ? 'Sarah M.' : 'Julie M.', r: en ? 'Customer since 2023' : 'Cliente depuis 2023', t: en ? 'Fast, friendly and professional. Highly recommend!' : 'Rapide, souriant et professionnel. Je recommande sans hésiter !', s: 5 },
+        { n: en ? 'David L.' : 'Marc L.', r: en ? 'Verified customer' : 'Client vérifié', t: en ? 'Great value and excellent advice.' : 'Excellent rapport qualité-prix et de très bons conseils.', s: 5 }] }) },
+    { id: 'stats', g: 'trust', ic: 'trending-up', n: ['Chiffres clés', 'Key figures'], d: ['Années d’expérience, clients, note moyenne…', 'Years of experience, customers, rating…'],
+      make: (en) => blk('stats', en ? 'Key figures' : 'En quelques chiffres', { items: [
+        { v: en ? '12 yrs' : '12 ans', l: en ? 'of experience' : 'd’expérience' }, { v: '500+', l: en ? 'happy customers' : 'clients satisfaits' }, { v: en ? '4.9/5' : '4,9/5', l: en ? 'average rating' : 'note moyenne' }] }) },
+    { id: 'tags', g: 'trust', ic: 'badge-check', n: ['Engagements', 'Guarantees'], d: ['Garanties, certifications, langues parlées…', 'Warranties, certifications, languages…'],
+      make: (en) => blk('tags', en ? 'Why choose us' : 'Nos engagements', { text: '',
+        tags: en ? 'Free quote, Licensed & insured, 1-year warranty, On-time guarantee' : 'Soumission gratuite, Entièrement assuré, Garantie 1 an, Service bilingue' }, { icon: 'check' }) },
+    { id: 'booking', g: 'actions', ic: 'calendar-check', n: ['Prise de rendez-vous', 'Appointment booking'], d: ['Votre outil de réservation ou une demande de créneau.', 'Your booking tool or a time slot request.'],
+      make: (en, pics, c) => blk('booking', en ? 'Book an appointment' : 'Prendre rendez-vous', { mode: 'request', email: (c.contact || {}).email || '',
+        text: en ? 'Pick a day and a time, and I’ll confirm by email.' : 'Choisissez un jour et un moment, je vous confirme par courriel.' }, { cta: en ? 'Book an appointment' : 'Prendre rendez-vous', icon: 'cal' }) },
+    { id: 'form', g: 'actions', ic: 'send', n: ['Formulaire de demande', 'Request form'], d: ['Devis, réservation ou question : vous recevez un email.', 'Quotes, bookings or questions, sent to your inbox.'],
+      make: (en, pics, c) => blk('form', en ? 'Request a quote' : 'Demande de soumission', { email: (c.contact || {}).email || '', files: true,
+        text: en ? 'Tell me what you need, and I’ll get back to you within 24 hours.' : 'Décrivez votre besoin, je vous réponds sous 24 h.' }) },
+    { id: 'action', g: 'actions', ic: 'shopping-bag', n: ['Bouton vers un lien', 'Link button'], d: ['Boutique en ligne, bon cadeau, promotion…', 'Online shop, gift card, promotion…'],
+      make: (en) => blk('action', en ? 'Online shop' : 'Boutique en ligne', { label: '', url: 'https://example.com',
+        text: en ? 'Order online and pick up in store.' : 'Commandez en ligne et récupérez en boutique.' }, { cta: en ? 'Visit the shop' : 'Voir la boutique', icon: 'bag' }) },
+    { id: 'links', g: 'actions', ic: 'link', n: ['Liens et documents', 'Links & documents'], d: ['Brochure, grille tarifaire, portfolio…', 'Brochure, price list, portfolio…'],
+      make: (en) => blk('links', en ? 'Links & documents' : 'Liens et documents', { items: [
+        { label: en ? 'Brochure (PDF)' : 'Brochure (PDF)', url: 'https://example.com' }, { label: en ? 'Price list' : 'Grille tarifaire', url: 'https://example.com' }] }) },
+    { id: 'gallery', g: 'media', ic: 'images', n: ['Galerie photos', 'Photo gallery'], d: ['1, 2 ou 4 photos côte à côte.', '1, 2 or 4 photos side by side.'] },
+    { id: 'imgcar', g: 'media', ic: 'gallery-horizontal', n: ['Carrousel de photos', 'Photo carousel'], d: ['Des photos qui défilent sur le côté.', 'Photos that scroll sideways.'] },
+    { id: 'vidcar', g: 'media', ic: 'clapperboard', n: ['Carrousel de vidéos', 'Video carousel'], d: ['Plusieurs vidéos à faire défiler.', 'Several videos to scroll through.'] },
+  ];
+  const catOf = (id) => CAT.find((x) => x.id === id);
+  /* Une section du catalogue est-elle déjà visible sur la carte ? */
+  function catPresent(id) {
+    const s = sec(), c = card(), defs = s.blocks.filter((b) => (c.blocks[b.key] || {}).on).map((b) => b)
+      .concat((c.custom || []).filter((x) => x.on !== false).map((x) => (x.type === 'block' ? x.def : { type: x.type })));
+    return defs.some((d) => {
+      if (id === 'faq') return d.type === 'list' && /question|faq/i.test(d.title || '');
+      if (id === 'services') return (d.type === 'list' && d.price) || d.type === 'menu';
+      if (id === 'text') return false;
+      if (id === 'gallery' || id === 'imgcar') return d.type === id || d.type === 'gallery';
+      return d.type === id;
+    });
+  }
+  const CAT_SUGGEST = ['reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
+  const catTile = (x, en) => `<button type="button" class="as-t" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`;
+  function catGroups(en) {
+    return CAT_GROUPS.map(([g, fr, eng]) => `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${CAT.filter((x) => x.g === g).map((x) => catTile(x, en)).join('')}</div></div>`).join('');
+  }
+  function addSecHTML() {
+    const en = ui() === 'en';
+    const sug = CAT_SUGGEST.filter((id) => !catPresent(id)).slice(0, 3).map(catOf);
+    return `<div class="add-sec">
+      <span class="f-l">${ic('plus', 15)}${en ? 'Add a section' : 'Ajouter une section'}</span>
+      ${sug.length ? `<div class="as-g as-sug"><span class="as-h">${en ? 'Suggested for you' : 'Suggérées pour vous'}</span><div class="as-grid">${sug.map((x) => catTile(x, en)).join('')}</div></div>` : ''}
+      <div class="as-all">${catGroups(en)}</div>
+      <button type="button" class="b as-more" data-act="addcat">${ic('plus', 16)}${en ? `See all sections (${CAT.length})` : `Voir toutes les sections (${CAT.length})`}</button>
+    </div>`;
+  }
+  /* Téléphone : le catalogue complet s’ouvre dans un panneau qui monte du bas */
+  function openCatalog() {
+    const en = ui() === 'en';
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md sheet" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${en ? 'Close' : 'Fermer'}">${ic('x')}</button>
+        <h2 id="md-t">${en ? 'Add a section' : 'Ajouter une section'}</h2>
+        <p>${en ? 'It arrives filled with an example: just replace the text.' : 'Elle arrive remplie d’un exemple : il suffit de remplacer le texte.'}</p>
+        <div class="sheet-b">${catGroups(en)}</div>
+      </div>`;
+    $('#modal').classList.add('on');
+    icons();
+  }
+
   /* Toutes les sections (blocs du secteur + sections ajoutées), dans l’ordre choisi, déplaçables */
   function sectionsEd() {
     const s = sec(), c = card(), cs = c.custom || (c.custom = []);
@@ -666,10 +765,10 @@
         const body = cc.type === 'block'
           ? inp('Titre de la section', `custom.${i}.title`, { ph: cc.def.title }) + blockEd(cc.def, `custom.${i}.data`)
           : customBody(cc, i);
-        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? `Copie · ${esc(cc.def.title)}` : `Section ajoutée · ${label}`, body, `custom.${i}.on`, mv('c-' + (cc.cid || i)) + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
+        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? (cc.added ? `Section ajoutée · ${esc(cc.def.title)}` : `Copie · ${esc(cc.def.title)}`) : `Section ajoutée · ${label}`, body, `custom.${i}.on`, mv('c-' + (cc.cid || i)) + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
       }
     });
-    h += `</div><div class="add-sec"><span class="f-l">${ic('plus', 15)}Ajouter une section</span><div class="add-sec-b">${Object.entries(SEC_TYPES).map(([t, [l, i]]) => `<button type="button" class="b sm" data-act="addsec" data-t="${t}">${ic(i, 15)}${l}</button>`).join('')}</div></div>`;
+    h += '</div>' + addSecHTML();
     return h;
   }
 
@@ -1089,15 +1188,21 @@
       case 'setcover': card().identity.coverType = t.dataset.v; structChanged(); break;
       case 'layout': card().custom[+t.dataset.i].layout = +t.dataset.v; structChanged(); break;
       case 'addsec': {
-        const cs = card().custom || (card().custom = []);
-        const ns = Object.assign(newSection(t.dataset.t), { cid: rid() });
+        const cs = card().custom || (card().custom = []), item = catOf(t.dataset.t);
+        if (!item) break;
+        const m = (NFC.MEDIA || {})[S.sectorId] || {};
+        const pics = (m.gallery || []).map((x) => ({ src: x.src, cap: x.cap })).concat((m.cards || []).map((src) => ({ src, cap: '' })));
+        const ns = Object.assign(item.make ? item.make(lang() === 'en', pics, card()) : newSection(t.dataset.t), { cid: rid(), on: true });
         cs.push(ns);
         openGroups.add('c-' + ns.cid);
+        closeModal();
         structChanged();
-        toast(`Section « ${SEC_TYPES[t.dataset.t][0]} » ajoutée en bas de la carte.`);
-        const pv = $('#pv'); if (pv) setTimeout(() => { pv.scrollTop = pv.scrollHeight; }, 50);
+        toast(`Section « ${item.n[ui() === 'en' ? 1 : 0]} » ajoutée en bas de la carte.`);
+        /* On montre la nouvelle section, ouverte, dans l’éditeur */
+        setTimeout(() => { const el = document.querySelector(`[data-grp="c-${ns.cid}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); const pv = $('#pv'); if (pv) pv.scrollTop = pv.scrollHeight; }, 60);
         break;
       }
+      case 'addcat': openCatalog(); break;
       case 'omove': {
         const o = VC.sectionOrder(card(), sec(), S.design), i = o.indexOf(t.dataset.k), j = i + +t.dataset.d;
         if (i < 0 || j < 0 || j >= o.length) break;
