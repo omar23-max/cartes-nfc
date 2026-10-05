@@ -272,19 +272,12 @@
     translateTree(document.body);
     fitPreview();
   }
-  /* Téléphone, onglet Aperçu : la carte tient entre le haut de l’écran et la barre Modifier / Aperçu */
+  /* Téléphone, onglet Aperçu : la carte s’affiche en plein écran, seule la barre Modifier / Aperçu / Publier reste */
   function fitPreview() {
-    const pv = $('.ed-grid.tab-view #pv');
-    if (!pv) return;
-    if (window.innerWidth > 900) { pv.style.height = ''; pv.style.minHeight = ''; return; }
-    const bar = $('.mbar'), head = $('.top');
-    const barH = bar ? bar.getBoundingClientRect().height : 0, headH = head ? head.getBoundingClientRect().height : 0;
-    const frame = pv.parentElement.getBoundingClientRect().height - pv.getBoundingClientRect().height;
-    pv.style.minHeight = '0';
-    pv.style.height = Math.max(300, window.innerHeight - headH - barH - frame - 20) + 'px';
-    /* La page défile pour placer le téléphone juste sous l’en-tête */
-    const top = pv.parentElement.getBoundingClientRect().top + window.scrollY;
-    window.scrollTo(0, Math.max(0, top - headH - 8));
+    const full = S.step === 4 && mobileTab === 'view' && window.innerWidth <= 900;
+    document.body.classList.toggle('pv-full', full);
+    const bar = $('.mbar');
+    if (bar) document.body.style.setProperty('--mbar-h', bar.getBoundingClientRect().height + 'px');
   }
   window.addEventListener('resize', () => { clearTimeout(fitPreview.t); fitPreview.t = setTimeout(fitPreview, 150); });
   const icons = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.8 } }); };
