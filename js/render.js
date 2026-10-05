@@ -499,7 +499,15 @@
     menu(def, b) {
       const cats = (b.cats || []).filter((c) => c.name || (c.items || []).some((x) => x.t));
       if (!cats.length) return '';
-      return cats.map((c) => `<div class="menu-cat">${c.name ? `<h3>${esc(c.name)}</h3>` : ''}${(c.items || []).filter((x) => x.t).map((x) => `<div class="mi"><div class="mi-r"><span>${esc(x.t)}</span><span class="dots"></span><span class="mi-p">${esc(x.p)}</span></div>${x.d ? `<div class="mi-d">${esc(x.d)}</div>` : ''}</div>`).join('')}</div>`).join('');
+      /* Carte façon menu imprimé : rubriques ornées, mentions (Signature, Végé…), note de bas de carte */
+      const body = cats.map((c) => `<div class="menu-cat">${c.name ? `<h3><span>${esc(c.name)}</span></h3>` : ''}${c.desc ? `<p class="menu-cd">${esc(c.desc)}</p>` : ''}${(c.items || []).filter((x) => x.t).map((x) => `<div class="mi"><div class="mi-r"><span class="mi-t">${esc(x.t)}${x.b ? ` <em class="mi-b">${esc(x.b)}</em>` : ''}</span><span class="dots"></span><span class="mi-p">${esc(x.p)}</span></div>${x.d ? `<div class="mi-d">${esc(x.d)}</div>` : ''}</div>`).join('')}</div>`).join('');
+      return `<div class="menu-x">${body}${b.note ? `<p class="menu-note">${esc(b.note)}</p>` : ''}</div>`;
+    },
+    /* Le chef : photo, titre, présentation et parcours (comme un CV) */
+    chef(def, b, m) {
+      if (!b.name && !b.text) return '';
+      const cv = (b.items || []).filter((x) => x.t || x.d);
+      return `<div class="chef"><div class="chef-ph">${b.photo ? `<img src="${img(b.photo, m)}" alt="" loading="lazy">` : ''}</div><div class="chef-id">${b.name ? `<h3>${esc(b.name)}</h3>` : ''}${b.role ? `<p class="chef-role">${esc(b.role)}</p>` : ''}</div></div>${b.text ? `<p class="txt chef-txt">${nl(b.text)}</p>` : ''}${cv.length ? `<ol class="chef-cv">${cv.map((x) => `<li><span class="cv-y">${esc(x.t)}</span><span class="cv-d">${esc(x.d)}</span></li>`).join('')}</ol>` : ''}`;
     },
     gallery(def, b, m) {
       const ims = (b.images || []).filter((x) => x.src);

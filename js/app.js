@@ -878,8 +878,15 @@
         return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f stat-f">${mini(`${base}.items.${i}.v`, 'Chiffre (ex. 48)', 'strong')}${mini(`${base}.items.${i}.l`, 'Libellé (ex. biens vendus en 2025)')}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'stat', 'Ajouter un chiffre')}`;
       case 'menu':
         return `${(b.cats || []).map((c, ci) => `<div class="cat"><div class="cat-h">${mini(`${base}.cats.${ci}.name`, 'Nom de la rubrique', 'strong')}${del(base + '.cats', ci, 'Supprimer la rubrique')}</div>
-          <div class="items">${(c.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.cats.${ci}.items.${i}.t`, 'Plat', 'strong')}${mini(`${base}.cats.${ci}.items.${i}.d`, 'Description')}${mini(`${base}.cats.${ci}.items.${i}.p`, 'Prix', 'price')}</div>${del(`${base}.cats.${ci}.items`, i)}</div>`).join('')}</div>
-          ${add(`${base}.cats.${ci}.items`, 'item', 'Ajouter un plat')}</div>`).join('')}${add(base + '.cats', 'cat', 'Ajouter une rubrique')}`;
+          ${mini(`${base}.cats.${ci}.desc`, 'Sous-titre de la rubrique (facultatif)', 'full')}
+          <div class="items">${(c.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.cats.${ci}.items.${i}.t`, 'Plat', 'strong')}${mini(`${base}.cats.${ci}.items.${i}.d`, 'Description')}${mini(`${base}.cats.${ci}.items.${i}.p`, 'Prix', 'price')}${mini(`${base}.cats.${ci}.items.${i}.b`, 'Mention (Signature, Végé…)')}</div>${del(`${base}.cats.${ci}.items`, i)}</div>`).join('')}</div>
+          ${add(`${base}.cats.${ci}.items`, 'item', 'Ajouter un plat')}</div>`).join('')}${add(base + '.cats', 'cat', 'Ajouter une rubrique')}
+          ${area('Note en bas de la carte', base + '.note', { rows: 2, ph: 'Allergies, taxes, provenance des produits…' })}`;
+      case 'chef':
+        return `<div class="it">${thumbF(base + '.photo')}<div class="it-f">${mini(base + '.name', 'Nom du chef', 'strong')}${mini(base + '.role', 'Titre (ex. Chef propriétaire)', 'full')}</div></div>
+          ${area('Présentation', base + '.text', { rows: 4 })}
+          <div class="f"><span class="f-l">Parcours</span></div>
+          <div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.items.${i}.t`, 'Année ou étape', 'strong')}${mini(`${base}.items.${i}.d`, 'Restaurant, distinction, formation', 'full')}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'item', 'Ajouter une étape')}`;
       case 'gallery':
         return galEd(base + '.images', b.images, def.help);
       case 'booking': {

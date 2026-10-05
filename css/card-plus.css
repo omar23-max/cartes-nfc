@@ -340,3 +340,29 @@
 .vc-d15 .btn { border-radius: 99px; background: linear-gradient(135deg, var(--p), color-mix(in srgb, var(--a) 55%, var(--p))); }
 .vc-d15 .btn.ghost { background: var(--sf); }
 .vc-d15 .sec-t { color: var(--p); }
+
+/* ---------- Menu raffiné (façon carte imprimée) ---------- */
+.vc .menu-x { padding: 22px 18px 18px; border: 1px solid var(--ln); border-radius: var(--r); background: var(--sf); box-shadow: inset 0 0 0 5px var(--sf), inset 0 0 0 6px color-mix(in srgb, var(--a) 45%, var(--ln)); }
+.vc .menu-x .menu-cat h3 { display: flex; align-items: center; gap: 10px; justify-content: center; margin-bottom: 4px; font: italic 600 20px/1.2 "Cormorant Garamond", Fraunces, Georgia, serif; letter-spacing: .01em; text-align: center; }
+.vc .menu-x .menu-cat h3::before, .vc .menu-x .menu-cat h3::after { content: ""; flex: 1; max-width: 54px; height: 1px; background: var(--a); }
+.vc .menu-cd { margin: 0 0 8px; text-align: center; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); }
+.vc .menu-x .mi { border-bottom: 0; padding: 8px 0; }
+.vc .menu-x .mi-t { font-weight: 600; }
+.vc .mi-b { margin-left: 4px; padding: 1px 7px; border-radius: 99px; font-style: normal; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--p); background: color-mix(in srgb, var(--a) 22%, transparent); vertical-align: 1px; }
+.vc .menu-x .mi-d { font-style: italic; }
+.vc .menu-note { margin: 14px 0 0; padding-top: 10px; border-top: 1px dashed var(--ln); text-align: center; font-size: 11.5px; color: var(--mu); }
+
+/* ---------- Le chef ---------- */
+.vc .chef { display: flex; align-items: center; gap: 14px; }
+.vc .chef-ph { flex: none; width: 92px; height: 92px; border-radius: 50%; overflow: hidden; background: var(--ln); box-shadow: 0 0 0 3px var(--sf), 0 0 0 4px var(--a); }
+.vc .chef-ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vc .chef-id h3 { font: 600 22px/1.15 "Cormorant Garamond", Fraunces, Georgia, serif; color: var(--tx); }
+.vc .chef-role { margin-top: 3px; font-size: 12.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--p); }
+.vc .chef-txt { margin-top: 14px; }
+.vc .chef-cv { list-style: none; margin: 14px 0 0; padding: 0 0 0 14px; border-left: 2px solid color-mix(in srgb, var(--a) 60%, var(--ln)); }
+.vc .chef-cv li { position: relative; display: flex; flex-direction: column; padding: 0 0 12px 10px; }
+.vc .chef-cv li::before { content: ""; position: absolute; left: -21px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--p); box-shadow: 0 0 0 3px var(--bg); }
+.vc .cv-y { font-size: 12px; font-weight: 700; color: var(--p); }
+.vc .cv-d { font-size: 14px; color: var(--tx); }
+.vc .mi-b { white-space: nowrap; display: inline-block; }
+.vc-d10 .menu-x .mi, .vc-d10 .chef-cv { text-align: left; }
