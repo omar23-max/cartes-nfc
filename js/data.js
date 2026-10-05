@@ -1,4 +1,4 @@
-/* Catalogue : 20 secteurs × 5 designs. Seuls les secteurs `active: true` sont remplis dans le site test. */
+/* Catalogue : 20 secteurs × 10 modèles × 6 palettes. Seuls les secteurs `active: true` sont remplis dans le site test. */
 window.NFC = window.NFC || {};
 
 (function () {
@@ -10,18 +10,19 @@ window.NFC = window.NFC || {};
     pal('Émeraude', '#065f46', '#34d399', '#f2f8f5', '#ffffff', '#0b1f18', '#55706a', '#dbebe4'),
     pal('Bordeaux', '#831843', '#f472b6', '#faf4f7', '#ffffff', '#23101a', '#705c66', '#efdde6'),
     pal('Indigo', '#3730a3', '#818cf8', '#f5f5fc', '#ffffff', '#15143a', '#626181', '#e3e3f5'),
+    pal('Ardoise', '#334155', '#38bdf8', '#f4f6f8', '#ffffff', '#0f172a', '#5b6477', '#e2e8f0'),
   ];
 
   const DESIGNS = [
-    { id: 'd1', name: 'Essentiel', desc: 'Compact, boutons visibles immédiatement, lecture rapide.' },
-    { id: 'd2', name: 'Éditorial', desc: 'Grands titres, sections aérées : met en valeur l’expertise.' },
-    { id: 'd3', name: 'Visuel', desc: 'Grande photo d’ouverture et galerie dominante.' },
-    { id: 'd4', name: 'Humain', desc: 'Portrait mis en avant, blocs arrondis, ton personnel.' },
-    { id: 'd5', name: 'Immersif', desc: 'Ouverture plein écran, ambiance sombre et narrative.' },
-    { id: 'd6', name: 'Carte', desc: 'Une fiche posée sur la couverture, comme une vraie carte de visite.' },
+    { id: 'd1', name: 'Essential', desc: 'Compact, boutons visibles immédiatement, lecture rapide.' },
+    { id: 'd2', name: 'Editorial', desc: 'Grands titres, sections aérées : met en valeur l’expertise.' },
+    { id: 'd3', name: 'Showcase', desc: 'Grande photo d’ouverture et galerie dominante.' },
+    { id: 'd4', name: 'Personal', desc: 'Portrait mis en avant, blocs arrondis, ton personnel.' },
+    { id: 'd5', name: 'Immersive', desc: 'Ouverture plein écran, ambiance sombre et narrative.' },
+    { id: 'd6', name: 'Classic', desc: 'Une fiche posée sur la couverture, comme une vraie carte de visite.' },
     { id: 'd7', name: 'Minimal', desc: 'Noir et blanc, typographie forte, aucun superflu.' },
-    { id: 'd8', name: 'Mosaïque', desc: 'Tuiles façon bento : photo, portrait et accroche d’un coup d’œil.' },
-    { id: 'd9', name: 'Vague', desc: 'En-tête en dégradé coloré, portrait centré, ton chaleureux.' },
+    { id: 'd8', name: 'Mosaic', desc: 'Tuiles façon bento : photo, portrait et accroche d’un coup d’œil.' },
+    { id: 'd9', name: 'Wave', desc: 'En-tête en dégradé coloré, portrait centré, ton chaleureux.' },
     { id: 'd10', name: 'Prestige', desc: 'Ivoire, typographie classique, portrait en arche : haut de gamme.' },
   ];
 
@@ -37,6 +38,7 @@ window.NFC = window.NFC || {};
       pal('Vert atelier', '#166534', '#eab308', '#f3f7f2', '#ffffff', '#132016', '#5a6b5d', '#dfe9dd'),
       pal('Graphite', '#18181b', '#eab308', '#f4f4f5', '#ffffff', '#18181b', '#63636b', '#e4e4e7'),
       pal('Rouge brique', '#9f1239', '#fb923c', '#faf5f5', '#ffffff', '#1f1315', '#6e5b5f', '#efdfe2'),
+      pal('Bleu acier', '#1f3a5f', '#f97316', '#f3f5f8', '#ffffff', '#0f1a2a', '#5a6573', '#dfe5ec'),
     ],
     blocks: [
       { key: 'about', type: 'text', title: 'Présentation', help: '100 à 200 mots conseillés' },
@@ -88,6 +90,7 @@ window.NFC = window.NFC || {};
       pal('Lavande', '#6d28d9', '#c4b5fd', '#f7f5fc', '#ffffff', '#1b1530', '#6a6280', '#e7e1f5'),
       pal('Bleu nuit', '#1e3a8a', '#93c5fd', '#f3f5fa', '#ffffff', '#0f172a', '#5b6477', '#e0e6f2'),
       pal('Sable', '#92600a', '#e9c46a', '#faf7f0', '#ffffff', '#231c0f', '#6f6653', '#ece4d2'),
+      pal('Vert sauge', '#3f6b5a', '#a7d3c0', '#f3f7f5', '#ffffff', '#12201b', '#5b6f67', '#dce8e2'),
     ],
     blocks: [
       { key: 'about', type: 'text', title: 'Présentation', help: '100 à 200 mots conseillés' },
@@ -138,6 +141,7 @@ window.NFC = window.NFC || {};
       pal('Terracotta', '#b4441b', '#f2c14e', '#fbf4ee', '#ffffff', '#2a160c', '#76604f', '#f0dfd0'),
       pal('Noir & or', '#1c1917', '#c9a227', '#f7f4ee', '#ffffff', '#1c1917', '#6b645a', '#e8e1d4'),
       pal('Bleu méditerranée', '#1e4f8a', '#e9b44c', '#f3f6f9', '#ffffff', '#0f1c2c', '#5a6776', '#dde5ee'),
+      pal('Érable', '#9a3412', '#f6c453', '#fbf5ef', '#ffffff', '#2a150b', '#76604f', '#f0dfd0'),
     ],
     blocks: [
       { key: 'about', type: 'text', title: 'Notre maison', help: '50 à 120 mots conseillés' },

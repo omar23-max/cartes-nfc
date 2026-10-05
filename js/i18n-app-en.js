@@ -53,6 +53,8 @@ window.NFC_EN_APP = {
   'Nuit étoilée': 'Starry night', 'Vert pomme': 'Apple green', 'Caramel': 'Caramel', 'Bleu': 'Blue', 'Argent': 'Silver', 'Or rose': 'Rose gold', 'Jade': 'Jade',
   'Noir velours': 'Velvet black', 'Bleu céramique': 'Ceramic blue', 'Rouge course': 'Racing red', 'Bleu mécanique': 'Mechanic blue', 'Noir carbone': 'Carbon black',
   'Vert anglais': 'British green', 'Gris acier': 'Steel grey',
+  'Bleu acier': 'Steel blue', 'Érable': 'Maple', 'Vert banquier': 'Banker green', 'Cyan tech': 'Tech cyan', 'Bleu lac': 'Lake blue', 'Cèdre': 'Cedar',
+  'Lilas': 'Lilac', 'Sirop d’érable': 'Maple syrup', 'Néon': 'Neon', 'Bleu ciel': 'Sky blue', 'Forêt boréale': 'Boreal forest', 'Aurore boréale': 'Northern lights', 'Orange piste': 'Track orange',
 
   /* Étape 4 : barre et panneaux */
   'Changer de couleurs': 'Change colors', 'Vider les exemples': 'Clear sample content', 'Modifier': 'Edit', 'Publier ma carte': 'Publish my card',
@@ -65,7 +67,7 @@ window.NFC_EN_APP = {
   'Lien direct vers un fichier vidéo (.mp4). Les liens YouTube ne peuvent pas servir de couverture.': 'A direct link to a video file (.mp4). YouTube links can’t be used as a cover.',
   'Démarre sans le son et tourne en boucle.': 'Starts muted and loops.', 'Vidéo d’exemple': 'Sample video', 'Vidéo téléversée': 'Uploaded video', 'Lien vidéo': 'Video link',
   'Vidéo de couverture d’exemple': 'Sample cover video', 'Retirer ma vidéo': 'Remove my video',
-  'La couverture apparaît dans les modèles Visuel, Immersif, Carte, Mosaïque et Vague. L’image de couverture sert aussi d’affiche à la vidéo.': 'The cover appears in the Visual, Immersive, Card, Mosaic and Wave templates. The cover image is also used as the video poster.',
+  'La couverture apparaît dans les modèles Showcase, Immersive, Classic, Mosaic et Wave. L’image de couverture sert aussi d’affiche à la vidéo.': 'The cover appears in the Showcase, Immersive, Classic, Mosaic and Wave templates. The cover image is also used as the video poster.',
   'Coordonnées & action principale': 'Contact details & main action', 'Téléphone, email, site': 'Phone, email, website', 'Site web': 'Website',
   'Format international : +33 6…': 'International format: +1 514…', 'Action principale': 'Main action', 'Le gros bouton toujours visible en bas de la carte.': 'The big button always visible at the bottom of the card.',
   'Écrire sur WhatsApp': 'Message on WhatsApp', 'Après « Enregistrer le contact », proposer au visiteur de me laisser ses coordonnées': 'After “Save contact”, invite visitors to leave me their details',
@@ -132,7 +134,7 @@ window.NFC_EN_APP = {
   'Site en français': 'Site in French', 'Langue du site': 'Site language',
   'Outil reconnu :': 'Tool detected:', '· peut s’afficher dans la carte': '· can be shown in the card', 'peut s’afficher dans la carte': 'can be shown in the card', 'intégrable': 'embeddable',
   '. Faites défiler chaque miniature pour voir toute la carte, puis cliquez pour la choisir. Vous pourrez en changer à tout moment sans perdre vos informations.': '. Scroll each thumbnail to see the whole card, then click to choose it. You can switch at any time without losing your information.',
-  '· 5 palettes pensées pour votre secteur.': '· 5 palettes designed for your industry.', '5 palettes pensées pour votre secteur.': '5 palettes designed for your industry.',
+  '· 6 palettes pensées pour votre secteur.': '· 6 palettes designed for your industry.', '6 palettes pensées pour votre secteur.': '6 palettes designed for your industry.',
   'Tant que le lien n’est pas renseigné, vos clients voient une': 'Until the link is filled in, your clients see a', 'Aucun numéro renseigné : vos clients voient une': 'No number entered: your clients see a',
   'Avez-vous déjà un QR code ?': 'Do you already have a QR code?',
   'Si votre carte NFC vous a été livrée avec un QR code et un lien déjà imprimés, votre nouvelle carte de visite sera reliée à ce lien.': 'If your NFC card was delivered with a QR code and a link already printed on it, your new business card will be connected to that link.',

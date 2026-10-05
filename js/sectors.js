@@ -30,7 +30,7 @@
   /* ---------- F02 Droit, finance et conseil ---------- */
   EXTRA.conseil = {
     rec: 'd2',
-    palettes: [pal('Marine & or', '#1b2a4a', '#c8a24a'), pal('Vert sapin', '#1f4d3a', '#b8a26a'), pal('Bordeaux', '#6b1d2a', '#c9a26b'), pal('Ardoise', '#2f3a45', '#8fb0cc'), pal('Bleu roi', '#1d3fa8', '#7aa2ff')],
+    palettes: [pal('Marine & or', '#1b2a4a', '#c8a24a'), pal('Vert sapin', '#1f4d3a', '#b8a26a'), pal('Bordeaux', '#6b1d2a', '#c9a26b'), pal('Ardoise', '#2f3a45', '#8fb0cc'), pal('Bleu roi', '#1d3fa8', '#7aa2ff'), pal('Vert banquier', '#14532d', '#d4af37')],
     blocks: [
       B('about', 'text', 'Présentation', { help: '150 à 250 mots conseillés' }),
       B('expertises', 'list', 'Domaines d’expertise'),
@@ -64,7 +64,7 @@
   /* ---------- F04 Freelance, IT ---------- */
   EXTRA.freelance = {
     rec: 'd2',
-    palettes: [pal('Indigo', '#4338ca', '#67e8f9'), pal('Graphite', '#1f2937', '#34d399'), pal('Violet', '#6d28d9', '#f9a8d4'), pal('Bleu pétrole', '#0e5a6b', '#fbbf24'), pal('Corail', '#c2410c', '#fdba74')],
+    palettes: [pal('Indigo', '#4338ca', '#67e8f9'), pal('Graphite', '#1f2937', '#34d399'), pal('Violet', '#6d28d9', '#f9a8d4'), pal('Bleu pétrole', '#0e5a6b', '#fbbf24'), pal('Corail', '#c2410c', '#fdba74'), pal('Cyan tech', '#0e7490', '#a5f3fc')],
     blocks: [
       B('about', 'text', 'Présentation', { help: '150 à 250 mots conseillés' }),
       B('services', 'list', 'Services & forfaits', { price: true }),
@@ -96,7 +96,7 @@
   /* ---------- F05 Immobilier ---------- */
   EXTRA.immobilier = {
     rec: 'd3',
-    palettes: [pal('Bleu ardoise', '#1e3a5f', '#e0a458'), pal('Vert olive', '#3f5a36', '#d9c27a'), pal('Terre', '#8a4b2a', '#f0c9a0'), pal('Noir chic', '#1a1a1a', '#c5a572'), pal('Bleu azur', '#0369a1', '#fbbf24')],
+    palettes: [pal('Bleu ardoise', '#1e3a5f', '#e0a458'), pal('Vert olive', '#3f5a36', '#d9c27a'), pal('Terre', '#8a4b2a', '#f0c9a0'), pal('Noir chic', '#1a1a1a', '#c5a572'), pal('Bleu azur', '#0369a1', '#fbbf24'), pal('Bleu lac', '#155e75', '#f5d08a')],
     blocks: [
       B('about', 'text', 'Présentation', { help: '100 à 180 mots conseillés' }),
       B('biens', 'cards', 'Biens à la vente', { price: true, help: 'Vos annonces du moment' }),
@@ -128,7 +128,7 @@
   /* ---------- F06 Architecture ---------- */
   EXTRA.archi = {
     rec: 'd3',
-    palettes: [pal('Sable', '#7a5c3e', '#d9b99b'), pal('Vert sauge', '#4f6b58', '#c9d6c3'), pal('Béton', '#3a3a3a', '#c2b8a3'), pal('Terracotta', '#a4512e', '#f0c29e'), pal('Bleu nuit', '#1f2a44', '#d4b483')],
+    palettes: [pal('Sable', '#7a5c3e', '#d9b99b'), pal('Vert sauge', '#4f6b58', '#c9d6c3'), pal('Béton', '#3a3a3a', '#c2b8a3'), pal('Terracotta', '#a4512e', '#f0c29e'), pal('Bleu nuit', '#1f2a44', '#d4b483'), pal('Cèdre', '#7c4a2d', '#e7c9a3')],
     blocks: [
       B('about', 'text', 'L’atelier', { help: '100 à 200 mots conseillés' }),
       B('projets', 'cards', 'Projets', { price: false, help: '3 à 6 projets' }),
@@ -158,7 +158,7 @@
   /* ---------- F08 Beauté et bien-être ---------- */
   EXTRA.beaute = {
     rec: 'd3',
-    palettes: [pal('Rose poudré', '#9d4b62', '#f3c4cf'), pal('Nude', '#8a6752', '#e8cfc0'), pal('Noir & or', '#1c1917', '#c9a227'), pal('Sauge', '#52705f', '#cfe0cf'), pal('Prune', '#5b2150', '#e9a8d9')],
+    palettes: [pal('Rose poudré', '#9d4b62', '#f3c4cf'), pal('Nude', '#8a6752', '#e8cfc0'), pal('Noir & or', '#1c1917', '#c9a227'), pal('Sauge', '#52705f', '#cfe0cf'), pal('Prune', '#5b2150', '#e9a8d9'), pal('Lilas', '#7e5a9b', '#e9d5f5')],
     blocks: [
       B('about', 'text', 'Le salon', { help: '80 à 150 mots conseillés' }),
       B('prestations', 'list', 'Prestations & tarifs', { price: true }),
@@ -192,7 +192,7 @@
   /* ---------- F09 Coaching, sport et formation ---------- */
   EXTRA.coaching = {
     rec: 'd4',
-    palettes: [pal('Énergie', '#dc2626', '#fbbf24'), pal('Bleu électrique', '#1d4ed8', '#67e8f9'), pal('Vert forêt', '#166534', '#bef264'), pal('Noir', '#111111', '#fb923c'), pal('Lavande', '#6d5aa8', '#f5c2e7')],
+    palettes: [pal('Énergie', '#dc2626', '#fbbf24'), pal('Bleu électrique', '#1d4ed8', '#67e8f9'), pal('Vert forêt', '#166534', '#bef264'), pal('Noir', '#111111', '#fb923c'), pal('Lavande', '#6d5aa8', '#f5c2e7'), pal('Turquoise', '#0f766e', '#fde047')],
     blocks: [
       B('about', 'text', 'Qui suis-je ?', { help: '150 à 250 mots conseillés' }),
       B('programmes', 'list', 'Programmes & tarifs', { price: true }),
@@ -226,7 +226,7 @@
   /* ---------- F11 Producteurs et commerces alimentaires ---------- */
   EXTRA.producteurs = {
     rec: 'd4', establishment: true,
-    palettes: [pal('Vert potager', '#3f6212', '#f59e0b'), pal('Terre', '#7c4a24', '#e9b872'), pal('Tomate', '#b91c1c', '#a3e635'), pal('Miel', '#a16207', '#fde047'), pal('Lin', '#57534e', '#b5c99a')],
+    palettes: [pal('Vert potager', '#3f6212', '#f59e0b'), pal('Terre', '#7c4a24', '#e9b872'), pal('Tomate', '#b91c1c', '#a3e635'), pal('Miel', '#a16207', '#fde047'), pal('Lin', '#57534e', '#b5c99a'), pal('Sirop d’érable', '#92400e', '#fcd34d')],
     blocks: [
       B('about', 'text', 'Qui sommes-nous ?', { help: '100 à 180 mots conseillés' }),
       B('produits', 'list', 'Nos produits', { price: true }),
@@ -258,7 +258,7 @@
   /* ---------- F12 Mariage et événementiel ---------- */
   EXTRA.evenementiel = {
     rec: 'd3',
-    palettes: [pal('Champagne', '#8c6a3f', '#e8d5b0'), pal('Blush', '#a8556b', '#f5d0d8'), pal('Eucalyptus', '#4b6b5d', '#cfe0d6'), pal('Bleu minuit', '#1e2a4a', '#d8b46a'), pal('Terracotta', '#b0563a', '#f2cda8')],
+    palettes: [pal('Champagne', '#8c6a3f', '#e8d5b0'), pal('Blush', '#a8556b', '#f5d0d8'), pal('Eucalyptus', '#4b6b5d', '#cfe0d6'), pal('Bleu minuit', '#1e2a4a', '#d8b46a'), pal('Terracotta', '#b0563a', '#f2cda8'), pal('Sauge', '#52705f', '#e8d5b0')],
     blocks: [
       B('about', 'text', 'Mon approche', { help: '100 à 200 mots conseillés' }),
       B('gallery', 'gallery', 'Réalisations', { help: '8 à 12 photos' }),
@@ -290,7 +290,7 @@
   /* ---------- F13 Portfolio artistique et visuel ---------- */
   EXTRA.portfolio = {
     rec: 'd3',
-    palettes: [pal('Encre', '#1f2937', '#fbbf24'), pal('Rouge galerie', '#9b1c1c', '#fca5a5'), pal('Bleu Klein', '#1e40af', '#93c5fd'), pal('Kaki', '#4d5b3a', '#d6c79a'), pal('Anthracite', '#27272a', '#d4d4d8')],
+    palettes: [pal('Encre', '#1f2937', '#fbbf24'), pal('Rouge galerie', '#9b1c1c', '#fca5a5'), pal('Bleu Klein', '#1e40af', '#93c5fd'), pal('Kaki', '#4d5b3a', '#d6c79a'), pal('Anthracite', '#27272a', '#d4d4d8'), pal('Corail', '#c2410c', '#fed7aa')],
     blocks: [
       B('gallery', 'gallery', 'Sélection', { help: '8 à 16 images' }),
       B('about', 'text', 'Démarche', { help: '50 à 150 mots conseillés' }),
@@ -322,7 +322,7 @@
   /* ---------- F14 Musique et spectacle ---------- */
   EXTRA.musique = {
     rec: 'd5', establishment: true,
-    palettes: [pal('Scène', '#7c3aed', '#f472b6'), pal('Vinyle', '#1c1917', '#f59e0b'), pal('Rouge velours', '#9f1239', '#fda4af'), pal('Bleu nuit', '#1e3a8a', '#fbbf24'), pal('Émeraude', '#065f46', '#6ee7b7')],
+    palettes: [pal('Scène', '#7c3aed', '#f472b6'), pal('Vinyle', '#1c1917', '#f59e0b'), pal('Rouge velours', '#9f1239', '#fda4af'), pal('Bleu nuit', '#1e3a8a', '#fbbf24'), pal('Émeraude', '#065f46', '#6ee7b7'), pal('Néon', '#0a0a0a', '#22d3ee')],
     blocks: [
       B('about', 'text', 'Le groupe', { help: '100 à 200 mots conseillés' }),
       B('video', 'video', 'En live'),
@@ -354,7 +354,7 @@
   /* ---------- F15 Influence et création de contenu ---------- */
   EXTRA.influence = {
     rec: 'd5',
-    palettes: [pal('Rose fluo', '#db2777', '#fbcfe8'), pal('Violet', '#7c3aed', '#c4b5fd'), pal('Orange', '#ea580c', '#fed7aa'), pal('Menthe', '#0d9488', '#99f6e4'), pal('Noir & jaune', '#0a0a0a', '#facc15')],
+    palettes: [pal('Rose fluo', '#db2777', '#fbcfe8'), pal('Violet', '#7c3aed', '#c4b5fd'), pal('Orange', '#ea580c', '#fed7aa'), pal('Menthe', '#0d9488', '#99f6e4'), pal('Noir & jaune', '#0a0a0a', '#facc15'), pal('Bleu ciel', '#0284c7', '#fde68a')],
     blocks: [
       B('about', 'text', 'Qui suis-je ?', { help: '50 à 150 mots conseillés' }),
       B('stats', 'stats', 'Audience'),
@@ -386,7 +386,7 @@
   /* ---------- F16 Hébergement et lieux à louer ---------- */
   EXTRA.hebergement = {
     rec: 'd3', establishment: true,
-    palettes: [pal('Olivier', '#5b6b2f', '#d9c27a'), pal('Lavande', '#6b5b95', '#d8c8f0'), pal('Pierre', '#8a7560', '#e6d5bf'), pal('Bleu piscine', '#0e7490', '#fcd34d'), pal('Terracotta', '#a0522d', '#f4c7a1')],
+    palettes: [pal('Olivier', '#5b6b2f', '#d9c27a'), pal('Lavande', '#6b5b95', '#d8c8f0'), pal('Pierre', '#8a7560', '#e6d5bf'), pal('Bleu piscine', '#0e7490', '#fcd34d'), pal('Terracotta', '#a0522d', '#f4c7a1'), pal('Forêt boréale', '#1f4d3a', '#e9c46a')],
     blocks: [
       B('gallery', 'gallery', 'Le lieu', { help: '8 à 12 photos' }),
       B('about', 'text', 'Bienvenue', { help: '150 à 250 mots conseillés' }),
@@ -418,7 +418,7 @@
   /* ---------- F17 Tourisme et expériences ---------- */
   EXTRA.tourisme = {
     rec: 'd5',
-    palettes: [pal('Méditerranée', '#0369a1', '#fbbf24'), pal('Turquoise', '#0f766e', '#fde68a'), pal('Coucher de soleil', '#c2410c', '#fcd34d'), pal('Garrigue', '#4d7c0f', '#fef08a'), pal('Nuit étoilée', '#1e3a8a', '#f9a8d4')],
+    palettes: [pal('Méditerranée', '#0369a1', '#fbbf24'), pal('Turquoise', '#0f766e', '#fde68a'), pal('Coucher de soleil', '#c2410c', '#fcd34d'), pal('Garrigue', '#4d7c0f', '#fef08a'), pal('Nuit étoilée', '#1e3a8a', '#f9a8d4'), pal('Aurore boréale', '#134e4a', '#a78bfa')],
     blocks: [
       B('about', 'text', 'Votre guide', { help: '100 à 200 mots conseillés' }),
       B('experiences', 'cards', 'Expériences', { price: true }),
@@ -452,7 +452,7 @@
   /* ---------- F18 Services aux animaux ---------- */
   EXTRA.animaux = {
     rec: 'd3',
-    palettes: [pal('Turquoise', '#0e7490', '#fcd34d'), pal('Corail', '#be123c', '#fecdd3'), pal('Vert pomme', '#4d7c0f', '#fde047'), pal('Caramel', '#9a5b2c', '#f6d5a8'), pal('Bleu', '#1d4ed8', '#fda4af')],
+    palettes: [pal('Turquoise', '#0e7490', '#fcd34d'), pal('Corail', '#be123c', '#fecdd3'), pal('Vert pomme', '#4d7c0f', '#fde047'), pal('Caramel', '#9a5b2c', '#f6d5a8'), pal('Bleu', '#1d4ed8', '#fda4af'), pal('Lavande', '#6b5b95', '#fcd34d')],
     blocks: [
       B('about', 'text', 'Présentation', { help: '100 à 200 mots conseillés' }),
       B('services', 'list', 'Prestations & tarifs', { price: true }),
@@ -486,7 +486,7 @@
   /* ---------- F19 Boutiques, marques et artisanat ---------- */
   EXTRA.boutiques = {
     rec: 'd3', establishment: true,
-    palettes: [pal('Argent', '#374151', '#cbd5e1'), pal('Or rose', '#9f5f5f', '#f1c6b8'), pal('Jade', '#0f5e4b', '#a7d7c5'), pal('Noir velours', '#18181b', '#d4af37'), pal('Bleu céramique', '#1e4f7a', '#f2d0a4')],
+    palettes: [pal('Argent', '#374151', '#cbd5e1'), pal('Or rose', '#9f5f5f', '#f1c6b8'), pal('Jade', '#0f5e4b', '#a7d7c5'), pal('Noir velours', '#18181b', '#d4af37'), pal('Bleu céramique', '#1e4f7a', '#f2d0a4'), pal('Terracotta', '#a4512e', '#f2cda8')],
     blocks: [
       B('about', 'text', 'La marque', { help: '80 à 180 mots conseillés' }),
       B('collection', 'cards', 'Collection', { price: true, help: 'Vos produits phares' }),
@@ -520,7 +520,7 @@
   /* ---------- F20 Automobile et mobilité ---------- */
   EXTRA.auto = {
     rec: 'd1',
-    palettes: [pal('Rouge course', '#b91c1c', '#fbbf24'), pal('Bleu mécanique', '#1e40af', '#f59e0b'), pal('Noir carbone', '#18181b', '#ef4444'), pal('Vert anglais', '#14532d', '#d4af37'), pal('Gris acier', '#374151', '#38bdf8')],
+    palettes: [pal('Rouge course', '#b91c1c', '#fbbf24'), pal('Bleu mécanique', '#1e40af', '#f59e0b'), pal('Noir carbone', '#18181b', '#ef4444'), pal('Vert anglais', '#14532d', '#d4af37'), pal('Gris acier', '#374151', '#38bdf8'), pal('Orange piste', '#c2410c', '#fde68a')],
     blocks: [
       B('about', 'text', 'Le garage', { help: '100 à 180 mots conseillés' }),
       B('services', 'list', 'Prestations', { price: true }),

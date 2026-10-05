@@ -143,7 +143,7 @@ svg.lucide { width: 22px; height: 22px; }
 /* Étape 3 */
 .split { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 48px; align-items: start; }
 .side { display: flex; flex-direction: column; gap: 16px; max-width: 460px; }
-.pals { display: flex; flex-direction: column; gap: 8px; }
+.pals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .pal {
   display: flex; align-items: center; gap: 14px; padding: 12px 14px; text-align: left;
   border: 1px solid var(--line); border-radius: 13px; background: var(--card);
@@ -157,6 +157,10 @@ svg.lucide { width: 22px; height: 22px; }
 .pal-n { flex: 1; font-weight: 600; }
 .pal-ck { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--ink); opacity: 0; }
 .pal.sel .pal-ck { opacity: 1; }
+/* Grille 2 × 3 : pastilles au-dessus du nom, coche en haut à droite */
+.pals .pal { position: relative; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; }
+.pals .pal-n { min-width: 0; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
+.pals .pal-ck { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; }
 .side > .b.lg { align-self: flex-start; }
 .pv-col { display: flex; flex-direction: column; align-items: center; }
 .pv-col.stick { position: sticky; top: 84px; }
@@ -330,9 +334,11 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   .brand-n, .reset span { display: none; }
   .steps { justify-content: flex-start; overflow-x: auto; scrollbar-width: none; }
   #main { padding: 24px 16px 60px; }
-  .split { grid-template-columns: 1fr; gap: 28px; }
-  .side { max-width: none; }
+  .split { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .side { max-width: none; min-width: 0; }
   .split .pv-col { order: -1; }
+  /* Étape 3 : les couleurs restent en haut, sous le titre ; l’aperçu vient après */
+  .split.s3 .pv-col { order: 0; }
   .mtabs { display: flex; gap: 4px; margin-bottom: 16px; padding: 4px; border-radius: 12px; background: #e8e6e0; }
   .mtabs button { flex: 1; min-height: 38px; border: 0; border-radius: 9px; background: none; font-weight: 600; color: var(--mut); }
   .mtabs button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }

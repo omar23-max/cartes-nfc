@@ -487,8 +487,8 @@
       </button>`).join('');
     return `<section class="wrap">
       ${back(2, 'Changer de modèle')}
-      ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 5 palettes pensées pour votre secteur.`)}
-      <div class="split">
+      ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 6 palettes pensées pour votre secteur.`)}
+      <div class="split s3">
         <div class="side">
           <div class="pals">${pals}</div>
           <p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>
@@ -605,7 +605,7 @@
           </div>
           ${inp('Ou collez un lien vers la vidéo', 'identity.coverVideoUrl', { ph: 'https://…/ma-video.mp4', hint: 'Lien direct vers un fichier vidéo (.mp4). Les liens YouTube ne peuvent pas servir de couverture.' })}
         </div>` : ''}
-      <p class="f-h">La couverture apparaît dans les modèles Visuel, Immersif, Carte, Mosaïque et Vague. L’image de couverture sert aussi d’affiche à la vidéo.</p>`;
+      <p class="f-h">La couverture apparaît dans les modèles Showcase, Immersive, Classic, Mosaic et Wave. L’image de couverture sert aussi d’affiche à la vidéo.</p>`;
   }
 
   const galEd = (path, images, help) => `<div class="gal-ed">${(images || []).map((x, i) => `<div class="gt"><div class="gt-im"><img src="${VC.img(x.src, mdl())}" alt="">${del(path, i, 'Retirer la photo')}</div>${mini(`${path}.${i}.cap`, 'Légende')}</div>`).join('')}
