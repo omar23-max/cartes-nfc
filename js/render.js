@@ -609,7 +609,8 @@
   }
 
   /* ---------- vCard ---------- */
-  function vcard(card) {
+  /* link : adresse permanente de la carte digitale, ajoutée en tête des liens du contact */
+  function vcard(card, link, lg) {
     const id = card.identity || {}, c = card.contact || {};
     const loc = Object.values(card.blocks || {}).find((b) => b && b.on && b.address);
     const e = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/([,;])/g, '\\$1');
@@ -620,17 +621,22 @@
     if (id.role) L.push('TITLE:' + e(id.role));
     if (c.phone) L.push('TEL;TYPE=CELL,VOICE:' + tel(c.phone));
     if (c.email) L.push('EMAIL;TYPE=INTERNET:' + c.email);
-    if (c.website) L.push('URL:' + url(c.website));
+    if (link) {
+      /* iPhone affiche l’étiquette X-ABLabel ; Android affiche le lien tel quel */
+      L.push('item1.URL;TYPE=pref:' + link, 'item1.X-ABLabel:' + (lg === 'en' ? 'Digital business card' : 'Carte de visite digitale'));
+    }
+    if (c.website) L.push('URL;TYPE=work:' + url(c.website));
     if (loc) L.push('ADR;TYPE=WORK:;;' + e(loc.address) + ';;;;');
-    if (id.specialty) L.push('NOTE:' + e(id.specialty));
+    const note = [id.specialty, link ? (lg === 'en' ? 'Digital business card: ' : 'Carte de visite digitale : ') + link : ''].filter(Boolean).join('\n');
+    if (note) L.push('NOTE:' + e(note));
     const ph = /^data:image\/jpeg;base64,(.+)$/.exec(id.photo || '');
     if (ph) L.push('PHOTO;ENCODING=b;TYPE=JPEG:' + ph[1]);
     L.push('END:VCARD');
     return L.join('\r\n');
   }
-  function downloadVCard(card) {
+  function downloadVCard(card, link, lg) {
     if (window.NFC_SANDBOX) return; /* téléchargement bloqué dans l’aperçu en ligne : l’écran d’échange le signale */
-    const blob = new Blob([vcard(card)], { type: 'text/vcard;charset=utf-8' });
+    const blob = new Blob([vcard(card, link, lg)], { type: 'text/vcard;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = (String((card.identity || {}).name || 'contact').replace(/[^\w\-À-ÿ ]+/g, '').trim().replace(/\s+/g, '-') || 'contact') + '.vcf';
@@ -849,7 +855,7 @@
       if (a === 'vcard') {
         e.preventDefault();
         const m = getModel();
-        downloadVCard(m.card);
+        downloadVCard(m.card, m.link, m.lang);
         if (m.card.exchange !== false) setTimeout(() => openExchange(t, m), window.NFC_SANDBOX ? 0 : 450);
       } else if (a === 'share' || a === 'sharemenu') {
         e.preventDefault();

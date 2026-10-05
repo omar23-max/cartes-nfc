@@ -1119,7 +1119,7 @@
       case 'copy':
         if (navigator.clipboard) navigator.clipboard.writeText(link()).then(() => toast('Lien copié'));
         break;
-      case 'vcf': VC.downloadVCard(card()); break;
+      case 'vcf': VC.downloadVCard(card(), link(), lang()); break;
       case 'json': exportJSON(); break;
       case 'full': openFull(); break;
       case 'reset':
