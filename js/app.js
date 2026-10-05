@@ -649,11 +649,12 @@
         const i = cs.findIndex((x, j) => (x.cid || 'i' + j) === k.slice(2));
         if (i < 0) return;
         const cc = cs[i];
+        if (cc.on === undefined) cc.on = true;
         const label = cc.type === 'block' ? cc.def.title : SEC_TYPES[cc.type][0];
         const body = cc.type === 'block'
           ? inp('Titre de la section', `custom.${i}.title`, { ph: cc.def.title }) + blockEd(cc.def, `custom.${i}.data`)
           : customBody(cc, i);
-        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? `Copie · ${esc(cc.def.title)}` : `Section ajoutée · ${label}`, body, '', mv + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
+        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? `Copie · ${esc(cc.def.title)}` : `Section ajoutée · ${label}`, body, `custom.${i}.on`, mv + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
       }
     });
     h += `</div><div class="add-sec"><span class="f-l">${ic('plus', 15)}Ajouter une section</span><div class="add-sec-b">${Object.entries(SEC_TYPES).map(([t, [l, i]]) => `<button type="button" class="b sm" data-act="addsec" data-t="${t}">${ic(i, 15)}${l}</button>`).join('')}</div></div>`;
@@ -1016,6 +1017,7 @@
         const n = cs.filter((x) => String(x.title || '').startsWith(root + ' (' + cw)).length;
         copy.title = n ? `${root} (${cw} ${n + 1})` : `${root} (${cw})`;
         copy.cid = rid();
+        copy.on = true;
         cs.push(copy);
         order.splice(order.indexOf(k) + 1, 0, 'c:' + copy.cid);
         c.order = order;

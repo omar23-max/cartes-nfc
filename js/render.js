@@ -408,6 +408,8 @@
     return `<div class="vid"><video src="${esc(src)}" poster="${cover}" controls playsinline preload="none"></video></div>`;
   }
   function customOne(c, i, m, ctx) {
+    /* Section ajoutée ou dupliquée masquée par son interrupteur */
+    if (c.on === false) return '';
     if (c.type === 'block') {
       const def = Object.assign({}, c.def, { key: 'custom-' + i });
       if (!S[def.type] || !c.data) return '';
