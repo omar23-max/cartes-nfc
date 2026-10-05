@@ -162,6 +162,7 @@
         if (mode === 'tool') return { l: b.label || def.cta || (P && P.cta) || RDV, i: def.icon || 'cal', attrs: `href="${esc(url(b.url))}" target="_blank" rel="noopener"` };
         if (mode === 'request' || mode === 'sms') return { l: def.cta || RDV, i: mode === 'sms' ? 'sms' : 'cal', attrs: `href="#" data-vc="scroll" data-to="${k}"` };
       }
+      if (def.type === 'shop') return { l: b.label || def.cta, i: 'bag', attrs: `href="#" data-vc="scroll" data-to="${k}"` };
       if (def.type === 'action' && b.url) return { l: b.label || def.cta, i: def.icon || 'cal', attrs: `href="${esc(url(b.url))}" target="_blank" rel="noopener"` };
     }
     if (k === 'whatsapp' && c.whatsapp) return { l: 'WhatsApp', i: 'wa', attrs: `href="https://wa.me/${digits(c.whatsapp)}" target="_blank" rel="noopener"` };
@@ -626,7 +627,7 @@
   };
 
   function footer(m) {
-    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div><p class="brand">${ic('nfc', 13)} Carte de visite NFC</p></footer>`;
+    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div><p class="brand">${ic('nfc', 13)} ${window.VC.brand ? L2(...window.VC.brand) : 'Carte de visite NFC'}</p></footer>`;
   }
 
   function sticky(m) {
@@ -933,6 +934,7 @@
         if (s) s.scrollIntoView({ behavior: 'smooth', block: 'center' });
         if (v) v.play().catch(() => {});
       } else if (a === 'lb') openLB(t);
+      else if (window.VC.onAct && window.VC.onAct(a, t, e, getModel())) { /* action d’un module (ex. panier) */ }
       else if (a === 'more') { const s = t.closest('.sec'); s.classList.toggle('open'); t.textContent = tx(s.classList.contains('open') ? 'Réduire' : 'Lire la suite'); }
     });
     root.addEventListener('change', (e) => { if (e.target.matches('.vc input[name=files]')) { setLang(); listFiles(e.target); } });
@@ -945,5 +947,5 @@
     });
   }
 
-  window.VC = { render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
+  window.VC = { S, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
 })();

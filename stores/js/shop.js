@@ -1,0 +1,272 @@
+/* NFC Card Studio – Stores : la section « Boutique » (catalogue, fiche produit, panier, commande).
+   Le propriétaire choisit comment il reçoit les commandes : SMS, WhatsApp, courriel, ou paiement en ligne
+   (son propre lien Stripe, Square, PayPal…). Branché sur le moteur du studio par VC.S et NFC_APP.editors. */
+(function () {
+  'use strict';
+
+  const { ic, esc } = VC;
+  const L2 = VC.L2, lg = () => VC.lg();
+
+  /* ---------- Prix et taxes ---------- */
+  const num = (v) => { const n = parseFloat(String(v == null ? '' : v).replace(/\s/g, '').replace(',', '.').replace(/[^\d.]/g, '')); return isFinite(n) ? n : 0; };
+  const money = (n) => (lg() === 'en' ? '$' + n.toFixed(2) : n.toFixed(2).replace('.', ',') + ' $');
+  const priceOf = (x) => (num(x.sp) > 0 && num(x.sp) < num(x.p) ? num(x.sp) : num(x.p));
+  const TAX = {
+    qc: () => [['TPS (5 %)', 'GST (5%)', 0.05], ['TVQ (9,975 %)', 'QST (9.975%)', 0.09975]],
+    on: () => [['TVH (13 %)', 'HST (13%)', 0.13]],
+    tps: () => [['TPS (5 %)', 'GST (5%)', 0.05]],
+    us: (b) => (num(b.rate) > 0 ? [[`Taxe de vente (${b.rate} %)`, `Sales tax (${b.rate}%)`, num(b.rate) / 100]] : []),
+    none: () => [],
+  };
+  const cats = (b) => String(b.cats || '').split(',').map((c) => c.trim()).filter(Boolean);
+  const opts = (x) => String(x.o || '').split(',').map((c) => c.trim()).filter(Boolean);
+  const items = (b) => (b.items || []).filter((x) => x.t);
+  const digits = (p) => String(p || '').replace(/\D/g, '');
+
+  /* ---------- Panier (gardé le temps de la visite) ---------- */
+  let CART = [];
+  try { CART = JSON.parse(sessionStorage.getItem('nfc-cart') || '[]'); } catch (e) { /* stockage indisponible */ }
+  const keep = () => { try { sessionStorage.setItem('nfc-cart', JSON.stringify(CART)); } catch (e) { /* rien */ } };
+  const count = () => CART.reduce((a, l) => a + l.q, 0);
+  const refreshBadges = (root) => (root || document).querySelectorAll('.shp-n').forEach((n) => { n.textContent = count(); n.hidden = !count(); });
+
+  /* Retrouve la section boutique de la carte affichée */
+  function shopOf(m) {
+    const def = m.sec.blocks.find((d) => d.type === 'shop');
+    return def ? { def, b: m.card.blocks[def.key] || {} } : null;
+  }
+  /* Ligne de panier → produit actuel (le nom sert de repère si l’ordre des produits change) */
+  const lineItem = (b, l) => items(b).find((x) => x.t === l.t);
+
+  /* ---------- Rendu dans la carte ---------- */
+  VC.S.shop = function (def, b, m) {
+    const list = items(b);
+    if (!list.length) return '';
+    const cs = cats(b).filter((c) => list.some((x) => x.cat === c));
+    const chips = cs.length > 1 ? `<div class="shp-cats" role="tablist"><button type="button" class="on" data-vc="shcat" data-c="">${L2('Tout', 'All')}</button>${cs.map((c) => `<button type="button" data-vc="shcat" data-c="${esc(c)}">${esc(c)}</button>`).join('')}</div>` : '<span></span>';
+    const tile = (x) => {
+      const i = (b.items || []).indexOf(x), sale = priceOf(x) < num(x.p);
+      return `<button type="button" class="shp-it" data-vc="prod" data-i="${i}" data-cat="${esc(x.cat || '')}">
+        <span class="shp-im">${x.img ? `<img src="${VC.img(x.img, m)}" alt="" loading="lazy">` : ''}${x.b ? `<span class="shp-b${sale ? ' sale' : ''}">${esc(x.b)}</span>` : ''}</span>
+        <span class="shp-t">${esc(x.t)}</span>${x.d ? `<span class="shp-d">${esc(x.d)}</span>` : ''}
+        <span class="shp-p">${num(x.p) ? `${sale ? `<s>${money(num(x.p))}</s>` : ''}<b>${money(priceOf(x))}</b>` : ''}</span></button>`;
+    };
+    const how = [b.pickup !== false ? L2('Ramassage en boutique', 'In-store pickup') : '', b.delivery ? L2('Livraison', 'Delivery') : ''].filter(Boolean).join(' · ');
+    return `<div class="shp" data-k="${def.key}">${b.text ? `<p class="txt">${VC.nl(b.text)}</p>` : ''}
+      <div class="shp-bar">${chips}<button type="button" class="shp-cart" data-vc="cart" aria-label="${L2('Panier', 'Cart')}">${ic('bag', 18)}<span class="shp-n"${count() ? '' : ' hidden'}>${count()}</span></button></div>
+      <div class="shp-grid">${list.map(tile).join('')}</div>
+      ${how ? `<p class="shp-how">${ic('check', 14)}<span>${how}${b.order === 'online' ? L2(' · Paiement en ligne sécurisé', ' · Secure online payment') : L2(' · Paiement au ramassage ou à la livraison', ' · Pay at pickup or on delivery')}</span></p>` : ''}</div>`;
+  };
+
+  /* ---------- Fenêtres : fiche produit et panier ---------- */
+  function sheet(from, html, cls) {
+    const o = VC.overlay(from, 'ov-shop ' + (cls || ''));
+    o.ov.innerHTML = `<div class="vc-ov-in"><div class="shs">${html}</div></div>`;
+    return o;
+  }
+
+  function openProduct(t, m) {
+    const sh = shopOf(m);
+    if (!sh) return;
+    const { b } = sh, x = (b.items || [])[+t.dataset.i];
+    if (!x) return;
+    const os = opts(x), sale = priceOf(x) < num(x.p);
+    let o = os.length === 1 ? os[0] : '', q = 1;
+    const { ov, close } = sheet(t, `<button type="button" class="ov-x shs-x" aria-label="${L2('Fermer', 'Close')}">${ic('x', 18)}</button>
+      ${x.img ? `<div class="shs-im"><img src="${VC.img(x.img, m)}" alt="">${x.b ? `<span class="shp-b${sale ? ' sale' : ''}">${esc(x.b)}</span>` : ''}</div>` : ''}
+      <div class="shs-b">
+        ${x.cat ? `<p class="shs-cat">${esc(x.cat)}</p>` : ''}
+        <h3>${esc(x.t)}</h3>
+        <p class="shs-p">${sale ? `<s>${money(num(x.p))}</s>` : ''}<b>${money(priceOf(x))}</b></p>
+        ${x.l || x.d ? `<p class="shs-l">${VC.nl(x.l || x.d)}</p>` : ''}
+        ${os.length ? `<p class="shs-lb">${L2('Choisissez', 'Choose')}</p><div class="shs-o">${os.map((v) => `<button type="button" data-o="${esc(v)}" class="${o === v ? 'on' : ''}">${esc(v)}</button>`).join('')}</div>` : ''}
+        <div class="shs-row"><div class="qty"><button type="button" data-q="-1" aria-label="${L2('Moins', 'Less')}">−</button><span>1</span><button type="button" data-q="1" aria-label="${L2('Plus', 'More')}">+</button></div>
+          <button type="button" class="btn shs-add">${ic('bag', 18)}<span>${L2('Ajouter au panier', 'Add to cart')}</span></button></div>
+        <p class="shs-msg" role="status"></p>
+      </div>`, 'ov-prod');
+    ov.addEventListener('click', (e) => {
+      const ob = e.target.closest('[data-o]'), qb = e.target.closest('[data-q]');
+      if (ob) { o = ob.dataset.o; ov.querySelectorAll('[data-o]').forEach((z) => z.classList.toggle('on', z === ob)); ov.querySelector('.shs-msg').textContent = ''; }
+      else if (qb) { q = Math.max(1, Math.min(20, q + +qb.dataset.q)); ov.querySelector('.qty span').textContent = q; }
+      else if (e.target.closest('.shs-add')) {
+        if (os.length && !o) { ov.querySelector('.shs-msg').textContent = L2('Choisissez d’abord une option.', 'Please choose an option first.'); return; }
+        const same = CART.find((l) => l.t === x.t && l.o === o);
+        if (same) same.q += q; else CART.push({ t: x.t, o, q });
+        keep();
+        refreshBadges(t.closest('.vc'));
+        close();
+        toastIn(t.closest('.vc'), L2('Ajouté au panier', 'Added to cart'));
+      }
+    });
+  }
+
+  function toastIn(vc, msg) {
+    if (!vc) return;
+    const el = document.createElement('div');
+    el.className = 'shp-toast';
+    el.innerHTML = `${ic('check', 16)}<span>${esc(msg)}</span>`;
+    const sc = vc.closest('[data-vc-scroll]');
+    el.style.top = sc ? sc.scrollTop + 14 + 'px' : '';
+    if (!sc) el.style.position = 'fixed';
+    vc.appendChild(el);
+    setTimeout(() => el.remove(), 1800);
+  }
+
+  function openCart(t, m) {
+    const sh = shopOf(m);
+    if (!sh) return;
+    const { b } = sh, shopName = String((m.card.identity || {}).name || '').trim();
+    const c = m.card.contact || {};
+    const canPick = b.pickup !== false, canShip = !!b.delivery;
+    let mode = canPick ? 'pick' : 'ship';
+    const { ov, close } = sheet(t, '', 'ov-cart');
+    const box = ov.querySelector('.shs');
+
+    const totals = () => {
+      const lines = CART.map((l) => ({ l, x: lineItem(b, l) })).filter((r) => r.x);
+      const sub = lines.reduce((a, r) => a + priceOf(r.x) * r.l.q, 0);
+      const fee = mode === 'ship' && !(num(b.freeFrom) && sub >= num(b.freeFrom)) ? num(b.fee) : 0;
+      const taxes = (TAX[b.tax] || TAX.none)(b).map(([fr, en, r]) => [L2(fr, en), (sub + fee) * r]);
+      return { lines, sub, fee, taxes, total: sub + fee + taxes.reduce((a, x) => a + x[1], 0) };
+    };
+    const draw = () => {
+      const T = totals();
+      if (!T.lines.length) {
+        box.innerHTML = `<button type="button" class="ov-x shs-x" aria-label="${L2('Fermer', 'Close')}">${ic('x', 18)}</button><div class="shs-b shc-empty">${ic('bag', 30)}<h3>${L2('Votre panier est vide', 'Your cart is empty')}</h3><p>${L2('Touchez un produit pour l’ajouter.', 'Tap a product to add it.')}</p><button type="button" class="btn ov-x">${L2('Voir les produits', 'Browse products')}</button></div>`;
+        return;
+      }
+      const f = (k) => { const el = box.querySelector(`[name=${k}]`); return el ? el.value : ''; };
+      const keepVals = { nom: f('nom'), tel: f('tel'), adr: f('adr'), note: f('note') };
+      const row = (l, v, cls = '') => `<div class="shc-t ${cls}"><span>${l}</span><span>${v}</span></div>`;
+      const way = b.order === 'online' ? 'online' : b.order === 'wa' ? 'wa' : b.order === 'email' ? 'email' : 'sms';
+      const sendL = { sms: L2('Envoyer ma commande par texto', 'Send my order by text'), wa: L2('Envoyer ma commande sur WhatsApp', 'Send my order on WhatsApp'), email: L2('Envoyer ma commande par courriel', 'Send my order by email'), online: L2(`Payer ${money(T.total)} en ligne`, `Pay ${money(T.total)} online`) }[way];
+      const sendI = { sms: 'sms', wa: 'wa', email: 'mail', online: 'bag' }[way];
+      box.innerHTML = `<button type="button" class="ov-x shs-x" aria-label="${L2('Fermer', 'Close')}">${ic('x', 18)}</button>
+        <div class="shs-b"><h3>${L2('Mon panier', 'My cart')}</h3>
+        <div class="shc-l">${T.lines.map(({ l, x }, k) => `<div class="shc-i">${x.img ? `<img src="${VC.img(x.img, m)}" alt="">` : '<span></span>'}<div class="shc-m"><b>${esc(x.t)}</b>${l.o ? `<span>${esc(l.o)}</span>` : ''}<span>${money(priceOf(x))}</span></div>
+          <div class="qty sm"><button type="button" data-lq="-1" data-k="${k}" aria-label="${L2('Moins', 'Less')}">−</button><span>${l.q}</span><button type="button" data-lq="1" data-k="${k}" aria-label="${L2('Plus', 'More')}">+</button></div></div>`).join('')}</div>
+        ${canPick && canShip ? `<div class="shc-mode" role="group">${[['pick', L2('Ramassage en boutique', 'In-store pickup'), L2('Gratuit', 'Free')], ['ship', L2('Livraison', 'Delivery'), num(b.fee) ? money(num(b.fee)) + (num(b.freeFrom) ? L2(` · gratuite dès ${money(num(b.freeFrom))}`, ` · free over ${money(num(b.freeFrom))}`) : '') : L2('Gratuite', 'Free')]].map(([v, l, d]) => `<button type="button" data-mode="${v}" class="${mode === v ? 'on' : ''}"><b>${l}</b><span>${d}</span></button>`).join('')}</div>` : ''}
+        ${mode === 'ship' && b.zone ? `<p class="shc-z">${ic('pin', 14)}<span>${L2('Zone de livraison', 'Delivery area')} : ${esc(b.zone)}</span></p>` : ''}
+        <div class="shc-f">
+          <input name="nom" placeholder="${L2('Votre nom', 'Your name')}" value="${esc(keepVals.nom)}" autocomplete="name">
+          <input name="tel" type="tel" placeholder="${L2('Votre téléphone', 'Your phone')}" value="${esc(keepVals.tel)}" autocomplete="tel">
+          ${mode === 'ship' ? `<input name="adr" placeholder="${L2('Adresse de livraison', 'Delivery address')}" value="${esc(keepVals.adr)}" autocomplete="street-address">` : ''}
+          <input name="note" placeholder="${L2('Une précision ? (facultatif)', 'Anything to add? (optional)')}" value="${esc(keepVals.note)}">
+        </div>
+        <div class="shc-tot">${row(L2('Sous-total', 'Subtotal'), money(T.sub))}${mode === 'ship' ? row(L2('Livraison', 'Delivery'), T.fee ? money(T.fee) : L2('Gratuite', 'Free')) : ''}${T.taxes.map(([l, v]) => row(l, money(v))).join('')}${row('Total', money(T.total), 'big')}</div>
+        <button type="button" class="btn shc-go">${ic(sendI, 18)}<span>${sendL}</span></button>
+        <p class="shs-msg" role="status"></p>
+        <p class="shc-h">${way === 'online' ? L2('Le paiement s’ouvre dans une page sécurisée.', 'Payment opens on a secure page.') : L2(`Un message déjà rédigé s’ouvre : il ne reste qu’à l’envoyer. ${esc(shopName)} vous confirme la commande et le paiement.`, `A ready-made message opens: just hit send. ${esc(shopName)} will confirm your order and payment.`)}</p></div>`;
+    };
+    const message = (T, v) => {
+      const lines = T.lines.map(({ l, x }) => `• ${l.q} × ${x.t}${l.o ? ` (${l.o})` : ''} : ${money(priceOf(x) * l.q)}`);
+      return [L2(`Bonjour ${shopName}, voici ma commande :`, `Hi ${shopName}, here is my order:`), ...lines, '',
+        `${L2('Sous-total', 'Subtotal')} : ${money(T.sub)}`, ...(mode === 'ship' ? [`${L2('Livraison', 'Delivery')} : ${money(T.fee)}`] : []),
+        ...T.taxes.map(([l, x]) => `${l} : ${money(x)}`), `Total : ${money(T.total)}`, '',
+        mode === 'ship' ? `${L2('Livraison à', 'Deliver to')} : ${v.adr}` : L2('Ramassage en boutique', 'In-store pickup'),
+        `${L2('Nom', 'Name')} : ${v.nom}`, `${L2('Téléphone', 'Phone')} : ${v.tel}`, ...(v.note ? [`${L2('Note', 'Note')} : ${v.note}`] : [])].join('\n');
+    };
+    draw();
+    ov.addEventListener('click', (e) => {
+      const lq = e.target.closest('[data-lq]'), md = e.target.closest('[data-mode]');
+      if (lq) {
+        const T = totals(), r = T.lines[+lq.dataset.k];
+        if (r) { r.l.q += +lq.dataset.lq; if (r.l.q <= 0) CART.splice(CART.indexOf(r.l), 1); keep(); refreshBadges(t.closest('.vc')); draw(); }
+      } else if (md) { mode = md.dataset.mode; draw(); }
+      else if (e.target.closest('.shc-go')) {
+        const v = {}; ['nom', 'tel', 'adr', 'note'].forEach((k) => { const el = box.querySelector(`[name=${k}]`); v[k] = el ? el.value.trim() : ''; });
+        const msgEl = box.querySelector('.shs-msg');
+        if (!v.nom || !v.tel || (mode === 'ship' && !v.adr)) { msgEl.textContent = L2('Indiquez votre nom, votre téléphone' + (mode === 'ship' ? ' et votre adresse.' : '.'), 'Please enter your name, phone' + (mode === 'ship' ? ' and address.' : '.')); return; }
+        const T = totals(), txt = message(T, v), E = encodeURIComponent;
+        const phone = String(b.phone || c.phone || '').replace(/[^\d+]/g, ''), wa = digits(b.wa || c.whatsapp || c.phone), email = b.email || c.email;
+        if (b.order === 'online') {
+          if (!b.payUrl) { msgEl.textContent = L2('Le lien de paiement n’est pas encore configuré.', 'The payment link isn’t set up yet.'); return; }
+          let u = VC.url(b.payUrl);
+          if (/paypal\.me\//i.test(u)) u = u.replace(/\/+$/, '') + '/' + T.total.toFixed(2);
+          window.open(u, '_blank', 'noopener');
+        } else if (b.order === 'wa' && wa) window.open(`https://wa.me/${wa}?text=${E(txt)}`, '_blank', 'noopener');
+        else if (b.order === 'email' && email) location.href = `mailto:${email}?subject=${E(L2('Commande', 'Order') + ' – ' + v.nom)}&body=${E(txt)}`;
+        else if (phone) location.href = `sms:${phone}?&body=${E(txt)}`;
+        else if (email) location.href = `mailto:${email}?subject=${E(L2('Commande', 'Order') + ' – ' + v.nom)}&body=${E(txt)}`;
+        box.innerHTML = `<button type="button" class="ov-x shs-x" aria-label="${L2('Fermer', 'Close')}">${ic('x', 18)}</button><div class="shs-b shc-empty"><span class="shc-ok">${ic('check', 28)}</span><h3>${L2('Merci !', 'Thank you!')}</h3>
+          <p>${b.order === 'online' ? L2('Terminez le paiement dans la page qui vient de s’ouvrir.', 'Complete your payment on the page that just opened.') : L2('Votre message est prêt : envoyez-le pour confirmer la commande.', 'Your message is ready: send it to confirm your order.')}</p>
+          <button type="button" class="btn" data-clear>${L2('Terminer', 'Done')}</button></div>`;
+      } else if (e.target.closest('[data-clear]')) { CART = []; keep(); refreshBadges(t.closest('.vc')); close(); }
+    });
+  }
+
+  /* Actions des visiteurs dans la carte */
+  VC.onAct = function (a, t, e, m) {
+    if (a === 'shcat') {
+      const shp = t.closest('.shp'), c = t.dataset.c;
+      shp.querySelectorAll('.shp-cats button').forEach((x) => x.classList.toggle('on', x === t));
+      shp.querySelectorAll('.shp-it').forEach((x) => { x.hidden = !!c && x.dataset.cat !== c; });
+      return true;
+    }
+    if (a === 'prod') { openProduct(t, m); return true; }
+    if (a === 'cart') { openCart(t, m); return true; }
+    return false;
+  };
+  VC.brand = ['Boutique NFC', 'NFC store'];
+
+  /* ---------- Éditeur de la section ---------- */
+  const app = window.NFC_APP || (window.NFC_APP = {});
+  app.tpl = Object.assign(app.tpl || {}, { prod: { t: '', d: '', l: '', p: '', sp: '', b: '', img: '', cat: '', o: '' } });
+  app.editors = Object.assign(app.editors || {}, {
+    shop(b, base, h) {
+      const { inp, area, mini, add, del, thumbF } = h;
+      const cs = cats(b), mode = ['sms', 'wa', 'email', 'online'].includes(b.order) ? b.order : 'sms', c = h.card().contact || {};
+      const catSel = (p, v) => `<select class="mini" data-path="${p}"><option value="">${'Sans catégorie'}</option>${cs.map((x) => `<option ${x === v ? 'selected' : ''}>${esc(x)}</option>`).join('')}</select>`;
+      const prods = (b.items || []).map((x, i) => {
+        const p = `${base}.items.${i}`;
+        return `<div class="it shop-it">${thumbF(p + '.img')}<div class="it-f">${mini(p + '.t', 'Nom du produit', 'strong')}${mini(p + '.d', 'Description courte')}
+          <span class="shop-lb">Prix · Prix soldé · Badge</span>
+          <div class="shop-row">${mini(p + '.p', 'Prix (ex. 89)', 'price')}${mini(p + '.sp', 'Prix soldé', 'price')}${mini(p + '.b', 'Badge (Nouveau…)')}</div>
+          <span class="shop-lb">Catégorie · Tailles ou options</span>
+          <div class="shop-row two">${catSel(p + '.cat', x.cat)}${mini(p + '.o', 'Tailles ou options : S, M, L')}</div>
+          ${mini(p + '.l', 'Description complète (fiche produit)')}</div>${del(base + '.items', i, 'Supprimer le produit')}</div>`;
+      }).join('');
+      const seg = (path, cur, list) => `<div class="seg wrap">${list.map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" data-act="bkmode" data-path="${path}" data-v="${v}">${l}</button>`).join('')}</div>`;
+      const recv = {
+        sms: inp('Numéro qui reçoit les commandes', base + '.phone', { type: 'tel', ph: c.phone || '', hint: 'Vide = votre téléphone. Le client envoie un texto déjà rédigé avec sa commande et le total.' }),
+        wa: inp('Numéro WhatsApp qui reçoit les commandes', base + '.wa', { type: 'tel', ph: c.whatsapp || c.phone || '', hint: 'Vide = votre numéro WhatsApp. Le client envoie la commande dans WhatsApp.' }),
+        email: inp('Adresse qui reçoit les commandes', base + '.email', { type: 'email', ph: c.email || '', hint: 'Vide = votre courriel.' }),
+        online: inp('Votre lien de paiement', base + '.payUrl', { ph: 'https://buy.stripe.com/… ou https://paypal.me/…', hint: 'Créez un lien de paiement chez Stripe, Square ou PayPal, puis collez-le ici. Avec PayPal.me, le montant du panier est ajouté automatiquement.' }),
+      }[mode];
+      return `<p class="f-l">Produits</p><div class="items">${prods}</div>${add(base + '.items', 'prod', 'Ajouter un produit')}
+        ${inp('Catégories', base + '.cats', { ph: 'Femme, Homme, Accessoires', hint: 'Séparez-les par des virgules, puis choisissez la catégorie de chaque produit.' })}
+        <div class="f"><span class="f-l">Comment vos clients commandent et paient ?</span>${seg(base + '.order', mode, [['sms', 'Texto'], ['wa', 'WhatsApp'], ['email', 'Courriel'], ['online', 'Paiement en ligne']])}</div>
+        ${recv}
+        <div class="f"><span class="f-l">Réception de la commande</span>
+          <label class="ck"><input type="checkbox" data-path="${base}.pickup" ${b.pickup !== false ? 'checked' : ''}><span>Ramassage en boutique</span></label>
+          <label class="ck"><input type="checkbox" data-path="${base}.delivery" ${b.delivery ? 'checked' : ''}><span>Livraison</span></label></div>
+        <div class="row2">${inp('Frais de livraison ($)', base + '.fee', { ph: '10' })}${inp('Livraison gratuite dès ($)', base + '.freeFrom', { ph: '150' })}</div>
+        ${inp('Zone de livraison', base + '.zone', { ph: 'Montréal et Laval' })}
+        <label class="f"><span class="f-l">Taxes ajoutées au total</span><select data-path="${base}.tax">${[['qc', 'Québec : TPS 5 % + TVQ 9,975 %'], ['on', 'Ontario : TVH 13 %'], ['tps', 'TPS 5 % seulement'], ['us', 'États-Unis : taxe de vente (taux à saisir)'], ['none', 'Aucune (prix taxes incluses)']].map(([v, l]) => `<option value="${v}" ${(b.tax || 'none') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        ${b.tax === 'us' ? inp('Taux de taxe de vente (%)', base + '.rate', { ph: '8.25', hint: 'Taux de votre ville ou de votre État.' }) : ''}
+        ${area('Texte d’accueil de la boutique', base + '.text', { rows: 2 })}
+        ${inp('Texte du gros bouton', base + '.label', { ph: 'Voir la boutique' })}`;
+    },
+  });
+
+  /* Textes fixes de l’éditeur en anglais */
+  Object.assign(window.NFC_EN_APP || (window.NFC_EN_APP = {}), {
+    'Produits': 'Products', 'Prix · Prix soldé · Badge': 'Price · Sale price · Badge', 'Catégorie · Tailles ou options': 'Category · Sizes or options', 'Nom du produit': 'Product name', 'Description courte': 'Short description', 'Prix (ex. 89)': 'Price (e.g. 89)', 'Prix soldé': 'Sale price',
+    'Badge (Nouveau…)': 'Badge (New…)', 'Sans catégorie': 'No category', 'Tailles ou options : S, M, L': 'Sizes or options: S, M, L', 'Description complète (fiche produit)': 'Full description (product page)',
+    'Supprimer le produit': 'Delete product', 'Ajouter un produit': 'Add a product', 'Catégories': 'Categories',
+    'Séparez-les par des virgules, puis choisissez la catégorie de chaque produit.': 'Separate them with commas, then pick each product’s category.',
+    'Comment vos clients commandent et paient ?': 'How do customers order and pay?', 'Texto': 'Text', 'Courriel': 'Email', 'Paiement en ligne': 'Online payment',
+    'Numéro qui reçoit les commandes': 'Number that receives orders', 'Numéro WhatsApp qui reçoit les commandes': 'WhatsApp number that receives orders', 'Adresse qui reçoit les commandes': 'Address that receives orders',
+    'Vide = votre téléphone. Le client envoie un texto déjà rédigé avec sa commande et le total.': 'Empty = your phone. Customers send a ready-made text with their order and total.',
+    'Vide = votre numéro WhatsApp. Le client envoie la commande dans WhatsApp.': 'Empty = your WhatsApp number. Customers send their order in WhatsApp.', 'Vide = votre courriel.': 'Empty = your email.',
+    'Votre lien de paiement': 'Your payment link', 'Créez un lien de paiement chez Stripe, Square ou PayPal, puis collez-le ici. Avec PayPal.me, le montant du panier est ajouté automatiquement.': 'Create a payment link with Stripe, Square or PayPal, then paste it here. With PayPal.me, the cart amount is added automatically.',
+    'Réception de la commande': 'Order fulfillment', 'Ramassage en boutique': 'In-store pickup', 'Livraison': 'Delivery', 'Frais de livraison ($)': 'Delivery fee ($)', 'Livraison gratuite dès ($)': 'Free delivery over ($)',
+    'Zone de livraison': 'Delivery area', 'Taxes ajoutées au total': 'Taxes added to the total', 'Québec : TPS 5 % + TVQ 9,975 %': 'Quebec: GST 5% + QST 9.975%', 'Ontario : TVH 13 %': 'Ontario: HST 13%',
+    'TPS 5 % seulement': 'GST 5% only', 'États-Unis : taxe de vente (taux à saisir)': 'United States: sales tax (enter rate)', 'Aucune (prix taxes incluses)': 'None (prices include tax)',
+    'Taux de taxe de vente (%)': 'Sales tax rate (%)', 'Taux de votre ville ou de votre État.': 'Your city or state rate.', 'Texte d’accueil de la boutique': 'Shop welcome text', 'Texte du gros bouton': 'Main button text',
+  });
+  Object.assign(window.NFC_EN_UI || (window.NFC_EN_UI = {}), {
+    'La boutique': 'The shop', 'Voir la boutique': 'Shop now', 'Notre histoire': 'Our story', 'En boutique': 'In store', 'Heures d’ouverture': 'Opening hours',
+    'Nous trouver': 'Find us', 'Ce que disent nos clients': 'What our customers say', 'Livraison, échanges et retours': 'Delivery, exchanges & returns',
+  });
+})();

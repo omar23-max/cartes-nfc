@@ -6,8 +6,10 @@
   const { ic, esc } = VC;
   const $ = (s, r = document) => r.querySelector(s);
   const clone = (o) => JSON.parse(JSON.stringify(o));
-  const KEY = 'nfc-studio-v6';
-  const STEPS = ['Secteur', 'Modèle', 'Couleurs', 'Contenu', 'Publication'];
+  /* Un autre produit (ex. Stores) peut changer la clé d’enregistrement, les étapes et les textes d’accueil */
+  const X = window.NFC_APP || {};
+  const KEY = X.key || 'nfc-studio-v6';
+  const STEPS = X.steps || ['Secteur', 'Modèle', 'Couleurs', 'Contenu', 'Publication'];
 
   const fresh = () => ({ v: 1, step: 1, sectorId: null, design: null, palette: 0, cards: {}, id: rid() });
   let S = load();
@@ -273,7 +275,7 @@
     $('.reset').innerHTML = `${ic('reset', 16)}<span>Recommencer</span>`;
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
     document.documentElement.lang = ui();
-    document.title = ui() === 'en' ? 'NFC Card Studio' : 'Studio Carte NFC';
+    document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : ui() === 'en' ? 'NFC Card Studio' : 'Studio Carte NFC';
     const main = $('#main');
     main.innerHTML = [step1, step2, step3, step4, step5][S.step - 1]();
     main.dataset.step = S.step;
@@ -384,7 +386,7 @@
         <span class="tile-ex">${s.ex}</span>
       </button>`).join('');
     return `<section class="wrap">
-      ${head('Quel est votre secteur d’activité ?', 'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.')}
+      ${X.pick ? head(...X.pick) : head('Quel est votre secteur d’activité ?', 'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.')}
       <div class="tiles">${tiles}
       </div>
     </section>`;
@@ -522,7 +524,7 @@
         </div>
       </div>`).join('');
     return `<section class="wrap">
-      ${back(1, 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
+      ${back(1, X.backTo || 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
       ${langSwitch()}
       ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Cliquez pour choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.`)}
       <div class="tpls">${cards}</div>
@@ -972,7 +974,8 @@
           ${vidSource(base, b.src, '')}
           ${inp('Ou lien de votre vidéo', base + '.url', { ph: 'YouTube, Vimeo, Instagram…', hint: 'La vidéo se lance au clic, pour garder une carte légère.' })}${inp('Légende', base + '.cap')}${imgF('Image de couverture', base + '.cover')}`;
       default:
-        return '';
+        /* Sections propres à un autre produit (ex. boutique en ligne de Stores) */
+        return X.editors && X.editors[def.type] ? X.editors[def.type](b, base, { inp, area, mini, add, del, thumbF, g, card, esc, ic }) : '';
     }
   }
 
@@ -1033,7 +1036,8 @@
     if (inp) inp.focus();
   }
 
-  const TPL = { rev: { n: '', r: '', t: '', s: 5 }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } };
+  const TPL = X.tpl || {};
+  Object.assign(TPL, { rev: { n: '', r: '', t: '', s: 5 }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } }, X.tpl || {});
 
   function structChanged() {
     save();

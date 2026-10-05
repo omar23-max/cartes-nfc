@@ -1,0 +1,87 @@
+/* NFC Card Studio – Stores : section Boutique, fiche produit, panier */
+
+/* ---------- Catalogue dans la carte ---------- */
+.vc .shp .txt { margin-bottom: 12px; }
+.vc .shp-bar { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: 10px; margin: 0 -2px 12px; padding: 6px 2px; background: var(--bg); }
+.vc .shp-cats { flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+.vc .shp-cats::-webkit-scrollbar { display: none; }
+.vc .shp-cats button { flex: none; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--ln); background: var(--sf); color: var(--tx); font: 600 13px/1 Inter, system-ui, sans-serif; cursor: pointer; }
+.vc .shp-cats button.on { background: var(--p); border-color: var(--p); color: #fff; }
+.vc .shp-cart { position: relative; flex: none; margin-left: auto; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; border: 1px solid var(--ln); background: var(--sf); color: var(--tx); cursor: pointer; }
+.vc .shp-n { position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px; background: var(--a); color: #111; font: 700 11.5px/20px Inter, system-ui, sans-serif; text-align: center; }
+.vc .shp-n[hidden] { display: none; }
+.vc .shp-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; }
+.vc .shp-it { display: flex; flex-direction: column; gap: 3px; padding: 0; border: 0; background: none; color: inherit; text-align: left; font: inherit; cursor: pointer; min-width: 0; }
+.vc .shp-it[hidden] { display: none; }
+.vc .shp-im { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 12px; background: var(--ln); margin-bottom: 5px; }
+.vc .shp-im img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
+.vc .shp-it:hover .shp-im img { transform: scale(1.04); }
+.vc .shp-b { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 6px; background: var(--sf); color: var(--tx); font: 700 10.5px/1 Inter, system-ui, sans-serif; letter-spacing: .02em; text-transform: uppercase; }
+.vc .shp-b.sale { background: #b91c1c; color: #fff; }
+.vc .shp-t { font-weight: 600; font-size: 14px; line-height: 1.3; }
+.vc .shp-d { font-size: 12.5px; line-height: 1.35; color: var(--mu); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vc .shp-p { display: flex; align-items: baseline; gap: 6px; font-size: 14px; }
+.vc .shp-p s, .vc .shs-p s { color: var(--mu); font-size: .88em; }
+.vc .shp-p b { color: var(--tx); }
+.vc .shp-how { display: flex; align-items: flex-start; gap: 7px; margin-top: 14px; font-size: 12.5px; color: var(--mu); }
+.vc .shp-how svg { flex: none; margin-top: 2px; color: var(--p); }
+
+/* ---------- Fenêtres : fiche produit et panier ---------- */
+.vc .shs {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 94%; overflow-y: auto;
+  border-radius: 24px 24px 0 0; background: var(--bg); color: var(--tx); animation: vcup .25s ease;
+  box-shadow: 0 -20px 50px -20px rgba(0,0,0,.4); font-family: Inter, system-ui, sans-serif;
+}
+.vc .shs-x { position: absolute; top: 12px; right: 12px; z-index: 2; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--sf); border: 1px solid var(--ln); color: var(--tx); }
+.vc .shs-im { position: relative; aspect-ratio: 1; max-height: 52vh; width: 100%; overflow: hidden; background: var(--ln); }
+.vc .shs-im img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vc .shs-im .shp-b { top: 14px; left: 14px; }
+.vc .shs-b { padding: 18px 20px calc(20px + env(safe-area-inset-bottom)); }
+.vc .shs-cat { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mu); }
+.vc .shs h3 { margin: 2px 0 4px; font-size: 21px; line-height: 1.25; }
+.vc .shs-p { display: flex; align-items: baseline; gap: 8px; font-size: 18px; }
+.vc .shs-l { margin-top: 10px; font-size: 14px; color: var(--mu); }
+.vc .shs-lb { margin: 16px 0 8px; font-size: 13px; font-weight: 600; }
+.vc .shs-o { display: flex; flex-wrap: wrap; gap: 7px; }
+.vc .shs-o button { min-width: 44px; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--ln); background: var(--sf); color: var(--tx); font: 600 13.5px/1 Inter, system-ui, sans-serif; cursor: pointer; }
+.vc .shs-o button.on { border-color: var(--p); background: var(--p); color: #fff; }
+.vc .shs-row { display: flex; gap: 10px; margin-top: 18px; }
+.vc .shs-row .btn { flex: 1; justify-content: center; }
+.vc .qty { display: inline-flex; align-items: center; border: 1px solid var(--ln); border-radius: 12px; background: var(--sf); }
+.vc .qty button { width: 40px; height: 46px; border: 0; background: none; color: var(--tx); font: 500 20px/1 Inter, system-ui, sans-serif; cursor: pointer; }
+.vc .qty span { min-width: 22px; text-align: center; font-weight: 600; }
+.vc .qty.sm button { width: 32px; height: 34px; font-size: 17px; }
+.vc .shs-msg { margin-top: 10px; font-size: 13px; color: #b91c1c; }
+.vc .shs-msg:empty { display: none; }
+
+.vc .shc-l { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+.vc .shc-i { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; align-items: center; gap: 12px; }
+.vc .shc-i img { width: 56px; height: 66px; border-radius: 10px; object-fit: cover; display: block; }
+.vc .shc-m { display: flex; flex-direction: column; font-size: 13px; color: var(--mu); min-width: 0; }
+.vc .shc-m b { color: var(--tx); font-size: 14px; }
+.vc .shc-mode { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 6px 0 10px; }
+.vc .shc-mode button { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--ln); background: var(--sf); color: var(--tx); text-align: left; font: 13px/1.3 Inter, system-ui, sans-serif; cursor: pointer; }
+.vc .shc-mode button span { font-size: 12px; color: var(--mu); }
+.vc .shc-mode button.on { border-color: var(--p); box-shadow: inset 0 0 0 1px var(--p); }
+.vc .shc-z { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; font-size: 12.5px; color: var(--mu); }
+.vc .shc-f { display: flex; flex-direction: column; gap: 8px; }
+.vc .shc-f input { width: 100%; padding: 11px 12px; border-radius: 10px; border: 1px solid var(--ln); background: var(--sf); color: var(--tx); font: 14px Inter, system-ui, sans-serif; }
+.vc .shc-tot { margin: 14px 0; padding-top: 10px; border-top: 1px solid var(--ln); }
+.vc .shc-t { display: flex; justify-content: space-between; padding: 3px 0; font-size: 13.5px; color: var(--mu); }
+.vc .shc-t.big { padding-top: 8px; font-size: 17px; font-weight: 700; color: var(--tx); }
+.vc .shc-go { width: 100%; justify-content: center; }
+.vc .shc-h { margin-top: 10px; font-size: 12px; color: var(--mu); text-align: center; }
+.vc .shc-empty { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 40px; text-align: center; }
+.vc .shc-empty p { color: var(--mu); font-size: 14px; }
+.vc .shc-empty .btn { margin-top: 8px; }
+.vc .shc-ok { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--p); color: #fff; }
+
+.vc .shp-toast { position: absolute; left: 50%; z-index: 45; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 999px; background: #16161a; color: #fff; font: 600 13px/1 Inter, system-ui, sans-serif; box-shadow: 0 10px 30px -10px rgba(0,0,0,.5); animation: vcdrop .2s ease; white-space: nowrap; }
+
+/* ---------- Éditeur ---------- */
+.shop-it .it-f { display: flex; flex-direction: column; gap: 6px; }
+.shop-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.shop-row.two { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); }
+.shop-row .mini { min-width: 0; width: 100%; }
+.shop-lb { display: block; margin: 2px 0 -2px; font-size: 11.5px; font-weight: 600; color: #6b6b72; }
+.seg.wrap { flex-wrap: wrap; }
