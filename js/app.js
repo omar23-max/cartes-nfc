@@ -385,7 +385,6 @@
       </button>`).join('');
     return `<section class="wrap">
       ${head('Quel est votre secteur d’activité ?', 'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.')}
-      ${qrNote()}
       <div class="tiles">${tiles}
       </div>
     </section>`;
