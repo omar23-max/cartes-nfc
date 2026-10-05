@@ -368,7 +368,8 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   .mtabs { display: flex; gap: 4px; margin-bottom: 16px; padding: 4px; border-radius: 12px; background: #e8e6e0; }
   .mtabs button { flex: 1; min-height: 38px; border: 0; border-radius: 9px; background: none; font-weight: 600; color: var(--mut); }
   .mtabs button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
-  .ed-grid { grid-template-columns: 1fr; }
+  .ed-grid { grid-template-columns: minmax(0, 1fr); }
+  .ed-grid .pv-col { min-width: 0; }
   .ed-grid.tab-edit .pv-col { display: none; }
   .ed-grid.tab-view .ed { display: none; }
   .pv-col.stick { position: static; }
@@ -387,7 +388,7 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   .tpl-view { padding: 14px 0 12px; }
   .tpl-meta { padding: 10px 12px 12px; }
   .tpl-meta p { display: none; }
-  .phone.live { width: 100%; max-width: 391px; padding: 6px; border-radius: 38px; }
+  .phone.live { box-sizing: border-box; width: 100%; max-width: 391px; padding: 6px; border-radius: 38px; }
   .phone.live .phone-screen { width: 100%; }
   .phone.live .phone-screen { height: 72vh; border-radius: 32px; }
   .row2, .row3 { grid-template-columns: 1fr; }

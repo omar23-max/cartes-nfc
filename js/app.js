@@ -270,7 +270,23 @@
     icons();
     if (S.step === 5) drawQR();
     translateTree(document.body);
+    fitPreview();
   }
+  /* Téléphone, onglet Aperçu : la carte tient entre le haut de l’écran et la barre Modifier / Aperçu */
+  function fitPreview() {
+    const pv = $('.ed-grid.tab-view #pv');
+    if (!pv) return;
+    if (window.innerWidth > 900) { pv.style.height = ''; pv.style.minHeight = ''; return; }
+    const bar = $('.mbar'), head = $('.top');
+    const barH = bar ? bar.getBoundingClientRect().height : 0, headH = head ? head.getBoundingClientRect().height : 0;
+    const frame = pv.parentElement.getBoundingClientRect().height - pv.getBoundingClientRect().height;
+    pv.style.minHeight = '0';
+    pv.style.height = Math.max(300, window.innerHeight - headH - barH - frame - 20) + 'px';
+    /* La page défile pour placer le téléphone juste sous l’en-tête */
+    const top = pv.parentElement.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo(0, Math.max(0, top - headH - 8));
+  }
+  window.addEventListener('resize', () => { clearTimeout(fitPreview.t); fitPreview.t = setTimeout(fitPreview, 150); });
   const icons = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.8 } }); };
 
   function renderPreview() {
@@ -1104,7 +1120,7 @@
       case 'clear':
         if (ask('Vider tous les textes et photos d’exemple ? La structure et vos choix de blocs sont conservés.')) { clearCard(); structChanged(); toast('Exemples vidés : à vous de jouer.'); }
         break;
-      case 'mtab': mobileTab = t.dataset.t; render(); window.scrollTo(0, 0); break;
+      case 'mtab': mobileTab = t.dataset.t; window.scrollTo(0, 0); render(); break;
       case 'done': {
         /* Referme le panneau et montre le résultat sur la carte */
         const gEl = t.closest('.grp');

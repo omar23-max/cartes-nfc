@@ -40,10 +40,13 @@
 .vc .lg { height: 22px; width: auto; border-radius: 4px; }
 
 /* Actions rapides */
-.vc .qa { display: grid; grid-template-columns: repeat(var(--qn, 4), 1fr); gap: 6px; padding: 0 16px 22px; }
-.vc .qa-i { display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 500; color: var(--mu); }
+.vc .qa { display: grid; grid-template-columns: repeat(var(--qn, 4), minmax(0, 1fr)); gap: 6px; padding: 0 16px 22px; }
+.vc .qa-i { display: flex; flex-direction: column; align-items: center; gap: 7px; min-width: 0; font-size: 11.5px; font-weight: 500; color: var(--mu); text-align: center; white-space: nowrap; }
+/* Cinq boutons ou plus : libellés un peu plus petits pour rester sur une ligne, même sur un petit téléphone */
+.vc .qa[style*="--qn:5"], .vc .qa[style*="--qn:6"] { gap: 4px; padding-inline: 12px; }
+.vc .qa[style*="--qn:5"] .qa-i, .vc .qa[style*="--qn:6"] .qa-i { font-size: 10.5px; letter-spacing: -.02em; }
 .vc .qa-ic {
-  width: 52px; height: 52px; border-radius: 16px;
+  width: min(52px, 100%); height: auto; aspect-ratio: 1; border-radius: 16px;
   display: grid; place-items: center;
   background: var(--sf); border: 1px solid var(--ln); color: var(--p);
   transition: transform .15s ease;
