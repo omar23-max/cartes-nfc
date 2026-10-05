@@ -38,7 +38,8 @@
 
   const sec = () => SECTORS.find((s) => s.id === S.sectorId);
   /* Langue de la carte : celle choisie, sinon celle du site */
-  const lang = () => (S.lang === 'en' || S.lang === 'fr' ? S.lang : S.ui === 'en' ? 'en' : 'fr');
+  /* Langue de la carte : celle du site, sauf carte bilingue où l’on choisit la version à modifier */
+  const lang = () => (bili() && (S.lang === 'en' || S.lang === 'fr') ? S.lang : ui());
   const ckey = (id = S.sectorId) => (lang() === 'en' ? id + ':en' : id);
   const demoOf = (s) => (lang() === 'en' && s.demoEn ? s.demoEn : s.demo);
   const card = () => S.cards[ckey()];
@@ -296,11 +297,13 @@
     const en = ui() === 'en', bi = bili(), fr = lang() === 'fr';
     /* Carte bilingue : les deux boutons choisissent la version à modifier, et un message permanent l’explique */
     const lab = bi ? (en ? ['French version', 'English version'] : ['Version française', 'Version anglaise']) : (en ? ['French card', 'English card'] : ['Carte en français', 'Carte en anglais']);
+    /* Hors carte bilingue, seule la version dans la langue du site est accessible */
+    const off = en ? 'Tick “Bilingual” to add the French version' : 'Cochez « Bilingue » pour ajouter la version anglaise';
     const note = !bi ? '' : en
-      ? `<p class="bili-note">${ic('globe', 15)}<span><b>Bilingual card:</b> visitors tap FR or EN on your card to pick their language. Make sure to fill in both versions.</span></p>`
+      ? `<p class="bili-note">${ic('globe', 15)}<span><b>Bilingual profile:</b> visitors tap FR or EN on your profile to pick their language. Make sure to fill in both versions.</span></p>`
       : `<p class="bili-note">${ic('globe', 15)}<span><b>Carte bilingue :</b> sur votre carte, le visiteur touche FR ou EN pour choisir sa langue. Il faut veiller à renseigner les deux versions.</span></p>`;
     return `<div class="lang-sw"><div class="seg" role="group" aria-label="${bi ? (en ? 'Version to edit' : 'Version à modifier') : (en ? 'Card language' : 'Langue de la carte')}">
-      <button type="button" class="${fr ? 'on' : ''}" data-act="lang" data-v="fr">${lab[0]}</button><button type="button" class="${!fr ? 'on' : ''}" data-act="lang" data-v="en">${lab[1]}</button></div>
+      <button type="button" class="${fr ? 'on' : ''}" data-act="lang" data-v="fr" ${!bi && !fr ? `disabled title="${off}"` : ''}>${lab[0]}</button><button type="button" class="${!fr ? 'on' : ''}" data-act="lang" data-v="en" ${!bi && fr ? `disabled title="${off}"` : ''}>${lab[1]}</button></div>
       <label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bi ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label>${note}</div>`;
   };
   const head = (t, p) => `<div class="sh"><h1>${t}</h1>${p ? `<p>${p}</p>` : ''}</div>`;
@@ -1195,9 +1198,9 @@
         S.bili[S.sectorId] = t.checked;
         if (t.checked) {
           /* Les deux versions doivent exister */
-          const cur = S.lang; ['fr', 'en'].forEach((l) => { S.lang = l; ensureCard(); }); S.lang = cur;
-          toast(ui() === 'en' ? 'Bilingual card on: fill in the French and the English version.' : 'Carte bilingue activée : remplissez la version française et la version anglaise.');
-        }
+          ['fr', 'en'].forEach((l) => { S.lang = l; ensureCard(); }); S.lang = ui();
+          toast(ui() === 'en' ? 'Bilingual profile on: fill in the French and the English version.' : 'Carte bilingue activée : remplissez la version française et la version anglaise.');
+        } else S.lang = ui();
         save();
         const pvB = $('#pv'), stB = pvB ? pvB.scrollTop : 0;
         render();
@@ -1215,11 +1218,11 @@
         const pvU = $('#pv'), stU = pvU ? pvU.scrollTop : 0;
         render();
         const nU = $('#pv'); if (nU) nU.scrollTop = stU;
-        toast(ui() === 'en' ? 'Site and card in English. You can pick another card language above the preview.' : 'Site et carte en français. Vous pouvez choisir une autre langue pour la carte au-dessus de l’aperçu.');
+        toast(ui() === 'en' ? 'Site and card in English. For a card in both languages, tick “Bilingual”.' : 'Site et carte en français. Pour une carte dans les deux langues, cochez « Bilingue ».');
         break;
       }
       case 'lang': {
-        if (t.dataset.v === lang()) break;
+        if (t.dataset.v === lang() || !bili()) break;
         S.lang = t.dataset.v;
         ensureCard();
         save();
@@ -1560,7 +1563,7 @@
   VC.notify = toast;
   /* Bouton FR | EN de la carte dans l’aperçu : change aussi la version modifiée */
   VC.onLangSwitch = (v) => {
-    if (!$('#pv') || v === lang()) return;
+    if (!$('#pv') || v === lang() || !bili()) return;
     S.lang = v; ensureCard(); save();
     const pvL = $('#pv'), st = pvL ? pvL.scrollTop : 0;
     render();
