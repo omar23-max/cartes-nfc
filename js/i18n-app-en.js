@@ -141,7 +141,7 @@ window.NFC_EN_APP = {
   'Entrée': 'Enter', 'Tapez un choix puis': 'Type a choice, then press', 'vos prestations': 'your services', 'Fermer': 'Close', 'Ajouter un choix': 'Add a choice',
   'Site en français': 'Site in French', 'Langue du site': 'Site language',
   'Outil reconnu :': 'Tool detected:', '· peut s’afficher dans la carte': '· can be shown in the card', 'peut s’afficher dans la carte': 'can be shown in the card', 'intégrable': 'embeddable',
-  '. Faites défiler chaque miniature pour voir toute la carte, puis cliquez pour la choisir. Vous pourrez changer de modèle à tout moment sans perdre vos informations. Vous choisirez la couleur du thème à l’étape suivante.': '. Scroll each thumbnail to see the whole card, then click to choose it. You can switch template at any time without losing your information. You will be asked to choose the theme color on the next step.',
+  '. Touchez-en une pour la choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.': '. Tap one to choose it, you can change it anytime without losing your info. Colors come on the next page.',
   '· 6 palettes pensées pour votre secteur.': '· 6 palettes designed for your industry.', '6 palettes pensées pour votre secteur.': '6 palettes designed for your industry.',
   'Tant que le lien n’est pas renseigné, vos clients voient une': 'Until the link is filled in, your clients see a', 'Aucun numéro renseigné : vos clients voient une': 'No number entered: your clients see a',
   'Avez-vous déjà un QR code ?': 'Do you already have a QR code?',
