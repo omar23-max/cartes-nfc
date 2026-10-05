@@ -291,9 +291,13 @@
   }
   const schedulePv = () => { clearTimeout(pvTimer); pvTimer = setTimeout(renderPreview, 120); };
 
-  const langSwitch = () => `<div class="lang-sw"><span>${bili() ? 'Version à modifier' : 'Langue de la carte'}</span><div class="seg" role="group" aria-label="Langue de la carte">
-      <button type="button" class="${lang() === 'fr' ? 'on' : ''}" data-act="lang" data-v="fr">Français</button><button type="button" class="${lang() === 'en' ? 'on' : ''}" data-act="lang" data-v="en">English</button></div>
-      <label class="ck bili-ck" title="Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue"><input type="checkbox" data-act="bili" ${bili() ? 'checked' : ''}><span>Carte bilingue</span></label></div>`;
+  /* Langue de la carte : « Carte en français | Carte en anglais » et « Bilingue », libellés dans la langue du site */
+  const langSwitch = () => {
+    const en = ui() === 'en';
+    return `<div class="lang-sw"><div class="seg" role="group" aria-label="${bili() ? (en ? 'Version to edit' : 'Version à modifier') : (en ? 'Card language' : 'Langue de la carte')}">
+      <button type="button" class="${lang() === 'fr' ? 'on' : ''}" data-act="lang" data-v="fr">${en ? 'French card' : 'Carte en français'}</button><button type="button" class="${lang() === 'en' ? 'on' : ''}" data-act="lang" data-v="en">${en ? 'English card' : 'Carte en anglais'}</button></div>
+      <label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bili() ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label></div>`;
+  };
   const head = (t, p) => `<div class="sh"><h1>${t}</h1>${p ? `<p>${p}</p>` : ''}</div>`;
   const back = (n, label) => `<button class="back" data-act="go" data-n="${n}">${ic('arrowl', 16)}${label}</button>`;
   const phone = () => `<div class="phone live"><div class="phone-screen" id="pv" data-vc-scroll>${VC.render(mdl())}</div></div>`;
@@ -517,8 +521,8 @@
         <div class="ed-links">
           ${langSwitch()}
           <button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>
-          <button class="b sm" data-act="go" data-n="2">Changer de modèle</button>
-          <button class="b sm" data-act="go" data-n="3">Changer de couleurs</button>
+          <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
+          <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
         </div>
       </div>
       <div class="mtabs">
