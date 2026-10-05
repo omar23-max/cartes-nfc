@@ -992,7 +992,13 @@
       case 'other-pick': closeModal(); pickSector(t.dataset.id, true); break;
       case 'modal-close': closeModal(); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
-      case 'palette': S.palette = +t.dataset.i; save(); render(); break;
+      case 'palette': {
+        S.palette = +t.dataset.i; save();
+        /* Seul l’aperçu est redessiné : il garde sa position de défilement, on voit l’effet sur la section regardée */
+        document.querySelectorAll('.pal').forEach((b) => b.classList.toggle('sel', b === t));
+        renderPreview();
+        break;
+      }
       case 'grp': {
         const el = t.closest('.grp'), id = t.dataset.id;
         el.classList.toggle('open');
