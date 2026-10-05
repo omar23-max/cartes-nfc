@@ -525,7 +525,7 @@
     return `<section class="wrap">
       ${back(1, 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
       ${langSwitch()}
-      ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Faites défiler chaque miniature pour voir toute la carte, puis cliquez pour la choisir. Vous pourrez en changer à tout moment sans perdre vos informations.`)}
+      ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Faites défiler chaque miniature pour voir toute la carte, puis cliquez pour la choisir. Vous pourrez changer de modèle à tout moment sans perdre vos informations. Vous choisirez la couleur du thème à l’étape suivante.`)}
       <div class="tpls">${cards}</div>
     </section>`;
   }
