@@ -276,7 +276,12 @@ svg.lucide { width: 22px; height: 22px; }
 .vsrc label.b { cursor: pointer; }
 .cover-vid { display: flex; flex-direction: column; gap: 12px; padding: 12px; border-radius: 12px; background: #f7f6f2; }
 .cs-ctl .ib:disabled { opacity: .3; background: none; color: var(--mut); }
-.cs-ctl .up { display: grid; transform: rotate(180deg); }
+.cs-ctl { align-items: center; }
+/* Dans la liste des sections : pas de chevron, un crayon « Modifier » et des flèches de déplacement groupées */
+.sec-list .grp-tg > .i { display: none; }
+.mv-g { display: inline-flex; padding: 1px; border: 1px solid var(--line); border-radius: 10px; }
+.mv-g .ib { width: 30px; height: 30px; }
+.grp.open .edit-b { background: var(--acc-s); color: var(--acc); }
 .cgrp { border-style: dashed; border-color: var(--line2); }
 .add-sec { display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1.5px dashed var(--acc); border-radius: var(--r); background: var(--acc-s); }
 .add-sec .f-l { display: flex; align-items: center; gap: 6px; color: var(--acc); font-size: 14px; }
@@ -520,4 +525,12 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   .mbar-seg button { flex: 1; min-height: 38px; }
   .mbar > .b { min-height: 44px; }
   .done-b { display: inline-flex; align-self: flex-start; margin-top: 4px; }
+}
+
+/* Liste des sections sur téléphone : titre sur toute la largeur, boutons sur une seconde ligne */
+@media (max-width: 600px) {
+  .sec-list .grp-h { flex-wrap: wrap; }
+  .sec-list .grp-tg { flex: 1 1 calc(100% - 60px); padding-bottom: 2px; }
+  .sec-list .cs-ctl { flex: 1; margin-left: 38px; padding-bottom: 10px; }
+  .sec-list .grp-h > .sw-t { margin-bottom: 10px; }
 }

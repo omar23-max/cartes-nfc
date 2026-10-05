@@ -73,7 +73,7 @@ window.NFC_EN_APP = {
   'Écrire sur WhatsApp': 'Message on WhatsApp', 'Après « Enregistrer le contact », proposer au visiteur de me laisser ses coordonnées': 'After “Save contact”, invite visitors to leave me their details',
   'Réseaux sociaux': 'Social media', 'Laissez vide pour masquer': 'Leave empty to hide',
   'Sections de votre carte': 'Your card sections', 'Activez ou masquez chaque section, et réorganisez-les : glissez-les par la poignée ou utilisez les flèches.': 'Turn each section on or off and reorder them: drag the handle or use the arrows.',
-  'Afficher ce bloc': 'Show this section', 'Monter': 'Move up', 'Descendre': 'Move down', 'Dupliquer la section': 'Duplicate section', 'Supprimer la section': 'Delete section', 'Glisser pour déplacer': 'Drag to move',
+  'Afficher ce bloc': 'Show this section', 'Monter': 'Move up', 'Modifier la section': 'Edit section', 'Déplacer la section': 'Move section', 'Descendre': 'Move down', 'Dupliquer la section': 'Duplicate section', 'Supprimer la section': 'Delete section', 'Glisser pour déplacer': 'Drag to move',
   'Supprimer': 'Delete', 'Titre de la section': 'Section title', 'Laissez vide pour garder le titre proposé.': 'Leave empty to keep the suggested title.',
   'Texte': 'Text', 'Intitulé': 'Title', 'Détail (facultatif)': 'Details (optional)', 'Prix (ex. dès 89 €)': 'Price (e.g. from $89)', 'Prix': 'Price', 'Ajouter une ligne': 'Add a line',
   'Titre': 'Title', 'Description': 'Description', 'Lien (facultatif)': 'Link (optional)', 'Ajouter une fiche': 'Add an item', 'Chiffre (ex. 48)': 'Number (e.g. 48)',

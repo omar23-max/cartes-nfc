@@ -509,7 +509,6 @@
           ${langSwitch()}
           <button class="b sm" data-act="go" data-n="2">Changer de modèle</button>
           <button class="b sm" data-act="go" data-n="3">Changer de couleurs</button>
-          <button class="b sm ghost" data-act="clear">Vider les exemples</button>
         </div>
       </div>
       <div class="mtabs">
@@ -637,14 +636,18 @@
     const order = VC.sectionOrder(c, s, S.design);
     let h = `<h3 class="ed-sub">Sections de votre carte<span>Activez ou masquez chaque section, et réorganisez-les : glissez-les par la poignée ou utilisez les flèches.</span></h3><div class="sec-list">`;
     order.forEach((k, idx) => {
-      const mv = `<div class="cs-ctl">
-          <button class="ib" data-act="omove" data-k="${k}" data-d="-1" aria-label="Monter" title="Monter" ${idx === 0 ? 'disabled' : ''}><span class="up">${ic('chevd', 16)}</span></button>
-          <button class="ib" data-act="omove" data-k="${k}" data-d="1" aria-label="Descendre" title="Descendre" ${idx === order.length - 1 ? 'disabled' : ''}>${ic('chevd', 16)}</button>
+      /* Modifier (crayon), déplacer (flèches groupées), dupliquer : trois rôles bien distincts */
+      const mv = (gid) => `<div class="cs-ctl">
+          <button class="ib edit-b" data-act="grp" data-id="${gid}" aria-label="Modifier la section" title="Modifier la section">${ic('pen', 15)}</button>
+          <span class="mv-g" role="group" aria-label="Déplacer la section">
+            <button class="ib" data-act="omove" data-k="${k}" data-d="-1" aria-label="Monter" title="Monter" ${idx === 0 ? 'disabled' : ''}>${ic('arrowup', 15)}</button>
+            <button class="ib" data-act="omove" data-k="${k}" data-d="1" aria-label="Descendre" title="Descendre" ${idx === order.length - 1 ? 'disabled' : ''}>${ic('arrowdown', 15)}</button>
+          </span>
           <button class="ib dup" data-act="dup" data-k="${k}" aria-label="Dupliquer la section" title="Dupliquer la section">${ic('copy', 15)}</button>`;
       if (k.startsWith('b:')) {
         const def = s.blocks.find((b) => b.key === k.slice(2)), bt = (c.blocks[def.key] || {}).title;
         const titleF = inp('Titre de la section', `blocks.${def.key}.title`, { ph: def.title, hint: 'Laissez vide pour garder le titre proposé.' });
-        h += grp('b-' + def.key, esc(bt || def.title), def.help || '', titleF + blockEd(def), `blocks.${def.key}.on`, mv + '</div>', k);
+        h += grp('b-' + def.key, esc(bt || def.title), def.help || '', titleF + blockEd(def), `blocks.${def.key}.on`, mv('b-' + def.key) + '</div>', k);
       } else {
         const i = cs.findIndex((x, j) => (x.cid || 'i' + j) === k.slice(2));
         if (i < 0) return;
@@ -654,7 +657,7 @@
         const body = cc.type === 'block'
           ? inp('Titre de la section', `custom.${i}.title`, { ph: cc.def.title }) + blockEd(cc.def, `custom.${i}.data`)
           : customBody(cc, i);
-        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? `Copie · ${esc(cc.def.title)}` : `Section ajoutée · ${label}`, body, `custom.${i}.on`, mv + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
+        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? `Copie · ${esc(cc.def.title)}` : `Section ajoutée · ${label}`, body, `custom.${i}.on`, mv('c-' + (cc.cid || i)) + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
       }
     });
     h += `</div><div class="add-sec"><span class="f-l">${ic('plus', 15)}Ajouter une section</span><div class="add-sec-b">${Object.entries(SEC_TYPES).map(([t, [l, i]]) => `<button type="button" class="b sm" data-act="addsec" data-t="${t}">${ic(i, 15)}${l}</button>`).join('')}</div></div>`;
