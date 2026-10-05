@@ -293,10 +293,15 @@
 
   /* Langue de la carte : « Carte en français | Carte en anglais » et « Bilingue », libellés dans la langue du site */
   const langSwitch = () => {
-    const en = ui() === 'en';
-    return `<div class="lang-sw"><div class="seg" role="group" aria-label="${bili() ? (en ? 'Version to edit' : 'Version à modifier') : (en ? 'Card language' : 'Langue de la carte')}">
-      <button type="button" class="${lang() === 'fr' ? 'on' : ''}" data-act="lang" data-v="fr">${en ? 'French card' : 'Carte en français'}</button><button type="button" class="${lang() === 'en' ? 'on' : ''}" data-act="lang" data-v="en">${en ? 'English card' : 'Carte en anglais'}</button></div>
-      <label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bili() ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label></div>`;
+    const en = ui() === 'en', bi = bili(), fr = lang() === 'fr';
+    /* Carte bilingue : les deux boutons choisissent la version à modifier, et un message permanent l’explique */
+    const lab = bi ? (en ? ['French version', 'English version'] : ['Version française', 'Version anglaise']) : (en ? ['French card', 'English card'] : ['Carte en français', 'Carte en anglais']);
+    const note = !bi ? '' : en
+      ? `<p class="bili-note">${ic('globe', 15)}<span><b>Bilingual card:</b> visitors tap FR or EN on your card to pick their language. Make sure to fill in both versions.</span></p>`
+      : `<p class="bili-note">${ic('globe', 15)}<span><b>Carte bilingue :</b> sur votre carte, le visiteur touche FR ou EN pour choisir sa langue. Il faut veiller à renseigner les deux versions.</span></p>`;
+    return `<div class="lang-sw"><div class="seg" role="group" aria-label="${bi ? (en ? 'Version to edit' : 'Version à modifier') : (en ? 'Card language' : 'Langue de la carte')}">
+      <button type="button" class="${fr ? 'on' : ''}" data-act="lang" data-v="fr">${lab[0]}</button><button type="button" class="${!fr ? 'on' : ''}" data-act="lang" data-v="en">${lab[1]}</button></div>
+      <label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bi ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label>${note}</div>`;
   };
   const head = (t, p) => `<div class="sh"><h1>${t}</h1>${p ? `<p>${p}</p>` : ''}</div>`;
   const back = (n, label) => `<button class="back" data-act="go" data-n="${n}">${ic('arrowl', 16)}${label}</button>`;
@@ -1191,7 +1196,7 @@
         if (t.checked) {
           /* Les deux versions doivent exister */
           const cur = S.lang; ['fr', 'en'].forEach((l) => { S.lang = l; ensureCard(); }); S.lang = cur;
-          toast('Carte bilingue : vos visiteurs choisissent FR ou EN. Pensez à remplir les deux versions.');
+          toast(ui() === 'en' ? 'Bilingual card on: fill in the French and the English version.' : 'Carte bilingue activée : remplissez la version française et la version anglaise.');
         }
         save();
         const pvB = $('#pv'), stB = pvB ? pvB.scrollTop : 0;
