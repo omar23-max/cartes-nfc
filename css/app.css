@@ -158,9 +158,14 @@ svg.lucide { width: 22px; height: 22px; }
 .pal-ck { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--ink); opacity: 0; }
 .pal.sel .pal-ck { opacity: 1; }
 /* Grille 2 × 3 : pastilles au-dessus du nom, coche en haut à droite */
-.pals .pal { position: relative; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; }
-.pals .pal-n { min-width: 0; font-size: 14px; line-height: 1.25; overflow-wrap: anywhere; }
-.pals .pal-ck { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; }
+.pals { gap: 8px; }
+.pals .pal { gap: 8px; min-width: 0; padding: 8px 10px; border-radius: 11px; }
+.pals .sw i { width: 20px; height: 20px; border-width: 1.5px; }
+.pals .sw i + i { margin-left: -6px; }
+.pals .sw i:nth-child(3) { display: none; }
+.pals .pal-n { min-width: 0; font-size: 13.5px; line-height: 1.2; overflow-wrap: anywhere; }
+.pals .pal-ck { display: none; }
+.pals .pal.sel { box-shadow: 0 0 0 1.5px var(--ink); }
 .side > .b.lg { align-self: flex-start; }
 .pv-col { display: flex; flex-direction: column; align-items: center; }
 .pv-col.stick { position: sticky; top: 84px; }
@@ -338,7 +343,11 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   .side { max-width: none; min-width: 0; }
   .split .pv-col { order: -1; }
   /* Étape 3 : les couleurs restent en haut, sous le titre ; l’aperçu vient après */
-  .split.s3 .pv-col { order: 0; }
+  .split.s3 { gap: 16px; }
+  .split.s3 .side { display: contents; }
+  .split.s3 .pv-col { order: 1; }
+  .split.s3 .side > p { order: 2; margin: 0; }
+  .split.s3 .side > .b.lg { order: 3; }
   .mtabs { display: flex; gap: 4px; margin-bottom: 16px; padding: 4px; border-radius: 12px; background: #e8e6e0; }
   .mtabs button { flex: 1; min-height: 38px; border: 0; border-radius: 9px; background: none; font-weight: 600; color: var(--mut); }
   .mtabs button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }

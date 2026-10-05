@@ -52,8 +52,8 @@ window.NFC = window.NFC || {};
     ],
     demo: {
       primary: 'call',
-      identity: { name: 'Yanis Morel', role: 'Plombier chauffagiste', specialty: 'Dépannage 7j/7 · Rénovation de salles de bain', company: 'Morel Plomberie', photo: 'ph:portrait', logo: '', cover: 'ph:cover|Chantier en cours' },
-      contact: { phone: '06 12 34 56 78', whatsapp: '+33 6 12 34 56 78', email: 'contact@morel-plomberie.fr', website: 'morel-plomberie.fr' },
+      identity: { name: 'Ryan Walsh', role: 'Plombier chauffagiste', specialty: 'Dépannage 7j/7 · Rénovation de salles de bain', company: 'Walsh Plomberie', photo: 'ph:portrait', logo: '', cover: 'ph:cover|Chantier en cours' },
+      contact: { phone: '06 12 34 56 78', whatsapp: '+33 6 12 34 56 78', email: 'contact@walsh-plomberie.fr', website: 'walsh-plomberie.fr' },
       socials: { linkedin: '', instagram: '', facebook: 'https://facebook.com/', tiktok: '', youtube: '' },
       blocks: {
         about: { on: true, text: 'Artisan plombier depuis 12 ans, j’interviens rapidement pour vos fuites, débouchages et pannes de chauffe-eau.\nJe réalise aussi vos rénovations de salles de bain, de la conception à la pose. Devis gratuit, travail soigné et chantier laissé propre.' },
@@ -72,7 +72,7 @@ window.NFC = window.NFC || {};
           { src: 'ph:photo|Avant / après', cap: 'Avant / après' },
           { src: 'ph:photo|Chaufferie', cap: 'Chaufferie' },
         ] },
-        quote: { on: true, email: 'contact@morel-plomberie.fr', text: 'Décrivez votre besoin : je vous rappelle sous 24 h avec un devis gratuit.', photos: true },
+        quote: { on: true, email: 'contact@walsh-plomberie.fr', text: 'Décrivez votre besoin : je vous rappelle sous 24 h avec un devis gratuit.', photos: true },
         hours: hours([['Lundi – Vendredi', '8h – 19h'], ['Samedi', '9h – 13h'], ['Dimanche', 'Urgences uniquement']], 'Urgences 24h/24, 7j/7'),
         qualif: { on: true, tags: 'Assurance décennale, Certifié RGE, Qualibat, Devis gratuit', text: '' },
         video: { on: false, url: '', cap: 'Présentation en vidéo', cover: '' },
@@ -105,7 +105,7 @@ window.NFC = window.NFC || {};
     ],
     demo: {
       primary: 'booking',
-      identity: { name: 'Dr Claire Martin', role: 'Chirurgien-dentiste', specialty: 'Implantologie · Soins esthétiques', company: 'Cabinet dentaire des Tilleuls', photo: 'ph:portrait', logo: '', cover: 'ph:cover|Le cabinet' },
+      identity: { name: 'Dr Emily Carter', role: 'Chirurgien-dentiste', specialty: 'Implantologie · Soins esthétiques', company: 'Cabinet dentaire des Tilleuls', photo: 'ph:portrait', logo: '', cover: 'ph:cover|Le cabinet' },
       contact: { phone: '04 78 12 34 56', whatsapp: '', email: 'cabinet@dentiste-tilleuls.fr', website: 'dentiste-tilleuls.fr' },
       socials: { linkedin: 'https://linkedin.com/', instagram: '', facebook: '', tiktok: '', youtube: '' },
       blocks: {
@@ -208,8 +208,8 @@ window.NFC = window.NFC || {};
     ],
     demo: {
       primary: 'save',
-      identity: { name: 'Sophie Laurent', role: 'Directrice commerciale', specialty: 'Solutions logistiques B2B', company: 'Nordlink Logistics', photo: 'ph:portrait', logo: '', cover: 'ph:cover|Entrepôt Nordlink' },
-      contact: { phone: '06 98 76 54 32', whatsapp: '', email: 's.laurent@nordlink.fr', website: 'nordlink.fr' },
+      identity: { name: 'Jessica Hughes', role: 'Directrice commerciale', specialty: 'Solutions logistiques B2B', company: 'Nordlink Logistics', photo: 'ph:portrait', logo: '', cover: 'ph:cover|Entrepôt Nordlink' },
+      contact: { phone: '06 98 76 54 32', whatsapp: '', email: 'j.hughes@nordlink.fr', website: 'nordlink.fr' },
       socials: { linkedin: 'https://linkedin.com/', instagram: '', facebook: '', tiktok: '', youtube: '' },
       blocks: {
         about: { on: true, text: 'J’accompagne les distributeurs et e-commerçants dans l’optimisation de leur chaîne logistique : entreposage, transport et préparation de commandes. Parlons de vos volumes et de vos délais.' },

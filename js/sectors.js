@@ -44,8 +44,8 @@
     ],
     demo: {
       primary: 'booking',
-      identity: id('Karim Bennani', 'Attaché commercial', 'Gestion de patrimoine', 'Banque Horizon', 'L’agence'),
-      contact: ct('06 45 12 78 90', 'k.bennani@banque-horizon.fr', 'banque-horizon.fr'),
+      identity: id('Michael Bennett', 'Attaché commercial', 'Gestion de patrimoine', 'Banque Horizon', 'L’agence'),
+      contact: ct('06 45 12 78 90', 'm.bennett@banque-horizon.fr', 'banque-horizon.fr'),
       socials: so({ linkedin: 'https://linkedin.com/' }),
       blocks: {
         about: text('J’accompagne les particuliers et les chefs d’entreprise dans la construction et la protection de leur patrimoine.\nÉpargne, placements, préparation de la retraite ou transmission : nous définissons ensemble une stratégie claire, adaptée à vos objectifs et à votre horizon.'),
@@ -77,8 +77,8 @@
     ],
     demo: {
       primary: 'booking',
-      identity: id('Léa Garnier', 'Développeuse web freelance', 'React · Next.js · Accessibilité', 'Studio Garnier', 'Espace de travail'),
-      contact: ct('06 71 22 34 56', 'hello@leagarnier.dev', 'leagarnier.dev'),
+      identity: id('Emma Turner', 'Développeuse web freelance', 'React · Next.js · Accessibilité', 'Studio Turner', 'Espace de travail'),
+      contact: ct('06 71 22 34 56', 'hello@emmaturner.dev', 'emmaturner.dev'),
       socials: so({ linkedin: 'https://linkedin.com/' }),
       blocks: {
         about: text('Développeuse front-end depuis 8 ans, je conçois des sites et applications web rapides, accessibles et faciles à faire évoluer.\nJ’interviens en mission ou au forfait, de la maquette à la mise en ligne, pour des startups comme pour des PME.'),
@@ -86,7 +86,7 @@
         projects: cards([['Plateforme de réservation', 'Next.js · 40 000 utilisateurs'], ['Site e-commerce', 'Refonte et SEO · +35 % de ventes'], ['Tableau de bord RH', 'React · Données en temps réel']]),
         skills: tags('React, Next.js, TypeScript, Accessibilité, Figma, Node.js', 'Disponible à partir du 1er novembre, 3 jours par semaine.'),
         booking: act('Réserver un appel découverte', 'https://calendly.com/', '20 minutes pour parler de votre projet, sans engagement.'),
-        brief: form('hello@leagarnier.dev', 'Décrivez votre projet, votre budget et vos délais : réponse sous 48 h.', false, false),
+        brief: form('hello@emmaturner.dev', 'Décrivez votre projet, votre budget et vos délais : réponse sous 48 h.', false, false),
         links: links([['Mon CV (PDF)', EX], ['GitHub', 'https://github.com/'], ['Profil Malt', 'https://malt.fr/']]),
         video: vid(),
       },
@@ -109,8 +109,8 @@
     ],
     demo: {
       primary: 'estimation',
-      identity: id('Julie Fontaine', 'Conseillère immobilière', 'Lyon 6e · Ventes & estimations', 'Fontaine Immobilier', 'Appartement lumineux'),
-      contact: ct('06 33 44 55 66', 'julie@fontaine-immo.fr', 'fontaine-immo.fr', '+33 6 33 44 55 66'),
+      identity: id('Olivia Parker', 'Conseillère immobilière', 'Lyon 6e · Ventes & estimations', 'Parker Immobilier', 'Appartement lumineux'),
+      contact: ct('06 33 44 55 66', 'olivia@parker-immo.fr', 'fontaine-immo.fr', '+33 6 33 44 55 66'),
       socials: so({ instagram: 'https://instagram.com/', facebook: 'https://facebook.com/' }),
       blocks: {
         about: text('Installée dans le 6e arrondissement depuis 10 ans, je connais chaque rue, chaque copropriété et les prix réels du quartier.\nJe vous accompagne de l’estimation à la signature chez le notaire, avec un seul interlocuteur du début à la fin.'),
@@ -118,7 +118,7 @@
         stats: stats([['48', 'biens vendus en 2025'], ['32 j', 'délai moyen de vente'], ['98 %', 'du prix affiché obtenu']]),
         secteur: tags('Lyon 6e, Lyon 3e, Caluire, Villeurbanne', 'Estimation offerte sous 48 h.'),
         services: list([['Estimation offerte', 'Rapport détaillé sous 48 h'], ['Accompagnement vente', 'Photos pro, visites, négociation'], ['Recherche sur mesure', 'Pour les acquéreurs pressés']], false),
-        estimation: form('julie@fontaine-immo.fr', 'Indiquez l’adresse et la surface de votre bien : je vous rappelle pour fixer un rendez-vous d’estimation.', true),
+        estimation: form('olivia@parker-immo.fr', 'Indiquez l’adresse et la surface de votre bien : je vous rappelle pour fixer un rendez-vous d’estimation.', true),
         visite: act('Demander une visite', 'https://calendly.com/', 'Visites du lundi au samedi.', false),
         video: vid(),
       },
@@ -140,8 +140,8 @@
     ],
     demo: {
       primary: 'projet',
-      identity: id('Hugo Marchand', 'Architecte d’intérieur', 'Rénovation d’appartements anciens', 'Atelier Marchand', 'Séjour rénové'),
-      contact: ct('06 82 14 25 36', 'contact@atelier-marchand.fr', 'atelier-marchand.fr'),
+      identity: id('Daniel Brooks', 'Architecte d’intérieur', 'Rénovation d’appartements anciens', 'Atelier Brooks', 'Séjour rénové'),
+      contact: ct('06 82 14 25 36', 'contact@atelier-brooks.fr', 'atelier-brooks.fr'),
       socials: so({ instagram: 'https://instagram.com/', linkedin: 'https://linkedin.com/' }),
       blocks: {
         about: text('Nous redonnons vie aux appartements anciens en respectant leur caractère : moulures, parquets et volumes, avec des matériaux durables et un confort d’aujourd’hui.'),
@@ -149,7 +149,7 @@
         demarche: list([['Visite et écoute', 'Nous découvrons votre lieu et vos envies'], ['Esquisses et plans 3D', 'Vous visualisez le projet avant les travaux'], ['Suivi de chantier', 'Coordination des artisans jusqu’à la livraison']]),
         gallery: gal(['Cuisine avant', 'Cuisine après', 'Salle de bain', 'Bibliothèque sur mesure'], false),
         services: list([['Conseil déco', 'Visite de 2 h et recommandations', '290 €'], ['Plans et 3D', 'Aménagement complet', 'dès 1 800 €'], ['Projet clé en main', 'Conception et suivi de chantier', 'Sur devis']]),
-        projet: form('contact@atelier-marchand.fr', 'Surface, budget indicatif, délais : décrivez votre projet et joignez quelques photos.', true),
+        projet: form('contact@atelier-brooks.fr', 'Surface, budget indicatif, délais : décrivez votre projet et joignez quelques photos.', true),
         video: vid(),
       },
     },
@@ -172,15 +172,15 @@
     ],
     demo: {
       primary: 'booking',
-      identity: id('Samir Haddad', 'Barbier coiffeur', 'Coupe · Barbe · Rasage à l’ancienne', 'Maison Haddad', 'Le salon'),
-      contact: ct('04 78 55 66 77', 'bonjour@maison-haddad.fr', 'maison-haddad.fr', '+33 6 55 66 77 88'),
+      identity: id('Jason Reid', 'Barbier coiffeur', 'Coupe · Barbe · Rasage à l’ancienne', 'Maison Reid', 'Le salon'),
+      contact: ct('04 78 55 66 77', 'bonjour@maison-reid.fr', 'maison-reid.fr', '+33 6 55 66 77 88'),
       socials: so({ instagram: 'https://instagram.com/', tiktok: 'https://tiktok.com/' }),
       blocks: {
         about: text('Un barbershop à l’ancienne où l’on prend le temps : diagnostic, coupe aux ciseaux ou à la tondeuse, taille de barbe et serviette chaude.'),
         prestations: list([['Coupe homme', '30 min', '25 €'], ['Taille de barbe', '20 min · serviette chaude', '18 €'], ['Coupe + barbe', '45 min', '38 €'], ['Rasage à l’ancienne', '30 min · au coupe-chou', '30 €']]),
         gallery: gal(['Coupe tendance', 'Taille de barbe', 'Contours précis', 'Le résultat', 'Nos outils', 'Dégradé']),
         booking: act('Réserver une prestation', 'https://www.planity.com/', 'Réservation en ligne 24h/24.'),
-        team: cards([['Samir', 'Barbier · fondateur', '', 'Portrait Samir'], ['Lucas', 'Coiffeur · coloriste', '', 'Portrait Lucas']], false),
+        team: cards([['Jason', 'Barbier · fondateur', '', 'Portrait Jason'], ['Logan', 'Coiffeur · coloriste', '', 'Portrait Logan']], false),
         gift: act('Offrir un bon cadeau', EX, 'Valable un an sur toutes les prestations.', false),
         hours: hours([['Mardi – Vendredi', '9h30 – 19h'], ['Samedi', '9h – 18h'], ['Dimanche – Lundi', 'Fermé']]),
         location: loc('5 rue Mercière, 69002 Lyon', 'Métro A – Cordeliers'),
@@ -206,8 +206,8 @@
     ],
     demo: {
       primary: 'booking',
-      identity: id('Thomas Leroy', 'Coach sportif diplômé d’État', 'Perte de poids · Remise en forme', '', 'Séance en extérieur'),
-      contact: ct('06 10 20 30 40', 'thomas@leroy-coaching.fr', 'leroy-coaching.fr', '+33 6 10 20 30 40'),
+      identity: id('Kevin Murphy', 'Coach sportif diplômé d’État', 'Perte de poids · Remise en forme', '', 'Séance en extérieur'),
+      contact: ct('06 10 20 30 40', 'kevin@murphy-coaching.fr', 'leroy-coaching.fr', '+33 6 10 20 30 40'),
       socials: so({ instagram: 'https://instagram.com/', youtube: 'https://youtube.com/' }),
       blocks: {
         about: text('Ancien athlète, je coache depuis 9 ans des personnes qui veulent reprendre le sport sans se blesser.\nChaque programme part de votre niveau réel, de votre emploi du temps et de vos objectifs : perte de poids, renforcement ou préparation d’une course.'),
@@ -239,7 +239,7 @@
     ],
     demo: {
       primary: 'order',
-      identity: id('Ferme des Quatre Saisons', 'Maraîchers bio', 'Légumes de saison · Paniers hebdomadaires', 'Paul & Marie Roche', 'Les serres', 'ph:logo'),
+      identity: id('Ferme des Quatre Saisons', 'Maraîchers bio', 'Légumes de saison · Paniers hebdomadaires', 'Paul & Mary Anderson', 'Les serres', 'ph:logo'),
       contact: ct('06 60 70 80 90', 'ferme@quatresaisons.fr', 'quatresaisons.fr'),
       socials: so({ facebook: 'https://facebook.com/', instagram: 'https://instagram.com/' }),
       blocks: {
@@ -271,15 +271,15 @@
     ],
     demo: {
       primary: 'dispo',
-      identity: id('Camille Dubois', 'Wedding planner', 'Mariages sur mesure en Provence', 'Maison Dubois Events', 'Cérémonie laïque'),
-      contact: ct('06 12 98 76 54', 'camille@dubois-events.fr', 'dubois-events.fr', '+33 6 12 98 76 54'),
+      identity: id('Ashley Collins', 'Wedding planner', 'Mariages sur mesure en Provence', 'Collins Events', 'Cérémonie laïque'),
+      contact: ct('06 12 98 76 54', 'ashley@collins-events.fr', 'collins-events.fr', '+33 6 12 98 76 54'),
       socials: so({ instagram: 'https://instagram.com/', facebook: 'https://facebook.com/' }),
       blocks: {
         about: text('Je conçois des mariages qui vous ressemblent, du choix du lieu jusqu’au dernier slow.\nVous profitez de chaque étape ; je m’occupe des prestataires, du budget et du rétroplanning.'),
         gallery: gal(['Cérémonie laïque', 'Table d’honneur', 'Décor floral', 'Vin d’honneur', 'Mas provençal', 'Première danse']),
         formules: list([['Coordination du jour J', 'Présence de 10 h à minuit', 'dès 1 200 €'], ['Organisation partielle', 'Lieu, traiteur et décor', 'dès 2 800 €'], ['Organisation complète', 'De A à Z, sur 12 mois', 'Sur devis']]),
         demarche: list([['Rendez-vous découverte', 'Vos envies, votre budget, vos invités'], ['Proposition sur mesure', 'Univers, prestataires, planning'], ['Le grand jour', 'Je coordonne, vous profitez']], false),
-        dispo: form('camille@dubois-events.fr', 'Indiquez la date, le lieu envisagé, le nombre d’invités et votre budget : je vous confirme ma disponibilité sous 48 h.'),
+        dispo: form('ashley@collins-events.fr', 'Indiquez la date, le lieu envisagé, le nombre d’invités et votre budget : je vous confirme ma disponibilité sous 48 h.'),
         booking: act('Réserver un appel découverte', 'https://calendly.com/', '30 minutes en visio, sans engagement.'),
         stats: stats([['120', 'mariages organisés'], ['8 ans', 'd’expérience']], false),
         video: vid(),
@@ -303,15 +303,15 @@
     ],
     demo: {
       primary: 'commande',
-      identity: id('Élise Moreau', 'Photographe', 'Portrait · Mariage · Entreprise', '', 'Portrait en lumière naturelle'),
-      contact: ct('06 23 45 67 89', 'studio@elisemoreau.fr', 'elisemoreau.fr'),
+      identity: id('Hannah Scott', 'Photographe', 'Portrait · Mariage · Entreprise', '', 'Portrait en lumière naturelle'),
+      contact: ct('06 23 45 67 89', 'studio@hannahscott.fr', 'hannahscott.fr'),
       socials: so({ instagram: 'https://instagram.com/' }),
       blocks: {
         gallery: gal(['Portrait', 'Mariage', 'Reportage', 'Corporate', 'Nature morte', 'Couple']),
         about: text('Je photographie les gens tels qu’ils sont, en lumière naturelle, sans poses figées. Des images sincères, pensées pour durer.'),
         series: cards([['Portraits d’artisans', 'Série personnelle · 2025'], ['Mariages', 'Reportages complets'], ['Entreprises', 'Équipes et locaux']], false),
         offres: list([['Séance portrait', '1 h · 10 photos retouchées', '180 €'], ['Photos d’équipe', 'Demi-journée sur site', '650 €'], ['Reportage mariage', 'Journée complète', 'dès 1 900 €']]),
-        commande: form('studio@elisemoreau.fr', 'Parlez-moi de votre projet : type de séance, date, lieu.'),
+        commande: form('studio@hannahscott.fr', 'Parlez-moi de votre projet : type de séance, date, lieu.'),
         booking: act('Réserver une séance', 'https://calendly.com/', '', false),
         links: links([['Portfolio complet', EX], ['Behance', 'https://behance.net/']]),
         video: vid(),
@@ -367,8 +367,8 @@
     ],
     demo: {
       primary: 'partenariat',
-      identity: id('Sarah Kem', 'Créatrice de contenu', 'Food & voyages', '', 'Tournage en cuisine'),
-      contact: ct('', 'collab@sarahkem.fr', 'sarahkem.fr'),
+      identity: id('Megan Price', 'Créatrice de contenu', 'Food & voyages', '', 'Tournage en cuisine'),
+      contact: ct('', 'collab@meganprice.fr', 'meganprice.fr'),
       socials: so({ tiktok: 'https://tiktok.com/', instagram: 'https://instagram.com/', youtube: 'https://youtube.com/' }),
       blocks: {
         about: text('Je partage des recettes simples et des carnets de voyage gourmands avec une communauté de passionnés de cuisine du quotidien.'),
@@ -377,7 +377,7 @@
         collabs: list([['Vidéo TikTok dédiée', 'Création + publication', 'dès 900 €'], ['Story Instagram', 'Pack de 3 stories', 'dès 400 €'], ['Contenu UGC', 'Vidéo livrée, non publiée', 'dès 350 €']]),
         marques: tags('Picard, Air France, Le Creuset, Hellofresh'),
         kit: links([['Télécharger mon kit média (PDF)', EX]]),
-        partenariat: form('collab@sarahkem.fr', 'Présentez votre marque, votre produit et votre calendrier.'),
+        partenariat: form('collab@meganprice.fr', 'Présentez votre marque, votre produit et votre calendrier.'),
         video: vid(true, '', 'Ma dernière recette'),
       },
     },
@@ -432,8 +432,8 @@
     ],
     demo: {
       primary: 'booking',
-      identity: id('Nadia Benali', 'Guide conférencière', 'Marseille & calanques', 'Azur Découvertes', 'Calanque de Sugiton'),
-      contact: ct('06 44 55 66 77', 'nadia@azur-decouvertes.fr', 'azur-decouvertes.fr', '+33 6 44 55 66 77'),
+      identity: id('Laura Campbell', 'Guide conférencière', 'Marseille & calanques', 'Azur Découvertes', 'Calanque de Sugiton'),
+      contact: ct('06 44 55 66 77', 'laura@azur-decouvertes.fr', 'azur-decouvertes.fr', '+33 6 44 55 66 77'),
       socials: so({ instagram: 'https://instagram.com/' }),
       blocks: {
         about: text('Marseillaise de naissance, je vous fais découvrir ma ville autrement : ruelles du Panier, cabanons cachés et criques accessibles seulement en bateau.'),
@@ -443,7 +443,7 @@
         inclus: list([['Guide diplômée', ''], ['Dégustations', 'Pour la visite gourmande'], ['Photos souvenir', 'Envoyées après l’activité']], false),
         langues: tags('Français, Anglais, Espagnol, Arabe'),
         gallery: gal(['Calanques', 'Le Panier', 'Vieux-Port', 'Coucher de soleil']),
-        surmesure: form('nadia@azur-decouvertes.fr', 'Groupe, séminaire ou séjour de plusieurs jours : décrivez votre projet.', false, false),
+        surmesure: form('laura@azur-decouvertes.fr', 'Groupe, séminaire ou séjour de plusieurs jours : décrivez votre projet.', false, false),
         video: vid(),
       },
     },
@@ -466,7 +466,7 @@
     ],
     demo: {
       primary: 'booking',
-      identity: id('Chloé Petit', 'Toiletteuse canin & félin', 'Salon & toilettage à domicile', 'Poils & Pattes', 'Le salon'),
+      identity: id('Rachel Cooper', 'Toiletteuse canin & félin', 'Salon & toilettage à domicile', 'Poils & Pattes', 'Le salon'),
       contact: ct('06 51 52 53 54', 'bonjour@poilsetpattes.fr', 'poilsetpattes.fr', '+33 6 51 52 53 54'),
       socials: so({ instagram: 'https://instagram.com/', facebook: 'https://facebook.com/' }),
       blocks: {
@@ -500,7 +500,7 @@
     ],
     demo: {
       primary: 'shop',
-      identity: id('Atelier Solène', 'Bijoux faits main', 'Argent recyclé · Pièces uniques', '', 'L’établi', 'ph:logo'),
+      identity: id('Atelier Grace', 'Bijoux faits main', 'Argent recyclé · Pièces uniques', '', 'L’établi', 'ph:logo'),
       contact: ct('06 90 80 70 60', 'hello@atelier-solene.fr', 'atelier-solene.fr'),
       socials: so({ instagram: 'https://instagram.com/', tiktok: 'https://tiktok.com/' }),
       blocks: {
@@ -535,14 +535,14 @@
     ],
     demo: {
       primary: 'booking',
-      identity: id('Antoine Lopez', 'Garagiste', 'Entretien toutes marques · Carrosserie', 'Garage Lopez', 'L’atelier'),
-      contact: ct('04 72 33 44 55', 'atelier@garage-lopez.fr', 'garage-lopez.fr', '+33 6 72 33 44 55'),
+      identity: id('Mark Thompson', 'Garagiste', 'Entretien toutes marques · Carrosserie', 'Garage Thompson', 'L’atelier'),
+      contact: ct('04 72 33 44 55', 'atelier@garage-thompson.fr', 'garage-thompson.fr', '+33 6 72 33 44 55'),
       socials: so({ facebook: 'https://facebook.com/' }),
       blocks: {
         about: text('Garage indépendant depuis 1998, nous entretenons et réparons toutes les marques avec des pièces d’origine ou équivalentes, au juste prix.'),
         services: list([['Vidange + filtres', 'Selon préconisations constructeur', 'dès 89 €'], ['Diagnostic électronique', 'Lecture et effacement des défauts', '49 €'], ['Pneumatiques', 'Montage et équilibrage', 'dès 15 € / pneu'], ['Carrosserie', 'Rayures, chocs, peinture', 'Sur devis']]),
         booking: act('Prendre rendez-vous atelier', EX, 'Véhicule de prêt sur réservation.'),
-        devis: form('atelier@garage-lopez.fr', 'Indiquez votre véhicule, son immatriculation et la réparation souhaitée.', true),
+        devis: form('atelier@garage-thompson.fr', 'Indiquez votre véhicule, son immatriculation et la réparation souhaitée.', true),
         vehicules: cards([['Peugeot 308 · 2021', '45 000 km · Diesel', '17 900 €'], ['Renault Clio · 2020', '38 000 km · Essence', '12 500 €']], false),
         garanties: tags('Pièces garanties 2 ans, Devis gratuit, Véhicule de prêt'),
         hours: hours([['Lundi – Vendredi', '8h – 12h · 14h – 18h30'], ['Samedi', '8h – 12h']]),

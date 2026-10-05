@@ -59,7 +59,7 @@
     '20 minutes pour parler de votre projet, sans engagement.': '20 minutes to talk about your project, no commitment.',
     'Décrivez votre projet, votre budget et vos délais : réponse sous 48 h ouvrables.': 'Tell me about your project, budget and timeline — I reply within 2 business days.',
     'Démonstration d’un projet': 'Project demo', 'CEO, startup SaaS': 'CEO, SaaS startup', 'Code propre, livré en avance, et une vraie force de proposition.': 'Clean code, delivered early, and full of great ideas.',
-    'Directeur marketing': 'Marketing Director', 'Notre nouveau site est deux fois plus rapide. Merci Léa !': 'Our new site is twice as fast. Thanks, Léa!',
+    'Directeur marketing': 'Marketing Director', 'Notre nouveau site est deux fois plus rapide. Merci Emma !': 'Our new site is twice as fast. Thanks, Emma!',
     'Mon CV (PDF)': 'My resume (PDF)', 'Profil Upwork': 'Upwork profile',
 
     /* ---- Immobilier ---- */
@@ -75,7 +75,7 @@
     'Photos professionnelles, visites libres, négociation': 'Professional photos, open houses, negotiation', 'Recherche sur mesure': 'Personalized home search',
     'Pour les acheteurs pressés': 'For buyers on a tight timeline',
     'Indiquez l’adresse et la superficie de votre propriété : je vous rappelle pour fixer un rendez-vous d’évaluation.': 'Share your home’s address and size — I’ll call you back to set up a valuation.',
-    'Visites du lundi au samedi.': 'Viewings Monday to Saturday.', 'Visite d’un appartement': 'Condo tour', 'Famille Durand': 'The Durand family', 'Vendeurs sur le Plateau': 'Sellers in the Plateau',
+    'Visites du lundi au samedi.': 'Viewings Monday to Saturday.', 'Visite d’un appartement': 'Condo tour', 'Famille Wilson': 'The Durand family', 'Vendeurs sur le Plateau': 'Sellers in the Plateau',
     'Condo vendu en 3 semaines au prix demandé.': 'Condo sold in 3 weeks at asking price.', 'Premier achat': 'First-time buyer',
     'Disponible, honnête, et de très bon conseil pour le CELIAPP.': 'Available, honest, and great advice on the FHSA.',
 
@@ -95,7 +95,7 @@
     'Maison à Westmount': 'Westmount home', 'Chantier livré dans les délais et le budget.': 'Delivered on time and on budget.',
 
     /* ---- Artisans ---- */
-    'Plombier chauffagiste': 'Plumbing & heating contractor', 'Urgence 24/7 · Rénovation de salles de bain': '24/7 emergency · Bathroom renovations', 'Plomberie Morel': 'Morel Plumbing',
+    'Plombier chauffagiste': 'Plumbing & heating contractor', 'Urgence 24/7 · Rénovation de salles de bain': '24/7 emergency · Bathroom renovations', 'Plomberie Walsh': 'Walsh Plumbing',
     'Maître plombier depuis 12 ans, j’interviens rapidement pour vos fuites, débouchages et chauffe-eau.\nJe réalise aussi vos rénovations de salles de bain, de la conception à la pose. Estimation gratuite, travail soigné et chantier laissé propre.':
       'A master plumber for 12 years, I respond fast to leaks, clogged drains and water heaters.\nI also renovate bathrooms from design to installation. Free estimates, careful work, and a clean site when I leave.',
     'Urgence et recherche de fuite': 'Emergency & leak detection', 'Intervention en moins de 2 h, 24/7': 'On site in under 2 hours, 24/7', 'dès 129 $': 'from $129', 'Débouchage de drains': 'Drain cleaning',
@@ -135,7 +135,7 @@
     'Échauffement': 'Warm-up', 'Coaching individuel': 'One-on-one coaching', 'Cross-training': 'Cross-training', 'Renforcement': 'Strength', 'Boxe': 'Boxing', 'Mobilité': 'Mobility',
     'Musculation': 'Weight training', 'Circuit training': 'Circuit training', 'Récupération': 'Recovery', 'Rendez-vous au chalet du parc, côté rue Sherbrooke': 'Meet at the park chalet, Sherbrooke Street side',
     'Extrait de séance': 'Session highlights', '-20 lb en 4 mois': '-20 lb in 4 months', 'Des séances variées et un vrai suivi. Je n’ai jamais été aussi motivée.': 'Varied sessions and real follow-up. I’ve never been so motivated.',
-    'Marathon de Montréal': 'Montreal Marathon', 'Premier marathon terminé sans blessure grâce à Thomas.': 'Finished my first marathon injury-free thanks to Thomas.',
+    'Marathon de Montréal': 'Montreal Marathon', 'Premier marathon terminé sans blessure grâce à Kevin.': 'Finished my first marathon injury-free thanks to Kevin.',
     'Mes séances en vidéo': 'My sessions on video', 'Séance individuelle ': 'Private session', 'Entraînement en salle': 'Gym workout', 'Boxe fitness': 'Boxing fitness', 'Étirements guidés': 'Guided stretching',
     'Dans la salle': 'At the gym', 'Préparation': 'Getting ready', 'Gainage': 'Core work', 'Cardio': 'Cardio', 'Plateau musculation': 'Weight room', 'Suivi personnalisé': 'Personal coaching',
 
@@ -156,7 +156,7 @@
     'Souper en terrasse': 'Dinner on the patio', 'Une adresse qu’on garde précieusement.': 'A spot we keep close to our hearts.',
 
     /* ---- Producteurs ---- */
-    'Maraîchers bio': 'Organic vegetable farm', 'Légumes de saison · Paniers bio hebdomadaires': 'Seasonal vegetables · Weekly organic baskets', 'Famille Roche': 'The Roche family',
+    'Maraîchers bio': 'Organic vegetable farm', 'Légumes de saison · Paniers bio hebdomadaires': 'Seasonal vegetables · Weekly organic baskets', 'Famille Anderson': 'The Anderson family',
     'Sur 8 acres à l’Île d’Orléans, nous cultivons plus de 40 variétés de légumes certifiés biologiques.\nRécoltés la veille, vendus en direct : c’est notre promesse.':
       'On 8 acres on Île d’Orléans, we grow more than 40 varieties of certified organic vegetables.\nPicked the day before, sold direct: that’s our promise.',
     'Panier découverte': 'Starter basket', '4 à 5 légumes de saison': '4 to 5 seasonal vegetables', 'Panier famille': 'Family basket', '7 à 8 légumes + œufs': '7 to 8 vegetables + eggs',
@@ -181,7 +181,7 @@
     'Indiquez la date, le lieu envisagé, le nombre d’invités et votre budget : je vous confirme ma disponibilité sous 48 h.': 'Share your date, venue idea, guest count and budget — I’ll confirm my availability within 48 hours.',
     '30 minutes en visio, sans engagement.': '30 minutes by video call, no commitment.', 'mariages organisés': 'weddings planned', '8 ans': '8 years', 'd’expérience': 'of experience',
     'Film d’un mariage': 'Wedding film', 'Mariage à Mont-Tremblant': 'Wedding in Mont-Tremblant', 'Nous avons profité de chaque minute. Tout était parfait.': 'We enjoyed every minute. Everything was perfect.',
-    'Mariage au domaine': 'Estate wedding', 'Camille a géré chaque imprévu sans que nous le voyions.': 'Camille handled every surprise without us ever noticing.',
+    'Mariage au domaine': 'Estate wedding', 'Ashley a géré chaque imprévu sans que nous le voyions.': 'Ashley handled every surprise without us ever noticing.',
 
     /* ---- Portfolio ---- */
     'Photographe': 'Photographer', 'Portrait · Mariage · Entreprise': 'Portraits · Weddings · Corporate', 'Portrait': 'Portrait', 'Mariage': 'Wedding', 'Mode': 'Fashion',
@@ -228,7 +228,7 @@
     'Réservation directe au meilleur prix.': 'Book direct for the best rate.', 'Arrivée': 'Check-in', '16 h – 20 h': '4 – 8 p.m.', 'Départ': 'Check-out', 'Avant 11 h': 'By 11 a.m.',
     'Ouverture': 'Open', 'À l’année': 'Year-round', 'À 1 h 30 de Montréal · 20 min de Sherbrooke': '1 hr 30 from Montreal · 20 min from Sherbrooke', 'Visite du mas': 'Tour the inn',
     'Séjour en octobre': 'Stay in October', 'Les couleurs de l’automne et un déjeuner mémorable.': 'Fall colors and a memorable breakfast.',
-    'Accueil chaleureux, spa et calme absolu. On reviendra !': 'Warm welcome, hot tub and total calm. We’ll be back!', 'Famille Martin': 'The Martin family',
+    'Accueil chaleureux, spa et calme absolu. On reviendra !': 'Warm welcome, hot tub and total calm. We’ll be back!', 'Famille Miller': 'The Miller family',
 
     /* ---- Tourisme ---- */
     'Guide touristique': 'Tour guide', 'Québec, Charlevoix et le Saint-Laurent': 'Quebec City, Charlevoix & the St. Lawrence',
@@ -240,7 +240,7 @@
     'Vieux-Québec · 10 h': 'Old Quebec · 10 a.m.', 'Guide diplômée': 'Certified guide', 'Dégustations': 'Tastings', 'Pour la visite gourmande': 'On the food tour',
     'Photos souvenir': 'Souvenir photos', 'Envoyées après l’activité': 'Sent after the tour', 'Français, Anglais, Espagnol, Arabe': 'French, English, Spanish, Arabic', 'Le port': 'The harbor',
     'Le ponton': 'The dock', 'Coucher de soleil': 'Sunset', 'En mer': 'On the water', 'Groupe, séminaire ou séjour de plusieurs jours : décrivez votre projet.': 'Group, corporate retreat or multi-day trip? Tell me about your plans.',
-    'Sortie en mer': 'Out on the water', 'Nadia connaît chaque recoin du fleuve, une matinée inoubliable.': 'Nadia knows every corner of the river — an unforgettable morning.',
+    'Sortie en mer': 'Out on the water', 'Laura connaît chaque recoin du fleuve, une matinée inoubliable.': 'Laura knows every corner of the river — an unforgettable morning.',
     'Visite du Vieux-Québec': 'Old Quebec tour', 'Passionnant et gourmand, on a découvert Québec autrement.': 'Fascinating and delicious — we saw Quebec City in a whole new way.',
 
     /* ---- Animaux ---- */
@@ -253,7 +253,7 @@
     'Montréal, Laval, Longueuil, Brossard': 'Montreal, Laval, Longueuil, Brossard', 'Toilettage à domicile dans un rayon de 25 km.': 'Mobile grooming within 25 km (15 miles).',
     'Mardi – samedi': 'Tuesday – Saturday', 'Vaccins à jour': 'Up-to-date vaccines', 'Carnet demandé au premier rendez-vous': 'Records required at the first visit', 'Durée': 'How long',
     'Comptez 1 h 30 à 3 h selon la race': 'Plan on 1.5 to 3 hours depending on the breed', 'Au salon': 'At the salon', 'Caniche': 'Poodle', 'Golden retriever': 'Golden retriever',
-    'Filou ressort toujours détendu et magnifique.': 'Filou always comes home relaxed and gorgeous.', 'Très douce avec les chiens anxieux. Merci Chloé !': 'So gentle with anxious dogs. Thank you, Chloé!',
+    'Filou ressort toujours détendu et magnifique.': 'Filou always comes home relaxed and gorgeous.', 'Très douce avec les chiens anxieux. Merci Rachel !': 'So gentle with anxious dogs. Thank you, Rachel!',
 
     /* ---- Boutiques ---- */
     'Bijoux faits main': 'Handmade jewelry', 'Argent recyclé · Pièces uniques · Fait à Montréal': 'Recycled silver · One-of-a-kind · Made in Montreal',
@@ -265,7 +265,7 @@
     'Bracelet': 'Bracelet', 'Écrin': 'Gift box', 'Portés': 'Worn', 'À l’atelier': 'In the studio', 'Atelier-boutique dans le Mile End': 'Studio-shop in the Mile End',
     'Mercredi – samedi': 'Wednesday – Saturday', 'Dimanche – mardi': 'Sunday – Tuesday', 'Sur rendez-vous': 'By appointment', 'Fabrication': 'How it’s made',
     'Un bijou délicat et un emballage superbe. Parfait pour offrir.': 'A delicate piece and gorgeous packaging. Perfect as a gift.', 'Pièce sur mesure': 'Custom piece',
-    'Solène a créé exactement l’alliance dont je rêvais.': 'Solène made exactly the wedding band I was dreaming of.',
+    'Grace a créé exactement l’alliance dont je rêvais.': 'Grace made exactly the wedding band I was dreaming of.',
 
     /* ---- Automobile ---- */
     'Garagiste': 'Auto repair', 'Entretien toutes marques · Carrosserie · Pneus': 'All makes & models · Body work · Tires',
