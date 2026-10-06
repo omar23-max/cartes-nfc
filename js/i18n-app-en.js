@@ -46,7 +46,7 @@ window.NFC_EN_APP = {
   'Carte en plein écran': 'Full-screen card',
 
   /* Étape 3 : couleurs */
-  'Changer de modèle': 'Change template', 'Choisissez vos couleurs': 'Choose your colors', 'Remplir ma carte': 'Fill in my card',
+  'Changer de modèle': 'Change template', 'Choisissez vos couleurs': 'Choose your colors', 'Remplir ma carte': 'Fill in my card', 'Remplir mes informations': 'Fill in my details',
   'Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.': 'A custom color, or one taken from your logo, can be added later.',
   'Bleu chantier': 'Site blue', 'Orange sécurité': 'Safety orange', 'Vert atelier': 'Workshop green', 'Graphite': 'Graphite', 'Rouge brique': 'Brick red',
   'Bleu clinique': 'Clinic blue', 'Menthe': 'Mint', 'Lavande': 'Lavender', 'Bleu nuit': 'Night blue', 'Sable': 'Sand', 'Bordeaux': 'Burgundy', 'Olive': 'Olive',

@@ -560,7 +560,7 @@
           ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 6 palettes pensées pour votre secteur.`)}
           <div class="pals">${pals}</div>
           <p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>
-          <button class="b pri lg" data-act="go" data-n="4">Remplir ma carte ${ic('arrow', 18)}</button>
+          <button class="b pri lg" data-act="go" data-n="4">Remplir mes informations ${ic('arrow', 18)}</button>
         </div>
         <div class="pv-col">${phone()}</div>
       </div>
