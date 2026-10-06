@@ -228,7 +228,7 @@
   /* Remplace les tuiles « Bientôt » correspondantes */
   TYPES.forEach((t) => {
     const i = NFC.SECTORS.findIndex((s) => s.id === t.id);
-    if (i >= 0) NFC.SECTORS[i] = t; else NFC.SECTORS.push(t);
+    if (i >= 0) { t.kw = NFC.SECTORS[i].kw; NFC.SECTORS[i] = t; } else NFC.SECTORS.push(t);
   });
 
   /* Titres de sections en anglais (carte) */

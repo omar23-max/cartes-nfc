@@ -399,10 +399,68 @@
       </button>`).join('');
     return `<section class="wrap">
       ${X.pick ? head(...X.pick) : head('Quel est votre secteur d’activité ?', 'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.')}
+      <div class="sq">
+        <label class="sq-f"><i data-lucide="search"></i><input type="search" id="secq" autocomplete="off" spellcheck="false" placeholder="${X.searchPh || 'Cherchez votre métier ou votre secteur (ex. coiffeuse, plombier, étudiant)'}" aria-label="${X.searchPh || 'Cherchez votre métier ou votre secteur'}"></label>
+        <div class="sq-r" id="secqr"></div>
+        <p class="sq-none" id="secqn" hidden>Aucun résultat. Essayez un autre mot, ou choisissez le secteur le plus proche ci-dessous.</p>
+      </div>
       <div class="tiles">${tiles}
       </div>
     </section>`;
   }
+
+  /* ---------- Recherche du secteur (et du métier) ---------- */
+  const norm = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const enOf = (t) => (window.NFC_EN_APP || {})[t] || (window.NFC_EN_UI || {})[t] || '';
+  /* Mots fréquents qui ne figurent pas dans le nom du secteur */
+  const KW = {
+    sante: 'medecin docteur dentiste infirmiere physiotherapeute kinesitherapeute psychologue chiropraticien osteopathe optometriste nutritionniste clinique doctor nurse therapist',
+    conseil: 'avocat notaire comptable fiscaliste conseiller financier banquier assureur courtier lawyer accountant advisor insurance',
+    pro: 'representant vendeur directeur gestionnaire entrepreneur cadre sales manager networking',
+    freelance: 'developpeur programmeur informaticien consultant designer redacteur traducteur developer programmer it',
+    immobilier: 'courtier immobilier agent immobilier realtor broker',
+    archi: 'architecte decorateur designer interieur paysagiste architect interior',
+    artisans: 'electricien plombier menuisier charpentier couvreur peintre macon renovation entrepreneur construction handyman contractor electrician plumber',
+    beaute: 'coiffeur coiffeuse barbier estheticienne manucure ongles spa massage maquilleuse hairdresser barber nails',
+    coaching: 'entraineur coach sportif yoga pilates professeur musique formateur trainer fitness',
+    restaurant: 'restaurateur chef cuisinier cafe bar pizzeria boulangerie cook',
+    producteurs: 'agriculteur fermier maraicher boulanger fromager vigneron farmer baker',
+    evenementiel: 'photographe mariage traiteur dj planner wedding',
+    portfolio: 'photographe graphiste illustrateur tatoueur artiste photographer artist',
+    musique: 'musicien chanteur dj comedien artiste musician singer',
+    influence: 'influenceur youtubeur createur contenu tiktok instagram creator',
+    hebergement: 'hotel gite chalet airbnb location salle',
+    tourisme: 'guide voyage excursion tour',
+    animaux: 'veterinaire toiletteur educateur canin promeneur chien chat vet groomer dog',
+    boutiques: 'commerce magasin vendeur artisan createur shop store',
+    auto: 'mecanicien garagiste carrossier chauffeur taxi vtc concessionnaire mechanic driver',
+    education: 'eleve etudiante orientation orthopedagogue directrice principal enseignement formation formatrice charge de cours conferencier enseignant enseignante professeure prof tuteur tutrice stage educatrice garderie cpe ecole universite cegep college teacher tutor school',
+  };
+  const secHay = (s) => norm([s.name, s.ex, enOf(s.name), enOf(s.ex), s.kw || '', KW[s.id] || ''].concat(...(s.profiles || []).map((p) => p.n.concat(p.ex))).join(' '));
+  function filterSectors(q) {
+    const words = norm(q).split(/\s+/).filter(Boolean), en = ui() === 'en';
+    const hit = (h) => words.every((w) => h.includes(w));
+    let n = 0;
+    document.querySelectorAll('.tiles [data-act="sector"]').forEach((el) => {
+      const s = SECTORS.find((x) => x.id === el.dataset.id), ok = !words.length || (s && hit(secHay(s)));
+      el.hidden = !ok;
+      if (ok) n++;
+    });
+    /* Métiers correspondants : un clic ouvre directement le bon exemple */
+    const profs = !words.length ? [] : [].concat(...SECTORS.filter((s) => s.active && s.profiles)
+      .map((s) => s.profiles.filter((p) => hit(norm(p.n.concat(p.ex).join(' ')))).map((p) => ({ s, p })))).slice(0, 8);
+    const box = $('#secqr'), none = $('#secqn');
+    if (box) box.innerHTML = profs.length ? `<span class="sq-l">${en ? 'Matching professions' : 'Métiers trouvés'}</span><div class="sq-ps">${profs.map(({ s, p }) => `<button type="button" class="sq-p" data-act="profgo" data-s="${s.id}" data-p="${p.id}"><i data-lucide="${p.icon}"></i><b>${esc(p.n[en ? 1 : 0])}</b><span>${esc(en ? enOf(s.name) || s.name : s.name)}</span></button>`).join('')}</div>` : '';
+    if (none) none.hidden = n > 0 || profs.length > 0;
+    icons();
+  }
+  document.addEventListener('input', (e) => { if (e.target.id === 'secq') filterSectors(e.target.value); });
+  document.addEventListener('keydown', (e) => {
+    if (e.target.id !== 'secq' || e.key !== 'Enter') return;
+    e.preventDefault();
+    const first = document.querySelector('.sq-p, .tiles [data-act="sector"]:not([hidden])');
+    if (first) first.click();
+  });
 
   function pickSector(id, fromOther) {
     const s = SECTORS.find((x) => x.id === id);
@@ -1211,6 +1269,14 @@
       case 'go': go(+t.dataset.n); break;
       case 'sector': pickSector(t.dataset.id); break;
       case 'profile': pickProfile(t.dataset.id); break;
+      case 'profgo': {
+        /* Résultat de recherche : secteur + métier en un clic */
+        const s = SECTORS.find((x) => x.id === t.dataset.s);
+        if (!s) break;
+        if (S.sectorId !== s.id) { S.sectorId = s.id; S.design = null; }
+        pickProfile(t.dataset.p);
+        break;
+      }
       case 'profpick': profPick = true; go(1); break;
       case 'profback': profPick = false; render(); window.scrollTo(0, 0); break;
       case 'other': openOther(); break;

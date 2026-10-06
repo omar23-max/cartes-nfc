@@ -135,6 +135,13 @@
     soon('B16', 'esthetique', 'Esthétique (produits de soin)', 'sparkles', 'Crèmes, sérums, maquillage…'),
   ];
   NFC.SECTORS = SECTORS;
+  /* Mots-clés de la recherche (en plus du nom et des exemples) */
+  const KW = { mode: 'vetements robe chemise pantalon chaussures pret-a-porter clothing apparel shoes boutique', friperie: 'vintage seconde main usage depot-vente thrift consignment',
+    bijoux: 'bague collier montre joaillier or argent jewelry ring watch', fleuriste: 'fleurs bouquet plantes flowers florist', deco: 'meubles mobilier deco luminaire furniture decor',
+    librairie: 'livres papeterie bd books stationery', cadeaux: 'cadeau souvenir artisanat gift', velos: 'velo bicyclette bike cycling', cosmetiques: 'savon soins naturel zero dechet soap',
+    telephones: 'cellulaire telephone ecran reparation phone repair', epicerie: 'epicerie depanneur marche grocery market', traiteur: 'traiteur repas buffet catering',
+    animalerie: 'animaux chien chat pet', resto: 'restaurant pizza burger poutine takeout', coiffure: 'coiffure salon shampoing hair', esthetique: 'esthetique soins peau maquillage skincare' };
+  SECTORS.forEach((s) => { s.kw = KW[s.id] || ''; });
   NFC.OTHER = [];
 
   /* Noms des types en anglais (étape 1 du site en anglais) */
@@ -155,7 +162,7 @@
     'Restaurant (pour emporter)': 'Restaurant (takeout)', 'Commandes à emporter et livraison…': 'Takeout and delivery orders…',
     'Coiffure (produits)': 'Hair salon (products)', 'Shampoings, soins, coiffants…': 'Shampoos, treatments, styling…',
     'Esthétique (produits de soin)': 'Esthetics (skincare)', 'Crèmes, sérums, maquillage…': 'Creams, serums, makeup…',
-    'Type de boutique': 'Store type', 'Changer de type de boutique': 'Change store type', 'Quel type de boutique avez-vous ?': 'What kind of store do you have?',
+    'Type de boutique': 'Store type', 'Cherchez votre type de boutique (ex. fleurs, vélos, bijoux)': 'Search your store type (e.g. flowers, bikes, jewelry)', 'Changer de type de boutique': 'Change store type', 'Quel type de boutique avez-vous ?': 'What kind of store do you have?',
     'Choisissez le type le plus proche de votre commerce. Produits, prix, textes et sections restent entièrement personnalisables ensuite.': 'Pick the type closest to your store. Products, prices, texts and sections stay fully customizable afterwards.',
     'Studio Carte NFC – Boutiques': 'NFC Card Studio – Stores', 'Boutiques': 'Stores',
     'La boutique': 'The shop', 'Voir la boutique': 'Shop now', 'Notre histoire': 'Our story', 'En boutique': 'In store',

@@ -632,3 +632,20 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   .split.s3 { grid-template-columns: minmax(0, 690px) auto; justify-content: center; gap: 64px; }
   .split.s3 .phone.live .phone-screen { height: min(760px, calc(100vh - 210px)); }
 }
+
+/* Recherche du secteur / du métier (étape 1) */
+.sq { margin: -6px 0 18px; }
+.sq-f { display: flex; align-items: center; gap: 10px; max-width: 560px; padding: 0 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.sq-f:focus-within { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-s); }
+.sq-f svg { flex: none; width: 19px; height: 19px; color: var(--mut); }
+.sq-f input { flex: 1; min-width: 0; height: 48px; border: 0; outline: 0; background: none; font: inherit; font-size: 15px; color: var(--ink); }
+.sq-r:empty { display: none; }
+.sq-r { margin-top: 12px; }
+.sq-l { display: block; margin-bottom: 8px; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #b45309; }
+.sq-ps { display: flex; flex-wrap: wrap; gap: 8px; }
+.sq-p { display: inline-flex; align-items: center; gap: 8px; text-align: left; padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.sq-p:hover { border-color: var(--acc); }
+.sq-p svg { width: 16px; height: 16px; color: var(--acc); }
+.sq-p span { color: var(--mut); font-size: 12.5px; }
+.sq-none { margin-top: 10px; font-size: 14px; color: var(--mut); }
+.tiles [hidden] { display: none; }

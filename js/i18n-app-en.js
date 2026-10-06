@@ -10,6 +10,8 @@ window.NFC_EN_APP = {
   'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.': 'Pick the industry closest to your business. Your job title, texts and sections stay fully customizable afterwards.',
   'Je ne trouve pas mon secteur': 'I can’t find my industry', 'Répondez à une question, nous vous orientons vers le bon modèle.': 'Answer one question and we’ll point you to the right template.',
   'Bientôt': 'Coming soon',
+  'Cherchez votre métier ou votre secteur (ex. coiffeuse, plombier, étudiant)': 'Search your profession or industry (e.g. hairdresser, plumber, student)', 'Cherchez votre métier ou votre secteur': 'Search your profession or industry',
+  'Aucun résultat. Essayez un autre mot, ou choisissez le secteur le plus proche ci-dessous.': 'No results. Try another word, or pick the closest industry below.',
   'Médecin, dentiste, kiné, psychologue, ostéopathe…': 'Doctor, dentist, physio, psychologist, osteopath…', 'Avocat, notaire, banquier, conseiller en patrimoine…': 'Lawyer, notary, banker, financial advisor…',
   'Dirigeant, commercial, manager, salarié, recruteur…': 'Executive, sales rep, manager, employee, recruiter…', 'Développeur, consultant, traducteur, rédacteur…': 'Developer, consultant, translator, copywriter…',
   'Agent immobilier, mandataire, promoteur…': 'Realtor, broker, developer…', 'Architecte, décorateur, paysagiste, cuisiniste…': 'Architect, decorator, landscaper, kitchen designer…',
