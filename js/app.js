@@ -400,7 +400,7 @@
     return `<section class="wrap">
       ${X.pick ? head(...X.pick) : head('Quel est votre secteur d’activité ?', 'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.')}
       <div class="sq">
-        <label class="sq-f"><i data-lucide="search"></i><input type="search" id="secq" autocomplete="off" spellcheck="false" placeholder="${X.searchPh || 'Cherchez votre métier ou votre secteur (ex. coiffeuse, plombier, étudiant)'}" aria-label="${X.searchPh || 'Cherchez votre métier ou votre secteur'}"></label>
+        <label class="sq-f"><i data-lucide="search"></i><input type="search" id="secq" autocomplete="off" spellcheck="false" placeholder="${X.searchPh || 'Cherchez votre métier ou votre secteur (ex. médecin, ingénieur, avocat)'}" aria-label="${X.searchPh || 'Cherchez votre métier ou votre secteur'}"></label>
         <div class="sq-r" id="secqr"></div>
         <p class="sq-none" id="secqn" hidden>Aucun résultat. Essayez un autre mot, ou choisissez le secteur le plus proche ci-dessous.</p>
       </div>
@@ -417,9 +417,9 @@
     sante: 'medecin docteur dentiste infirmiere physiotherapeute kinesitherapeute psychologue chiropraticien osteopathe optometriste nutritionniste clinique doctor nurse therapist',
     conseil: 'avocat notaire comptable fiscaliste conseiller financier banquier assureur courtier lawyer accountant advisor insurance',
     pro: 'representant vendeur directeur gestionnaire entrepreneur cadre sales manager networking',
-    freelance: 'developpeur programmeur informaticien consultant designer redacteur traducteur developer programmer it',
+    freelance: 'ingenieur engineer developpeur programmeur informaticien consultant designer redacteur traducteur developer programmer it',
     immobilier: 'courtier immobilier agent immobilier realtor broker',
-    archi: 'architecte decorateur designer interieur paysagiste architect interior',
+    archi: 'ingenieur engineer architecte decorateur designer interieur paysagiste architect interior',
     artisans: 'electricien plombier menuisier charpentier couvreur peintre macon renovation entrepreneur construction handyman contractor electrician plumber',
     beaute: 'coiffeur coiffeuse barbier estheticienne manucure ongles spa massage maquilleuse hairdresser barber nails',
     coaching: 'entraineur coach sportif yoga pilates professeur musique formateur trainer fitness',
