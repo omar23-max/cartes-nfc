@@ -13,7 +13,8 @@
 
   const fresh = () => ({ v: 1, step: 1, sectorId: null, design: null, palette: 0, cards: {}, id: rid() });
   let S = load();
-  const openGroups = new Set(['identity']);
+  /* Tous les panneaux de l’étape Contenu arrivent fermés : le client ouvre celui qu’il veut modifier */
+  const openGroups = new Set();
   let mobileTab = 'edit';
   let pvTimer = null;
 
