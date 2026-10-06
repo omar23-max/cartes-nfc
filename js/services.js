@@ -23,6 +23,9 @@ window.NFC = window.NFC || {};
       ['linkedin', 'LinkedIn'], ['instagram', 'Instagram'], ['facebook', 'Facebook'], ['tiktok', 'TikTok'], ['youtube', 'YouTube'], ['x', 'X (Twitter)'], ['threads', 'Threads'], ['pinterest', 'Pinterest'], ['snapchat', 'Snapchat'] ] },
     { id: 'share', n: ['Partage de la carte (visiteurs)', 'Profile sharing (visitors)'], d: ['Options du bouton « Partager » sur les cartes.', 'Options of the “Share” button on profiles.'], items: [
       ['wa', 'WhatsApp'], ['sms', 'SMS'], ['mail', 'Courriel', 'Email'], ['qr', 'QR code'], ['copy', 'Copier le lien', 'Copy link'], ['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['telegram', 'Telegram'], ['native', 'Partage du téléphone (« Plus… »)', 'Phone share sheet (“More…”)'] ] },
+    { id: 'crm', n: ['Réception des contacts', 'Contact delivery'], d: ['Choix proposés au titulaire pour recevoir les coordonnées de ses interlocuteurs.', 'Options offered to card owners to receive the details of people they meet.'], items: [
+      ['email', 'Courriel à chaque nouveau contact', 'Email for each new contact'], ['phone', '« Ajouter à mes contacts »', '“Add to my contacts”'], ['mini', 'Mini-CRM NexTap', 'NexTap mini-CRM'],
+      ['excel', 'Télécharger en Excel', 'Download as Excel'], ['sheets', 'Google Sheets', 'Google Sheets'], ['hubspot', 'HubSpot', 'HubSpot'], ['ghl', 'GoHighLevel', 'GoHighLevel'], ['zoho', 'Zoho CRM', 'Zoho CRM'], ['pipedrive', 'Pipedrive', 'Pipedrive'] ] },
     { id: 'google', n: ['Google', 'Google'], d: ['Services Google affichés sur les cartes.', 'Google services shown on profiles.'], items: [
       ['maps', 'Google Maps (plan intégré)', 'Google Maps (embedded map)'], ['reviews', 'Avis Google (section)', 'Google reviews (section)'] ] },
     { id: 'ai', n: ['Intelligence artificielle', 'Artificial intelligence'], d: ['Fonctions qui utilisent l’IA.', 'Features that use AI.'], items: [

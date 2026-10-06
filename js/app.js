@@ -301,6 +301,31 @@
   function maxStep() { return !S.sectorId ? 1 : !S.design ? 2 : 5; }
   function go(n) { S.step = Math.max(1, Math.min(n, maxStep())); save(); render(); window.scrollTo(0, 0); }
 
+  /* ---------- Réception des contacts (coordonnées laissées par les interlocuteurs) ----------
+     Le titulaire choisit comment il les reçoit. L’envoi réel (courriel, Google Sheets, CRM) se fait sur le serveur. */
+  const LEAD_CRM = [['hubspot', 'HubSpot'], ['ghl', 'GoHighLevel'], ['zoho', 'Zoho CRM'], ['pipedrive', 'Pipedrive']];
+  function leadsEd() {
+    const c = card();
+    if (!c.leads) c.leads = { email: true, emailTo: '', phone: true, mini: true, excel: true, sheets: false, crm: false, crmTool: '' };
+    const L = c.leads, ce = (c.contact || {}).email || '';
+    const opt = (svc, key, title, desc, extra = '') => (!svcOn('crm:' + svc) && !L[key] ? '' : `<div class="ld-o">
+        <label class="ck"><input type="checkbox" data-path="leads.${key}" ${L[key] ? 'checked' : ''}><span><b>${title}</b><small>${desc}</small></span></label>${extra ? `<div class="ld-x">${extra}</div>` : ''}</div>`);
+    const tools = LEAD_CRM.filter(([k]) => svcOn('crm:' + k) || L.crmTool === k);
+    const connect = (what) => `<button type="button" class="b sm" data-act="leadconnect" data-v="${what}">${ic('link', 15)}Connecter ${what}</button>`;
+    return `<label class="ck ld-ex"><input type="checkbox" data-path="exchange" ${c.exchange !== false ? 'checked' : ''}><span><b>Proposer l’échange de coordonnées</b><small>Après « Enregistrer le contact », la personne rencontrée peut vous laisser les siennes (ou scanner sa carte papier).</small></span></label>
+      <p class="f-l ld-t">Comment voulez-vous recevoir ces coordonnées ?</p>
+      <div class="ld">
+        ${opt('email', 'email', 'Courriel à chaque nouveau contact', '« Nouveau contact : Julie Tremblay, 514… » dans votre boîte.', inp('Adresse qui reçoit les contacts', 'leads.emailTo', { type: 'email', ph: ce, hint: 'Vide = votre courriel.' }))}
+        ${opt('phone', 'phone', '« Ajouter à mes contacts »', 'Un bouton sur chaque contact reçu l’enregistre dans votre téléphone, comme un contact normal.')}
+        ${opt('mini', 'mini', 'Mini-CRM NexTap', 'Une liste claire de vos contacts : statut (nouveau, rappelé, client), notes et recherche.')}
+        ${opt('excel', 'excel', '« Télécharger en Excel »', 'Un vrai fichier Excel qui s’ouvre proprement, accents et téléphones intacts.')}
+        ${opt('sheets', 'sheets', '« Envoyer vers Google Sheets »', 'Vos contacts s’ajoutent tout seuls dans une feuille Google.', connect('Google Sheets'))}
+        ${tools.length ? `<div class="ld-o"><label class="ck"><input type="checkbox" data-path="leads.crm" ${L.crm ? 'checked' : ''}><span><b>« Connecter mon CRM »</b><small>Chaque contact part automatiquement dans votre CRM. Vous autorisez une seule fois.</small></span></label>
+          <div class="ld-x"><label class="f"><span class="f-l">Votre CRM</span><select data-path="leads.crmTool"><option value="">Choisir…</option>${tools.map(([k, n]) => `<option value="${k}" ${L.crmTool === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>${connect(((tools.find(([k]) => k === L.crmTool) || [])[1]) || 'mon CRM')}</div></div>` : ''}
+      </div>
+      <p class="f-h">Vous recevez les contacts dès que votre carte est en ligne ; vous pouvez changer ces choix à tout moment.</p>`;
+  }
+
   /* ---------- Mode administrateur dans le studio ----------
      Boutons « Désactiver / Activer » et « Supprimer » sur les secteurs, métiers, modèles et palettes,
      et « Ajouter une palette ». Visibles seulement en mode administrateur (sur GoBiz : administrateur connecté). */
@@ -840,8 +865,8 @@
     h += grp('contact', 'Coordonnées & action principale', 'Téléphone, email, site', `
       <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('WhatsApp', 'contact.whatsapp', { type: 'tel', hint: 'Format international : +33 6…' })}</div>
       <div class="row2">${inp('Email', 'contact.email', { type: 'email' })}${inp('Site web', 'contact.website', { ph: 'monsite.fr' })}</div>
-      <label class="f"><span class="f-l">Action principale</span><select data-path="primary">${primaryOptions()}</select><span class="f-h">Le gros bouton toujours visible en bas de la carte.</span></label>
-      <label class="ck"><input type="checkbox" data-path="exchange" ${card().exchange !== false ? 'checked' : ''}><span>Après « Enregistrer le contact », proposer au visiteur de me laisser ses coordonnées</span></label>`);
+      <label class="f"><span class="f-l">Action principale</span><select data-path="primary">${primaryOptions()}</select><span class="f-h">Le gros bouton toujours visible en bas de la carte.</span></label>`);
+    h += grp('leads', 'Réception de vos contacts', 'Comment recevoir les coordonnées des personnes rencontrées', leadsEd());
     normSocials(card());
     const socRow = ([k, l]) => { const on = !!(card().socialsOn || {})[k]; return `<div class="soc-f ${on ? 'on' : ''}" data-socf="${k}">
         <label class="soc-ck" title="Afficher ${l} sur la carte"><input type="checkbox" data-path="socialsOn.${k}" data-socck="${k}" ${on ? 'checked' : ''}><span class="soc-lg">${VC.brandIc(k, 18)}</span><span class="soc-n">${l}</span></label>
@@ -1436,6 +1461,7 @@
       case 'modal-close': closeModal(); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
+      case 'leadconnect': toast(`La connexion à ${t.dataset.v} se fera depuis votre espace NexTap, une fois votre carte en ligne.`); break;
       case 'palette': {
         S.palette = +t.dataset.i; save();
         /* Seul l’aperçu est redessiné : il garde sa position de défilement, on voit l’effet sur la section regardée */
