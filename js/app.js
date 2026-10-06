@@ -436,10 +436,13 @@
     auto: 'mecanicien garagiste carrossier chauffeur taxi vtc concessionnaire mechanic driver',
     education: 'eleve etudiante orientation orthopedagogue directrice principal enseignement formation formatrice charge de cours conferencier enseignant enseignante professeure prof tuteur tutrice stage educatrice garderie cpe ecole universite cegep college teacher tutor school',
   };
-  const secHay = (s) => norm([s.name, s.ex, enOf(s.name), enOf(s.ex), s.kw || '', KW[s.id] || ''].concat(...(s.profiles || []).map((p) => p.n.concat(p.ex))).join(' '));
+  /* Liste de métiers sans carte propre (js/jobs.js) : chacun renvoie vers son secteur */
+  const JOBS = [].concat(...Object.entries(NFC.JOBS || {}).map(([sid, list]) => list.split('|').map((n) => ({ n, sid, h: norm(n) }))));
+  const secHay = (s) => norm([s.name, s.ex, enOf(s.name), enOf(s.ex), s.kw || '', KW[s.id] || '', (NFC.JOBS || {})[s.id] || ''].concat(...(s.profiles || []).map((p) => p.n.concat(p.ex))).join(' '));
   function filterSectors(q) {
     const words = norm(q).split(/\s+/).filter(Boolean), en = ui() === 'en';
-    const hit = (h) => words.every((w) => h.includes(w));
+    /* Un mot tapé doit être le début d’un mot du métier ou du secteur (« data » ne trouve pas « mandataire ») */
+    const hit = (h) => { const toks = h.split(/[^a-z0-9]+/); return words.every((w) => { const st = w.length > 3 && w.endsWith('s') ? w.slice(0, -1) : w; return toks.some((t) => t.startsWith(st)); }); };
     let n = 0;
     document.querySelectorAll('.tiles [data-act="sector"]').forEach((el) => {
       const s = SECTORS.find((x) => x.id === el.dataset.id), ok = !words.length || (s && hit(secHay(s)));
@@ -449,9 +452,15 @@
     /* Métiers correspondants : un clic ouvre directement le bon exemple */
     const profs = !words.length ? [] : [].concat(...SECTORS.filter((s) => s.active && s.profiles)
       .map((s) => s.profiles.filter((p) => hit(norm(p.n.concat(p.ex).join(' ')))).map((p) => ({ s, p })))).slice(0, 8);
+    /* Puis les métiers de la liste, ceux qui commencent par le mot tapé en premier */
+    const seen = new Set(profs.map(({ p }) => norm(p.n[0])));
+    const jobs = !words.length ? [] : JOBS.filter((j) => hit(j.h) && !seen.has(j.h) && SECTORS.some((s) => s.id === j.sid))
+      .sort((a, b) => (b.h.startsWith(words[0]) - a.h.startsWith(words[0])) || a.h.length - b.h.length).slice(0, Math.max(0, 8 - profs.length));
+    const secName = (sid) => { const s = SECTORS.find((x) => x.id === sid); return s ? (en ? enOf(s.name) || s.name : s.name) : ''; };
+    const icOf = (sid) => (SECTORS.find((x) => x.id === sid) || {}).icon || 'briefcase';
     const box = $('#secqr'), none = $('#secqn');
-    if (box) box.innerHTML = profs.length ? `<span class="sq-l">${en ? 'Matching professions' : 'Métiers trouvés'}</span><div class="sq-ps">${profs.map(({ s, p }) => `<button type="button" class="sq-p" data-act="profgo" data-s="${s.id}" data-p="${p.id}"><i data-lucide="${p.icon}"></i><b>${esc(p.n[en ? 1 : 0])}</b><span>${esc(en ? enOf(s.name) || s.name : s.name)}</span></button>`).join('')}</div>` : '';
-    if (none) none.hidden = n > 0 || profs.length > 0;
+    if (box) box.innerHTML = profs.length || jobs.length ? `<span class="sq-l">${en ? 'Matching professions' : 'Métiers trouvés'}</span><div class="sq-ps">${profs.map(({ s, p }) => `<button type="button" class="sq-p" data-act="profgo" data-s="${s.id}" data-p="${p.id}"><i data-lucide="${p.icon}"></i><b>${esc(p.n[en ? 1 : 0])}</b><span>${esc(secName(s.id))}</span></button>`).join('')}${jobs.map((j) => `<button type="button" class="sq-p" data-act="sector" data-id="${j.sid}"><i data-lucide="${icOf(j.sid)}"></i><b>${esc(j.n)}</b><span>${esc(secName(j.sid))}</span></button>`).join('')}</div>` : '';
+    if (none) none.hidden = n > 0 || profs.length > 0 || jobs.length > 0;
     icons();
   }
   document.addEventListener('input', (e) => { if (e.target.id === 'secq') filterSectors(e.target.value); });
