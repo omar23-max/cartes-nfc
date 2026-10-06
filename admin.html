@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=70">
+  <link rel="stylesheet" href="css/app.css?v=72">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -97,23 +97,23 @@
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=70"></script>
-  <script src="js/data.js?v=70"></script>
-  <script src="js/sectors.js?v=70"></script>
-  <script src="js/media.js?v=70"></script>
-  <script src="js/extras.js?v=70"></script>
-  <script src="js/locale-na.js?v=70"></script>
-  <script src="js/locale-na-en.js?v=70"></script>
-  <script src="js/google.js?v=70"></script>
-  <script src="js/profiles.js?v=70"></script>
-  <script src="js/profiles-sport.js?v=70"></script>
-  <script src="js/profiles-sante.js?v=70"></script>
-  <script src="js/profiles-archi.js?v=70"></script>
-  <script src="js/profiles-resto.js?v=70"></script>
-  <script src="js/profiles-auto.js?v=70"></script>
-  <script src="js/profiles-edu.js?v=70"></script>
-  <script src="js/jobs.js?v=70"></script>
-  <script src="js/render.js?v=70"></script>
+  <script src="js/services.js?v=72"></script>
+  <script src="js/data.js?v=72"></script>
+  <script src="js/sectors.js?v=72"></script>
+  <script src="js/media.js?v=72"></script>
+  <script src="js/extras.js?v=72"></script>
+  <script src="js/locale-na.js?v=72"></script>
+  <script src="js/locale-na-en.js?v=72"></script>
+  <script src="js/google.js?v=72"></script>
+  <script src="js/profiles.js?v=72"></script>
+  <script src="js/profiles-sport.js?v=72"></script>
+  <script src="js/profiles-sante.js?v=72"></script>
+  <script src="js/profiles-archi.js?v=72"></script>
+  <script src="js/profiles-resto.js?v=72"></script>
+  <script src="js/profiles-auto.js?v=72"></script>
+  <script src="js/profiles-edu.js?v=72"></script>
+  <script src="js/jobs.js?v=72"></script>
+  <script src="js/render.js?v=72"></script>
   <script>
   (function () {
     'use strict';
@@ -158,7 +158,7 @@
     /* 2. Catalogue */
     const secRows = (list, group) => {
       const ord = C.get('sectors.order', []), pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
-      const sorted = list.map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
+      const sorted = list.filter((s) => !C.get('sectors.del', []).includes(s.id)).map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
       const st = (s) => (C.get('sectors.off', []).includes(s.id) ? 'off' : (!s.active || C.get('sectors.soon', []).includes(s.id)) ? 'soon' : 'on');
       return sorted.map((s, i) => `<div class="adm-sec"><span>${esc(s.name)}${s.active ? '' : ' <small style="color:var(--mut)">(exemple pas encore prêt)</small>'}</span>
         <select data-secst="${s.id}" aria-label="État de ${esc(s.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué']].map(([v, l]) => `<option value="${v}" ${st(s) === v ? 'selected' : ''} ${v === 'on' && !s.active ? 'disabled' : ''}>${l}</option>`).join('')}</select>
@@ -167,7 +167,16 @@
     P.cat = () => {
       const withProf = CARDS.filter((s) => s.profiles);
       const jobsN = Object.values(NFC.JOBS || {}).reduce((a, s) => a + s.split('|').length, 0);
+      const del = [];
+      C.get('sectors.del', []).forEach((id) => del.push([`Secteur : ${SECNAME(id)}`, 'sectors.del', id]));
+      C.get('profDel', []).forEach((id) => { const [sid, pid] = id.split('~'), s = CARDS.find((x) => x.id === sid), p = s && (s.profiles || []).find((x) => x.id === pid); del.push([`Métier : ${p ? p.n[0] : pid} (${SECNAME(sid)})`, 'profDel', id]); });
+      C.get('designsDel', []).forEach((id) => del.push([`Modèle : ${(DESIGNS.find((d) => d.id === id) || {}).name || id}`, 'designsDel', id]));
+      Object.entries(C.get('palDel', {})).forEach(([k, arr]) => (arr || []).forEach((i) => del.push([`Palette n° ${i + 1} : ${SECNAME(k.split('~')[0])}${k.includes('~') ? ' – ' + k.split('~')[1] : ''}`, 'pal', k + '|' + i])));
+      const added = Object.entries(C.get('palAdd', {})).filter(([, a]) => a && a.length);
       return `<div class="sh"><h1>Catalogue</h1><p>Ce que vos clients voient : secteurs, métiers, modèles, sections et recherche.</p></div>
+      ${box('Mode administrateur dans les studios', LIVE, 'Affiche, directement dans les studios, les boutons Désactiver, Supprimer, Recommander et Ajouter une palette. Vos clients ne les voient pas (sur GoBiz : réservé à l’administrateur connecté).', fBool('adminMode', 'Activer le mode administrateur', 'Raccourci : ajoutez ?admin=1 à l’adresse d’un studio (?admin=0 pour quitter).') + '<p class="adm-d" style="margin-top:10px"><a class="adm-btn pri" style="text-decoration:none" href="index.html">Ouvrir le studio des cartes</a> <a class="adm-btn" style="text-decoration:none" href="stores/">Ouvrir le studio des boutiques</a></p>')}
+      ${box('Éléments supprimés', LIVE, 'Supprimés depuis le studio en mode administrateur. Restaurez-les pour les proposer de nouveau.', del.length ? del.map(([l, path, v]) => `<div class="adm-f"><div>${esc(l)}</div><div><button type="button" class="adm-btn" data-restore="${esc(path)}" data-v="${esc(v)}">Restaurer</button></div></div>`).join('') : '<p class="adm-empty">Rien n’a été supprimé.</p>')}
+      ${box('Palettes ajoutées', LIVE, 'Ajoutées depuis l’étape Couleurs du studio, en mode administrateur.', added.length ? added.map(([k, a]) => a.map((x) => `<div class="adm-f"><div><span style="display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px"><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.p)};display:inline-block"></i><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.a)};display:inline-block"></i></span>${esc(x.name)}<small>${esc(SECNAME(k.split('~')[0]))}${k.includes('~') ? ' – ' + esc(k.split('~')[1]) : ''}</small></div><div><span class="adm-d">Pour la retirer : « Supprimer » sur la palette, dans le studio.</span></div></div>`).join('')).join('') : '<p class="adm-empty">Aucune palette ajoutée.</p>')}
       ${box('Secteurs des cartes', LIVE, 'Visible, « Bientôt » (affiché mais pas encore ouvert) ou masqué. Les flèches changent l’ordre d’affichage.', secRows(CARDS, 'cards'))}
       ${box('Types de boutique', LIVE, 'Même principe pour le studio des boutiques.', secRows(STORES, 'stores'))}
       ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<p class="adm-d" style="margin:10px 0 4px"><b>${esc(s.name)}</b></p><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div>`).join(''))}
@@ -304,6 +313,11 @@
         const other = (d.g === 'cards' ? STORES : CARDS).map((s) => s.id).filter((id) => ord.includes(id));
         C.set('sectors.order', ids.concat(other), `Ordre modifié : ${SECNAME(d.mv)}`);
         draw(); return saved();
+      }
+      if (d.restore) {
+        if (d.restore === 'pal') { const [k, i] = d.v.split('|'), m = Object.assign({}, C.get('palDel', {})); m[k] = (m[k] || []).filter((x) => x !== +i); C.set('palDel', m, `Palette restaurée (${k})`); }
+        else C.set(d.restore, C.get(d.restore, []).filter((x) => x !== d.v), `Restauré : ${d.v}`);
+        draw(); return saved('Restauré');
       }
       if (d.jobadd !== undefined) { C.set('jobs', C.get('jobs', []).concat([['', CARDS[0].id]])); draw(); return; }
       if (d.jobdel !== undefined) { const j = C.get('jobs', []); const r = j.splice(+d.jobdel, 1); C.set('jobs', j, `Métier retiré : ${(r[0] || [])[0] || ''}`); draw(); return saved(); }

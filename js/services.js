@@ -96,3 +96,34 @@ window.NFC = window.NFC || {};
   };
   /* Le service « book:… », « pay:… » est aussi soumis au forfait pour le paiement en ligne */
 })();
+
+/* ---------- Palettes de couleurs ajoutées par l’administrateur ----------
+   Liste d’une carte = palettes d’origine + palettes ajoutées (dans cet ordre, sans jamais rien retirer),
+   pour que le numéro de palette d’une carte existante reste toujours le même.
+   Désactiver ou supprimer une palette la retire seulement du choix proposé aux clients. */
+(function () {
+  'use strict';
+  const hx = (h) => [0, 2, 4].map((i) => parseInt(String(h).slice(1).substr(i, 2), 16) || 0);
+  const mix = (a, b, t) => '#' + hx(a).map((v, i) => Math.round(v + (hx(b)[i] - v) * t).toString(16).padStart(2, '0')).join('');
+  NFC.fullPal = (name, p, a) => ({ name, p, a, bg: mix(p, '#ffffff', 0.955), sf: '#ffffff', tx: mix(p, '#0b0b0f', 0.86), mu: mix(p, '#6b6b72', 0.8), ln: mix(p, '#ffffff', 0.87), added: true });
+  NFC.palKey = (s) => (s ? s.id + (s.profile ? '~' + s.profile.id : '') : '');
+  NFC.palsOf = (s) => {
+    if (!s) return [];
+    const add = NFC.cfg ? (NFC.cfg.get('palAdd', {})[NFC.palKey(s)] || []) : [];
+    return (s.palettes || []).concat(add.map((x) => NFC.fullPal(x.name, x.p, x.a)));
+  };
+  /* État d’une palette pour le choix : 'on', 'off' (désactivée) ou 'del' (supprimée) */
+  NFC.palState = (s, i) => {
+    if (!NFC.cfg) return 'on';
+    const k = NFC.palKey(s);
+    if ((NFC.cfg.get('palDel', {})[k] || []).includes(i)) return 'del';
+    if ((NFC.cfg.get('palOff', {})[k] || []).includes(i)) return 'off';
+    return 'on';
+  };
+  /* Mode administrateur dans les studios : boutons de gestion visibles (jamais pour les clients sur GoBiz) */
+  try {
+    const q = new URLSearchParams(location.search).get('admin');
+    if (q === '1' || q === '0') NFC.cfg.set('adminMode', q === '1', q === '1' ? 'Mode administrateur activé' : 'Mode administrateur désactivé');
+  } catch (e) { /* rien */ }
+  NFC.isAdmin = () => !!(NFC.cfg && NFC.cfg.get('adminMode', false));
+})();

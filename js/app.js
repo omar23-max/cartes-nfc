@@ -15,13 +15,17 @@
   const plan = () => (NFC.cfg ? NFC.cfg.plan() : { sections: 99, photos: 99, products: 999, bili: true, video: true, shop: true, online: true, ai: true });
   const isStores = !!X.key && X.key !== 'nfc-studio-v6';
   /* Secteurs (ou types de boutique) : masqués, « Bientôt », ordre */
-  const secOff = (s) => cfg('sectors.off', []).includes(s.id);
+  const ADM = () => !!(NFC.isAdmin && NFC.isAdmin());
+  const secDel = (s) => cfg('sectors.del', []).includes(s.id);
+  const secOff = (s) => cfg('sectors.off', []).includes(s.id) || secDel(s);
   const secSoon = (s) => !s.active || cfg('sectors.soon', []).includes(s.id);
   const secList = () => {
     const ord = cfg('sectors.order', []), pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
-    return SECTORS.filter((s) => !secOff(s)).map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
+    /* L’administrateur voit aussi les secteurs désactivés (grisés), jamais les supprimés */
+    return SECTORS.filter((s) => (ADM() ? !secDel(s) : !secOff(s))).map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
   };
-  const profOk = (s, p) => !cfg('profOff', []).includes(s.id + '~' + p.id);
+  const profDel = (s, p) => cfg('profDel', []).includes(s.id + '~' + p.id);
+  const profOk = (s, p) => !cfg('profOff', []).includes(s.id + '~' + p.id) && !profDel(s, p);
   const recOf = (s) => cfg('rec', {})[s.id] || s.rec;
   const KEY = X.key || 'nfc-studio-v6';
   const STEPS = X.steps || ['Secteur', 'Modèle', 'Couleurs', 'Contenu', 'Publication'];
@@ -278,13 +282,14 @@
   const uiSwitch = () => `<div class="seg ui-sw" role="group" aria-label="${ui() === 'en' ? 'Site language' : 'Langue du site'}">${ic('globe', 15)}<button type="button" class="${ui() === 'fr' ? 'on' : ''}" data-act="ui" data-v="fr" lang="fr" title="Site en français">FR</button><button type="button" class="${ui() === 'en' ? 'on' : ''}" data-act="ui" data-v="en" lang="en" title="Site in English">EN</button></div>`;
   const mdl = (d = S.design, p = S.palette) => {
     const s = sec();
-    return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: s.palettes[p] || s.palettes[0], link: link(), lang: lang(), bilingual: bili() };
+    const ps = NFC.palsOf ? NFC.palsOf(s) : s.palettes;
+    return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: ps[p] || ps[0], link: link(), lang: lang(), bilingual: bili() };
   };
   const designOf = (id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id) || DESIGNS[0];
   /* Mises en page proposées : les 10 communes + celles propres au secteur (ex. beauté) */
   const designsNow = () => {
-    const all = DESIGNS.concat((sec() && sec().designs) || []), off = cfg('designsOff', []);
-    const on = all.filter((d) => !off.includes(d.id) || d.id === S.design);
+    const all = DESIGNS.concat((sec() && sec().designs) || []), off = cfg('designsOff', []), del = cfg('designsDel', []);
+    const on = all.filter((d) => (ADM() ? !del.includes(d.id) : (!off.includes(d.id) && !del.includes(d.id))) || d.id === S.design);
     return on.length ? on : all;
   };
   const code = (d = S.design) => `${sec().code}-${String(d || sec().rec).toUpperCase()}`;
@@ -295,6 +300,82 @@
 
   function maxStep() { return !S.sectorId ? 1 : !S.design ? 2 : 5; }
   function go(n) { S.step = Math.max(1, Math.min(n, maxStep())); save(); render(); window.scrollTo(0, 0); }
+
+  /* ---------- Mode administrateur dans le studio ----------
+     Boutons « Désactiver / Activer » et « Supprimer » sur les secteurs, métiers, modèles et palettes,
+     et « Ajouter une palette ». Visibles seulement en mode administrateur (sur GoBiz : administrateur connecté). */
+  const admBar = () => (ADM() ? `<div class="adm-bar">${ic('shield', 16)}<span><b>Mode administrateur</b> · vos clients ne voient pas ces boutons. Désactivé = caché aux clients (grisé pour vous) ; supprimé = retiré, à restaurer depuis la page admin.</span><a class="linkish" href="${isStores ? '../' : ''}admin.html#cat">Page admin</a><button type="button" class="linkish" data-act="adm" data-op="quit">Quitter le mode admin</button></div>` : '');
+  function admTools(kind, id, state, soon, rec) {
+    const b = (op, label, cls = '') => `<button type="button" class="adm-t ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}">${label}</button>`;
+    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? b('off', 'Désactiver') : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? b('soon', 'Bientôt') : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on">Recommandé</span>' : b('rec', 'Recommander')) : ''}${b('del', 'Supprimer', 'danger')}</div>`;
+  }
+  const admWrap = (html, kind, id, state, soon) => (ADM() ? `<div class="adm-w">${html}${admTools(kind, id, state, soon)}</div>` : html);
+  const addTo = (path, v) => { const a = cfg(path, []).filter((x) => x !== v); a.push(v); return a; };
+  const rmFrom = (path, v) => cfg(path, []).filter((x) => x !== v);
+  function admAct(t) {
+    if (!NFC.cfg || !ADM()) return;
+    const C = NFC.cfg, { kind, id, op } = t.dataset;
+    const name = kind === 'sec' ? ((SECTORS.find((x) => x.id === id) || {}).name || id) : kind === 'des' ? designOf(id).name : kind === 'prof' ? id : 'palette ' + id;
+    if (op === 'quit') { C.set('adminMode', false, 'Mode administrateur désactivé'); toast('Mode administrateur quitté.'); render(); return; }
+    if (op === 'paladd') { openPalAdd(); return; }
+    if (op === 'del' && !confirm(`Supprimer « ${name} » ? Vos clients ne le verront plus. Vous pourrez le restaurer depuis la page admin.`)) return;
+    if (kind === 'sec') {
+      if (op === 'off') C.set('sectors.off', addTo('sectors.off', id), `Secteur ${name} : désactivé`);
+      if (op === 'on') { C.set('sectors.off', rmFrom('sectors.off', id)); C.set('sectors.soon', rmFrom('sectors.soon', id), `Secteur ${name} : activé`); }
+      if (op === 'soon') C.set('sectors.soon', addTo('sectors.soon', id), `Secteur ${name} : Bientôt`);
+      if (op === 'del') { C.set('sectors.del', addTo('sectors.del', id), `Secteur ${name} : supprimé`); if (S.sectorId === id) { S.sectorId = null; S.design = null; } }
+    } else if (kind === 'prof') {
+      if (op === 'off') C.set('profOff', addTo('profOff', id), `Métier ${id} : désactivé`);
+      if (op === 'on') C.set('profOff', rmFrom('profOff', id), `Métier ${id} : activé`);
+      if (op === 'del') C.set('profDel', addTo('profDel', id), `Métier ${id} : supprimé`);
+    } else if (kind === 'des') {
+      if (op === 'off') C.set('designsOff', addTo('designsOff', id), `Modèle ${name} : désactivé`);
+      if (op === 'on') C.set('designsOff', rmFrom('designsOff', id), `Modèle ${name} : activé`);
+      if (op === 'del') { C.set('designsDel', addTo('designsDel', id), `Modèle ${name} : supprimé`); if (S.design === id) S.design = null; }
+      if (op === 'rec') { const r = cfg('rec', {}); r[S.sectorId] = id; C.set('rec', r, `Modèle recommandé ${sec().name} : ${name}`); }
+    } else if (kind === 'pal') {
+      const k = NFC.palKey(sec()), i = +id, map = (p) => Object.assign({}, cfg(p, {}));
+      const off = map('palOff'), del = map('palDel');
+      off[k] = (off[k] || []).filter((x) => x !== i); del[k] = (del[k] || []).filter((x) => x !== i);
+      if (op === 'off') off[k].push(i);
+      if (op === 'del') del[k].push(i);
+      C.set('palOff', off); C.set('palDel', del, `Palette ${(NFC.palsOf(sec())[i] || {}).name} (${sec().name}) : ${op === 'on' ? 'activée' : op === 'off' ? 'désactivée' : 'supprimée'}`);
+    }
+    save(); render();
+    toast(op === 'del' ? 'Supprimé. Restaurable depuis la page admin.' : op === 'off' ? 'Désactivé : caché à vos clients.' : op === 'soon' ? 'Affiché « Bientôt » à vos clients.' : op === 'rec' ? 'Modèle recommandé changé.' : 'Activé : visible par vos clients.');
+  }
+  /* Ajouter une palette : nom, couleur principale, couleur d’accent ; aperçu immédiat */
+  function openPalAdd() {
+    const s = sec(), base = (NFC.palsOf(s)[S.palette] || s.palettes[0]);
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
+        <h2 id="md-t">Ajouter une palette</h2>
+        <p>Pour <b>${esc(s.profile ? profName(s.profile) : s.name)}</b>. Les teintes de fond, de texte et de bordure sont calculées automatiquement.</p>
+        <form class="pal-form" data-paladd>
+          <label class="f"><span class="f-l">Nom de la palette</span><input name="n" required maxlength="30" placeholder="Ex. Bleu NexTap"></label>
+          <div class="row2"><label class="f"><span class="f-l">Couleur principale</span><input type="color" name="p" value="${base.p}"></label><label class="f"><span class="f-l">Couleur d’accent</span><input type="color" name="a" value="${base.a}"></label></div>
+          <div class="pal-pv"><span class="sw"><i data-pv="p" style="background:${base.p}"></i><i data-pv="a" style="background:${base.a}"></i><i data-pv="bg" style="background:${base.bg}"></i></span><span>Aperçu</span></div>
+          <div class="btns"><button type="submit" class="b pri">Ajouter la palette</button><button type="button" class="b" data-act="modal-close">Annuler</button></div>
+        </form>
+      </div>`;
+    $('#modal').classList.add('on');
+    const f = $('[data-paladd]');
+    f.addEventListener('input', () => {
+      const P = NFC.fullPal('', f.p.value, f.a.value);
+      f.querySelector('[data-pv="p"]').style.background = P.p; f.querySelector('[data-pv="a"]').style.background = P.a; f.querySelector('[data-pv="bg"]').style.background = P.bg;
+    });
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const n = f.n.value.trim();
+      if (!n) return;
+      const k = NFC.palKey(s), add = Object.assign({}, cfg('palAdd', {}));
+      add[k] = (add[k] || []).concat([{ name: n, p: f.p.value, a: f.a.value }]);
+      NFC.cfg.set('palAdd', add, `Palette ajoutée : ${n} (${s.name})`);
+      S.palette = NFC.palsOf(s).length - 1;
+      save(); closeModal(); render(); toast('Palette ajoutée et appliquée à l’aperçu.');
+    });
+  }
 
   /* ---------- Rendu global ---------- */
   function render() {
@@ -402,13 +483,13 @@
   let profPick = false;
   function stepProf() {
     const b = baseSec(), cur = prof(), en = ui() === 'en';
-    const tiles = b.profiles.filter((p) => profOk(b, p)).map((p) => `
-      <button class="tile has-bg ${cur && cur.id === p.id && S.design ? 'sel' : ''}" data-act="profile" data-id="${p.id}" style="background-image:url('${(p.media && p.media.cover) || ''}')">
+    const tiles = b.profiles.filter((p) => (ADM() ? !profDel(b, p) : profOk(b, p))).map((p) => admWrap(`
+      <button class="tile has-bg ${cur && cur.id === p.id && S.design ? 'sel' : ''} ${ADM() && !profOk(b, p) ? 'adm-off' : ''}" data-act="profile" data-id="${p.id}" style="background-image:url('${(p.media && p.media.cover) || ''}')">
         <span class="tile-top"><span class="tile-ic"><i data-lucide="${p.icon}"></i></span></span>
         <span class="tile-n">${p.n[en ? 1 : 0]}</span>
         <span class="tile-ex">${p.ex[en ? 1 : 0]}</span>
-      </button>`).join('');
-    return `<section class="wrap">
+      </button>`, 'prof', b.id + '~' + p.id, profOk(b, p) ? 'on' : 'off')).join('');
+    return `<section class="wrap">${admBar()}
       <button class="back" data-act="profback">${ic('arrowl', 16)}${en ? 'Change industry' : 'Changer de secteur'}</button>
       ${head(en ? 'What is your profession?' : 'Quel est votre métier ?', en ? `${b.profiles.length} profiles for <b>${b.name}</b>, each with its own example, colors and photos. Everything stays customizable.` : `${b.profiles.length} métiers pour <b>${b.name}</b>, chacun avec son exemple, ses couleurs et ses photos. Tout reste personnalisable.`)}
       <div class="tiles">${tiles}</div>
@@ -428,13 +509,13 @@
   function step1() {
     if (S.qr === undefined) return step0();
     if (profPick && baseSec() && baseSec().profiles) return stepProf();
-    const tiles = secList().map((s) => `
-      <button class="tile ${secSoon(s) ? 'soon' : ''} ${S.sectorId === s.id ? 'sel' : ''} ${bgOf(s) ? 'has-bg' : ''}" data-act="sector" data-id="${s.id}"${bgOf(s) ? ` style="background-image:url('${bgOf(s)}')"` : ''}>
+    const tiles = secList().map((s) => admWrap(`
+      <button class="tile ${secSoon(s) ? 'soon' : ''} ${ADM() && secOff(s) ? 'adm-off' : ''} ${S.sectorId === s.id ? 'sel' : ''} ${bgOf(s) ? 'has-bg' : ''}" data-act="sector" data-id="${s.id}"${bgOf(s) ? ` style="background-image:url('${bgOf(s)}')"` : ''}>
         <span class="tile-top"><span class="tile-ic"><i data-lucide="${s.icon}"></i></span><span class="tile-code">${s.code}</span>${secSoon(s) ? '<span class="tile-b">Bientôt</span>' : ''}</span>
         <span class="tile-n">${s.name}</span>
         <span class="tile-ex">${s.ex}</span>
-      </button>`).join('');
-    return `<section class="wrap">
+      </button>`, 'sec', s.id, secOff(s) ? 'off' : cfg('sectors.soon', []).includes(s.id) ? 'soon' : 'on', true)).join('');
+    return `<section class="wrap">${admBar()}
       ${X.pick ? head(...X.pick) : head('Quel est votre secteur d’activité ?', 'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.')}
       <div class="sq">
         <label class="sq-f"><i data-lucide="search"></i><input type="search" id="secq" autocomplete="off" spellcheck="false" placeholder="${X.searchPh || 'Cherchez votre métier ou votre secteur (ex. médecin, ingénieur, avocat)'}" aria-label="${X.searchPh || 'Cherchez votre métier ou votre secteur'}"></label>
@@ -484,7 +565,7 @@
     let n = 0;
     document.querySelectorAll('.tiles [data-act="sector"]').forEach((el) => {
       const s = SECTORS.find((x) => x.id === el.dataset.id), ok = !words.length || (s && hit(secHay(s)));
-      el.hidden = !ok;
+      (el.closest('.adm-w') || el).hidden = !ok;
       if (ok) n++;
     });
     /* Métiers correspondants : un clic ouvre directement le bon exemple */
@@ -630,17 +711,19 @@
   /* ---------- Étape 2 : modèle ---------- */
   function step2() {
     const s = sec();
+    const dOff = (d) => cfg('designsOff', []).includes(d.id);
     const cards = designsNow().map((d) => `
-      <div class="tpl ${S.design === d.id ? 'sel' : ''}" role="button" tabindex="0" aria-label="Choisir le modèle ${d.name}" data-act="design" data-id="${d.id}">
+      <div class="tpl ${S.design === d.id ? 'sel' : ''} ${ADM() && dOff(d) ? 'adm-off' : ''}" role="button" tabindex="0" aria-label="Choisir le modèle ${d.name}" data-act="design" data-id="${d.id}">
         <div class="tpl-view"><div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(d.id), { thumb: true }))}</div></div></div>
           <button type="button" class="tpl-zoom" data-act="fullpreview" data-id="${d.id}" aria-label="Aperçu plein écran du modèle ${d.name}">${ic('eye', 15)}Aperçu</button></div>
         <div class="tpl-meta">
           <div class="tpl-top"><span class="tpl-n">${d.name}</span>${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}</div>
           <p>${d.desc}</p>
           <div class="tpl-foot"><span class="tpl-code">${s.code}-${d.id.toUpperCase()}</span><span class="tpl-go">Choisir ${ic('arrow', 14)}</span></div>
+          ${ADM() ? admTools('des', d.id, dOff(d) ? 'off' : 'on', false, recOf(s) === d.id) : ''}
         </div>
       </div>`).join('');
-    return `<section class="wrap">
+    return `<section class="wrap">${admBar()}
       ${back(1, X.backTo || 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
       ${langSwitch()}
       ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Cliquez pour choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.`)}
@@ -651,18 +734,22 @@
   /* ---------- Étape 3 : couleurs ---------- */
   function step3() {
     const s = sec();
-    const pals = s.palettes.map((p, i) => `
-      <button class="pal ${S.palette === i ? 'sel' : ''}" data-act="palette" data-i="${i}">
+    const PS = NFC.palsOf ? NFC.palsOf(s) : s.palettes;
+    const pst = (i) => (NFC.palState ? NFC.palState(s, i) : 'on');
+    const nPal = PS.filter((x, i) => pst(i) === 'on').length;
+    /* Clients : palettes actives seulement (la palette déjà choisie reste affichée) ; administrateur : aussi les désactivées */
+    const pals = PS.map((p, i) => [p, i]).filter(([, i]) => i === S.palette || (ADM() ? pst(i) !== 'del' : pst(i) === 'on')).map(([p, i]) => admWrap(`
+      <button class="pal ${S.palette === i ? 'sel' : ''} ${ADM() && pst(i) !== 'on' ? 'adm-off' : ''}" data-act="palette" data-i="${i}">
         <span class="sw"><i style="background:${p.p}"></i><i style="background:${p.a}"></i><i style="background:${p.bg}"></i></span>
-        <span class="pal-n">${p.name}</span>
+        <span class="pal-n">${esc(p.name)}</span>
         <span class="pal-ck">${ic('check', 16)}</span>
-      </button>`).join('');
+      </button>`, 'pal', String(i), pst(i) === 'on' ? 'on' : 'off')).join('') + (ADM() ? `<button type="button" class="pal pal-add" data-act="adm" data-op="paladd">${ic('plus', 16)}<span class="pal-n">Ajouter une palette</span></button>` : '');
     /* Titre dans la colonne de gauche : sur ordinateur, l’aperçu remonte en haut, à côté du titre */
-    return `<section class="wrap s3w">
+    return `<section class="wrap s3w">${admBar()}
       <div class="split s3">
         <div class="side">
           ${back(2, 'Changer de modèle')}
-          ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 6 palettes pensées pour votre secteur.`)}
+          ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · ${nPal === 6 ? '6 palettes pensées pour votre secteur.' : ui() === 'en' ? `${nPal} palettes designed for your industry.` : `${nPal} palettes pensées pour votre secteur.`}`)}
           <div class="pals">${pals}</div>
           <p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>
           <button class="b pri lg" data-act="go" data-n="4">Remplir mes informations ${ic('arrow', 18)}</button>
@@ -674,7 +761,7 @@
 
   /* ---------- Étape 4 : contenu ---------- */
   function step4() {
-    const s = sec(), p = s.palettes[S.palette];
+    const s = sec(), p = (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0];
     return `<section class="wrap wide">
       <div class="ed-bar">
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
@@ -1296,7 +1383,7 @@
 
   function exportJSON() {
     if (window.NFC_SANDBOX) { toast('Aperçu en ligne : l’export sera disponible sur la version finale.'); return; }
-    const data = { modele: code(), secteur: sec().name, design: designOf(S.design).name, palette: sec().palettes[S.palette], lien: link(), carte: card() };
+    const data = { modele: code(), secteur: sec().name, design: designOf(S.design).name, palette: (NFC.palsOf ? NFC.palsOf(sec()) : sec().palettes)[S.palette], lien: link(), carte: card() };
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
     a.download = `carte-${code()}-${S.id}.json`;
@@ -1348,6 +1435,7 @@
       case 'other-pick': closeModal(); pickSector(t.dataset.id, true); break;
       case 'modal-close': closeModal(); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
+      case 'adm': admAct(t); break;
       case 'palette': {
         S.palette = +t.dataset.i; save();
         /* Seul l’aperçu est redessiné : il garde sa position de défilement, on voit l’effet sur la section regardée */
