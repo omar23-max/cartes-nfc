@@ -282,7 +282,19 @@
     icons();
     if (S.step === 5) drawQR();
     translateTree(document.body);
+    reword(document.body);
     fitPreview();
+  }
+  /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
+  function reword(root) {
+    const list = X.reword && X.reword[ui()];
+    if (!list || !root) return;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && n.parentElement.closest('.vc, script, style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    for (let n = w.nextNode(); n; n = w.nextNode()) {
+      let t = n.nodeValue;
+      list.forEach(([a, b]) => { if (t.includes(a)) t = t.split(a).join(b); });
+      if (t !== n.nodeValue) n.nodeValue = t;
+    }
   }
   /* Téléphone, onglet Aperçu : la carte s’affiche en plein écran, seule la barre Modifier / Aperçu / Publier reste */
   function fitPreview() {
@@ -722,7 +734,7 @@
         { n: en ? 'Sarah M.' : 'Julie M.', r: en ? 'Customer since 2023' : 'Cliente depuis 2023', t: en ? 'Fast, friendly and professional. Highly recommend!' : 'Rapide, souriant et professionnel. Je recommande sans hésiter !', s: 5 },
         { n: en ? 'David L.' : 'Marc L.', r: en ? 'Verified customer' : 'Client vérifié', t: en ? 'Great value and excellent advice.' : 'Excellent rapport qualité-prix et de très bons conseils.', s: 5 }] }) },
     { id: 'google', g: 'trust', ic: 'star', n: ['Avis Google', 'Google reviews'], d: ['Votre note Google et un bouton « Laisser un avis ».', 'Your Google rating and a “Leave a review” button.'],
-      make: (en) => blk('greviews', en ? 'Google reviews' : 'Avis Google', { rating: en ? '4.8' : '4,8', count: '52', reviewUrl: 'https://g.page/r/example/review', mapsUrl: 'https://maps.google.com/',
+      make: (en) => blk('greviews', en ? 'Google reviews' : 'Avis Google', { rating: en ? '4.8' : '4,8', count: '52', reviewUrl: 'https://g.page/r/example/review', mapsUrl: en ? 'https://maps.app.goo.gl/example' : 'https://maps.app.goo.gl/exemple',
         text: en ? 'Your review helps us grow. Thank you!' : 'Votre avis nous aide à grandir. Merci !' }) },
     { id: 'stats', g: 'trust', ic: 'trending-up', n: ['Chiffres clés', 'Key figures'], d: ['Années d’expérience, clients, note moyenne…', 'Years of experience, customers, rating…'],
       make: (en) => blk('stats', en ? 'Key figures' : 'En quelques chiffres', { items: [
@@ -870,6 +882,18 @@
     return { type: 'vidcar', title: lang() === 'en' ? 'Videos' : 'Vidéos', videos: vids.map((v) => ({ url: '', src: v.src, cover: v.poster, cap: v.cap })) };
   }
 
+  /* Avis Google : la note vient de la fiche Google reliée ; le propriétaire ne peut pas la fixer lui-même */
+  function gSync(b) {
+    const ok = VC.gLinked(b.mapsUrl), en = ui() === 'en';
+    const n = ok && b.rating ? ` · ${esc(b.rating)} ★${b.count ? (en ? `, ${esc(b.count)} reviews` : `, ${esc(b.count)} avis`) : ''}` : '';
+    const txt = ok
+      ? (en ? `<b>Google listing connected${n}</b>Your official rating shows on your profile and updates by itself. It can’t be edited by hand.`
+        : `<b>Fiche Google reliée${n}</b>Votre note officielle s’affiche sur la carte et se met à jour toute seule. Elle ne se modifie pas à la main.`)
+      : (en ? 'Paste your Google listing link: your real Google rating will show on your profile automatically.'
+        : 'Collez le lien de votre fiche Google : votre vraie note Google s’affichera automatiquement sur la carte.');
+    const test = en ? 'Test site: the rating shown is a sample. On the live site, it is read directly from Google.' : 'Site test : la note affichée est un exemple. Sur le site final, elle sera lue directement chez Google.';
+    return `<div class="g-sync${ok ? ' on' : ''}">${ic(ok ? 'check' : 'star', 16)}<span>${txt}${ok ? `<i>${test}</i>` : ''}</span></div>`;
+  }
   function blockEd(def, base = `blocks.${def.key}`) {
     const b = g(base);
     switch (def.type) {
@@ -888,11 +912,10 @@
           ${add(`${base}.cats.${ci}.items`, 'item', 'Ajouter un plat')}</div>`).join('')}${add(base + '.cats', 'cat', 'Ajouter une rubrique')}
           ${area('Note en bas de la carte', base + '.note', { rows: 2, ph: 'Allergies, taxes, provenance des produits…' })}`;
       case 'greviews':
-        return `<div class="row2">${inp('Note Google (sur 5)', base + '.rating', { ph: '4,8' })}${inp('Nombre d’avis', base + '.count', { ph: '124' })}</div>
+        return `${inp('Lien de votre fiche Google', base + '.mapsUrl', { ph: 'https://maps.app.goo.gl/…', hint: 'Cherchez votre commerce sur Google Maps, puis « Partager » et « Copier le lien ».' })}
+          ${gSync(b)}
           ${inp('Lien « Laisser un avis »', base + '.reviewUrl', { ph: 'https://g.page/r/…/review', hint: 'Dans votre profil d’entreprise Google : « Demander des avis », puis copiez le lien.' })}
-          ${inp('Lien de votre fiche Google', base + '.mapsUrl', { ph: 'https://maps.google.com/…', hint: 'Cherchez votre commerce sur Google Maps, puis « Partager » et « Copier le lien ».' })}
-          ${area('Petit mot pour vos clients', base + '.text', { rows: 2, ph: 'Votre avis nous aide à grandir. Merci !' })}
-          <p class="f-h">Pensez à mettre votre note à jour de temps en temps.</p>`;
+          ${area('Petit mot pour vos clients', base + '.text', { rows: 2, ph: 'Votre avis nous aide à grandir. Merci !' })}`;
       case 'chef':
         return `<div class="it">${thumbF(base + '.photo')}<div class="it-f">${mini(base + '.name', 'Nom du chef', 'strong')}${mini(base + '.role', 'Titre (ex. Chef propriétaire)', 'full')}</div></div>
           ${area('Présentation', base + '.text', { rows: 4 })}
@@ -975,7 +998,7 @@
           ${inp('Ou lien de votre vidéo', base + '.url', { ph: 'YouTube, Vimeo, Instagram…', hint: 'La vidéo se lance au clic, pour garder une carte légère.' })}${inp('Légende', base + '.cap')}${imgF('Image de couverture', base + '.cover')}`;
       default:
         /* Sections propres à un autre produit (ex. boutique en ligne de Stores) */
-        return X.editors && X.editors[def.type] ? X.editors[def.type](b, base, { inp, area, mini, add, del, thumbF, g, card, esc, ic }) : '';
+        return X.editors && X.editors[def.type] ? X.editors[def.type](b, base, { inp, area, mini, add, del, thumbF, g, card, esc, ic, lang: lang() }) : '';
     }
   }
 
@@ -1378,6 +1401,11 @@
     if (/^(blocks\.[^.]+|custom\.\d+)\.title$/.test(t.dataset.path)) {
       const h = t.closest('.grp') && t.closest('.grp').querySelector('.grp-t');
       if (h) h.textContent = t.value || t.placeholder;
+    }
+    /* Lien de la fiche Google : l’encadré « fiche reliée » suit la saisie */
+    if (/\.mapsUrl$/.test(t.dataset.path)) {
+      const box = t.closest('.grp') && t.closest('.grp').querySelector('.g-sync');
+      if (box) { box.outerHTML = gSync(g(t.dataset.path.replace(/\.mapsUrl$/, ''))); icons(); }
     }
     if (t.dataset.struct === 're') {
       /* Changement d’outil : on retire le lien d’un autre outil, pour saisir le bon */

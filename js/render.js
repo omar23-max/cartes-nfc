@@ -81,6 +81,8 @@
   const nl = (s) => esc(s).replace(/\n/g, '<br>');
   const url = (u) => (/^(https?:|mailto:|tel:)/i.test(u) ? u : 'https://' + u);
   const tel = (p) => String(p || '').replace(/[^\d+]/g, '');
+  /* Lien d’une vraie fiche Google (Maps) : la note affichée est alors celle de Google, jamais saisie à la main */
+  const gLinked = (u) => /^(https?:\/\/)?(maps\.app\.goo\.gl\/\S+|(www\.)?google\.[a-z.]+\/maps\/place\/\S+|g\.page\/(?!r\/)\S+|goo\.gl\/maps\/\S+|maps\.google\.[a-z.]+\/\S*[?&](cid|q)=\S+)/i.test(String(u || '').trim());
   const digits = (p) => String(p || '').replace(/\D/g, '').replace(/^00/, '');
 
   /* ---------- Langue de la carte ----------
@@ -506,7 +508,7 @@
     },
     /* Avis Google : note, étoiles, nombre d’avis, bouton « Laisser un avis » */
     greviews(def, b) {
-      const r = parseFloat(String(b.rating || '').replace(',', '.'));
+      const r = gLinked(b.mapsUrl) ? parseFloat(String(b.rating || '').replace(',', '.')) : 0;
       if (!b.reviewUrl && !b.mapsUrl && !r) return '';
       const pct = r ? Math.max(0, Math.min(100, (r / 5) * 100)) : 0;
       const rTxt = r ? (LG === 'en' ? r.toFixed(1) : r.toFixed(1).replace('.', ',')) : '';
@@ -947,5 +949,5 @@
     });
   }
 
-  window.VC = { S, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
+  window.VC = { S, gLinked, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
 })();

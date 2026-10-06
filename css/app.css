@@ -614,3 +614,15 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 .bili-note { flex: 1 1 100%; display: flex; gap: 8px; align-items: flex-start; margin: 2px 0 0; padding: 10px 12px; border-radius: 10px; background: var(--acc-s); color: var(--ink); font-size: 13px; font-weight: 400; line-height: 1.4; }
 .bili-note svg { flex: none; margin-top: 1px; color: var(--acc); }
 .lang-sw .seg button:disabled { opacity: .4; cursor: not-allowed; }
+
+/* Avis Google : fiche reliée (note lue chez Google, non modifiable) */
+.g-sync { display: flex; gap: 10px; align-items: flex-start; margin: -4px 0 14px; padding: 10px 12px; border-radius: 12px; background: #f4f4f1; border: 1px dashed var(--line); font-size: 13px; color: var(--mut); }
+.g-sync svg { flex: none; margin-top: 2px; color: #fbbc05; }
+.g-sync span { display: flex; flex-direction: column; gap: 2px; }
+.g-sync b { color: var(--ink); font-weight: 600; }
+.g-sync i { font-style: normal; font-size: 12px; opacity: .8; margin-top: 2px; }
+.g-sync.on { background: #ecf7ef; border: 1px solid #b7e1c3; }
+.g-sync.on svg { color: #15803d; }
+
+/* Catalogue « Ajouter une section » : titres des catégories dans une couleur distincte */
+.as-all .as-h, .sheet-b .as-h { display: inline-flex; align-self: flex-start; padding: 3px 9px; border-radius: 999px; background: #fdf0e6; color: #b45309; margin-top: 4px; }

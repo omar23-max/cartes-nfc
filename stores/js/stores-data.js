@@ -38,7 +38,7 @@
       P('Baskets blanches', 'Cuir, semelle naturelle', 'Baskets minimalistes en cuir blanc, semelle en caoutchouc naturel. Confortables toute la journée.', '120', '', '', I.baskets, 'Accessoires', '6, 7, 8, 9, 10, 11'),
       P('Écharpe en laine', 'Laine tissée, motif écossais', 'Grande écharpe en laine tissée, motif écossais, franges courtes. Idéale pour l’hiver québécois.', '45', '', '', I.echarpe, 'Accessoires', ''),
     ],
-    order: 'sms', phone: '', wa: '', email: '', payUrl: '',
+    order: 'sms', phone: '', wa: '', email: '', payUrl: '', pay: { cash: true, card: true, interac: true, etr: true }, payLinks: {}, payInfo: { interac: 'bonjour@maisonlumen.ca' }, dinein: false, food: false,
     pickup: true, delivery: true, fee: '10', freeFrom: '150', zone: 'Montréal et Laval', tax: 'qc', rate: '',
   };
   const shopEn = Object.assign({}, shopFr, {
@@ -55,7 +55,7 @@
       P('White sneakers', 'Leather, natural sole', 'Minimalist white leather sneakers with a natural rubber sole. Comfortable all day long.', '120', '', '', I.baskets, 'Accessories', '6, 7, 8, 9, 10, 11'),
       P('Wool scarf', 'Woven wool, plaid', 'Large woven wool scarf in a plaid pattern, short fringe. Made for real winters.', '45', '', '', I.echarpe, 'Accessories', ''),
     ],
-    zone: 'Portland metro area', tax: 'us', rate: '0',
+    zone: 'Portland metro area', tax: 'us', rate: '0', pay: { cash: true, card: true, zelle: true }, payInfo: { zelle: 'hello@maisonlumen.com' },
   });
 
   const mode = {
@@ -83,7 +83,7 @@
         gallery: { on: true, images: [{ src: I.g1, cap: 'Nouvelle collection' }, { src: I.g2, cap: 'Chemises' }, { src: I.g3, cap: 'Tons neutres' }, { src: I.g4, cap: 'En boutique' }] },
         hours: hours([['Lundi – Mercredi', '10 h – 18 h'], ['Jeudi – Vendredi', '10 h – 21 h'], ['Samedi', '10 h – 17 h'], ['Dimanche', '12 h – 17 h']], 'Ramassage des commandes aux heures d’ouverture'),
         location: { on: true, map: true, address: '4321, boulevard Saint-Laurent, Montréal (Québec) H2W 1Z5', access: 'Métro Mont-Royal · Stationnement rue Rachel' },
-        google: { on: true, rating: '4,8', count: '126', reviewUrl: 'https://g.page/r/exemple/review', mapsUrl: 'https://maps.google.com/', text: 'Votre avis nous aide à grandir. Merci !' },
+        google: { on: true, rating: '4,8', count: '126', reviewUrl: 'https://g.page/r/exemple/review', mapsUrl: 'https://maps.app.goo.gl/exemple', text: 'Votre avis nous aide à grandir. Merci !' },
         reviews: { on: true, items: [{ n: 'Julie T.', r: 'Robe en lin', t: 'Accueil super, on m’a aidée à trouver la bonne taille. La robe est magnifique !', s: 5 }, { n: 'Marc-André L.', r: 'Veste en jean', t: 'Commandé par texto le matin, ramassé le soir même. Très pratique.', s: 5 }] },
         policies: { on: true, items: [
           { t: 'Ramassage en boutique', d: 'Gratuit, prêt en 24 h. Nous vous écrivons quand c’est prêt.' },
@@ -104,7 +104,7 @@
       gallery: { on: true, images: [{ src: I.g1, cap: 'New collection' }, { src: I.g2, cap: 'Shirts' }, { src: I.g3, cap: 'Neutral tones' }, { src: I.g4, cap: 'In store' }] },
       hours: hours([['Monday – Wednesday', '10 am – 6 pm'], ['Thursday – Friday', '10 am – 9 pm'], ['Saturday', '10 am – 5 pm'], ['Sunday', '12 pm – 5 pm']], 'Order pickup during opening hours'),
       location: { on: true, map: true, address: '1120 NW Couch St, Portland, OR 97209', access: 'Streetcar NW 11th & Couch · Street parking' },
-      google: { on: true, rating: '4.8', count: '126', reviewUrl: 'https://g.page/r/example/review', mapsUrl: 'https://maps.google.com/', text: 'Your review helps us grow. Thank you!' },
+      google: { on: true, rating: '4.8', count: '126', reviewUrl: 'https://g.page/r/example/review', mapsUrl: 'https://maps.app.goo.gl/example', text: 'Your review helps us grow. Thank you!' },
       reviews: { on: true, items: [{ n: 'Julie T.', r: 'Linen dress', t: 'Lovely welcome, they helped me find the right size. The dress is beautiful!', s: 5 }, { n: 'Mark L.', r: 'Denim jacket', t: 'Ordered by text in the morning, picked up the same evening. So easy.', s: 5 }] },
       policies: { on: true, items: [
         { t: 'In-store pickup', d: 'Free, ready within 24 hours. We text you when it’s ready.' },

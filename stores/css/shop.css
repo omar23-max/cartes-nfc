@@ -85,3 +85,22 @@
 .shop-row .mini { min-width: 0; width: 100%; }
 .shop-lb { display: block; margin: 2px 0 -2px; font-size: 11.5px; font-weight: 600; color: #6b6b72; }
 .seg.wrap { flex-wrap: wrap; }
+
+/* Panier : choix du paiement */
+.vc .shc-lb { margin: 14px 0 6px; font-size: 13px; font-weight: 600; }
+.vc .shc-pay { display: flex; flex-direction: column; gap: 6px; }
+.vc .shc-pay button { padding: 10px 12px; border-radius: 10px; border: 1px solid var(--ln); background: var(--sf); color: var(--tx); text-align: left; font: 13.5px/1.3 Inter, system-ui, sans-serif; cursor: pointer; }
+.vc .shc-pay button.on { border-color: var(--p); box-shadow: inset 0 0 0 1px var(--p); font-weight: 600; }
+.vc .shc-tr { padding: 10px 12px; border-radius: 10px; background: var(--sf); border: 1px solid var(--ln); font-size: 14px; color: var(--tx); }
+.vc .shc-empty .btn + .btn { margin-top: 0; }
+
+/* Éditeur : paiements à cocher */
+.pay-f .ck { margin: 0; }
+.pay-g { margin: 10px 0 2px; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: #b45309; }
+.pay-row { display: flex; flex-direction: column; gap: 4px; padding: 3px 0; }
+.pay-x { display: none; padding-left: 28px; }
+.pay-x .mini { width: 100%; }
+.pay-row:has(input[type=checkbox]:checked) .pay-x { display: block; }
+.pay-more { margin-top: 6px; }
+.pay-more summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--acc); padding: 4px 0; }
+.vc .shc-mode.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }

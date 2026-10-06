@@ -15,7 +15,7 @@
     s.blocks.splice(i < 0 ? s.blocks.length : i, 0, { key: 'google', type: 'greviews', title: 'Avis Google', help: 'Votre note Google et un bouton pour laisser un avis' });
     const [r, n] = NOTE[s.id] || [4.8, 52];
     const on = !OFF.includes(s.id);
-    s.demo.blocks.google = { on, rating: String(r).replace('.', ','), count: String(n), reviewUrl: 'https://g.page/r/exemple/review', mapsUrl: 'https://maps.google.com/', text: 'Votre avis nous aide à grandir. Merci !' };
-    if (s.demoEn) s.demoEn.blocks.google = { on, rating: String(r), count: String(n), reviewUrl: 'https://g.page/r/example/review', mapsUrl: 'https://maps.google.com/', text: 'Your review helps us grow. Thank you!' };
+    s.demo.blocks.google = { on, rating: String(r).replace('.', ','), count: String(n), reviewUrl: 'https://g.page/r/exemple/review', mapsUrl: 'https://maps.app.goo.gl/exemple', text: 'Votre avis nous aide à grandir. Merci !' };
+    if (s.demoEn) s.demoEn.blocks.google = { on, rating: String(r), count: String(n), reviewUrl: 'https://g.page/r/example/review', mapsUrl: 'https://maps.app.goo.gl/example', text: 'Your review helps us grow. Thank you!' };
   });
 })();
