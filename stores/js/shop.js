@@ -59,8 +59,6 @@
   let CART = [];
   try { CART = JSON.parse(sessionStorage.getItem('nfc-cart') || '[]'); } catch (e) { /* stockage indisponible */ }
   const keep = () => { try { sessionStorage.setItem('nfc-cart', JSON.stringify(CART)); } catch (e) { /* rien */ } };
-  const count = () => CART.reduce((a, l) => a + l.q, 0);
-  const refreshBadges = (root) => (root || document).querySelectorAll('.shp-n').forEach((n) => { n.textContent = count(); n.hidden = !count(); });
 
   /* Retrouve la section boutique de la carte affichée */
   function shopOf(m) {
@@ -69,6 +67,9 @@
   }
   /* Ligne de panier → produit actuel (le nom sert de repère si l’ordre des produits change) */
   const lineItem = (b, l) => items(b).find((x) => x.t === l.t);
+  /* Chaque boutique ne compte que ses propres articles */
+  const count = (b) => CART.filter((l) => lineItem(b, l)).reduce((a, l) => a + l.q, 0);
+  const refreshBadges = (root, b) => (root || document).querySelectorAll('.shp-n').forEach((n) => { n.textContent = count(b); n.hidden = !count(b); });
 
   /* ---------- Rendu dans la carte ---------- */
   VC.S.shop = function (def, b, m) {
@@ -85,7 +86,7 @@
     };
     const how = recvModes(b).map((x) => x[1]).join(' · ');
     return `<div class="shp" data-k="${def.key}">${b.text ? `<p class="txt">${VC.nl(b.text)}</p>` : ''}
-      <div class="shp-bar">${chips}<button type="button" class="shp-cart" data-vc="cart" aria-label="${L2('Panier', 'Cart')}">${ic('bag', 18)}<span class="shp-n"${count() ? '' : ' hidden'}>${count()}</span></button></div>
+      <div class="shp-bar">${chips}<button type="button" class="shp-cart" data-vc="cart" aria-label="${L2('Panier', 'Cart')}">${ic('bag', 18)}<span class="shp-n"${count(b) ? '' : ' hidden'}>${count(b)}</span></button></div>
       <div class="shp-grid">${list.map(tile).join('')}</div>
       ${how ? `<p class="shp-how">${ic('check', 14)}<span>${how}</span></p>` : ''}${payOf(b).length ? `<p class="shp-how">${ic('bag', 14)}<span>${L2('Paiement :', 'Payment:')} ${esc(payShort(b))}</span></p>` : ''}</div>`;
   };
@@ -125,7 +126,7 @@
         const same = CART.find((l) => l.t === x.t && l.o === o);
         if (same) same.q += q; else CART.push({ t: x.t, o, q });
         keep();
-        refreshBadges(t.closest('.vc'));
+        refreshBadges(t.closest('.vc'), b);
         close();
         toastIn(t.closest('.vc'), L2('Ajouté au panier', 'Added to cart'));
       }
@@ -221,7 +222,7 @@
       const lq = e.target.closest('[data-lq]'), md = e.target.closest('[data-mode]');
       if (lq) {
         const T = totals(), r = T.lines[+lq.dataset.k];
-        if (r) { r.l.q += +lq.dataset.lq; if (r.l.q <= 0) CART.splice(CART.indexOf(r.l), 1); keep(); refreshBadges(t.closest('.vc')); draw(); }
+        if (r) { r.l.q += +lq.dataset.lq; if (r.l.q <= 0) CART.splice(CART.indexOf(r.l), 1); keep(); refreshBadges(t.closest('.vc'), b); draw(); }
       } else if (md) { mode = md.dataset.mode; draw(); }
       else if (e.target.closest('[data-pay]')) { pay = e.target.closest('[data-pay]').dataset.pay; draw(); }
       else if (e.target.closest('[data-send]')) send(lastV);
@@ -242,7 +243,7 @@
           <p>${P && P.url ? L2('Terminez le paiement dans la page qui vient de s’ouvrir, puis envoyez-nous le détail de votre commande.', 'Complete your payment on the page that just opened, then send us your order details.') : L2('Votre message est prêt : envoyez-le pour confirmer la commande.', 'Your message is ready: send it to confirm your order.')}</p>${transfer}
           ${P && P.url ? `<button type="button" class="btn" data-send>${ic({ sms: 'sms', wa: 'wa', email: 'mail' }[way], 18)}<span>${sendL}</span></button>` : ''}
           <button type="button" class="btn${P && P.url ? ' ghost' : ''}" data-clear>${L2('Terminer', 'Done')}</button></div>`;
-      } else if (e.target.closest('[data-clear]')) { CART = []; keep(); refreshBadges(t.closest('.vc')); close(); }
+      } else if (e.target.closest('[data-clear]')) { CART = CART.filter((l) => !lineItem(b, l)); keep(); refreshBadges(t.closest('.vc'), b); close(); }
     });
   }
 

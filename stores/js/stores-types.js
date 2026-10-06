@@ -222,6 +222,9 @@
       policies: [['Special orders', 'Any book in print, ready in 48 hours, no extra fee.'], ['Delivery', '$6 in Chicago, free on orders over $50.'], ['Exchanges', '15 days with receipt, book in perfect condition.']] },
   }));
 
+  /* Le constructeur sert aussi aux types suivants (stores-types-2.js) */
+  NFC.storeType = T;
+
   /* Remplace les tuiles « Bientôt » correspondantes */
   TYPES.forEach((t) => {
     const i = NFC.SECTORS.findIndex((s) => s.id === t.id);

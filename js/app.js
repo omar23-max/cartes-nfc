@@ -552,11 +552,12 @@
         <span class="pal-n">${p.name}</span>
         <span class="pal-ck">${ic('check', 16)}</span>
       </button>`).join('');
+    /* Titre dans la colonne de gauche : sur ordinateur, l’aperçu remonte en haut, à côté du titre */
     return `<section class="wrap s3w">
-      ${back(2, 'Changer de modèle')}
-      ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 6 palettes pensées pour votre secteur.`)}
       <div class="split s3">
         <div class="side">
+          ${back(2, 'Changer de modèle')}
+          ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · 6 palettes pensées pour votre secteur.`)}
           <div class="pals">${pals}</div>
           <p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>
           <button class="b pri lg" data-act="go" data-n="4">Remplir ma carte ${ic('arrow', 18)}</button>
