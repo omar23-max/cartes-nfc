@@ -275,7 +275,7 @@
     $('.reset').innerHTML = `${ic('reset', 16)}<span>Recommencer</span>`;
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
     document.documentElement.lang = ui();
-    document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : ui() === 'en' ? 'NFC Card Studio' : 'Studio Carte NFC';
+    document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : 'NexTap Studio';
     const main = $('#main');
     main.innerHTML = [step1, step2, step3, step4, step5][S.step - 1]();
     main.dataset.step = S.step;
