@@ -8,24 +8,32 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=67">
+  <link rel="stylesheet" href="css/app.css?v=70">
   <style>
-    .adm { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
-    .adm-warn { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; margin-bottom: 22px; border-radius: 12px; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; font-size: 14px; }
-    .adm-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 18px; }
-    .adm-tools input { flex: 1; min-width: 220px; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; }
-    .adm-sum { font-size: 14px; color: var(--mut); }
+    .adm-wrap > main { min-width: 0; }
+    .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
+    .adm-nav { position: sticky; top: 84px; align-self: start; display: flex; flex-direction: column; gap: 2px; }
+    .adm-nav a { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-radius: 10px; color: var(--ink); text-decoration: none; font-size: 14px; font-weight: 500; }
+    .adm-nav a:hover { background: #efede7; }
+    .adm-nav a.on { background: var(--ink); color: #fff; }
+    .adm-warn { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; margin-bottom: 18px; border-radius: 12px; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; font-size: 14px; }
+    .adm-legend { display: flex; flex-wrap: wrap; gap: 10px; margin: -6px 0 16px; font-size: 13px; color: var(--mut); align-items: center; }
+    .adm-live, .adm-gb { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+    .adm-live { background: #dcfce7; color: #166534; }
+    .adm-gb { background: #e0e7ff; color: #3730a3; }
     .adm-cat { margin-bottom: 16px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
     .adm-h { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-    .adm-h h2 { margin: 0; font-size: 17px; }
+    .adm-h h2 { margin: 0; font-size: 17px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .adm-n { padding: 3px 9px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 12px; font-weight: 700; }
     .adm-d { margin: 0 0 12px; font-size: 13.5px; color: var(--mut); }
-    .adm-act { display: flex; gap: 6px; }
-    .adm-act button { padding: 6px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); font: 600 12.5px Inter, sans-serif; cursor: pointer; }
-    .adm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px 14px; }
+    .adm-act { display: flex; gap: 6px; flex-wrap: wrap; }
+    .adm-btn { padding: 6px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); font: 600 12.5px Inter, sans-serif; cursor: pointer; color: var(--ink); }
+    .adm-btn:disabled { opacity: .35; cursor: default; }
+    .adm-btn.pri { background: var(--ink); color: #fff; border-color: var(--ink); }
+    .adm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 4px 14px; }
     .adm-i { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 10px; font-size: 14px; }
     .adm-i:hover { background: #f7f6f2; }
-    .adm-i.off span { color: var(--mut); text-decoration: line-through; }
+    .adm-i.off > span:first-child { color: var(--mut); text-decoration: line-through; }
     .adm-i[hidden], .adm-cat[hidden] { display: none; }
     .adm-sw { position: relative; flex: none; width: 40px; height: 23px; }
     .adm-sw input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
@@ -34,60 +42,278 @@
     .adm-sw input:checked + b { background: #16a34a; }
     .adm-sw input:checked + b::after { transform: translateX(17px); }
     .adm-sw input:focus-visible + b { outline: 2px solid #3b82f6; outline-offset: 2px; }
+    .adm-sw input:disabled { cursor: not-allowed; }
+    .adm-f { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 8px 16px; align-items: center; padding: 8px 0; border-top: 1px solid #f0eee8; font-size: 14px; }
+    .adm-f:first-of-type { border-top: 0; }
+    .adm-f small { display: block; color: var(--mut); font-size: 12.5px; margin-top: 2px; }
+    .adm-f input[type=text], .adm-f input[type=number], .adm-f input[type=url], .adm-f input[type=password], .adm-f select, .adm-tbl input[type=number], .adm-row input[type=text], .adm-row select {
+      width: 100%; height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: #fff; font: inherit; font-size: 14px; box-sizing: border-box; }
+    .adm-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 16px; }
+    .adm-tools input { flex: 1; min-width: 220px; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; }
+    .adm-sum { font-size: 14px; color: var(--mut); }
+    .adm-sec { display: grid; grid-template-columns: minmax(0, 1fr) 150px auto; gap: 8px; align-items: center; padding: 6px 8px; border-radius: 10px; font-size: 14px; }
+    .adm-sec:hover { background: #f7f6f2; }
+    .adm-sec select { height: 34px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; padding: 0 6px; }
+    .adm-sec .mv { display: flex; gap: 4px; }
+    .adm-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .adm-tbl th, .adm-tbl td { padding: 8px 6px; border-top: 1px solid #f0eee8; text-align: left; vertical-align: middle; }
+    .adm-tbl th { font-size: 12.5px; color: var(--mut); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; border-top: 0; }
+    .adm-tbl td:not(:first-child), .adm-tbl th:not(:first-child) { text-align: center; }
+    .adm-tbl input[type=number] { width: 90px; text-align: center; }
+    .adm-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 8px; margin-bottom: 8px; }
+    .adm-empty { color: var(--mut); font-size: 14px; padding: 6px 0; }
+    .adm-log li { padding: 6px 0; border-top: 1px solid #f0eee8; font-size: 13.5px; list-style: none; }
+    .adm-log { padding: 0; margin: 0; }
+    .adm-log time { color: var(--mut); margin-right: 8px; font-variant-numeric: tabular-nums; }
+    .adm-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+    .adm-stat { padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+    .adm-stat b { display: block; font-size: 24px; }
+    .adm-stat span { font-size: 13px; color: var(--mut); }
+    @media (max-width: 900px) {
+      .adm-wrap { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+      .adm-wrap > main, .adm-nav { min-width: 0; }
+      .adm-nav { position: static; flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+      .adm-nav a { flex: none; border: 1px solid var(--line); }
+      .adm-f { grid-template-columns: 1fr; }
+      .adm-sec { grid-template-columns: minmax(0, 1fr) 120px; }
+      .adm-sec .mv { grid-column: 1 / -1; }
+      .adm-row { grid-template-columns: 1fr; }
+      .adm-tbl-w { overflow-x: auto; }
+    }
   </style>
 </head>
 <body>
   <header class="top">
     <div class="brand"><span class="brand-mk"></span><span class="brand-n">NexTap Studio – Administration</span><span class="badge">Site test</span></div>
-    <nav class="adm-links" style="display:flex;gap:8px;margin-left:auto"><a class="b sm ghost" href="index.html">Studio cartes</a><a class="b sm ghost" href="stores/">Studio boutiques</a></nav>
+    <nav style="display:flex;gap:8px;margin-left:auto"><a class="b sm ghost" href="index.html">Studio cartes</a><a class="b sm ghost" href="stores/">Studio boutiques</a></nav>
   </header>
-  <main class="adm">
-    <div class="sh"><h1>Services et applications</h1><p>Activez ou désactivez les services proposés à vos clients, dans le studio des cartes et dans celui des boutiques. Un service désactivé n’est plus proposé ; les cartes déjà créées le gardent.</p></div>
-    <p class="adm-warn"><span>⚠</span><span><b>Maquette.</b> Sur ce site test, vos réglages sont enregistrés dans ce navigateur seulement et la page n’est pas protégée. Dans GoBiz, ils seront enregistrés en base et réservés à l’administrateur connecté.</span></p>
-    <div class="adm-tools"><input type="search" id="q" placeholder="Rechercher un service (ex. PayPal, Calendly, TikTok)" autocomplete="off"><span class="adm-sum" id="sum"></span></div>
-    <div id="cats"></div>
-  </main>
+  <div class="adm-wrap">
+    <nav class="adm-nav" id="nav" aria-label="Rubriques"></nav>
+    <main>
+      <p class="adm-warn"><span>⚠</span><span><b>Maquette.</b> Sur ce site test, vos réglages sont enregistrés dans ce navigateur seulement et la page n’est pas protégée. Dans GoBiz, ils seront enregistrés en base et réservés à l’administrateur connecté.</span></p>
+      <p class="adm-legend"><span class="adm-live">Actif dans la maquette</span> déjà appliqué dans les studios de ce site · <span class="adm-gb">Appliqué dans GoBiz</span> enregistré ici, mis en service avec GoBiz</p>
+      <div id="pane"></div>
+    </main>
+  </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=67"></script>
-  <script src="js/render.js?v=67"></script>
+  <script src="js/services.js?v=70"></script>
+  <script src="js/data.js?v=70"></script>
+  <script src="js/sectors.js?v=70"></script>
+  <script src="js/media.js?v=70"></script>
+  <script src="js/extras.js?v=70"></script>
+  <script src="js/locale-na.js?v=70"></script>
+  <script src="js/locale-na-en.js?v=70"></script>
+  <script src="js/google.js?v=70"></script>
+  <script src="js/profiles.js?v=70"></script>
+  <script src="js/profiles-sport.js?v=70"></script>
+  <script src="js/profiles-sante.js?v=70"></script>
+  <script src="js/profiles-archi.js?v=70"></script>
+  <script src="js/profiles-resto.js?v=70"></script>
+  <script src="js/profiles-auto.js?v=70"></script>
+  <script src="js/profiles-edu.js?v=70"></script>
+  <script src="js/jobs.js?v=70"></script>
+  <script src="js/render.js?v=70"></script>
   <script>
-    (function () {
-      const S = NFC.svc, esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-      const norm = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-      const box = document.getElementById('cats'), sum = document.getElementById('sum');
-      function draw() {
-        box.innerHTML = S.all().map((c) => {
-          const n = c.items.filter(([id]) => S.on(c.id + ':' + id)).length;
-          return `<section class="adm-cat" data-cat="${c.id}"><div class="adm-h"><h2>${esc(c.n[0])} <span class="adm-n">${n} / ${c.items.length} activés</span></h2>
-            <div class="adm-act"><button type="button" data-all="${c.id}" data-v="1">Tout activer</button><button type="button" data-all="${c.id}" data-v="0">Tout désactiver</button></div></div>
-            <p class="adm-d">${esc(c.d[0])}</p>
-            <div class="adm-list">${c.items.map(([id, fr]) => { const k = c.id + ':' + id, on = S.on(k);
-              return `<label class="adm-i ${on ? '' : 'off'}" data-n="${esc(norm(fr))}"><span>${esc(fr)}</span><span class="adm-sw"><input type="checkbox" data-k="${k}" ${on ? 'checked' : ''} aria-label="${esc(fr)}"><b></b></span></label>`; }).join('')}</div></section>`;
-        }).join('');
-        const all = S.all().reduce((a, c) => a + c.items.length, 0);
-        sum.textContent = `${all - S.offList().length} services activés sur ${all}`;
-        filter();
-      }
-      function filter() {
-        const q = norm(document.getElementById('q').value).trim();
-        box.querySelectorAll('.adm-cat').forEach((c) => {
-          let any = false;
-          c.querySelectorAll('.adm-i').forEach((i) => { const ok = !q || i.dataset.n.includes(q); i.hidden = !ok; any = any || ok; });
-          c.hidden = !any;
-        });
-      }
-      const toast = (m) => { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1600); };
-      box.addEventListener('change', (e) => { const k = e.target.dataset.k; if (!k) return; S.set(k, e.target.checked); draw(); toast(e.target.checked ? 'Service activé' : 'Service désactivé'); });
-      box.addEventListener('click', (e) => {
-        const b = e.target.closest('[data-all]'); if (!b) return;
-        const c = S.all().find((x) => x.id === b.dataset.all);
-        c.items.forEach(([id]) => S.set(c.id + ':' + id, b.dataset.v === '1'));
-        draw(); toast(b.dataset.v === '1' ? 'Catégorie activée' : 'Catégorie désactivée');
+  (function () {
+    'use strict';
+    const C = NFC.cfg, S = NFC.svc;
+    const $ = (s) => document.querySelector(s);
+    const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+    const norm = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    const LIVE = '<span class="adm-live">Actif dans la maquette</span>', GB = '<span class="adm-gb">Appliqué dans GoBiz</span>';
+
+    /* Données des deux studios */
+    const CARDS = NFC.SECTORS.slice();
+    const STORES = [['mode', 'Mode et vêtements'], ['friperie', 'Friperie et seconde main'], ['bijoux', 'Bijouterie'], ['fleuriste', 'Fleuriste'], ['deco', 'Décoration et mobilier'], ['librairie', 'Librairie et papeterie'], ['cadeaux', 'Cadeaux et souvenirs'], ['velos', 'Vélos'], ['cosmetiques', 'Cosmétiques naturels'], ['telephones', 'Réparation de téléphones'], ['epicerie', 'Supermarché et épicerie'], ['traiteur', 'Traiteur'], ['animalerie', 'Animalerie'], ['resto', 'Restaurant (pour emporter)'], ['coiffure', 'Coiffure (produits)'], ['esthetique', 'Esthétique (produits de soin)']].map(([id, name]) => ({ id, name, active: true }));
+    const DESIGNS = NFC.DESIGNS_ALL || NFC.DESIGNS;
+    const CATSEC = [['text', 'Texte libre'], ['services', 'Services et tarifs'], ['faq', 'Questions fréquentes'], ['hours', 'Horaires'], ['location', 'Adresse et plan'], ['cards', 'Fiches avec photo'], ['reviews', 'Avis clients'], ['google', 'Avis Google'], ['stats', 'Chiffres clés'], ['tags', 'Engagements'], ['booking', 'Prise de rendez-vous'], ['form', 'Formulaire de demande'], ['products', 'Produits'], ['action', 'Bouton vers un lien'], ['links', 'Liens et documents'], ['gallery', 'Galerie photos'], ['imgcar', 'Carrousel de photos'], ['vidcar', 'Carrousel de vidéos']];
+    const PLANS = [['gratuit', 'Gratuit'], ['pro', 'Pro'], ['premium', 'Premium']];
+    const SECNAME = (id) => (CARDS.concat(STORES).find((s) => s.id === id) || {}).name || id;
+
+    const TABS = [['svc', 'Services et applications'], ['cat', 'Catalogue'], ['plans', 'Forfaits et limites'], ['brand', 'Marque NexTap'], ['stores', 'Boutiques'], ['lang', 'Langues et textes'], ['ai', 'Intelligence artificielle'], ['keys', 'Clés des services'], ['privacy', 'Confidentialité (Loi 25)'], ['cards', 'Cartes et statistiques'], ['log', 'Journal des changements']];
+    let tab = (location.hash || '').slice(1);
+    if (!TABS.some((t) => t[0] === tab)) tab = 'svc';
+
+    /* ---------- Petits composants ---------- */
+    const sw = (attrs, on, dis) => `<span class="adm-sw"><input type="checkbox" ${attrs} ${on ? 'checked' : ''} ${dis ? 'disabled' : ''}><b></b></span>`;
+    const box = (title, badge, desc, body, act = '') => `<section class="adm-cat"><div class="adm-h"><h2>${title} ${badge || ''}</h2>${act ? `<div class="adm-act">${act}</div>` : ''}</div>${desc ? `<p class="adm-d">${desc}</p>` : ''}${body}</section>`;
+    const fBool = (path, label, hint = '') => `<div class="adm-f"><div>${label}${hint ? `<small>${hint}</small>` : ''}</div><div>${sw(`data-cfg="${path}" data-k="bool" aria-label="${esc(label)}"`, C.get(path))}</div></div>`;
+    const fTxt = (path, label, hint = '', ph = '', type = 'text') => `<div class="adm-f"><div>${label}${hint ? `<small>${hint}</small>` : ''}</div><div><input type="${type}" data-cfg="${path}" value="${esc(C.get(path, ''))}" placeholder="${esc(ph)}"></div></div>`;
+    const fNum = (path, label, hint = '') => `<div class="adm-f"><div>${label}${hint ? `<small>${hint}</small>` : ''}</div><div><input type="number" min="0" data-cfg="${path}" data-k="num" value="${esc(C.get(path, ''))}"></div></div>`;
+    const fSel = (path, label, opts, hint = '') => `<div class="adm-f"><div>${label}${hint ? `<small>${hint}</small>` : ''}</div><div><select data-cfg="${path}">${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(C.get(path, '')) === String(v) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select></div></div>`;
+    const toggleIn = (path, id, on, label) => { const arr = C.get(path, []).filter((x) => x !== id); if (!on) arr.push(id); C.set(path, arr, label); };
+
+    /* ---------- Rubriques ---------- */
+    const P = {};
+
+    /* 1. Services et applications */
+    P.svc = () => `<div class="sh"><h1>Services et applications</h1><p>Un service désactivé n’est plus proposé aux clients ; les cartes déjà créées le gardent. Les options de partage et le scan concernent les visiteurs : désactivées, elles disparaissent de toutes les cartes.</p></div>
+      <div class="adm-tools"><input type="search" id="q" placeholder="Rechercher un service (ex. PayPal, Calendly, TikTok)" autocomplete="off"><span class="adm-sum">${S.all().reduce((a, c) => a + c.items.length, 0) - S.offList().length} services activés sur ${S.all().reduce((a, c) => a + c.items.length, 0)}</span></div>
+      ${S.all().map((c) => { const n = c.items.filter(([id]) => S.on(c.id + ':' + id)).length;
+        return `<section class="adm-cat" data-cat="${c.id}"><div class="adm-h"><h2>${esc(c.n[0])} <span class="adm-n">${n} / ${c.items.length} activés</span> ${LIVE}</h2><div class="adm-act"><button type="button" class="adm-btn" data-svcall="${c.id}" data-v="1">Tout activer</button><button type="button" class="adm-btn" data-svcall="${c.id}" data-v="0">Tout désactiver</button></div></div>
+          <p class="adm-d">${esc(c.d[0])}</p><div class="adm-list">${c.items.map(([id, fr]) => { const k = c.id + ':' + id, on = S.on(k);
+            return `<label class="adm-i ${on ? '' : 'off'}" data-n="${esc(norm(fr))}"><span>${esc(fr)}</span>${sw(`data-svc="${k}" aria-label="${esc(fr)}"`, on)}</label>`; }).join('')}</div></section>`; }).join('')}`;
+
+    /* 2. Catalogue */
+    const secRows = (list, group) => {
+      const ord = C.get('sectors.order', []), pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
+      const sorted = list.map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
+      const st = (s) => (C.get('sectors.off', []).includes(s.id) ? 'off' : (!s.active || C.get('sectors.soon', []).includes(s.id)) ? 'soon' : 'on');
+      return sorted.map((s, i) => `<div class="adm-sec"><span>${esc(s.name)}${s.active ? '' : ' <small style="color:var(--mut)">(exemple pas encore prêt)</small>'}</span>
+        <select data-secst="${s.id}" aria-label="État de ${esc(s.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué']].map(([v, l]) => `<option value="${v}" ${st(s) === v ? 'selected' : ''} ${v === 'on' && !s.active ? 'disabled' : ''}>${l}</option>`).join('')}</select>
+        <span class="mv"><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="1" ${i === sorted.length - 1 ? 'disabled' : ''} aria-label="Descendre">↓</button></span></div>`).join('');
+    };
+    P.cat = () => {
+      const withProf = CARDS.filter((s) => s.profiles);
+      const jobsN = Object.values(NFC.JOBS || {}).reduce((a, s) => a + s.split('|').length, 0);
+      return `<div class="sh"><h1>Catalogue</h1><p>Ce que vos clients voient : secteurs, métiers, modèles, sections et recherche.</p></div>
+      ${box('Secteurs des cartes', LIVE, 'Visible, « Bientôt » (affiché mais pas encore ouvert) ou masqué. Les flèches changent l’ordre d’affichage.', secRows(CARDS, 'cards'))}
+      ${box('Types de boutique', LIVE, 'Même principe pour le studio des boutiques.', secRows(STORES, 'stores'))}
+      ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<p class="adm-d" style="margin:10px 0 4px"><b>${esc(s.name)}</b></p><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div>`).join(''))}
+      ${box('Modèles (mises en page)', LIVE, 'Un modèle désactivé n’est plus proposé ; un client qui l’a déjà choisi le garde.', `<div class="adm-list">${DESIGNS.map((d) => { const on = !C.get('designsOff', []).includes(d.id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(d.name)} <small style="color:var(--mut)">${esc(d.id.toUpperCase())}</small></span>${sw(`data-des="${d.id}"`, on)}</label>`; }).join('')}</div>`)}
+      ${box('Modèle recommandé par secteur', LIVE, 'Le badge « Recommandé » à l’étape Modèle.', CARDS.filter((s) => s.active).map((s) => `<div class="adm-f"><div>${esc(s.name)}</div><div><select data-rec="${s.id}"><option value="">Par défaut (${esc(String(s.rec || '').toUpperCase())})</option>${DESIGNS.map((d) => `<option value="${d.id}" ${C.get('rec', {})[s.id] === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></div></div>`).join(''))}
+      ${box('Sections de « Ajouter une section »', LIVE, 'Types de sections que le client peut ajouter à sa carte.', `<div class="adm-list">${CATSEC.map(([id, n]) => { const on = !C.get('catOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(n)}</span>${sw(`data-catsec="${id}"`, on)}</label>`; }).join('')}</div>`)}
+      ${box('Recherche : métiers ajoutés', LIVE, `${jobsN} métiers sont déjà reconnus. Ajoutez-en d’autres et choisissez leur secteur.`, `${C.get('jobs', []).map((j, i) => `<div class="adm-row"><input type="text" data-job="${i}" data-f="0" value="${esc(j[0])}" placeholder="Nom du métier"><select data-job="${i}" data-f="1">${CARDS.map((s) => `<option value="${s.id}" ${j[1] === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select><button type="button" class="adm-btn" data-jobdel="${i}">Retirer</button></div>`).join('') || '<p class="adm-empty">Aucun métier ajouté pour l’instant.</p>'}`, '<button type="button" class="adm-btn pri" data-jobadd>Ajouter un métier</button>')}
+      ${box('Palettes de couleurs', GB, 'Ajout de palettes personnalisées et couleur extraite du logo.', fBool('palettes.custom', 'Autoriser une couleur personnalisée', 'Le client choisit sa propre couleur principale.'))}`;
+    };
+
+    /* 3. Forfaits et limites */
+    P.plans = () => {
+      const rows = [['sections', 'Sections ajoutées (maximum)', 'n', 1], ['photos', 'Photos par galerie (maximum)', 'n', 1], ['products', 'Produits par boutique (maximum)', 'n', 1], ['size', 'Taille maximale d’un fichier (Mo)', 'n', 0],
+        ['bili', 'Carte bilingue', 'b', 1], ['video', 'Vidéo de couverture', 'b', 1], ['shop', 'Boutique en ligne', 'b', 0], ['online', 'Paiement en ligne (Stripe, PayPal, Interac, Zelle)', 'b', 1], ['ai', 'Éditer avec l’IA', 'b', 1], ['domain', 'Domaine personnalisé', 'b', 0]];
+      return `<div class="sh"><h1>Forfaits et limites</h1><p>Ce que chaque forfait permet. Sur GoBiz, ces limites suivent le forfait réel du client.</p></div>
+      ${box('Forfait utilisé pour l’aperçu', LIVE, 'Dans cette maquette, les studios appliquent les limites du forfait choisi ici.', fSel('planSim', 'Forfait simulé', PLANS))}
+      ${box('Limites par forfait', '', '', `<div class="adm-tbl-w"><table class="adm-tbl"><thead><tr><th>Réglage</th>${PLANS.map(([, l]) => `<th>${l}</th>`).join('')}</tr></thead><tbody>${rows.map(([k, l, t, live]) => `<tr><td>${l} ${live ? LIVE : GB}</td>${PLANS.map(([p]) => `<td>${t === 'n' ? `<input type="number" min="0" data-cfg="plans.${p}.${k}" data-k="num" value="${esc(C.get(`plans.${p}.${k}`))}" aria-label="${esc(l)} – ${p}">` : sw(`data-cfg="plans.${p}.${k}" data-k="bool" aria-label="${esc(l)} – ${p}"`, C.get(`plans.${p}.${k}`))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`)}`;
+    };
+
+    /* 4. Marque NexTap */
+    P.brand = () => `<div class="sh"><h1>Marque NexTap</h1><p>Noms affichés dans les studios et mention en bas des cartes.</p></div>
+      ${box('Noms des studios', LIVE, '', fTxt('brand.studio', 'Nom du studio des cartes', 'Vide = NexTap Studio', 'NexTap Studio') + fTxt('brand.stores', 'Nom du studio des boutiques', 'Vide = NexTap Studio – Stores', 'NexTap Studio – Stores'))}
+      ${box('Mention en bas des cartes', LIVE, '', fTxt('brand.footCards', 'Cartes de visite', 'Vide = « Carte de visite NFC »', 'Créé avec NexTap') + fTxt('brand.footStores', 'Boutiques', 'Vide = « Boutique NFC »', 'Boutique NexTap') +
+        `<div class="adm-f"><div>Masquer la mention pour les forfaits<small>Avantage des forfaits supérieurs.</small></div><div class="adm-act">${PLANS.map(([p, l]) => `<label class="adm-i" style="padding:4px 8px"><span>${l}</span>${sw(`data-hidefoot="${p}"`, C.get('brand.hideFoot', []).includes(p))}</label>`).join('')}</div></div>`)}
+      ${box('Adresse des cartes', LIVE, 'Début du lien de chaque carte (le code de la carte est ajouté à la fin).', fTxt('brand.linkBase', 'Adresse de base', 'Vide = https://votre-site.com/c/', 'https://nextap.ca/'))}
+      ${box('Logo et couleurs du studio', GB, '', fTxt('brand.logoUrl', 'Lien du logo', '', 'https://…/logo.svg', 'url') + fTxt('brand.color', 'Couleur principale', 'Code couleur, ex. #111111', '#111111'))}`;
+
+    /* 5. Boutiques */
+    P.stores = () => `<div class="sh"><h1>Boutiques</h1><p>Valeurs proposées aux nouvelles boutiques. Le commerçant peut toujours les modifier.</p></div>
+      ${box('Taxes et devise', '', '', fSel('storeDef.tax', 'Taxe par défaut ' + LIVE, [['', 'Selon le type de boutique'], ['qc', 'Québec : TPS + TVQ'], ['on', 'Ontario : TVH 13 %'], ['tps', 'TPS 5 % seulement'], ['us', 'États-Unis : taxe de vente'], ['none', 'Aucune (taxes incluses)']]) + fSel('storeDef.currency', 'Devise ' + GB, [['CAD', 'Dollar canadien (CAD)'], ['USD', 'Dollar américain (USD)']]))}
+      ${box('Livraison par défaut', LIVE, 'Vide = valeur de l’exemple de chaque type de boutique.', fNum('storeDef.fee', 'Frais de livraison ($)') + fNum('storeDef.freeFrom', 'Livraison gratuite dès ($)'))}
+      ${box('Choix de réception proposés', LIVE, '', fBool('storeDef.dine', 'Sur place', 'Proposé seulement aux restaurants et traiteurs.') + fBool('storeDef.pick', 'À emporter / ramassage en boutique') + fBool('storeDef.ship', 'Livraison'))}
+      ${box('Limites', GB, 'Le nombre de produits se règle par forfait (rubrique Forfaits et limites).', fNum('storeDef.maxCats', 'Catégories par boutique (maximum)'))}`;
+
+    /* 6. Langues et textes */
+    P.lang = () => `<div class="sh"><h1>Langues et textes</h1><p>Langues proposées et textes de l’éditeur.</p></div>
+      ${box('Langues', '', '', fBool('lang.bili', 'Autoriser la carte bilingue ' + LIVE, 'Aussi soumis au forfait.') + fSel('lang.market', 'Exemples proposés ' + GB, [['auto', 'Selon la langue (FR = Québec, EN = États-Unis)'], ['ca', 'Toujours canadiens'], ['us', 'Toujours américains']]))}
+      ${box('Remplacer un texte de l’éditeur', LIVE, 'Écrivez le texte exact tel qu’il apparaît dans l’éditeur (en français), puis votre nouveau texte.', `${C.get('lang.reword', []).map((r, i) => `<div class="adm-row"><input type="text" data-rw="${i}" data-f="0" value="${esc(r[0])}" placeholder="Texte actuel (ex. Remplir mes informations)"><input type="text" data-rw="${i}" data-f="1" value="${esc(r[1])}" placeholder="Nouveau texte"><button type="button" class="adm-btn" data-rwdel="${i}">Retirer</button></div>`).join('') || '<p class="adm-empty">Aucun texte remplacé.</p>'}`, '<button type="button" class="adm-btn pri" data-rwadd>Ajouter un remplacement</button>')}`;
+
+    /* 7. IA */
+    P.ai = () => `<div class="sh"><h1>Intelligence artificielle</h1><p>Les fonctions IA s’activent dans « Services et applications » ; l’accès par forfait dans « Forfaits et limites ».</p></div>
+      ${box('Quota', GB, 'Limite le coût de l’IA.', fNum('ai.quota', 'Utilisations par client et par mois'))}
+      ${box('État actuel', LIVE, '', `<div class="adm-f"><div>« Éditer avec l’IA »</div><div>${S.on('ai:edit') ? 'Activé' : 'Désactivé'}</div></div><div class="adm-f"><div>Scan de carte papier</div><div>${S.on('ai:scan') ? 'Activé' : 'Désactivé'}</div></div>`)}`;
+
+    /* 8. Clés des services (jamais saisies sur le site test) */
+    P.keys = () => `<div class="sh"><h1>Clés des services</h1><p>Rangées côté serveur, jamais montrées aux clients.</p></div>
+      <p class="adm-warn"><span>🔒</span><span>Ne saisissez <b>jamais</b> de vraie clé sur ce site test : il est public. Ces champs seront remplis dans l’admin GoBiz.</span></p>
+      ${box('Google', GB, '', [['Clé Google Maps (plan intégré officiel)', 'AIza…'], ['Clé Google Places (vraie note Google)', 'AIza…']].map(([l, ph]) => `<div class="adm-f"><div>${l}</div><div><input type="password" placeholder="${ph}" disabled></div></div>`).join(''))}
+      ${box('Intelligence artificielle', GB, '', `<div class="adm-f"><div>Clé Claude (Anthropic)</div><div><input type="password" placeholder="sk-ant-…" disabled></div></div>`)}
+      ${box('Shopify', GB, '', `<div class="adm-f"><div>Clé secrète du webhook</div><div><input type="password" placeholder="shpss_…" disabled></div></div><div class="adm-f"><div>Produit Shopify → forfait GoBiz<small>Ex. « Carte NFC Pro » → forfait Pro</small></div><div><input type="text" placeholder="À configurer dans GoBiz" disabled></div></div>`)}`;
+
+    /* 9. Confidentialité */
+    P.privacy = () => `<div class="sh"><h1>Confidentialité (Loi 25)</h1><p>Protection des renseignements personnels des visiteurs.</p></div>
+      ${box('Formulaires et échanges de coordonnées', LIVE, '', fBool('privacy.consent', 'Case de consentement obligatoire', '« J’accepte que mes coordonnées soient transmises à ce professionnel. »'))}
+      ${box('Google Maps', LIVE, '', fBool('privacy.mapClick', 'Afficher le plan seulement au clic', 'Aucune donnée n’est envoyée à Google tant que le visiteur ne clique pas.'))}
+      ${box('Politique de confidentialité', LIVE, '', fTxt('privacy.policyUrl', 'Lien affiché en bas des cartes', 'Vide = pas de lien', 'https://nextap.ca/confidentialite', 'url'))}
+      ${box('Conservation des contacts reçus', GB, '', fSel('privacy.retention', 'Durée de conservation', [[6, '6 mois'], [12, '12 mois'], [24, '24 mois'], [36, '36 mois']]))}`;
+
+    /* 10. Cartes et statistiques */
+    P.cards = () => {
+      const rows = [];
+      [['nfc-studio-v6', 'Cartes', 'view.html'], ['nfc-stores-v1', 'Boutiques', 'stores/view.html']].forEach(([key, studio, view]) => {
+        try {
+          const st = JSON.parse(localStorage.getItem(key) || 'null');
+          if (!st || !st.id) return;
+          const first = Object.values(st.cards || {})[0] || {};
+          rows.push({ id: st.id, studio, view, name: ((first.identity || {}).name) || '—', sec: SECNAME(st.sectorId) });
+        } catch (e) { /* ignoré */ }
       });
-      document.getElementById('q').addEventListener('input', filter);
-      draw();
-    })();
+      let leads = [];
+      try { leads = JSON.parse(localStorage.getItem('nfc-leads') || '[]'); } catch (e) { leads = []; }
+      const stat = (n, l, b) => `<div class="adm-stat"><b>${n}</b><span>${l} ${b}</span></div>`;
+      return `<div class="sh"><h1>Cartes et statistiques</h1><p>Sur GoBiz : toutes les cartes de tous les clients. Dans la maquette : les cartes créées dans ce navigateur.</p></div>
+      ${box('Cartes publiées', LIVE, 'Une carte suspendue affiche « Carte momentanément indisponible » à ses visiteurs.', rows.length ? `<div class="adm-tbl-w"><table class="adm-tbl"><thead><tr><th>Carte</th><th>Studio</th><th>Secteur</th><th>Code</th><th>Voir</th><th>Suspendue</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.name)}</td><td>${r.studio}</td><td>${esc(r.sec)}</td><td>${esc(r.id)}</td><td><a href="${r.view}" target="_blank" rel="noopener">Ouvrir</a></td><td>${sw(`data-susp="${esc(r.id)}"`, C.get('suspended', []).includes(r.id))}</td></tr>`).join('')}</tbody></table></div>` : '<p class="adm-empty">Aucune carte créée dans ce navigateur pour l’instant.</p>')}
+      ${box('Statistiques', '', '', `<div class="adm-stats">${stat(leads.length, 'contacts reçus (formulaires et échanges)', LIVE)}${stat('—', 'vues des cartes', GB)}${stat('—', 'clics sur « Appeler »', GB)}${stat('—', 'contacts enregistrés (.vcf)', GB)}${stat('—', 'commandes des boutiques', GB)}</div>`)}`;
+    };
+
+    /* 11. Journal */
+    P.log = () => { const L = C.get('log', []).slice().reverse();
+      return `<div class="sh"><h1>Journal des changements</h1><p>Les 200 derniers réglages modifiés. Sur GoBiz, avec le nom de l’administrateur.</p></div>
+      ${box('Derniers changements', LIVE, '', L.length ? `<ul class="adm-log">${L.map((x) => `<li><time>${new Date(x.t).toLocaleString('fr-CA')}</time>${esc(x.w)}</li>`).join('')}</ul>` : '<p class="adm-empty">Aucun changement enregistré.</p>', '<button type="button" class="adm-btn" data-reset>Tout remettre par défaut</button>')}`; };
+
+    /* ---------- Affichage ---------- */
+    function draw() {
+      $('#nav').innerHTML = TABS.map(([id, l]) => `<a href="#${id}" class="${tab === id ? 'on' : ''}" data-tab="${id}">${l}</a>`).join('');
+      const y = window.scrollY;
+      $('#pane').innerHTML = P[tab]();
+      window.scrollTo(0, y);
+      filterSvc();
+    }
+    function filterSvc() {
+      const q = $('#q');
+      if (!q) return;
+      const v = norm(q.value).trim();
+      document.querySelectorAll('.adm-cat[data-cat]').forEach((c) => { let any = false; c.querySelectorAll('.adm-i').forEach((i) => { const ok = !v || i.dataset.n.includes(v); i.hidden = !ok; any = any || ok; }); c.hidden = !any; });
+    }
+    const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1600); };
+    const saved = (m) => { toast(m || 'Enregistré'); };
+
+    /* ---------- Modifications ---------- */
+    document.addEventListener('change', (e) => {
+      const t = e.target, d = t.dataset;
+      if (d.svc) { S.set(d.svc, t.checked); C.set('log', C.get('log', []).concat([{ t: new Date().toISOString(), w: `${t.checked ? 'Activé' : 'Désactivé'} : ${d.svc}` }]).slice(-200)); draw(); return saved(t.checked ? 'Service activé' : 'Service désactivé'); }
+      if (d.cfg) { const v = d.k === 'bool' ? t.checked : d.k === 'num' ? (t.value === '' ? '' : +t.value) : t.value; C.set(d.cfg, v, `${d.cfg} = ${v === '' ? '(vide)' : v}`); if (d.cfg === 'planSim') draw(); return saved(); }
+      if (d.secst) {
+        const id = d.secst, v = t.value;
+        C.set('sectors.off', C.get('sectors.off', []).filter((x) => x !== id).concat(v === 'off' ? [id] : []));
+        C.set('sectors.soon', C.get('sectors.soon', []).filter((x) => x !== id).concat(v === 'soon' ? [id] : []), `Secteur ${SECNAME(id)} : ${v === 'on' ? 'visible' : v === 'soon' ? 'Bientôt' : 'masqué'}`);
+        return saved();
+      }
+      if (d.prof) { toggleIn('profOff', d.prof, t.checked, `Métier ${d.prof} : ${t.checked ? 'proposé' : 'retiré'}`); draw(); return saved(); }
+      if (d.des) { toggleIn('designsOff', d.des, t.checked, `Modèle ${d.des} : ${t.checked ? 'proposé' : 'retiré'}`); draw(); return saved(); }
+      if (d.catsec) { toggleIn('catOff', d.catsec, t.checked, `Section ${d.catsec} : ${t.checked ? 'proposée' : 'retirée'}`); draw(); return saved(); }
+      if (d.rec) { const r = C.get('rec', {}); if (t.value) r[d.rec] = t.value; else delete r[d.rec]; C.set('rec', r, `Modèle recommandé ${SECNAME(d.rec)} : ${t.value || 'par défaut'}`); return saved(); }
+      if (d.hidefoot) { const a = C.get('brand.hideFoot', []).filter((x) => x !== d.hidefoot).concat(t.checked ? [d.hidefoot] : []); C.set('brand.hideFoot', a, `Mention masquée pour : ${a.join(', ') || 'aucun forfait'}`); return saved(); }
+      if (d.susp) { const a = C.get('suspended', []).filter((x) => x !== d.susp).concat(t.checked ? [d.susp] : []); C.set('suspended', a, `Carte ${d.susp} : ${t.checked ? 'suspendue' : 'réactivée'}`); return saved(t.checked ? 'Carte suspendue' : 'Carte réactivée'); }
+      if (d.job !== undefined) { const j = C.get('jobs', []); j[+d.job][+d.f] = t.value; C.set('jobs', j, `Métier ajouté : ${j[+d.job][0]}`); return saved(); }
+      if (d.rw !== undefined) { const r = C.get('lang.reword', []); r[+d.rw][+d.f] = t.value; C.set('lang.reword', r, `Texte remplacé : « ${r[+d.rw][0]} » → « ${r[+d.rw][1]} »`); return saved(); }
+    });
+    document.addEventListener('input', (e) => { if (e.target.id === 'q') filterSvc(); });
+    document.addEventListener('click', (e) => {
+      const t = e.target.closest('button, a[data-tab]');
+      if (!t) return;
+      const d = t.dataset;
+      if (d.tab) { e.preventDefault(); tab = d.tab; history.replaceState(null, '', '#' + tab); window.scrollTo(0, 0); draw(); return; }
+      if (d.svcall) { const c = S.all().find((x) => x.id === d.svcall); c.items.forEach(([id]) => S.set(c.id + ':' + id, d.v === '1')); C.set('log', C.get('log', []).concat([{ t: new Date().toISOString(), w: `${d.v === '1' ? 'Activé' : 'Désactivé'} : catégorie ${c.n[0]}` }]).slice(-200)); draw(); return saved(); }
+      if (d.mv) {
+        const list = (d.g === 'cards' ? CARDS : STORES), ord = C.get('sectors.order', []);
+        const pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
+        const ids = list.map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0].id);
+        const i = ids.indexOf(d.mv), j = i + +d.d;
+        if (j < 0 || j >= ids.length) return;
+        [ids[i], ids[j]] = [ids[j], ids[i]];
+        const other = (d.g === 'cards' ? STORES : CARDS).map((s) => s.id).filter((id) => ord.includes(id));
+        C.set('sectors.order', ids.concat(other), `Ordre modifié : ${SECNAME(d.mv)}`);
+        draw(); return saved();
+      }
+      if (d.jobadd !== undefined) { C.set('jobs', C.get('jobs', []).concat([['', CARDS[0].id]])); draw(); return; }
+      if (d.jobdel !== undefined) { const j = C.get('jobs', []); const r = j.splice(+d.jobdel, 1); C.set('jobs', j, `Métier retiré : ${(r[0] || [])[0] || ''}`); draw(); return saved(); }
+      if (d.rwadd !== undefined) { C.set('lang.reword', C.get('lang.reword', []).concat([['', '']])); draw(); return; }
+      if (d.rwdel !== undefined) { const r = C.get('lang.reword', []); r.splice(+d.rwdel, 1); C.set('lang.reword', r, 'Remplacement de texte retiré'); draw(); return saved(); }
+      if (d.reset !== undefined) { if (!confirm('Remettre tous les réglages et tous les services par défaut ?')) return; C.reset(); NFC.svc.offList().forEach((k) => NFC.svc.set(k, true)); draw(); return saved('Réglages remis par défaut'); }
+    });
+    window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (TABS.some((x) => x[0] === h)) { tab = h; draw(); } });
+    draw();
+  })();
   </script>
 </body>
 </html>

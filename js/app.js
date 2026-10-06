@@ -10,6 +10,19 @@
   const X = window.NFC_APP || {};
   /* Services activés par l’administrateur (js/services.js) ; tout est activé si le registre est absent */
   const svcOn = (id) => !NFC.svc || NFC.svc.on(id);
+  /* Réglages de l’administrateur (js/services.js, NFC.cfg) et forfait du client */
+  const cfg = (p, d) => (NFC.cfg ? NFC.cfg.get(p, d) : d);
+  const plan = () => (NFC.cfg ? NFC.cfg.plan() : { sections: 99, photos: 99, products: 999, bili: true, video: true, shop: true, online: true, ai: true });
+  const isStores = !!X.key && X.key !== 'nfc-studio-v6';
+  /* Secteurs (ou types de boutique) : masqués, « Bientôt », ordre */
+  const secOff = (s) => cfg('sectors.off', []).includes(s.id);
+  const secSoon = (s) => !s.active || cfg('sectors.soon', []).includes(s.id);
+  const secList = () => {
+    const ord = cfg('sectors.order', []), pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
+    return SECTORS.filter((s) => !secOff(s)).map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
+  };
+  const profOk = (s, p) => !cfg('profOff', []).includes(s.id + '~' + p.id);
+  const recOf = (s) => cfg('rec', {})[s.id] || s.rec;
   const KEY = X.key || 'nfc-studio-v6';
   const STEPS = X.steps || ['Secteur', 'Modèle', 'Couleurs', 'Contenu', 'Publication'];
 
@@ -178,7 +191,7 @@
   }
   /* Textes par défaut proposés dans l’éditeur, dans la langue de la carte */
   const uiLang = (x) => (lang() === 'en' && window.NFC_EN_UI && window.NFC_EN_UI[x]) || x;
-  const QR_BASE = 'https://votre-site.com/c/';
+  const QR_BASE = cfg('brand.linkBase', '') || 'https://votre-site.com/c/';
   /* hasQR() : la carte NFC a été reçue avec un QR code et un lien déjà imprimés */
   const hasQR = () => !!(S.qr && S.qr.url);
   const link = () => (hasQR() ? S.qr.url : QR_BASE + S.id);
@@ -269,7 +282,11 @@
   };
   const designOf = (id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id) || DESIGNS[0];
   /* Mises en page proposées : les 10 communes + celles propres au secteur (ex. beauté) */
-  const designsNow = () => DESIGNS.concat((sec() && sec().designs) || []);
+  const designsNow = () => {
+    const all = DESIGNS.concat((sec() && sec().designs) || []), off = cfg('designsOff', []);
+    const on = all.filter((d) => !off.includes(d.id) || d.id === S.design);
+    return on.length ? on : all;
+  };
   const code = (d = S.design) => `${sec().code}-${String(d || sec().rec).toUpperCase()}`;
 
   const getP = (o, path) => path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);
@@ -300,12 +317,15 @@
     if (S.step === 5) drawQR();
     translateTree(document.body);
     reword(document.body);
+    const bn = $('.brand-n'), bt = cfg(isStores ? 'brand.stores' : 'brand.studio', '');
+    if (bn && bt) { bn.textContent = bt; document.title = bt; }
     fitPreview();
   }
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
   function reword(root) {
-    const list = X.reword && X.reword[ui()];
-    if (!list || !root) return;
+    /* Textes remplacés par l’administrateur (en français) */
+    const list = ((X.reword && X.reword[ui()]) || []).concat(ui() === 'fr' ? cfg('lang.reword', []).filter((r) => r && r[0]) : []);
+    if (!list.length || !root) return;
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && n.parentElement.closest('.vc, script, style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     for (let n = w.nextNode(); n; n = w.nextNode()) {
       let t = n.nodeValue;
@@ -344,7 +364,7 @@
       : `<p class="bili-note">${ic('globe', 15)}<span><b>Carte bilingue :</b> sur votre carte, le visiteur touche FR ou EN pour choisir sa langue. Il faut veiller à renseigner les deux versions.</span></p>`;
     return `<div class="lang-sw"><div class="seg" role="group" aria-label="${bi ? (en ? 'Version to edit' : 'Version à modifier') : (en ? 'Card language' : 'Langue de la carte')}">
       <button type="button" class="${fr ? 'on' : ''}" data-act="lang" data-v="fr" ${!bi && !fr ? `disabled title="${off}"` : ''}>${lab[0]}</button><button type="button" class="${!fr ? 'on' : ''}" data-act="lang" data-v="en" ${!bi && fr ? `disabled title="${off}"` : ''}>${lab[1]}</button></div>
-      <label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bi ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label>${note}</div>`;
+      ${!cfg('lang.bili', true) || !plan().bili ? '' : `<label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bi ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label>`}${note}</div>`;
   };
   const head = (t, p) => `<div class="sh"><h1>${t}</h1>${p ? `<p>${p}</p>` : ''}</div>`;
   const back = (n, label) => `<button class="back" data-act="go" data-n="${n}">${ic('arrowl', 16)}${label}</button>`;
@@ -382,7 +402,7 @@
   let profPick = false;
   function stepProf() {
     const b = baseSec(), cur = prof(), en = ui() === 'en';
-    const tiles = b.profiles.map((p) => `
+    const tiles = b.profiles.filter((p) => profOk(b, p)).map((p) => `
       <button class="tile has-bg ${cur && cur.id === p.id && S.design ? 'sel' : ''}" data-act="profile" data-id="${p.id}" style="background-image:url('${(p.media && p.media.cover) || ''}')">
         <span class="tile-top"><span class="tile-ic"><i data-lucide="${p.icon}"></i></span></span>
         <span class="tile-n">${p.n[en ? 1 : 0]}</span>
@@ -408,9 +428,9 @@
   function step1() {
     if (S.qr === undefined) return step0();
     if (profPick && baseSec() && baseSec().profiles) return stepProf();
-    const tiles = SECTORS.map((s) => `
-      <button class="tile ${s.active ? '' : 'soon'} ${S.sectorId === s.id ? 'sel' : ''} ${bgOf(s) ? 'has-bg' : ''}" data-act="sector" data-id="${s.id}"${bgOf(s) ? ` style="background-image:url('${bgOf(s)}')"` : ''}>
-        <span class="tile-top"><span class="tile-ic"><i data-lucide="${s.icon}"></i></span><span class="tile-code">${s.code}</span>${s.active ? '' : '<span class="tile-b">Bientôt</span>'}</span>
+    const tiles = secList().map((s) => `
+      <button class="tile ${secSoon(s) ? 'soon' : ''} ${S.sectorId === s.id ? 'sel' : ''} ${bgOf(s) ? 'has-bg' : ''}" data-act="sector" data-id="${s.id}"${bgOf(s) ? ` style="background-image:url('${bgOf(s)}')"` : ''}>
+        <span class="tile-top"><span class="tile-ic"><i data-lucide="${s.icon}"></i></span><span class="tile-code">${s.code}</span>${secSoon(s) ? '<span class="tile-b">Bientôt</span>' : ''}</span>
         <span class="tile-n">${s.name}</span>
         <span class="tile-ex">${s.ex}</span>
       </button>`).join('');
@@ -454,7 +474,8 @@
     education: 'eleve etudiante orientation orthopedagogue directrice principal enseignement formation formatrice charge de cours conferencier enseignant enseignante professeure prof tuteur tutrice stage educatrice garderie cpe ecole universite cegep college teacher tutor school',
   };
   /* Liste de métiers sans carte propre (js/jobs.js) : chacun renvoie vers son secteur */
-  const JOBS = [].concat(...Object.entries(NFC.JOBS || {}).map(([sid, list]) => list.split('|').map((n) => ({ n, sid, h: norm(n) }))));
+  const JOBS = [].concat(...Object.entries(NFC.JOBS || {}).map(([sid, list]) => list.split('|').map((n) => ({ n, sid, h: norm(n) }))))
+    .concat(cfg('jobs', []).filter((j) => j && j[0] && j[1]).map(([n, sid]) => ({ n, sid, h: norm(n) })));
   const secHay = (s) => norm([s.name, s.ex, enOf(s.name), enOf(s.ex), s.kw || '', KW[s.id] || '', (NFC.JOBS || {})[s.id] || ''].concat(...(s.profiles || []).map((p) => p.n.concat(p.ex))).join(' '));
   function filterSectors(q) {
     const words = norm(q).split(/\s+/).filter(Boolean), en = ui() === 'en';
@@ -467,11 +488,11 @@
       if (ok) n++;
     });
     /* Métiers correspondants : un clic ouvre directement le bon exemple */
-    const profs = !words.length ? [] : [].concat(...SECTORS.filter((s) => s.active && s.profiles)
-      .map((s) => s.profiles.filter((p) => hit(norm(p.n.concat(p.ex).join(' ')))).map((p) => ({ s, p })))).slice(0, 8);
+    const profs = !words.length ? [] : [].concat(...secList().filter((s) => !secSoon(s) && s.profiles)
+      .map((s) => s.profiles.filter((p) => profOk(s, p) && hit(norm(p.n.concat(p.ex).join(' ')))).map((p) => ({ s, p })))).slice(0, 8);
     /* Puis les métiers de la liste, ceux qui commencent par le mot tapé en premier */
     const seen = new Set(profs.map(({ p }) => norm(p.n[0])));
-    const jobs = !words.length ? [] : JOBS.filter((j) => hit(j.h) && !seen.has(j.h) && SECTORS.some((s) => s.id === j.sid))
+    const jobs = !words.length ? [] : JOBS.filter((j) => hit(j.h) && !seen.has(j.h) && secList().some((s) => s.id === j.sid))
       .sort((a, b) => (b.h.startsWith(words[0]) - a.h.startsWith(words[0])) || a.h.length - b.h.length).slice(0, Math.max(0, 8 - profs.length));
     const secName = (sid) => { const s = SECTORS.find((x) => x.id === sid); return s ? (en ? enOf(s.name) || s.name : s.name) : ''; };
     const icOf = (sid) => (SECTORS.find((x) => x.id === sid) || {}).icon || 'briefcase';
@@ -490,7 +511,7 @@
 
   function pickSector(id, fromOther) {
     const s = SECTORS.find((x) => x.id === id);
-    if (!s.active) {
+    if (secSoon(s) || secOff(s)) {
       toast(`« ${s.name} » arrive bientôt.`);
       return;
     }
@@ -614,7 +635,7 @@
         <div class="tpl-view"><div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(d.id), { thumb: true }))}</div></div></div>
           <button type="button" class="tpl-zoom" data-act="fullpreview" data-id="${d.id}" aria-label="Aperçu plein écran du modèle ${d.name}">${ic('eye', 15)}Aperçu</button></div>
         <div class="tpl-meta">
-          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${s.rec === d.id ? '<span class="rec">Recommandé</span>' : ''}</div>
+          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}</div>
           <p>${d.desc}</p>
           <div class="tpl-foot"><span class="tpl-code">${s.code}-${d.id.toUpperCase()}</span><span class="tpl-go">Choisir ${ic('arrow', 14)}</span></div>
         </div>
@@ -659,7 +680,7 @@
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
         <div class="ed-links">
           ${langSwitch()}
-          ${svcOn('ai:edit') ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
+          ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
         </div>
@@ -749,7 +770,7 @@
     const kind = id.coverVideoFile ? 'Vidéo téléversée' : id.coverVideoUrl ? 'Lien vidéo' : id.coverVideo ? 'Vidéo d’exemple' : '';
     const cur = VC.vsrc(id.coverVideoFile) || id.coverVideoUrl || id.coverVideo;
     return `<div class="f"><span class="f-l">Couverture</span>
-        <div class="seg" role="group" aria-label="Type de couverture"><button type="button" class="${video ? '' : 'on'}" data-act="setcover" data-v="image">${ic('image', 15)}Image</button><button type="button" class="${video ? 'on' : ''}" data-act="setcover" data-v="video">${ic('play', 13)}Vidéo</button></div></div>
+        <div class="seg" role="group" aria-label="Type de couverture"><button type="button" class="${video ? '' : 'on'}" data-act="setcover" data-v="image">${ic('image', 15)}Image</button>${plan().video || video ? `<button type="button" class="${video ? 'on' : ''}" data-act="setcover" data-v="video">${ic('play', 13)}Vidéo</button>` : ''}</div></div>
       ${video ? `<div class="cover-vid">
           ${cur ? `<div class="demo-vid"><video src="${esc(cur)}" muted playsinline preload="metadata"></video><div><b>${kind}</b><span>Démarre sans le son et tourne en boucle.</span>${id.coverVideoFile || id.coverVideoUrl ? `<button class="b xs ghost" data-act="coverclear">Retirer ma vidéo</button>` : ''}</div></div>` : ''}
           <div class="f"><span class="f-l">Votre vidéo de couverture</span>
@@ -865,7 +886,7 @@
   }
   const CAT_SUGGEST_BY = { boutiques: ['products'], producteurs: ['products'], restaurant: ['products'], influence: ['products'], coaching: ['products'] };
   const CAT_SUGGEST = ['google', 'reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
-  const catOn = (x) => x && (x.id !== 'google' || svcOn('google:reviews'));
+  const catOn = (x) => x && (x.id !== 'google' || svcOn('google:reviews')) && !cfg('catOff', []).includes(x.id);
   const catTile = (x, en) => `<button type="button" class="as-t" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`;
   function catGroups(en) {
     return CAT_GROUPS.map(([g, fr, eng]) => `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${CAT.filter((x) => x.g === g && catOn(x)).map((x) => catTile(x, en)).join('')}</div></div>`).join('');
@@ -1340,7 +1361,9 @@
         if (el.classList.contains('open')) { openGroups.add(id); showInPreview(id); } else openGroups.delete(id);
         break;
       }
-      case 'add': g(t.dataset.path).push(clone(TPL[t.dataset.tpl])); structChanged(); break;
+      case 'add':
+        if (t.dataset.tpl === 'prod' && g(t.dataset.path).length >= plan().products) { toast(`Votre forfait permet ${plan().products} produits. Passez au forfait supérieur pour en ajouter d’autres.`); break; }
+        g(t.dataset.path).push(clone(TPL[t.dataset.tpl])); structChanged(); break;
       case 'dup': {
         const c = card(), cs = c.custom || (c.custom = []), k = t.dataset.k;
         const order = VC.sectionOrder(c, sec(), S.design);
@@ -1417,6 +1440,7 @@
       case 'addsec': {
         const cs = card().custom || (card().custom = []), item = catOf(t.dataset.t);
         if (!item) break;
+        if (cs.length >= plan().sections) { closeModal(); toast(`Votre forfait permet ${plan().sections} sections ajoutées. Passez au forfait supérieur pour en ajouter d’autres.`); break; }
         const m = mediaNow();
         const pics = (m.gallery || []).map((x) => ({ src: x.src, cap: x.cap })).concat((m.cards || []).map((src) => ({ src, cap: '' })));
         const ns = Object.assign(item.make ? item.make(lang() === 'en', pics, card()) : newSection(t.dataset.t), { cid: rid(), on: true });
@@ -1692,7 +1716,9 @@
       } else {
         const arr = g(t.dataset.gal);
         if (arr.length && arr.every((x) => NFC.isDemoMedia(x.src))) { arr.length = 0; toast('Les photos d’exemple ont été remplacées par les vôtres.'); }
-        for (const f of t.files) arr.push({ src: await readImg(f, 1200), cap: '' });
+        const room = Math.max(0, plan().photos - arr.length), files = [...t.files].slice(0, room);
+        if (files.length < t.files.length) toast(`Votre forfait permet ${plan().photos} photos par galerie.`);
+        for (const f of files) arr.push({ src: await readImg(f, 1200), cap: '' });
       }
       structChanged();
     } catch (err) {

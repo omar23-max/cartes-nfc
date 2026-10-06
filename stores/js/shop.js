@@ -266,7 +266,14 @@
   /* Nouvelle boutique : moyens de paiement et canaux désactivés par l’administrateur retirés de l’exemple */
   app.strip = (def, b, on) => {
     if (def.type !== 'shop') return;
-    if (b.pay) Object.keys(b.pay).forEach((k) => { if (!on('pay:' + k)) b.pay[k] = false; });
+    /* Valeurs par défaut choisies par l’administrateur (taxes, livraison, réception) */
+    const D = NFC.cfg ? NFC.cfg.get('storeDef', {}) : {};
+    if (D.tax) b.tax = D.tax;
+    if (D.fee !== '' && D.fee != null) b.fee = String(D.fee);
+    if (D.freeFrom !== '' && D.freeFrom != null) b.freeFrom = String(D.freeFrom);
+    if (NFC.cfg) { b.dinein = !!(b.dinein && D.dine !== false) || !!(D.dine && b.food); b.pickup = D.pick !== false; b.delivery = D.ship !== false && !!b.delivery; }
+    const online = !NFC.cfg || NFC.cfg.plan().online;
+    if (b.pay) Object.keys(b.pay).forEach((k) => { if (!on('pay:' + k) || (!online && /^(stripe|paypal|etr|zelle)$/.test(k))) b.pay[k] = false; });
     if (!on('order:' + (b.order || 'sms'))) b.order = ['sms', 'wa', 'email'].find((v) => on('order:' + v)) || b.order;
   };
   app.tpl = Object.assign(app.tpl || {}, { prod: { t: '', d: '', l: '', p: '', sp: '', b: '', img: '', cat: '', o: '' } });
@@ -279,7 +286,9 @@
       if (!b.payLinks) b.payLinks = {};
       if (!b.payInfo) b.payInfo = {};
       if (b.order === 'online') { if (b.payUrl && !Object.values(b.payLinks).some(Boolean)) { b.payLinks.stripe = b.payUrl; b.pay.stripe = true; } b.order = 'sms'; }
-      const sv = (id) => !NFC.svc || NFC.svc.on(id);
+      const pl = NFC.cfg ? NFC.cfg.plan() : { online: true };
+      /* Paiement en ligne réservé aux forfaits qui l’incluent */
+      const sv = (id) => (!NFC.svc || NFC.svc.on(id)) && (pl.online || !/^pay:(stripe|paypal|etr|zelle)$/.test(id));
       const pk = (k, label, extra = '') => !sv('pay:' + k) && !b.pay[k] ? '' : `<div class="pay-row"><label class="ck"><input type="checkbox" data-path="${base}.pay.${k}" ${b.pay[k] ? 'checked' : ''}><span>${label}</span></label>${extra ? `<div class="pay-x">${extra}</div>` : ''}</div>`;
       const lk = (k, ph) => `<input class="mini" data-path="${base}.payLinks.${k}" value="${esc(b.payLinks[k] || '')}" placeholder="${esc(ph)}">`;
       const off = [['cash', 'Comptant'], ['card', 'Carte de débit ou de crédit'], ['interac', 'Virement Interac']].map(([k, l]) => pk(k, l)).join('');

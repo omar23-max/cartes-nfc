@@ -43,3 +43,56 @@ window.NFC = window.NFC || {};
     },
   };
 })();
+
+/* ---------- Autres réglages de l’administrateur (NFC.cfg) ----------
+   Un seul objet enregistré ; chaque valeur a une valeur par défaut. Les modifications sont journalisées. */
+(function () {
+  'use strict';
+  const KEY = 'nextap-admin-config';
+  const plan = (sections, photos, products, o) => Object.assign({ sections, photos, products, bili: true, video: true, shop: true, online: true, ai: true, domain: false, size: 10 }, o || {});
+  const DEF = {
+    sectors: { off: [], soon: [], order: [] },
+    profOff: [],
+    designsOff: [], rec: {},
+    catOff: [],
+    jobs: [],
+    plans: {
+      gratuit: plan(2, 4, 5, { bili: false, video: false, online: false, ai: false, size: 5 }),
+      pro: plan(6, 12, 30, { ai: false }),
+      premium: plan(20, 40, 200, { domain: true, size: 25 }),
+    },
+    planSim: 'premium',
+    brand: { studio: '', stores: '', footCards: '', footStores: '', hideFoot: [], linkBase: '' },
+    storeDef: { tax: '', currency: 'CAD', fee: '', freeFrom: '', maxCats: '', dine: false, pick: true, ship: true },
+    lang: { bili: true, market: 'auto', reword: [] },
+    ai: { quota: 20 },
+    privacy: { consent: false, mapClick: false, policyUrl: '', retention: 24 },
+    suspended: [],
+    log: [],
+  };
+  const clone = (o) => JSON.parse(JSON.stringify(o));
+  let C = {};
+  try { C = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { C = {}; }
+  const getP = (o, path) => path.split('.').reduce((a, k) => (a == null ? undefined : a[k]), o);
+  NFC.cfg = {
+    KEY, DEF,
+    get(path, d) {
+      const v = getP(C, path);
+      if (v !== undefined) return v;
+      const dv = getP(DEF, path);
+      return dv !== undefined ? clone(dv) : d;
+    },
+    set(path, v, label) {
+      const ks = path.split('.'), last = ks.pop();
+      let o = C;
+      ks.forEach((k) => { if (o[k] == null || typeof o[k] !== 'object') o[k] = clone(getP(DEF, ks.slice(0, ks.indexOf(k) + 1).join('.')) || {}); o = o[k]; });
+      o[last] = v;
+      if (label) { C.log = (C.log || []).slice(-199); C.log.push({ t: new Date().toISOString(), w: label }); }
+      try { localStorage.setItem(KEY, JSON.stringify(C)); } catch (e) { /* rien */ }
+    },
+    reset() { C = {}; try { localStorage.removeItem(KEY); } catch (e) { /* rien */ } },
+    /* Forfait utilisé pour l’aperçu (sur GoBiz : le forfait réel du client) */
+    plan() { const p = this.get('plans'), k = this.get('planSim'); return p[k] || p.premium; },
+  };
+  /* Le service « book:… », « pay:… » est aussi soumis au forfait pour le paiement en ligne */
+})();

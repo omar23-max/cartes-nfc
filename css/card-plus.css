@@ -379,3 +379,12 @@
 .vc .gr-t { margin-top: 10px; font-size: 14px; color: var(--tx); }
 .vc .gr-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
 .vc .gr-btns .btn { justify-content: center; }
+
+/* Réglages admin : consentement, carte suspendue, lien de politique */
+.vc .vc-consent { display: flex; gap: 8px; align-items: flex-start; margin: 4px 0; font-size: 12.5px; color: var(--mu); text-align: left; }
+.vc .vc-consent input { margin-top: 2px; flex: none; }
+.vc-susp { display: grid; place-items: center; min-height: 70vh; padding: 30px; text-align: center; }
+.vc-susp-in { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--tx, #18181b); }
+.vc-susp-in h1 { font-size: 20px; }
+.vc .ft .brand a { color: inherit; text-decoration: underline; }
+button.map.map-static { width: 100%; border: 0; cursor: pointer; font: inherit; }

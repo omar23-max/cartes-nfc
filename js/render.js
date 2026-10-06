@@ -419,6 +419,7 @@
     if (window.NFC_SANDBOX || m.thumb) {
       return `<a class="map map-static" href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" aria-label="Ouvrir le plan dans Google Maps"><span class="map-pin">${ic('pin', 22)}</span><span class="map-lbl">Voir sur Google Maps</span></a>`;
     }
+    if (cfg('privacy.mapClick', false)) return `<button type="button" class="map map-static" data-vc="mapload" data-q="${q}"><span class="map-pin">${ic('pin', 22)}</span><span class="map-lbl">${L2('Afficher le plan', 'Show the map')}</span></button>`;
     return `<div class="map"><iframe src="https://maps.google.com/maps?q=${q}&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${L2('Plan : ', 'Map: ')}${esc(address)}"></iframe></div>`;
   }
 
@@ -461,6 +462,7 @@
     const fd = new FormData(f), v = (k) => String(fd.get(k) || '').trim();
     const err = f.querySelector('.f-err');
     if (!v('nom') || !(v('tel') || v('email'))) { if (err) err.hidden = false; return; }
+    if (f.querySelector('[name=consent]') && !fd.get('consent')) { if (err) { err.textContent = L2('Cochez la case pour accepter la transmission de vos coordonnées.', 'Please tick the box to agree to share your details.'); err.hidden = false; } return; }
     saveLead({ date: new Date().toISOString(), pour: ownerName(m.card), type: f.dataset.subject, prenom: v('nom'), nom: '', entreprise: '', tel: v('tel'), email: v('email'), message: v('msg'), fichiers: attached(f), rdv: v('date') || v('creneau') ? [v('date'), v('creneau'), v('motif')].filter(Boolean).join(' · ') : '' });
     f.innerHTML = f.classList.contains('bk-req')
       ? `<div class="f-ok"><span class="xch-ok">${ic('check', 22)}</span><div><b>${tx('Demande envoyée')}</b><p>${esc(ownerName(m.card))} ${L2('vous confirme le rendez-vous très vite.', 'will confirm your appointment shortly.')}</p></div></div>`
@@ -540,7 +542,7 @@
     },
     form(def, b) {
       if (!b.email) return '';
-      return `<form class="qform" novalidate data-email="${esc(b.email)}" data-subject="${esc(def.title)}">${b.text ? `<p class="txt">${nl(b.text)}</p>` : ''}<input name="nom" placeholder="Votre nom" autocomplete="name"><div class="qf-2"><input name="tel" type="tel" placeholder="Téléphone" autocomplete="tel"><input name="email" type="email" placeholder="Email" autocomplete="email"></div><textarea name="msg" rows="3" placeholder="Décrivez votre besoin…"></textarea>${fileField(b)}<p class="f-err" hidden>Indiquez votre nom et un téléphone ou un email.</p><button class="btn" type="submit">${ic('send', 18)}<span>Envoyer la demande</span></button></form>`;
+      return `<form class="qform" novalidate data-email="${esc(b.email)}" data-subject="${esc(def.title)}">${b.text ? `<p class="txt">${nl(b.text)}</p>` : ''}<input name="nom" placeholder="Votre nom" autocomplete="name"><div class="qf-2"><input name="tel" type="tel" placeholder="Téléphone" autocomplete="tel"><input name="email" type="email" placeholder="Email" autocomplete="email"></div><textarea name="msg" rows="3" placeholder="Décrivez votre besoin…"></textarea>${fileField(b)}${consentBox()}<p class="f-err" hidden>Indiquez votre nom et un téléphone ou un email.</p><button class="btn" type="submit">${ic('send', 18)}<span>Envoyer la demande</span></button></form>`;
     },
     booking(def, b, m) {
       const mode = bkMode(b, m);
@@ -582,7 +584,7 @@
     },
     contact(def, b) {
       if (!b.email) return '';
-      return `<form class="qform" novalidate data-subject="Message">${b.text ? `<p class="txt">${nl(b.text)}</p>` : ''}<input name="nom" placeholder="Votre nom" autocomplete="name"><div class="qf-2"><input name="email" type="email" placeholder="Email" autocomplete="email"><input name="tel" type="tel" placeholder="Téléphone" autocomplete="tel"></div><textarea name="msg" rows="4" placeholder="Votre message…"></textarea>${fileField(b)}<p class="f-err" hidden>Indiquez votre nom et un email ou un téléphone.</p><button class="btn" type="submit">${ic('send', 18)}<span>Envoyer le message</span></button></form>`;
+      return `<form class="qform" novalidate data-subject="Message">${b.text ? `<p class="txt">${nl(b.text)}</p>` : ''}<input name="nom" placeholder="Votre nom" autocomplete="name"><div class="qf-2"><input name="email" type="email" placeholder="Email" autocomplete="email"><input name="tel" type="tel" placeholder="Téléphone" autocomplete="tel"></div><textarea name="msg" rows="4" placeholder="Votre message…"></textarea>${fileField(b)}${consentBox()}<p class="f-err" hidden>Indiquez votre nom et un email ou un téléphone.</p><button class="btn" type="submit">${ic('send', 18)}<span>Envoyer le message</span></button></form>`;
     },
     reviews(def, b) {
       const items = (b.items || []).filter((x) => x.t);
@@ -628,9 +630,17 @@
     },
   };
 
+  /* Réglages de l’administrateur (js/services.js) */
+  const cfg = (p, d) => (window.NFC && NFC.cfg ? NFC.cfg.get(p, d) : d);
   function footer(m) {
-    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div><p class="brand">${ic('nfc', 13)} ${window.VC.brand ? L2(...window.VC.brand) : 'Carte de visite NFC'}</p></footer>`;
+    const store = (m.sec.blocks || []).some((b) => b.type === 'shop');
+    const own = cfg(store ? 'brand.footStores' : 'brand.footCards', '');
+    const hide = cfg('brand.hideFoot', []).includes(cfg('planSim', 'premium'));
+    const pol = cfg('privacy.policyUrl', '');
+    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div>${hide ? '' : `<p class="brand">${ic('nfc', 13)} ${own ? esc(own) : window.VC.brand ? L2(...window.VC.brand) : 'Carte de visite NFC'}</p>`}${pol ? `<p class="brand"><a href="${esc(url(pol))}" target="_blank" rel="noopener">${L2('Politique de confidentialité', 'Privacy policy')}</a></p>` : ''}</footer>`;
   }
+  /* Case de consentement (Loi 25) ajoutée aux formulaires si l’administrateur l’a activée */
+  const consentBox = () => (cfg('privacy.consent', false) ? `<label class="vc-consent"><input type="checkbox" name="consent"><span>${L2('J’accepte que mes coordonnées soient transmises à ce professionnel.', 'I agree that my details are shared with this professional.')}</span></label>` : '');
 
   function sticky(m) {
     const p = primary(m), c = m.card.contact || {};
@@ -642,6 +652,10 @@
 
   function render(m) {
     LG = m.lang === 'en' ? 'en' : 'fr';
+    const cid = String(m.link || '').split('/').pop();
+    if (!m.thumb && cid && cfg('suspended', []).includes(cid) && !document.getElementById('main')) {
+      return `<div class="vc vc-susp"><div class="vc-susp-in">${ic('shield', 30)}<h1>${L2('Carte momentanément indisponible', 'Profile temporarily unavailable')}</h1><p>${L2('Cette carte a été suspendue. Revenez plus tard.', 'This profile has been suspended. Please check back later.')}</p></div></div>`;
+    }
     const { card, sec, d, pal } = m;
     const ctx = { n: 0 };
     const customs = card.custom || [];
@@ -887,6 +901,7 @@
         ${f('tel', 'Téléphone', 'tel', 'tel')}
         ${f('email', 'Email', 'email', 'email')}
         ${fileField({ files: true }, 'Joindre un document (photo, image, fichier)')}
+        ${consentBox()}
         <p class="xch-err" hidden>Indiquez au moins votre nom et un téléphone ou un email.</p>
         <button type="submit" class="btn">${ic('send', 18)}<span>Envoyer mes coordonnées</span></button>
         <button type="button" class="xch-skip ov-x">Passer</button>
@@ -898,6 +913,7 @@
       e.preventDefault();
       const fd = new FormData(e.target), v = (k) => String(fd.get(k) || '').trim();
       if (!(v('prenom') || v('nom')) || !(v('tel') || v('email'))) { ov.querySelector('.xch-err').hidden = false; return; }
+      if (e.target.querySelector('[name=consent]') && !fd.get('consent')) { const x = ov.querySelector('.xch-err'); x.textContent = L2('Cochez la case pour accepter la transmission de vos coordonnées.', 'Please tick the box to agree to share your details.'); x.hidden = false; return; }
       saveLead({ date: new Date().toISOString(), pour: name, prenom: v('prenom'), nom: v('nom'), entreprise: v('entreprise'), tel: v('tel'), email: v('email'), fichiers: attached(e.target) });
       ov.querySelector('.xch').innerHTML = toEn(`<div class="xch-done"><span class="xch-ok big">${ic('check', 30)}</span><h3>${L2(`Merci ${esc(v('prenom'))} !`, `Thank you ${esc(v('prenom'))}!`)}</h3><p>${esc(name)} ${L2('a bien reçu vos coordonnées.', 'has received your details.')}</p><p class="xch-legal">Démo : dans la version finale, elles arrivent dans l’espace client du professionnel.</p><button type="button" class="btn ov-x">Revenir à la carte</button></div>`);
     });
@@ -939,6 +955,7 @@
         if (s) s.scrollIntoView({ behavior: 'smooth', block: 'center' });
         if (v) v.play().catch(() => {});
       } else if (a === 'lb') openLB(t);
+      else if (a === 'mapload') { e.preventDefault(); const d = document.createElement('div'); d.className = 'map'; d.innerHTML = `<iframe src="https://maps.google.com/maps?q=${t.dataset.q}&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map"></iframe>`; t.replaceWith(d); }
       else if (window.VC.onAct && window.VC.onAct(a, t, e, getModel())) { /* action d’un module (ex. panier) */ }
       else if (a === 'more') { const s = t.closest('.sec'); s.classList.toggle('open'); t.textContent = tx(s.classList.contains('open') ? 'Réduire' : 'Lire la suite'); }
     });
