@@ -684,3 +684,9 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 .ld-x .f { width: 100%; margin: 0; }
 .ld-o:has(> .ck input:checked) { border-color: var(--acc); }
 .ld-o:has(> .ck input:checked) .ld-x { display: flex; }
+
+.ld-t0 { margin-top: 0; }
+.ld-fix { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.ld-fix > span:nth-child(2) { display: flex; flex-direction: column; gap: 2px; }
+.ld-ic { color: var(--acc); margin-top: 1px; }
+.ld-on { font-size: 11.5px; font-weight: 700; color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }

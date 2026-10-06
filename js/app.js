@@ -312,7 +312,16 @@
         <label class="ck"><input type="checkbox" data-path="leads.${key}" ${L[key] ? 'checked' : ''}><span><b>${title}</b><small>${desc}</small></span></label>${extra ? `<div class="ld-x">${extra}</div>` : ''}</div>`);
     const tools = LEAD_CRM.filter(([k]) => svcOn('crm:' + k) || L.crmTool === k);
     const connect = (what) => `<button type="button" class="b sm" data-act="leadconnect" data-v="${what}">${ic('link', 15)}Connecter ${what}</button>`;
-    return `<label class="ck ld-ex"><input type="checkbox" data-path="exchange" ${c.exchange !== false ? 'checked' : ''}><span><b>Proposer l’échange de coordonnées</b><small>Après « Enregistrer le contact », la personne rencontrée peut vous laisser les siennes (ou scanner sa carte papier).</small></span></label>
+    const sendWays = [svcOn('crm:sendmail') ? 'courriel' : '', svcOn('crm:sendsms') ? 'texto' : ''].filter(Boolean).join(' et ');
+    return `<p class="f-l ld-t ld-t0">Ce que reçoit la personne rencontrée</p>
+      <div class="ld">
+        <div class="ld-o ld-fix"><span class="ld-ic">${ic('userplus', 18)}</span><span><b>Vos coordonnées dans ses contacts</b><small>« Enregistrer le contact » ajoute votre nom, téléphone, courriel et adresse à son téléphone, avec un lien cliquable vers votre carte digitale.</small></span><span class="ld-on">Toujours</span></div>
+        ${sendWays ? `<div class="ld-o ld-fix"><span class="ld-ic">${ic('send', 18)}</span><span><b>Votre carte envoyée par ${sendWays}</b><small>Dès qu’elle vous laisse ses coordonnées, elle reçoit automatiquement le lien de votre carte et votre photo, pour la retrouver facilement.</small></span><span class="ld-on">Toujours</span></div>
+        ${area('Petit mot ajouté à l’envoi (facultatif)', 'leads.thanks', { rows: 2, ph: 'Merci pour notre rencontre ! Voici ma carte, n’hésitez pas à me contacter.' })}` : ''}
+        ${svcOn('crm:home') || c.homeScreen === true ? `<div class="ld-o"><label class="ck"><input type="checkbox" data-path="homeScreen" ${c.homeScreen !== false ? 'checked' : ''}><span><b>Proposer « Ajouter à l’écran d’accueil »</b><small>Votre carte devient une icône sur son téléphone, comme une application.</small></span></label></div>` : ''}
+      </div>
+      <p class="f-l ld-t">Ce que vous recevez</p>
+      <label class="ck ld-ex"><input type="checkbox" data-path="exchange" ${c.exchange !== false ? 'checked' : ''}><span><b>Proposer l’échange de coordonnées</b><small>Après « Enregistrer le contact », la personne rencontrée peut vous laisser les siennes (ou scanner sa carte papier).</small></span></label>
       <p class="f-l ld-t">Comment voulez-vous recevoir ces coordonnées ?</p>
       <div class="ld">
         ${opt('email', 'email', 'Courriel à chaque nouveau contact', '« Nouveau contact : Julie Tremblay, 514… » dans votre boîte.', inp('Adresse qui reçoit les contacts', 'leads.emailTo', { type: 'email', ph: ce, hint: 'Vide = votre courriel.' }))}
@@ -866,7 +875,7 @@
       <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('WhatsApp', 'contact.whatsapp', { type: 'tel', hint: 'Format international : +33 6…' })}</div>
       <div class="row2">${inp('Email', 'contact.email', { type: 'email' })}${inp('Site web', 'contact.website', { ph: 'monsite.fr' })}</div>
       <label class="f"><span class="f-l">Action principale</span><select data-path="primary">${primaryOptions()}</select><span class="f-h">Le gros bouton toujours visible en bas de la carte.</span></label>`);
-    h += grp('leads', 'Réception de vos contacts', 'Comment recevoir les coordonnées des personnes rencontrées', leadsEd());
+    h += grp('leads', 'Échange de contacts', 'Ce que reçoit la personne rencontrée, et comment vous recevez ses coordonnées', leadsEd());
     normSocials(card());
     const socRow = ([k, l]) => { const on = !!(card().socialsOn || {})[k]; return `<div class="soc-f ${on ? 'on' : ''}" data-socf="${k}">
         <label class="soc-ck" title="Afficher ${l} sur la carte"><input type="checkbox" data-path="socialsOn.${k}" data-socck="${k}" ${on ? 'checked' : ''}><span class="soc-lg">${VC.brandIc(k, 18)}</span><span class="soc-n">${l}</span></label>

@@ -637,7 +637,34 @@
     const own = cfg(store ? 'brand.footStores' : 'brand.footCards', '');
     const hide = cfg('brand.hideFoot', []).includes(cfg('planSim', 'premium'));
     const pol = cfg('privacy.policyUrl', '');
-    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div>${hide ? '' : `<p class="brand">${ic('nfc', 13)} ${own ? esc(own) : window.VC.brand ? L2(...window.VC.brand) : 'Carte de visite NFC'}</p>`}${pol ? `<p class="brand"><a href="${esc(url(pol))}" target="_blank" rel="noopener">${L2('Politique de confidentialité', 'Privacy policy')}</a></p>` : ''}</footer>`;
+    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div>${homeOn(m) ? `<a class="btn ghost ft-home" href="#" data-vc="a2hs">${ic('phone', 17)}<span>${L2('Ajouter à l’écran d’accueil', 'Add to home screen')}</span></a>` : ''}${hide ? '' : `<p class="brand">${ic('nfc', 13)} ${own ? esc(own) : window.VC.brand ? L2(...window.VC.brand) : 'Carte de visite NFC'}</p>`}${pol ? `<p class="brand"><a href="${esc(url(pol))}" target="_blank" rel="noopener">${L2('Politique de confidentialité', 'Privacy policy')}</a></p>` : ''}</footer>`;
+  }
+  /* « Ajouter à l’écran d’accueil » : choix du titulaire, service autorisé par l’administrateur */
+  const svcOk = (id) => !(window.NFC && NFC.svc) || NFC.svc.on(id);
+  const homeOn = (m) => m.card.homeScreen !== false && svcOk('crm:home');
+  let a2hsEvt = null;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); a2hsEvt = e; });
+  function openA2hs(from, m) {
+    if (a2hsEvt) { a2hsEvt.prompt(); a2hsEvt = null; return; }
+    const ua = navigator.userAgent || '', ios = /iPhone|iPad|iPod/i.test(ua), android = /Android/i.test(ua);
+    const steps = ios
+      ? [L2('Touchez le bouton Partager', 'Tap the Share button') + ` <span class="a2-k">${ic('share', 15)}</span> ${L2('en bas de Safari', 'at the bottom of Safari')}`, L2('Choisissez « Sur l’écran d’accueil »', 'Choose “Add to Home Screen”'), L2('Touchez « Ajouter »', 'Tap “Add”')]
+      : android ? [L2('Touchez le menu ⋮ en haut à droite de Chrome', 'Tap the ⋮ menu at the top right of Chrome'), L2('Choisissez « Ajouter à l’écran d’accueil »', 'Choose “Add to Home screen”'), L2('Touchez « Ajouter »', 'Tap “Add”')]
+        : [L2('Ouvrez cette carte sur votre téléphone (scannez son QR code)', 'Open this profile on your phone (scan its QR code)'), L2('Puis ajoutez-la à l’écran d’accueil depuis le menu du navigateur', 'Then add it to the home screen from the browser menu')];
+    const { ov } = overlay(from, 'ov-xch');
+    ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="xch a2">
+      <button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>
+      <h3>${L2('Ajouter à l’écran d’accueil', 'Add to home screen')}</h3>
+      <p>${L2(`La carte de ${esc(ownerName(m.card))} devient une icône sur votre téléphone, comme une application.`, `${esc(ownerName(m.card))}’s profile becomes an icon on your phone, like an app.`)}</p>
+      <ol class="a2-l">${steps.map((s) => `<li>${s}</li>`).join('')}</ol>
+      <button type="button" class="btn ov-x">${L2('J’ai compris', 'Got it')}</button></div></div>`);
+  }
+  /* Icône et nom de la carte quand elle est ajoutée à l’écran d’accueil (pages publiques) */
+  function homeMeta(m) {
+    const id = m.card.identity || {}, icon = img(id.photo || id.logo || '', m);
+    const set = (sel, make) => { let el = document.head.querySelector(sel); if (!el) { el = make(); document.head.appendChild(el); } return el; };
+    if (icon && !/^data:image\/svg/.test(icon)) set('link[rel="apple-touch-icon"]', () => Object.assign(document.createElement('link'), { rel: 'apple-touch-icon' })).href = icon;
+    set('meta[name="apple-mobile-web-app-title"]', () => Object.assign(document.createElement('meta'), { name: 'apple-mobile-web-app-title' })).content = String(id.name || '').slice(0, 30);
   }
   /* Case de consentement (Loi 25) ajoutée aux formulaires si l’administrateur l’a activée */
   const consentBox = () => (cfg('privacy.consent', false) ? `<label class="vc-consent"><input type="checkbox" name="consent"><span>${L2('J’accepte que mes coordonnées soient transmises à ce professionnel.', 'I agree that my details are shared with this professional.')}</span></label>` : '');
@@ -881,6 +908,14 @@
     if (doc) doc.addEventListener('change', () => { const img = [...doc.files].find((x) => /^image\//.test(x.type)); if (img) runScan(img); });
   }
 
+  /* Envoi automatique de la carte à la personne rencontrée (courriel et/ou texto, selon l’administrateur) */
+  const sendWays = () => [svcOk('crm:sendmail') ? 'mail' : '', svcOk('crm:sendsms') ? 'sms' : ''].filter(Boolean);
+  const sendNote = (name) => {
+    const w = sendWays();
+    if (!w.length) return '';
+    const how = w.length === 2 ? L2('par courriel ou texto', 'by email or text') : w[0] === 'mail' ? L2('par courriel', 'by email') : L2('par texto', 'by text');
+    return `<p class="xch-send">${ic('send', 14)}<span>${L2(`Vous recevrez la carte de ${esc(name)} ${how}, pour la retrouver facilement.`, `You’ll receive ${esc(name)}’s profile ${how}, so you can find it easily.`)}</span></p>`;
+  };
   function openExchange(from, m) {
     const who = firstName(m.card, m.sec), name = ownerName(m.card);
     const { ov, close } = overlay(from, 'ov-xch');
@@ -905,6 +940,7 @@
         <p class="xch-err" hidden>Indiquez au moins votre nom et un téléphone ou un email.</p>
         <button type="submit" class="btn">${ic('send', 18)}<span>Envoyer mes coordonnées</span></button>
         <button type="button" class="xch-skip ov-x">Passer</button>
+        ${sendNote(name)}
         <p class="xch-legal">${L2(`Vos coordonnées sont transmises uniquement à ${esc(name)}.`, `Your details are shared only with ${esc(name)}.`)}</p>
       </form>
     </div></div>`);
@@ -915,7 +951,7 @@
       if (!(v('prenom') || v('nom')) || !(v('tel') || v('email'))) { ov.querySelector('.xch-err').hidden = false; return; }
       if (e.target.querySelector('[name=consent]') && !fd.get('consent')) { const x = ov.querySelector('.xch-err'); x.textContent = L2('Cochez la case pour accepter la transmission de vos coordonnées.', 'Please tick the box to agree to share your details.'); x.hidden = false; return; }
       saveLead({ date: new Date().toISOString(), pour: name, prenom: v('prenom'), nom: v('nom'), entreprise: v('entreprise'), tel: v('tel'), email: v('email'), fichiers: attached(e.target) });
-      ov.querySelector('.xch').innerHTML = toEn(`<div class="xch-done"><span class="xch-ok big">${ic('check', 30)}</span><h3>${L2(`Merci ${esc(v('prenom'))} !`, `Thank you ${esc(v('prenom'))}!`)}</h3><p>${esc(name)} ${L2('a bien reçu vos coordonnées.', 'has received your details.')}</p><p class="xch-legal">Démo : dans la version finale, elles arrivent dans l’espace client du professionnel.</p><button type="button" class="btn ov-x">Revenir à la carte</button></div>`);
+      ov.querySelector('.xch').innerHTML = toEn(`<div class="xch-done"><span class="xch-ok big">${ic('check', 30)}</span><h3>${L2(`Merci ${esc(v('prenom'))} !`, `Thank you ${esc(v('prenom'))}!`)}</h3><p>${esc(name)} ${L2('a bien reçu vos coordonnées.', 'has received your details.')}</p>${(() => { const w = sendWays().filter((k) => (k === 'mail' ? v('email') : v('tel'))); if (!w.length) return ''; const dest = w.map((k) => (k === 'mail' ? esc(v('email')) : esc(v('tel')))).join(L2(' et au ', ' and ')); return `<p class="xch-send">${ic('send', 14)}<span>${L2(`Sa carte vous est envoyée à ${dest}.`, `Their profile is on its way to ${dest}.`)}</span></p>`; })()}${homeOn(m) ? `<button type="button" class="btn ghost" data-vc="a2hs">${ic('phone', 17)}<span>${L2('Ajouter sa carte à l’écran d’accueil', 'Add their profile to my home screen')}</span></button>` : ''}<p class="xch-legal">Démo : dans la version finale, vos coordonnées arrivent chez le professionnel et sa carte vous est envoyée automatiquement.</p><button type="button" class="btn ov-x">Revenir à la carte</button></div>`);
     });
   }
 
@@ -955,6 +991,7 @@
         if (s) s.scrollIntoView({ behavior: 'smooth', block: 'center' });
         if (v) v.play().catch(() => {});
       } else if (a === 'lb') openLB(t);
+      else if (a === 'a2hs') { e.preventDefault(); openA2hs(t, getModel()); }
       else if (a === 'mapload') { e.preventDefault(); const d = document.createElement('div'); d.className = 'map'; d.innerHTML = `<iframe src="https://maps.google.com/maps?q=${t.dataset.q}&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map"></iframe>`; t.replaceWith(d); }
       else if (window.VC.onAct && window.VC.onAct(a, t, e, getModel())) { /* action d’un module (ex. panier) */ }
       else if (a === 'more') { const s = t.closest('.sec'); s.classList.toggle('open'); t.textContent = tx(s.classList.contains('open') ? 'Réduire' : 'Lire la suite'); }
@@ -969,5 +1006,5 @@
     });
   }
 
-  window.VC = { S, gLinked, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
+  window.VC = { S, gLinked, homeMeta, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
 })();
