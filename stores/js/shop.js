@@ -263,6 +263,12 @@
 
   /* ---------- Éditeur de la section ---------- */
   const app = window.NFC_APP || (window.NFC_APP = {});
+  /* Nouvelle boutique : moyens de paiement et canaux désactivés par l’administrateur retirés de l’exemple */
+  app.strip = (def, b, on) => {
+    if (def.type !== 'shop') return;
+    if (b.pay) Object.keys(b.pay).forEach((k) => { if (!on('pay:' + k)) b.pay[k] = false; });
+    if (!on('order:' + (b.order || 'sms'))) b.order = ['sms', 'wa', 'email'].find((v) => on('order:' + v)) || b.order;
+  };
   app.tpl = Object.assign(app.tpl || {}, { prod: { t: '', d: '', l: '', p: '', sp: '', b: '', img: '', cat: '', o: '' } });
   app.editors = Object.assign(app.editors || {}, {
     shop(b, base, h) {
@@ -273,7 +279,8 @@
       if (!b.payLinks) b.payLinks = {};
       if (!b.payInfo) b.payInfo = {};
       if (b.order === 'online') { if (b.payUrl && !Object.values(b.payLinks).some(Boolean)) { b.payLinks.stripe = b.payUrl; b.pay.stripe = true; } b.order = 'sms'; }
-      const pk = (k, label, extra = '') => `<div class="pay-row"><label class="ck"><input type="checkbox" data-path="${base}.pay.${k}" ${b.pay[k] ? 'checked' : ''}><span>${label}</span></label>${extra ? `<div class="pay-x">${extra}</div>` : ''}</div>`;
+      const sv = (id) => !NFC.svc || NFC.svc.on(id);
+      const pk = (k, label, extra = '') => !sv('pay:' + k) && !b.pay[k] ? '' : `<div class="pay-row"><label class="ck"><input type="checkbox" data-path="${base}.pay.${k}" ${b.pay[k] ? 'checked' : ''}><span>${label}</span></label>${extra ? `<div class="pay-x">${extra}</div>` : ''}</div>`;
       const lk = (k, ph) => `<input class="mini" data-path="${base}.payLinks.${k}" value="${esc(b.payLinks[k] || '')}" placeholder="${esc(ph)}">`;
       const off = [['cash', 'Comptant'], ['card', 'Carte de débit ou de crédit'], ['interac', 'Virement Interac']].map(([k, l]) => pk(k, l)).join('');
       const on = PAY_ON.map(([k, n, ph]) => pk(k, n, lk(k, ph))).join('')
@@ -298,7 +305,7 @@
       }[mode];
       return `<p class="f-l">Produits</p><div class="items">${prods}</div>${add(base + '.items', 'prod', 'Ajouter un produit')}
         ${inp('Catégories', base + '.cats', { ph: 'Femme, Homme, Accessoires', hint: 'Séparez-les par des virgules, puis choisissez la catégorie de chaque produit.' })}
-        <div class="f"><span class="f-l">Comment recevez-vous les commandes ?</span>${seg(base + '.order', mode, [['sms', 'Texto'], ['wa', 'WhatsApp'], ['email', 'Courriel']])}</div>
+        <div class="f"><span class="f-l">Comment recevez-vous les commandes ?</span>${seg(base + '.order', mode, [['sms', 'Texto'], ['wa', 'WhatsApp'], ['email', 'Courriel']].filter(([v]) => sv('order:' + v) || v === mode))}</div>
         ${recv}
         <div class="f pay-f"><span class="f-l">Paiements acceptés</span><span class="f-h">Cochez tous ceux que vous acceptez : le client choisit au moment de commander.</span>
           <p class="pay-g">À la réception (paiement à la livraison ou au ramassage)</p>${off}

@@ -758,6 +758,9 @@
       { l: 'Telegram', i: 'telegram', c: '#229ED9', href: `https://t.me/share/url?url=${E(u)}&text=${E(subj)}` },
     ];
     if (navigator.share) opts.push({ l: 'Plus…', i: 'dots', c: '#94a3b8', act: 'native' });
+    /* Options de partage désactivées par l’administrateur */
+    const SK = { WhatsApp: 'wa', SMS: 'sms', Email: 'mail', 'QR code': 'qr', 'Copier le lien': 'copy', LinkedIn: 'linkedin', Facebook: 'facebook', Telegram: 'telegram', 'Plus…': 'native' };
+    for (let j = opts.length - 1; j >= 0; j--) if (window.NFC && NFC.svc && !NFC.svc.on('share:' + SK[opts[j].l])) opts.splice(j, 1);
     const { ov, close } = overlay(from, 'ov-share');
     ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="shr" role="menu" aria-label="Partager cette carte">
       <div class="shr-h"><span>Partager cette carte</span><button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button></div>
@@ -872,7 +875,7 @@
       <button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>
       <div class="xch-top"><span class="xch-ok">${ic('check', 22)}</span><div><h3>${window.NFC_SANDBOX ? 'Fiche contact prête' : 'Contact enregistré'}</h3><p>${window.NFC_SANDBOX ? 'Aperçu : sur la version finale, le contact s’ajoute à votre téléphone.' : esc(name) + L2(' est dans votre téléphone.', ' is now in your phone.')}</p></div></div>
       <div class="xch-ask"><h4>Et vous ?</h4><p>${L2(`Laissez vos coordonnées à ${esc(who)} pour faciliter la prise de contact.`, `Leave your details for ${esc(who)} so you can stay in touch.`)}</p></div>
-      <div class="xch-scan">
+      <div class="xch-scan"${window.NFC && NFC.svc && !NFC.svc.on('ai:scan') ? ' hidden' : ''}>
         <label class="btn scan-box">${ic('camera', 19)}<span class="scan-l">Scanner ma carte de visite pour remplir les champs</span><input class="scan-in" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden></label>
         <p class="xch-scan-note">Scannez votre carte papier : les champs se remplissent tout seuls.</p>
         <p class="scan-msg" hidden></p>

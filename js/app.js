@@ -8,6 +8,8 @@
   const clone = (o) => JSON.parse(JSON.stringify(o));
   /* Un autre produit (ex. Stores) peut changer la clé d’enregistrement, les étapes et les textes d’accueil */
   const X = window.NFC_APP || {};
+  /* Services activés par l’administrateur (js/services.js) ; tout est activé si le registre est absent */
+  const svcOn = (id) => !NFC.svc || NFC.svc.on(id);
   const KEY = X.key || 'nfc-studio-v6';
   const STEPS = X.steps || ['Secteur', 'Modèle', 'Couleurs', 'Contenu', 'Publication'];
 
@@ -79,7 +81,21 @@
     const other = S.cards[lang() === 'en' ? kid() : kid() + ':en'];
     if (other) mirrorMedia(other, S.cards[ckey()], lang() === 'en');
     normSocials(S.cards[ckey()]);
+    stripOff(S.cards[ckey()], s);
   };
+  /* Nouvelle carte : les services désactivés par l’administrateur ne sont pas repris de l’exemple.
+     Les cartes déjà créées ne sont pas touchées. */
+  function stripOff(c, s) {
+    VC.SOC.forEach(([k]) => { if (!svcOn('soc:' + k) && c.socialsOn) c.socialsOn[k] = false; });
+    s.blocks.forEach((def) => {
+      const b = c.blocks[def.key];
+      if (!b) return;
+      if (def.type === 'location' && !svcOn('google:maps')) b.map = false;
+      if (def.type === 'greviews' && !svcOn('google:reviews')) b.on = false;
+      if (def.type === 'booking') { const P = VC.providerOf(b); if (P && !svcOn('book:' + P.id)) { b.mode = 'request'; b.url = ''; b.provider = ''; } }
+      if (X.strip) X.strip(def, b, svcOn);
+    });
+  }
 
   /* ---------- Photos et vidéos communes aux versions française et anglaise ----------
      Seuls les médias sont recopiés ; les textes de chaque version restent indépendants. */
@@ -643,7 +659,7 @@
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
         <div class="ed-links">
           ${langSwitch()}
-          <button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>
+          ${svcOn('ai:edit') ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
         </div>
@@ -723,7 +739,7 @@
         <label class="soc-ck" title="Afficher ${l} sur la carte"><input type="checkbox" data-path="socialsOn.${k}" data-socck="${k}" ${on ? 'checked' : ''}><span class="soc-lg">${VC.brandIc(k, 18)}</span><span class="soc-n">${l}</span></label>
         <input type="text" data-path="socials.${k}" data-soc="${k}" inputmode="url" spellcheck="false" value="${esc(g('socials.' + k))}" placeholder="${VC.SOC_BASE[k]}…" aria-label="Adresse ${l}">
       </div>`; };
-    h += grp('socials', 'Réseaux sociaux', 'Cochez vos réseaux, complétez l’adresse', `<div class="soc-ed">${VC.SOC.map(socRow).join('')}</div>`);
+    h += grp('socials', 'Réseaux sociaux', 'Cochez vos réseaux, complétez l’adresse', `<div class="soc-ed">${VC.SOC.filter(([k]) => svcOn('soc:' + k) || (card().socialsOn || {})[k]).map(socRow).join('')}</div>`);
     h += sectionsEd();
     return h;
   }
@@ -849,13 +865,14 @@
   }
   const CAT_SUGGEST_BY = { boutiques: ['products'], producteurs: ['products'], restaurant: ['products'], influence: ['products'], coaching: ['products'] };
   const CAT_SUGGEST = ['google', 'reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
+  const catOn = (x) => x && (x.id !== 'google' || svcOn('google:reviews'));
   const catTile = (x, en) => `<button type="button" class="as-t" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`;
   function catGroups(en) {
-    return CAT_GROUPS.map(([g, fr, eng]) => `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${CAT.filter((x) => x.g === g).map((x) => catTile(x, en)).join('')}</div></div>`).join('');
+    return CAT_GROUPS.map(([g, fr, eng]) => `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${CAT.filter((x) => x.g === g && catOn(x)).map((x) => catTile(x, en)).join('')}</div></div>`).join('');
   }
   function addSecHTML() {
     const en = ui() === 'en';
-    const sug = (CAT_SUGGEST_BY[S.sectorId] || []).concat(CAT_SUGGEST).filter((id) => !catPresent(id)).slice(0, 3).map(catOf);
+    const sug = (CAT_SUGGEST_BY[S.sectorId] || []).concat(CAT_SUGGEST).filter((id) => !catPresent(id) && catOn(catOf(id))).slice(0, 3).map(catOf);
     return `<div class="add-sec">
       <span class="f-l">${ic('plus', 15)}${en ? 'Add a section' : 'Ajouter une section'}</span>
       ${sug.length ? `<div class="as-g as-sug"><span class="as-h">${en ? 'Suggested for you' : 'Suggérées pour vous'}</span><div class="as-grid">${sug.map((x) => catTile(x, en)).join('')}</div></div>` : ''}
@@ -902,6 +919,10 @@
     const order = VC.sectionOrder(c, s, S.design);
     let h = `<h3 class="ed-sub">Sections de votre carte<span>Activez ou masquez chaque section, et réorganisez-les : glissez-les par la poignée ou utilisez les flèches.</span></h3><div class="sec-list">`;
     order.forEach((k, idx) => {
+      if (k.startsWith('b:') && !svcOn('google:reviews')) {
+        const d0 = s.blocks.find((b) => b.key === k.slice(2));
+        if (d0 && d0.type === 'greviews' && !(c.blocks[d0.key] || {}).on) return;
+      }
       /* Modifier (crayon), déplacer (flèches groupées), dupliquer : trois rôles bien distincts */
       const mv = (gid) => `<div class="cs-ctl">
           <button class="ib edit-b" data-act="grp" data-id="${gid}" aria-label="Modifier la section" title="Modifier la section">${ic('pen', 15)}</button>
@@ -1002,8 +1023,10 @@
           const cur = P ? P.id : (b.provider === undefined ? reco[0] || '' : b.provider);
           const byId = (id) => VC.PROVIDERS.find((x) => x.id === id);
           const opt = (x, tag = '') => `<option value="${x.id}" ${cur === x.id ? 'selected' : ''}>${x.name}${tag}${x.embed ? ' · intégrable' : ''}</option>`;
-          const top = byId(reco[0]), recoP = reco.slice(1).map(byId).filter(Boolean);
-          const others = VC.PROVIDERS.filter((x) => !reco.includes(x.id)).sort((x, y) => x.name.localeCompare(y.name));
+          /* Outils désactivés par l’administrateur : retirés de la liste (sauf celui déjà choisi par le client) */
+          const ok = (x) => x && (svcOn('book:' + x.id) || x.id === cur);
+          const top = [byId(reco[0])].filter(ok)[0], recoP = reco.slice(1).map(byId).filter(ok);
+          const others = VC.PROVIDERS.filter((x) => !reco.includes(x.id) && ok(x)).sort((x, y) => x.name.localeCompare(y.name));
           body += `<label class="f"><span class="f-l">Votre outil de réservation</span><select data-path="${base}.provider" data-struct="re">
               ${top ? `<optgroup label="Le plus utilisé dans votre profession">${opt(top, ' (par défaut)')}</optgroup>` : ''}
               ${recoP.length ? `<optgroup label="Autres outils courants dans votre profession">${recoP.map((x) => opt(x)).join('')}</optgroup>` : ''}
@@ -1042,7 +1065,7 @@
         return `<div class="items">${(b.rows || []).map((r, i) => `<div class="it"><div class="it-f two">${mini(`${base}.rows.${i}.d`, 'Jour(s)')}${mini(`${base}.rows.${i}.h`, 'Horaires')}</div>${del(base + '.rows', i)}</div>`).join('')}</div>${add(base + '.rows', 'hour', 'Ajouter une ligne')}${inp('Mention spéciale', base + '.note', { ph: 'Ex. Urgences 24h/24' })}`;
       case 'location':
         return `${inp('Adresse', base + '.address', { ph: 'Numéro, rue, code postal, ville' })}${inp('Accès et informations pratiques', base + '.access', { ph: 'Métro, parking, accès PMR…' })}
-          <label class="ck"><input type="checkbox" data-path="${base}.map" ${b.map !== false ? 'checked' : ''}><span>Afficher le plan Google Maps</span></label>`;
+          ${svcOn('google:maps') || b.map !== false ? `<label class="ck"><input type="checkbox" data-path="${base}.map" ${b.map !== false ? 'checked' : ''}><span>Afficher le plan Google Maps</span></label>` : ''}`;
       case 'action':
         return `<div class="row2">${inp('Texte du bouton', base + '.label', { ph: def.cta })}${inp('Lien de réservation', base + '.url', { ph: 'https://…' })}</div>${area('Texte d’accompagnement', base + '.text', { rows: 2 })}`;
       case 'form':

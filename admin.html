@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NexTap Studio – Administration</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css?v=67">
+  <style>
+    .adm { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
+    .adm-warn { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; margin-bottom: 22px; border-radius: 12px; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; font-size: 14px; }
+    .adm-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 18px; }
+    .adm-tools input { flex: 1; min-width: 220px; height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); font: inherit; }
+    .adm-sum { font-size: 14px; color: var(--mut); }
+    .adm-cat { margin-bottom: 16px; padding: 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+    .adm-h { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+    .adm-h h2 { margin: 0; font-size: 17px; }
+    .adm-n { padding: 3px 9px; border-radius: 999px; background: #eef2ff; color: #3730a3; font-size: 12px; font-weight: 700; }
+    .adm-d { margin: 0 0 12px; font-size: 13.5px; color: var(--mut); }
+    .adm-act { display: flex; gap: 6px; }
+    .adm-act button { padding: 6px 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); font: 600 12.5px Inter, sans-serif; cursor: pointer; }
+    .adm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px 14px; }
+    .adm-i { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 10px; font-size: 14px; }
+    .adm-i:hover { background: #f7f6f2; }
+    .adm-i.off span { color: var(--mut); text-decoration: line-through; }
+    .adm-i[hidden], .adm-cat[hidden] { display: none; }
+    .adm-sw { position: relative; flex: none; width: 40px; height: 23px; }
+    .adm-sw input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+    .adm-sw b { position: absolute; inset: 0; border-radius: 999px; background: #d4d4d8; transition: background .15s; pointer-events: none; }
+    .adm-sw b::after { content: ''; position: absolute; top: 3px; left: 3px; width: 17px; height: 17px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }
+    .adm-sw input:checked + b { background: #16a34a; }
+    .adm-sw input:checked + b::after { transform: translateX(17px); }
+    .adm-sw input:focus-visible + b { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand"><span class="brand-mk"></span><span class="brand-n">NexTap Studio – Administration</span><span class="badge">Site test</span></div>
+    <nav class="adm-links" style="display:flex;gap:8px;margin-left:auto"><a class="b sm ghost" href="index.html">Studio cartes</a><a class="b sm ghost" href="stores/">Studio boutiques</a></nav>
+  </header>
+  <main class="adm">
+    <div class="sh"><h1>Services et applications</h1><p>Activez ou désactivez les services proposés à vos clients, dans le studio des cartes et dans celui des boutiques. Un service désactivé n’est plus proposé ; les cartes déjà créées le gardent.</p></div>
+    <p class="adm-warn"><span>⚠</span><span><b>Maquette.</b> Sur ce site test, vos réglages sont enregistrés dans ce navigateur seulement et la page n’est pas protégée. Dans GoBiz, ils seront enregistrés en base et réservés à l’administrateur connecté.</span></p>
+    <div class="adm-tools"><input type="search" id="q" placeholder="Rechercher un service (ex. PayPal, Calendly, TikTok)" autocomplete="off"><span class="adm-sum" id="sum"></span></div>
+    <div id="cats"></div>
+  </main>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/services.js?v=67"></script>
+  <script src="js/render.js?v=67"></script>
+  <script>
+    (function () {
+      const S = NFC.svc, esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+      const norm = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+      const box = document.getElementById('cats'), sum = document.getElementById('sum');
+      function draw() {
+        box.innerHTML = S.all().map((c) => {
+          const n = c.items.filter(([id]) => S.on(c.id + ':' + id)).length;
+          return `<section class="adm-cat" data-cat="${c.id}"><div class="adm-h"><h2>${esc(c.n[0])} <span class="adm-n">${n} / ${c.items.length} activés</span></h2>
+            <div class="adm-act"><button type="button" data-all="${c.id}" data-v="1">Tout activer</button><button type="button" data-all="${c.id}" data-v="0">Tout désactiver</button></div></div>
+            <p class="adm-d">${esc(c.d[0])}</p>
+            <div class="adm-list">${c.items.map(([id, fr]) => { const k = c.id + ':' + id, on = S.on(k);
+              return `<label class="adm-i ${on ? '' : 'off'}" data-n="${esc(norm(fr))}"><span>${esc(fr)}</span><span class="adm-sw"><input type="checkbox" data-k="${k}" ${on ? 'checked' : ''} aria-label="${esc(fr)}"><b></b></span></label>`; }).join('')}</div></section>`;
+        }).join('');
+        const all = S.all().reduce((a, c) => a + c.items.length, 0);
+        sum.textContent = `${all - S.offList().length} services activés sur ${all}`;
+        filter();
+      }
+      function filter() {
+        const q = norm(document.getElementById('q').value).trim();
+        box.querySelectorAll('.adm-cat').forEach((c) => {
+          let any = false;
+          c.querySelectorAll('.adm-i').forEach((i) => { const ok = !q || i.dataset.n.includes(q); i.hidden = !ok; any = any || ok; });
+          c.hidden = !any;
+        });
+      }
+      const toast = (m) => { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1600); };
+      box.addEventListener('change', (e) => { const k = e.target.dataset.k; if (!k) return; S.set(k, e.target.checked); draw(); toast(e.target.checked ? 'Service activé' : 'Service désactivé'); });
+      box.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-all]'); if (!b) return;
+        const c = S.all().find((x) => x.id === b.dataset.all);
+        c.items.forEach(([id]) => S.set(c.id + ':' + id, b.dataset.v === '1'));
+        draw(); toast(b.dataset.v === '1' ? 'Catégorie activée' : 'Catégorie désactivée');
+      });
+      document.getElementById('q').addEventListener('input', filter);
+      draw();
+    })();
+  </script>
+</body>
+</html>
