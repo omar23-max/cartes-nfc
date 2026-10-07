@@ -1434,12 +1434,12 @@
   /* ---------- Étape 5 : publication ---------- */
   function step5() {
     return `<section class="wrap">
+      <div class="split s5">
+        <div class="side pub">
       ${back(4, 'Modifier ma carte')}
       ${head('Votre carte est prête', hasQR()
         ? 'Elle est reliée au lien et au QR code déjà imprimés sur votre carte NFC : scannez-les, votre nouvelle carte s’affiche.'
         : 'Voici le lien permanent de votre carte. C’est lui qui est programmé dans votre carte NFC et encodé dans votre QR code.')}
-      <div class="split">
-        <div class="side pub">
           <div class="box">
             <span class="box-l">${hasQR() ? 'Lien de votre carte · déjà imprimé' : `Lien permanent · modèle ${code()}`}</span>
             <div class="linkrow"><code>${esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
@@ -1474,7 +1474,7 @@
             <button class="b" data-act="json">${ic('download', 17)}Exporter la configuration</button>
           </div>
         </div>
-        <div class="pv-col">${phone()}</div>
+        <div class="pv-col stick">${phone()}</div>
       </div>
     </section>`;
   }

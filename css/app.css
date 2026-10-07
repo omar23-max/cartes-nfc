@@ -380,6 +380,12 @@ textarea.mini { resize: vertical; line-height: 1.45; }
   .split.s3 .pv-col { order: 1; }
   .split.s3 .side > p { order: 2; margin: 0; }
   .split.s3 .side > .b.lg { order: 3; }
+  /* Étape 5 : titre, puis aperçu, puis lien, QR code et commande */
+  .split.s5 { gap: 12px; }
+  .split.s5 .side { display: contents; }
+  .split.s5 .side > .back, .split.s5 .side > .sh { order: -2; }
+  .split.s5 .side > .back { justify-self: start; margin-bottom: 0; }
+  .split.s5 .pv-col { order: -1; margin-bottom: 8px; }
   .mtabs { display: flex; gap: 4px; margin-bottom: 16px; padding: 4px; border-radius: 12px; background: #e8e6e0; }
   .mtabs button { flex: 1; min-height: 38px; border: 0; border-radius: 9px; background: none; font-weight: 600; color: var(--mut); }
   .mtabs button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.1); }
@@ -737,4 +743,9 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 @media (min-width: 901px) {
   .phone.live { zoom: var(--pv-k, 1); }
   .phone.live .phone-screen, .split.s3 .phone.live .phone-screen { height: 760px; min-height: 0; }
+}
+/* Étape Publication, sur ordinateur : aperçu en haut, collé au contenu */
+@media (min-width: 901px) {
+  .split.s5 { grid-template-columns: minmax(0, 560px) auto; justify-content: center; gap: 64px; }
+  .split.s5 .side { max-width: none; }
 }
