@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=98">
+  <link rel="stylesheet" href="css/app.css?v=99">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -105,27 +105,28 @@
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=98"></script>
-  <script src="js/data.js?v=98"></script>
-  <script src="js/sectors.js?v=98"></script>
-  <script src="js/media.js?v=98"></script>
-  <script src="js/extras.js?v=98"></script>
-  <script src="js/locale-na.js?v=98"></script>
-  <script src="js/locale-na-en.js?v=98"></script>
-  <script src="js/google.js?v=98"></script>
-  <script src="js/profiles.js?v=98"></script>
-  <script src="js/profiles-sport.js?v=98"></script>
-  <script src="js/profiles-sante.js?v=98"></script>
-  <script src="js/profiles-archi.js?v=98"></script>
-  <script src="js/profiles-resto.js?v=98"></script>
-  <script src="js/profiles-auto.js?v=98"></script>
-  <script src="js/profiles-edu.js?v=98"></script>
-  <script src="js/jobs.js?v=98"></script>
-  <script src="js/render.js?v=98"></script>
+  <script src="js/services.js?v=99"></script>
+  <script src="js/data.js?v=99"></script>
+  <script src="js/sectors.js?v=99"></script>
+  <script src="js/media.js?v=99"></script>
+  <script src="js/extras.js?v=99"></script>
+  <script src="js/locale-na.js?v=99"></script>
+  <script src="js/locale-na-en.js?v=99"></script>
+  <script src="js/google.js?v=99"></script>
+  <script src="js/profiles.js?v=99"></script>
+  <script src="js/profiles-sport.js?v=99"></script>
+  <script src="js/profiles-sante.js?v=99"></script>
+  <script src="js/profiles-archi.js?v=99"></script>
+  <script src="js/profiles-resto.js?v=99"></script>
+  <script src="js/profiles-auto.js?v=99"></script>
+  <script src="js/profiles-edu.js?v=99"></script>
+  <script src="js/jobs.js?v=99"></script>
+  <script src="js/render.js?v=99"></script>
   <script>
   (function () {
     'use strict';
     const C = NFC.cfg, S = NFC.svc;
+    C.set('admTab', true); /* l’onglet Admin reste visible dans les studios de ce navigateur */
     document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs('admin', ''));
     const $ = (s) => document.querySelector(s);
     const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
