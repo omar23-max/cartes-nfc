@@ -926,14 +926,14 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     /* Options de partage désactivées par l’administrateur */
     const SK = { WhatsApp: 'wa', SMS: 'sms', Email: 'mail', 'QR code': 'qr', 'Copier le lien': 'copy', LinkedIn: 'linkedin', Facebook: 'facebook', Telegram: 'telegram', 'Plus…': 'native' };
     for (let j = opts.length - 1; j >= 0; j--) if (window.NFC && NFC.svc && !NFC.svc.on('share:' + SK[opts[j].l])) opts.splice(j, 1);
-    /* Avant le paiement : seul l’aperçu du QR code reste, le lien n’est pas partagé */
-    if (m.locked) for (let j = opts.length - 1; j >= 0; j--) if (opts[j].act !== 'qr') opts.splice(j, 1);
+    /* Avant le paiement : tous les choix restent visibles mais grisés ; un toucher affiche un message */
+    if (m.locked) opts.forEach((o) => { delete o.href; o.act = 'locked'; });
     const { ov, close } = overlay(from, 'ov-share');
     ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="shr" role="menu" aria-label="Partager cette carte">
       <div class="shr-h"><span>Partager cette carte</span><button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button></div>
-      <div class="shr-l">${opts.map((o) => o.href
+      <div class="shr-l${m.locked ? ' locked' : ''}">${opts.map((o) => o.href
         ? `<a class="shr-i" role="menuitem" href="${esc(o.href)}" target="_blank" rel="noopener"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></a>`
-        : `<button type="button" class="shr-i" role="menuitem" data-sh="${o.act}"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></button>`).join('')}${m.locked ? `<p class="shr-lock">${ic('lock', 15)}<span>${L2('Partage par WhatsApp, SMS, courriel ou lien disponible après le paiement de votre carte.', 'Sharing by WhatsApp, text, email or link available once your card is paid.')}</span></p>` : ''}</div>
+        : `<button type="button" class="shr-i" role="menuitem" data-sh="${o.act}"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></button>`).join('')}${m.locked ? `<p class="shr-lock" hidden>${ic('lock', 15)}<span>${L2('Le partage sera disponible dès le paiement de votre carte NFC. Votre lien et votre QR code vous seront alors envoyés par courriel.', 'Sharing will be available as soon as your NFC card is paid. Your link and QR code will then be emailed to you.')}</span></p>` : ''}</div>
       <div class="shr-qr" hidden><div class="shr-code${m.locked ? ' locked' : ''}" data-l="${L2('APERÇU', 'PREVIEW')}"></div><p>${m.locked ? L2('Aperçu : votre QR code sera actif après le paiement de votre carte.', 'Preview: your QR code will be active once your card is paid.') : L2('Faites scanner ce code avec l’appareil photo d’un téléphone.', 'Have someone scan this code with their phone camera.')}</p>${m.locked ? '' : `<code>${esc(u)}</code>`}<button type="button" class="shr-back" data-sh="back">${ic('arrowl', 16)}Retour</button></div>
     </div></div>`);
     const list = ov.querySelector('.shr-l'), qr = ov.querySelector('.shr-qr');
@@ -941,6 +941,11 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       const b = e.target.closest('[data-sh]');
       if (!b) { if (e.target.closest('a.shr-i')) setTimeout(close, 200); return; }
       const s = b.dataset.sh;
+      if (s === 'locked') {
+        const n = ov.querySelector('.shr-lock');
+        n.hidden = false; n.classList.remove('pop'); void n.offsetWidth; n.classList.add('pop');
+        return;
+      }
       if (s === 'qr') {
         list.hidden = true; qr.hidden = false;
         const box = qr.querySelector('.shr-code');

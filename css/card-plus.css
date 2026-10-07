@@ -416,3 +416,6 @@ button.map.map-static { width: 100%; border: 0; cursor: pointer; font: inherit; 
 .vc .shr-code.locked::after { content: attr(data-l); position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 20px; letter-spacing: .14em; color: #111; transform: rotate(-18deg); }
 .vc .shr-lock { grid-column: 1 / -1; display: flex; gap: 8px; align-items: flex-start; margin: 6px 0 0; padding: 10px 12px; border-radius: 10px; background: #f4f4f5; color: #52525b; font-size: 13px; line-height: 1.4; }
 .vc .shr-lock svg { flex: none; margin-top: 1px; }
+.vc .shr-l.locked .shr-i { opacity: .4; filter: grayscale(1); cursor: not-allowed; }
+.vc .shr-lock.pop { animation: shrPop .35s ease; }
+@keyframes shrPop { 0% { transform: scale(.96); background: #fde68a; } 100% { transform: none; } }
