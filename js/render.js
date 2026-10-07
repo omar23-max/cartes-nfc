@@ -926,13 +926,15 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     /* Options de partage désactivées par l’administrateur */
     const SK = { WhatsApp: 'wa', SMS: 'sms', Email: 'mail', 'QR code': 'qr', 'Copier le lien': 'copy', LinkedIn: 'linkedin', Facebook: 'facebook', Telegram: 'telegram', 'Plus…': 'native' };
     for (let j = opts.length - 1; j >= 0; j--) if (window.NFC && NFC.svc && !NFC.svc.on('share:' + SK[opts[j].l])) opts.splice(j, 1);
+    /* Avant le paiement : seul l’aperçu du QR code reste, le lien n’est pas partagé */
+    if (m.locked) for (let j = opts.length - 1; j >= 0; j--) if (opts[j].act !== 'qr') opts.splice(j, 1);
     const { ov, close } = overlay(from, 'ov-share');
     ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="shr" role="menu" aria-label="Partager cette carte">
       <div class="shr-h"><span>Partager cette carte</span><button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button></div>
       <div class="shr-l">${opts.map((o) => o.href
         ? `<a class="shr-i" role="menuitem" href="${esc(o.href)}" target="_blank" rel="noopener"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></a>`
-        : `<button type="button" class="shr-i" role="menuitem" data-sh="${o.act}"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></button>`).join('')}</div>
-      <div class="shr-qr" hidden><div class="shr-code"></div><p>Faites scanner ce code avec l’appareil photo d’un téléphone.</p><code>${esc(u)}</code><button type="button" class="shr-back" data-sh="back">${ic('arrowl', 16)}Retour</button></div>
+        : `<button type="button" class="shr-i" role="menuitem" data-sh="${o.act}"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></button>`).join('')}${m.locked ? `<p class="shr-lock">${ic('lock', 15)}<span>${L2('Partage par WhatsApp, SMS, courriel ou lien disponible après le paiement de votre carte.', 'Sharing by WhatsApp, text, email or link available once your card is paid.')}</span></p>` : ''}</div>
+      <div class="shr-qr" hidden><div class="shr-code${m.locked ? ' locked' : ''}" data-l="${L2('APERÇU', 'PREVIEW')}"></div><p>${m.locked ? L2('Aperçu : votre QR code sera actif après le paiement de votre carte.', 'Preview: your QR code will be active once your card is paid.') : L2('Faites scanner ce code avec l’appareil photo d’un téléphone.', 'Have someone scan this code with their phone camera.')}</p>${m.locked ? '' : `<code>${esc(u)}</code>`}<button type="button" class="shr-back" data-sh="back">${ic('arrowl', 16)}Retour</button></div>
     </div></div>`);
     const list = ov.querySelector('.shr-l'), qr = ov.querySelector('.shr-qr');
     ov.addEventListener('click', (e) => {

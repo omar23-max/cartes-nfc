@@ -411,3 +411,8 @@ button.map.map-static { width: 100%; border: 0; cursor: pointer; font: inherit; 
 .vc .myqr-c.locked { position: relative; overflow: hidden; margin-bottom: 18px; }
 .vc .myqr-c.locked svg { filter: blur(7px); opacity: .5; }
 .vc .myqr-c.locked::after { content: attr(data-l); position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 26px; letter-spacing: .14em; color: #111; transform: rotate(-18deg); }
+.vc .shr-code.locked { position: relative; overflow: hidden; }
+.vc .shr-code.locked > * { filter: blur(6px); opacity: .5; }
+.vc .shr-code.locked::after { content: attr(data-l); position: absolute; inset: 0; display: grid; place-items: center; font-weight: 800; font-size: 20px; letter-spacing: .14em; color: #111; transform: rotate(-18deg); }
+.vc .shr-lock { grid-column: 1 / -1; display: flex; gap: 8px; align-items: flex-start; margin: 6px 0 0; padding: 10px 12px; border-radius: 10px; background: #f4f4f5; color: #52525b; font-size: 13px; line-height: 1.4; }
+.vc .shr-lock svg { flex: none; margin-top: 1px; }
