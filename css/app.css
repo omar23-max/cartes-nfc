@@ -745,3 +745,4 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .split.s5 { grid-template-columns: minmax(0, 560px) auto; justify-content: center; gap: 64px; }
   .split.s5 .side { max-width: none; }
 }
+.lk-mask { letter-spacing: .15em; color: var(--mut); }

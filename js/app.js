@@ -1439,8 +1439,8 @@
         : 'Voici le lien permanent de votre carte. C’est lui qui est programmé dans votre carte NFC et encodé dans votre QR code.')}
           <div class="box">
             <span class="box-l">${hasQR() ? 'Lien de votre carte · déjà imprimé' : `Lien permanent · modèle ${code()}`}</span>
-            <div class="linkrow"><code>${esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
-            <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
+            <div class="linkrow"><code>${locked() ? esc(link().replace(/[^/]+$/, '')) + '<span class="lk-mask">••••••</span>' : esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
+            <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : locked() ? 'Votre lien complet vous sera envoyé par courriel après le paiement, avec votre QR code.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
           </div>
           <div class="box qrbox${locked() ? ' locked' : ''}">
             <div id="qr" class="qr"></div>
@@ -1727,7 +1727,7 @@
         if (locked()) break;
         if (navigator.clipboard) navigator.clipboard.writeText(link()).then(() => toast('Lien copié'));
         break;
-      case 'vcf': VC.downloadVCard(card(), link(), lang()); break;
+      case 'vcf': VC.downloadVCard(card(), locked() ? '' : link(), lang()); break; /* avant le paiement : fiche sans le lien de la carte */
       case 'json': exportJSON(); break;
       case 'full': openFull(); break;
       case 'reset':

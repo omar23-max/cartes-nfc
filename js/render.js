@@ -1096,7 +1096,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       if (a === 'vcard') {
         e.preventDefault();
         const m = getModel();
-        downloadVCard(m.card, m.link, m.lang);
+        downloadVCard(m.card, m.locked ? '' : m.link, m.lang); /* avant le paiement : fiche sans le lien de la carte */
         if (m.card.exchange !== false) setTimeout(() => openExchange(t, m), window.NFC_SANDBOX ? 0 : 450);
       } else if (a === 'share' || a === 'sharemenu') {
         e.preventDefault();
