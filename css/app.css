@@ -426,7 +426,7 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 .ed-grid #pv .vc .sec, .ed-grid #pv .vc .hd, .ed-grid #pv .vc .qa, .ed-grid #pv .vc .qa-list, .ed-grid #pv .vc .soc { cursor: pointer; transition: outline-color .15s; outline: 2px solid transparent; outline-offset: -2px; }
 .ed-grid #pv .vc .sec:hover, .ed-grid #pv .vc .hd:hover, .ed-grid #pv .vc .qa:hover, .ed-grid #pv .vc .qa-list:hover, .ed-grid #pv .vc .soc:hover { outline-color: rgba(47,85,212,.45); }
 #pv .vc .pv-sel { animation: pvSel 2.4s ease-out; }
-@keyframes pvSel { 0%, 55% { outline: 3px solid #2f55d4; outline-offset: -3px; } 100% { outline: 3px solid transparent; outline-offset: -3px; } }
+@keyframes pvSel { 0%, 60% { outline: 3px solid #2f55d4; outline-offset: -3px; background-color: rgba(47,85,212,.10); } 100% { outline: 3px solid transparent; outline-offset: -3px; background-color: transparent; } }
 @media (prefers-reduced-motion: reduce) { .grp.glow, #pv .vc .pv-sel { animation-duration: .01s; } }
 
 /* Éditeur à étiquettes (motifs, moments) */

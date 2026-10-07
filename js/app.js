@@ -1707,6 +1707,7 @@
     if (id === 'identity') return pv.querySelector('.hd');
     if (id === 'contact') return pv.querySelector('.qa, .qa-list');
     if (id === 'socials') return pv.querySelector('.soc-top') || pv.querySelector('.soc');
+    if (id === 'leads') return pv.querySelector('.ft');
     if (id.startsWith('b-')) return pv.querySelector(`[data-sec="${id.slice(2)}"]`);
     if (id.startsWith('c-')) {
       const i = (card().custom || []).findIndex((c, j) => (c.cid || String(j)) === id.slice(2));
@@ -1723,7 +1724,18 @@
     flash(gEl, 'glow');
     flash(previewOf(id), 'pv-sel');
   }
+  /* Travailler dans un panneau ouvert (champ, bouton) fait aussi suivre l’aperçu, une fois par panneau */
+  let followId = '';
+  const follow = (e) => {
+    const gEl = e.target.closest && e.target.closest('#ed .grp[data-grp]');
+    if (!gEl || !gEl.classList.contains('open') || gEl.dataset.grp === followId || e.target.closest('.grp-h')) return;
+    followId = gEl.dataset.grp;
+    showInPreview(followId);
+  };
+  document.addEventListener('focusin', follow);
+  document.addEventListener('pointerdown', follow);
   function showInPreview(id) {
+    followId = id;
     const el = previewOf(id), pv = $('#pv');
     if (!el || !pv) return;
     const top = el.getBoundingClientRect().top - pv.getBoundingClientRect().top + pv.scrollTop - 12;
