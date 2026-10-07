@@ -454,6 +454,10 @@
         const vs = (c.videos || []).filter((v) => v.url || v.src);
         if (vs.length) inner = `<div class="car car-v">${vs.map((v) => `<figure class="car-s">${mediaTile(v, m)}${v.cap ? `<figcaption>${esc(v.cap)}</figcaption>` : ''}</figure>`).join('')}</div>`;
       }
+      /* Dans le studio seulement : une section photos ou vidéos encore vide reste visible, pour savoir où elle est */
+      if (!inner && !m.thumb && document.getElementById('main') && ['gallery', 'imgcar', 'vidcar'].includes(c.type)) {
+        inner = `<div class="cg-empty">${ic(c.type === 'vidcar' ? 'play' : 'image', 22)}<span>${c.type === 'vidcar' ? L2('Ajoutez vos vidéos dans l’éditeur', 'Add your videos in the editor') : L2('Ajoutez vos photos dans l’éditeur', 'Add your photos in the editor')}</span><small>${L2('Visible seulement ici : cette section reste cachée sur votre carte tant qu’elle est vide.', 'Only visible here: this section stays hidden on your profile while empty.')}</small></div>`;
+      }
       if (!inner) return '';
       return wrap({ key: 'custom-' + i, type: 'custom-' + c.type, title: c.title || '' }, inner, ctx);
     }

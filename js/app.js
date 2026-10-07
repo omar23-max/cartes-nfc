@@ -1690,7 +1690,15 @@
         if (!item) break;
         if (cs.length >= plan().sections) { closeModal(); toast(`Votre forfait permet ${plan().sections} sections ajoutées. Passez au forfait supérieur pour en ajouter d’autres.`); break; }
         const m = mediaNow();
-        const pics = (m.gallery || []).map((x) => ({ src: x.src, cap: x.cap })).concat((m.cards || []).map((src) => ({ src, cap: '' })));
+        let pics = (m.gallery || []).map((x) => ({ src: x.src, cap: x.cap })).concat((m.cards || []).map((src) => ({ src, cap: '' })));
+        /* Secteur sans photos d’exemple : on reprend les photos déjà présentes sur la carte */
+        if (!pics.length) {
+          const seen = new Set(), c0 = card(), add = (src) => { if (src && typeof src === 'string' && !/^ph:/.test(src) && !seen.has(src)) { seen.add(src); pics.push({ src, cap: '' }); } };
+          add((c0.identity || {}).cover);
+          Object.values(c0.blocks || {}).forEach((b) => { (b.images || []).forEach((x) => add(x.src)); (b.items || []).forEach((x) => add(x.img)); });
+          (c0.custom || []).forEach((x) => (x.images || []).forEach((y) => add(y.src)));
+          pics = pics.slice(0, 6);
+        }
         const ns = Object.assign(item.make ? item.make(lang() === 'en', pics, card()) : newSection(t.dataset.t), { cid: rid(), on: true });
         cs.push(ns);
         openGroups.add('c-' + ns.cid);
