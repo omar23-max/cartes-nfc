@@ -696,3 +696,11 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 .ld-note.warn { background: #fff7ed; color: #9a3412; }
 .ld-note svg { flex: none; margin-top: 1px; }
 .ld-dim { opacity: .45; pointer-events: none; }
+
+/* PDF dans « Liens et documents » */
+.pdf-chip { display: flex; align-items: center; gap: 6px; min-width: 0; padding: 0 10px; height: 36px; border: 1px dashed var(--line); border-radius: 9px; font-size: 13px; color: var(--ink); background: #fbfaf7; }
+.pdf-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pdf-chip small { flex: none; color: var(--mut); }
+.pdf-chip svg { flex: none; color: #b91c1c; }
+.pdf-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.pdf-add { cursor: pointer; }

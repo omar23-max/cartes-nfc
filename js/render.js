@@ -597,9 +597,13 @@
       return `${tags.length ? `<div class="tags">${tags.map((t) => `<span class="tag">${ic(def.icon || 'check', 15)}${esc(t)}</span>`).join('')}</div>` : ''}${b.text ? `<p class="tag-t">${nl(b.text)}</p>` : ''}`;
     },
     links(def, b) {
-      const items = (b.items || []).filter((x) => x.label && x.url);
+      /* Lien, ou PDF téléversé (ouvert ou téléchargé d’un toucher) */
+      const items = (b.items || []).filter((x) => x.label && (x.url || (x.file && vsrc(x.file))));
       if (!items.length) return '';
-      return `<div class="links">${items.map((x) => `<a class="lk" href="${esc(url(x.url))}" target="_blank" rel="noopener"><span class="lk-ic">${ic('file', 18)}</span><span class="lk-l">${esc(x.label)}</span>${ic('arrowur', 16)}</a>`).join('')}</div>`;
+      const size = (n) => (n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + ' Ko' : (n / 1024 / 1024).toFixed(1).replace('.', LG === 'en' ? '.' : ',') + ' Mo');
+      return `<div class="links">${items.map((x) => (x.file
+        ? `<a class="lk lk-pdf" href="${esc(vsrc(x.file))}" target="_blank" rel="noopener" download="${esc(x.name || x.label + '.pdf')}"><span class="lk-ic">${ic('file', 18)}</span><span class="lk-l">${esc(x.label)}<small>PDF${x.size ? ' · ' + size(x.size) : ''}</small></span>${ic('download', 16)}</a>`
+        : `<a class="lk" href="${esc(url(x.url))}" target="_blank" rel="noopener"><span class="lk-ic">${ic('file', 18)}</span><span class="lk-l">${esc(x.label)}</span>${ic('arrowur', 16)}</a>`)).join('')}</div>`;
     },
     /* Produits : photo, nom, prix et bouton Commander (SMS ou email pré-rédigé) ; lien vers la boutique complète */
     products(def, b, m) {

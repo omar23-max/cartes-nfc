@@ -12,7 +12,7 @@
   const svcOn = (id) => !NFC.svc || NFC.svc.on(id);
   /* Réglages de l’administrateur (js/services.js, NFC.cfg) et forfait du client */
   const cfg = (p, d) => (NFC.cfg ? NFC.cfg.get(p, d) : d);
-  const plan = () => (NFC.cfg ? NFC.cfg.plan() : { sections: 99, photos: 99, products: 999, bili: true, video: true, shop: true, online: true, ai: true });
+  const plan = () => Object.assign({ docs: 5, size: 10 }, NFC.cfg ? NFC.cfg.plan() : { sections: 99, photos: 99, products: 999, bili: true, video: true, shop: true, online: true, ai: true });
   const isStores = !!X.key && X.key !== 'nfc-studio-v6';
   /* Secteurs (ou types de boutique) : masqués, « Bientôt », ordre */
   const ADM = () => !!(NFC.isAdmin && NFC.isAdmin());
@@ -1230,8 +1230,15 @@
           ${inp('Lien vers votre boutique complète (facultatif)', base + '.shopUrl', { ph: 'https://…', hint: 'Ajoute un bouton « Voir toute la boutique » sous les produits.' })}
           ${area('Texte d’accompagnement', base + '.text', { rows: 2 })}`;
       }
-      case 'links':
-        return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f two">${mini(`${base}.items.${i}.label`, 'Intitulé', 'strong')}${mini(`${base}.items.${i}.url`, 'Lien https://…')}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'link', 'Ajouter un lien')}`;
+      case 'links': {
+        /* Lien collé, ou PDF téléversé (gardé dans le navigateur sur le site test, sur le serveur avec GoBiz) */
+        const items = b.items || [], nPdf = items.filter((x) => x.file).length, P = plan();
+        return `<div class="items">${items.map((x, i) => `<div class="it"><div class="it-f two">${mini(`${base}.items.${i}.label`, 'Intitulé', 'strong')}${x.file
+          ? `<span class="pdf-chip">${ic('file', 15)}<span>${esc(x.name || 'document.pdf')}</span><small>PDF · ${fmtSize(x.size)}</small></span>`
+          : mini(`${base}.items.${i}.url`, 'Lien https://…')}</div>${del(base + '.items', i)}</div>`).join('')}</div>
+          <div class="btns pdf-btns">${add(base + '.items', 'link', 'Ajouter un lien')}<label class="add pdf-add">${ic('upload', 16)}Ajouter un PDF<input type="file" accept="application/pdf,.pdf" hidden data-pdf="${base}.items"></label></div>
+          <p class="f-h">PDF de ${P.size} Mo maximum · ${nPdf} / ${P.docs} document${P.docs > 1 ? 's' : ''} téléversé${P.docs > 1 ? 's' : ''} avec votre forfait. Le visiteur l’ouvre ou le télécharge d’un toucher.</p>`;
+      }
       case 'video':
         return `${b.src && VC.vsrc(b.src) ? `<div class="demo-vid"><video src="${esc(VC.vsrc(b.src))}" muted playsinline preload="metadata"></video><div><b>${/^idb:/.test(b.src) ? 'Vidéo téléversée' : 'Vidéo d’exemple'}</b><span>${b.url ? 'Votre lien ci-dessous est prioritaire.' : 'Téléversez la vôtre ou collez un lien.'}</span></div></div>` : ''}
           ${vidSource(base, b.src, '')}
@@ -1781,6 +1788,35 @@
   document.addEventListener('change', (e) => { if (e.target.dataset && e.target.dataset.rechange && $('#ed') && $('#ed').contains(e.target)) structChanged(); });
 
   /* Téléversement de vidéos (couverture, bloc vidéo, carrousel) */
+  /* Taille lisible d’un fichier */
+  function fmtSize(n) {
+    n = +n || 0;
+    if (n < 1024 * 1024) return Math.max(1, Math.round(n / 1024)) + ' Ko';
+    return (n / 1024 / 1024).toFixed(1).replace('.', ui() === 'en' ? '.' : ',') + ' Mo';
+  }
+  /* PDF téléversé dans « Liens et documents » */
+  document.addEventListener('change', async (e) => {
+    const t = e.target;
+    if (t.type !== 'file' || !t.dataset.pdf) return;
+    const f = t.files[0];
+    t.value = '';
+    if (!f) return;
+    const P = plan(), arr = g(t.dataset.pdf) || [];
+    if (!(f.type === 'application/pdf' || /\.pdf$/i.test(f.name))) { toast('Choisissez un fichier PDF.'); return; }
+    if (f.size > P.size * 1024 * 1024) { toast(`PDF trop lourd : ${P.size} Mo maximum avec votre forfait.`); return; }
+    if (arr.filter((x) => x.file).length >= P.docs) { toast(`Votre forfait permet ${P.docs} document${P.docs > 1 ? 's' : ''} PDF. Passez au forfait supérieur pour en ajouter d’autres.`); return; }
+    try {
+      toast('Téléversement du PDF…');
+      const ref = await VC.idb.put('p' + Date.now().toString(36) + rid(), f);
+      arr.push({ label: f.name.replace(/\.pdf$/i, '').replace(/[_-]+/g, ' ').trim(), url: '', file: ref, name: f.name, size: f.size });
+      setP(card(), t.dataset.pdf, arr);
+      structChanged();
+      toast('PDF ajouté. Vous pouvez modifier son intitulé.');
+    } catch (err) {
+      toast('Le PDF n’a pas pu être enregistré dans ce navigateur.');
+    }
+  });
+
   document.addEventListener('change', async (e) => {
     const t = e.target;
     if (t.type !== 'file' || !t.dataset.vid) return;

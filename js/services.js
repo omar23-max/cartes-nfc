@@ -53,7 +53,7 @@ window.NFC = window.NFC || {};
 (function () {
   'use strict';
   const KEY = 'nextap-admin-config';
-  const plan = (sections, photos, products, o) => Object.assign({ sections, photos, products, bili: true, video: true, shop: true, online: true, ai: true, domain: false, size: 10 }, o || {});
+  const plan = (sections, photos, products, o) => Object.assign({ sections, photos, products, docs: 5, bili: true, video: true, shop: true, online: true, ai: true, domain: false, size: 10 }, o || {});
   const DEF = {
     sectors: { off: [], soon: [], order: [] },
     profOff: [],
@@ -61,9 +61,9 @@ window.NFC = window.NFC || {};
     catOff: [],
     jobs: [],
     plans: {
-      gratuit: plan(2, 4, 5, { bili: false, video: false, online: false, ai: false, size: 5 }),
+      gratuit: plan(2, 4, 5, { docs: 1, bili: false, video: false, online: false, ai: false, size: 5 }),
       pro: plan(6, 12, 30, { ai: false }),
-      premium: plan(20, 40, 200, { domain: true, size: 25 }),
+      premium: plan(20, 40, 200, { docs: 20, domain: true, size: 25 }),
     },
     planSim: 'premium',
     brand: { studio: '', stores: '', footCards: '', footStores: '', hideFoot: [], linkBase: '' },
