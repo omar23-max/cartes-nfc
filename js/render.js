@@ -641,8 +641,69 @@
     const own = cfg(store ? 'brand.footStores' : 'brand.footCards', '');
     const hide = cfg('brand.hideFoot', []).includes(cfg('planSim', 'premium'));
     const pol = cfg('privacy.policyUrl', '');
-    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div>${homeOn(m) ? `<a class="btn ghost ft-home" href="#" data-vc="a2hs">${ic('phone', 17)}<span>${L2('Ajouter à l’écran d’accueil', 'Add to home screen')}</span></a>` : ''}${hide ? '' : `<p class="brand">${ic('nfc', 13)} ${own ? esc(own) : window.VC.brand ? L2(...window.VC.brand) : 'Carte de visite NFC'}</p>`}${pol ? `<p class="brand"><a href="${esc(url(pol))}" target="_blank" rel="noopener">${L2('Politique de confidentialité', 'Privacy policy')}</a></p>` : ''}</footer>`;
+    return `<footer class="ft">${socials(m, 'soc-ft')}<div class="ft-btns"><a class="btn ghost" href="#" data-vc="vcard">${ic('userplus', 18)}<span>Enregistrer</span></a><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>Partager</span></a></div>${qrBtnOn(m) ? `<a class="btn ghost ft-home" href="#" data-vc="myqr">${ic('qr', 17)}<span>${L2('Mon QR code', 'My QR code')}</span></a>` : ''}${homeOn(m) ? `<a class="btn ghost ft-home" href="#" data-vc="a2hs">${ic('phone', 17)}<span>${L2('Ajouter à l’écran d’accueil', 'Add to home screen')}</span></a>` : ''}${hide ? '' : `<p class="brand">${ic('nfc', 13)} ${own ? esc(own) : window.VC.brand ? L2(...window.VC.brand) : 'Carte de visite NFC'}</p>`}${pol ? `<p class="brand"><a href="${esc(url(pol))}" target="_blank" rel="noopener">${L2('Politique de confidentialité', 'Privacy policy')}</a></p>` : ''}</footer>`;
   }
+  /* ---------- QR code de la carte ----------
+     Matrice calculée par qrcode.js ; fichiers PNG (haute définition) et SVG (vectoriel, pour l’imprimeur). */
+  function qrMatrix(text) {
+    if (!window.QRCode) return null;
+    const box = document.createElement('div');
+    const q = new window.QRCode(box, { text, width: 64, height: 64, correctLevel: window.QRCode.CorrectLevel.M });
+    const m = q._oQRCode;
+    if (!m) return null;
+    const n = m.getModuleCount(), rows = [];
+    for (let r = 0; r < n; r++) { const row = []; for (let c = 0; c < n; c++) row.push(m.isDark(r, c)); rows.push(row); }
+    return rows;
+  }
+  function qrSvg(text, color = '#111114') {
+    const M = qrMatrix(text);
+    if (!M) return '';
+    const n = M.length, q = 4, size = n + q * 2;
+    let d = '';
+    M.forEach((row, r) => row.forEach((on, c) => { if (on) d += `M${c + q} ${r + q}h1v1h-1z`; }));
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="1024" height="1024" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="#ffffff"/><path fill="${color}" d="${d}"/></svg>`;
+  }
+  function qrPng(text, px = 1200, color = '#111114') {
+    const M = qrMatrix(text);
+    if (!M) return '';
+    const n = M.length, q = 4, cell = Math.floor(px / (n + q * 2)), size = cell * (n + q * 2);
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const x = cv.getContext('2d');
+    x.fillStyle = '#ffffff'; x.fillRect(0, 0, size, size);
+    x.fillStyle = color;
+    M.forEach((row, r) => row.forEach((on, c) => { if (on) x.fillRect((c + q) * cell, (r + q) * cell, cell, cell); }));
+    return cv.toDataURL('image/png');
+  }
+  function saveFile(href, name) {
+    if (window.NFC_SANDBOX) return false;
+    const a = document.createElement('a');
+    a.href = href; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(() => { if (/^blob:/.test(href)) URL.revokeObjectURL(href); a.remove(); }, 500);
+    return true;
+  }
+  /* Télécharge le QR code d’un lien : 'png' ou 'svg' */
+  function qrDownload(text, fmt, base) {
+    const name = (String(base || 'qr-code').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'qr-code') + '-qr.' + fmt;
+    if (fmt === 'svg') { const s = qrSvg(text); return s ? saveFile(URL.createObjectURL(new Blob([s], { type: 'image/svg+xml' })), name) : false; }
+    const p = qrPng(text);
+    return p ? saveFile(p, name) : false;
+  }
+  /* Bouton « Mon QR code » : le titulaire le fait scanner sur son écran */
+  const qrBtnOn = (m) => m.card.qrBtn !== false && (!(window.NFC && NFC.svc) || NFC.svc.on('share:qrbtn'));
+  function openMyQr(from, m) {
+    const u = m.link || location.href, svg = qrSvg(u, '#111114');
+    const { ov } = overlay(from, 'ov-xch');
+    ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="xch myqr">
+      <button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>
+      <h3>${esc(ownerName(m.card))}</h3>
+      <p>${L2('Faites scanner ce code avec l’appareil photo d’un téléphone.', 'Have someone scan this code with their phone camera.')}</p>
+      <div class="myqr-c">${svg || `<p>${L2('QR code indisponible hors ligne', 'QR code unavailable offline')}</p>`}</div>
+      <code>${esc(u)}</code>
+      <div><button type="button" class="btn ov-x">${L2('Fermer', 'Close')}</button></div></div></div>`);
+  }
+
   /* « Ajouter à l’écran d’accueil » : choix du titulaire, service autorisé par l’administrateur */
   const svcOk = (id) => !(window.NFC && NFC.svc) || NFC.svc.on(id);
   const homeOn = (m) => m.card.homeScreen !== false && svcOk('crm:home');
@@ -661,7 +722,7 @@
       <h3>${L2('Ajouter à l’écran d’accueil', 'Add to home screen')}</h3>
       <p>${L2(`La carte de ${esc(ownerName(m.card))} devient une icône sur votre téléphone, comme une application.`, `${esc(ownerName(m.card))}’s profile becomes an icon on your phone, like an app.`)}</p>
       <ol class="a2-l">${steps.map((s) => `<li>${s}</li>`).join('')}</ol>
-      <button type="button" class="btn ov-x">${L2('J’ai compris', 'Got it')}</button></div></div>`);
+      <div><button type="button" class="btn ov-x">${L2('J’ai compris', 'Got it')}</button></div></div></div>`);
   }
   /* Icône et nom de la carte quand elle est ajoutée à l’écran d’accueil (pages publiques) */
   function homeMeta(m) {
@@ -996,6 +1057,7 @@
         if (v) v.play().catch(() => {});
       } else if (a === 'lb') openLB(t);
       else if (a === 'a2hs') { e.preventDefault(); openA2hs(t, getModel()); }
+      else if (a === 'myqr') { e.preventDefault(); openMyQr(t, getModel()); }
       else if (a === 'mapload') { e.preventDefault(); const d = document.createElement('div'); d.className = 'map'; d.innerHTML = `<iframe src="https://maps.google.com/maps?q=${t.dataset.q}&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map"></iframe>`; t.replaceWith(d); }
       else if (window.VC.onAct && window.VC.onAct(a, t, e, getModel())) { /* action d’un module (ex. panier) */ }
       else if (a === 'more') { const s = t.closest('.sec'); s.classList.toggle('open'); t.textContent = tx(s.classList.contains('open') ? 'Réduire' : 'Lire la suite'); }
@@ -1010,5 +1072,5 @@
     });
   }
 
-  window.VC = { S, gLinked, homeMeta, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
+  window.VC = { S, gLinked, homeMeta, qrDownload, qrSvg, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
 })();

@@ -704,3 +704,6 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 .pdf-chip svg { flex: none; color: #b91c1c; }
 .pdf-btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .pdf-add { cursor: pointer; }
+
+.qr-dl { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.ld-fix .qr-dl { margin-top: 0; }

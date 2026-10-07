@@ -10,6 +10,8 @@ window.NFC_EN_APP = {
   'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.': 'Pick the industry closest to your business. Your job title, texts and sections stay fully customizable afterwards.',
   'Je ne trouve pas mon secteur': 'I can’t find my industry', 'Répondez à une question, nous vous orientons vers le bon modèle.': 'Answer one question and we’ll point you to the right template.',
   'Bientôt': 'Coming soon',
+  'Bouton « Mon QR code » sur la carte': '“My QR code” button on the profile', 'Un toucher affiche votre QR code en grand, à faire scanner par la personne en face de vous.': 'One tap shows your QR code full size, for the person in front of you to scan.',
+  'Votre QR code': 'Your QR code', 'Pour vos cartes, flyers, vitrine ou signature courriel.': 'For your cards, flyers, storefront or email signature.',
   'Ajouter un PDF': 'Add a PDF', 'Choisissez un fichier PDF.': 'Choose a PDF file.', 'Téléversement du PDF…': 'Uploading the PDF…', 'PDF ajouté. Vous pouvez modifier son intitulé.': 'PDF added. You can edit its title.', 'Le PDF n’a pas pu être enregistré dans ce navigateur.': 'The PDF could not be saved in this browser.',
   'Réception de vos contacts': 'Receiving your contacts', 'Comment recevoir les coordonnées des personnes rencontrées': 'How to receive the details of people you meet',
   'Échange de contacts': 'Contact exchange', 'Ce que reçoit la personne rencontrée, et comment vous recevez ses coordonnées': 'What the person you meet receives, and how you receive their details',

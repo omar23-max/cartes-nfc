@@ -322,6 +322,8 @@
         <div class="ld-o ld-fix"><span class="ld-ic">${ic('userplus', 18)}</span><span><b>Vos coordonnées dans ses contacts</b><small>« Enregistrer le contact » ajoute votre nom, téléphone, courriel et adresse à son téléphone, avec un lien cliquable vers votre carte digitale.</small></span><span class="ld-on">Toujours</span></div>
         ${sendWays ? `<div class="ld-o ld-fix"><span class="ld-ic">${ic('send', 18)}</span><span><b>Votre carte envoyée par ${sendWays}</b><small>Dès qu’elle vous laisse ses coordonnées, elle reçoit automatiquement le lien de votre carte et votre photo, pour la retrouver facilement.</small></span><span class="ld-on">Toujours</span></div>
         ${area('Petit mot ajouté à l’envoi (facultatif)', 'leads.thanks', { rows: 2, ph: 'Merci pour notre rencontre ! Voici ma carte, n’hésitez pas à me contacter.' })}` : ''}
+        ${svcOn('share:qrbtn') || c.qrBtn === true ? `<div class="ld-o"><label class="ck"><input type="checkbox" data-path="qrBtn" ${c.qrBtn !== false ? 'checked' : ''}><span><b>Bouton « Mon QR code » sur la carte</b><small>Un toucher affiche votre QR code en grand, à faire scanner par la personne en face de vous.</small></span></label></div>` : ''}
+        <div class="ld-o ld-fix"><span class="ld-ic">${ic('qr', 18)}</span><span><b>Votre QR code</b><small>Pour vos cartes, flyers, vitrine ou signature courriel.</small></span><span class="qr-dl">${qrDl()}</span></div>
         ${svcOn('crm:home') || c.homeScreen === true ? `<div class="ld-o"><label class="ck"><input type="checkbox" data-path="homeScreen" ${c.homeScreen !== false ? 'checked' : ''}><span><b>Proposer « Ajouter à l’écran d’accueil »</b><small>Votre carte devient une icône sur son téléphone, comme une application.</small></span></label></div>` : ''}
       </div>
       <p class="f-l ld-t">Ce que vous recevez</p>
@@ -340,6 +342,9 @@
       </div>
       <p class="f-h">Vous recevez les contacts dès que votre carte est en ligne ; vous pouvez changer ces choix à tout moment.</p>`;
   }
+
+  /* Boutons de téléchargement du QR code de la carte */
+  const qrDl = () => `<button type="button" class="b xs" data-act="qrdl" data-v="png">${ic('download', 14)}PNG</button><button type="button" class="b xs" data-act="qrdl" data-v="svg">${ic('download', 14)}SVG</button>`;
 
   /* ---------- Mode administrateur dans le studio ----------
      Boutons « Désactiver / Activer » et « Supprimer » sur les secteurs, métiers, modèles et palettes,
@@ -1367,7 +1372,7 @@
           </div>
           <div class="box qrbox">
             <div id="qr" class="qr"></div>
-            <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p></div>
+            <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
           </div>
           <div class="box">
             <span class="box-l">Recevoir le lien et le QR code par email</span>
@@ -1483,6 +1488,11 @@
       case 'modal-close': closeModal(); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
+      case 'qrdl': {
+        const ok = VC.qrDownload(link(), t.dataset.v, ((card() || {}).identity || {}).name);
+        toast(ok ? `QR code téléchargé (${t.dataset.v.toUpperCase()}).` : window.NFC_SANDBOX ? 'Téléchargement bloqué dans cet aperçu : ouvrez le site test pour télécharger.' : 'QR code indisponible hors ligne.');
+        break;
+      }
       case 'leadconnect': toast(`La connexion à ${t.dataset.v} se fera depuis votre espace NexTap, une fois votre carte en ligne.`); break;
       case 'palette': {
         S.palette = +t.dataset.i; save();
