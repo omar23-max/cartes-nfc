@@ -630,7 +630,6 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 /* Étape Couleurs, sur ordinateur : l’aperçu se place juste à côté des palettes et tient en entier dans l’écran */
 @media (min-width: 901px) {
   .split.s3 { grid-template-columns: minmax(0, 690px) auto; justify-content: center; gap: 64px; }
-  .split.s3 .phone.live .phone-screen { height: min(760px, calc(100vh - 210px)); }
 }
 
 /* Recherche du secteur / du métier (étape 1) */
@@ -734,3 +733,8 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .qr-lock-n { display: flex; gap: 6px; align-items: flex-start; font-size: 12.5px; color: var(--mut); }
 .qr-lock-n svg { flex: none; margin-top: 1px; }
+/* Ordinateur : proportions de téléphone conservées, l’ensemble est réduit selon la hauteur de l’écran (--pv-k, calculé dans app.js) */
+@media (min-width: 901px) {
+  .phone.live { zoom: var(--pv-k, 1); }
+  .phone.live .phone-screen, .split.s3 .phone.live .phone-screen { height: 760px; min-height: 0; }
+}

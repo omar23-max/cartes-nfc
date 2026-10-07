@@ -537,6 +537,9 @@
     document.body.classList.toggle('pv-full', full);
     const bar = $('.mbar');
     if (bar) document.body.style.setProperty('--mbar-h', bar.getBoundingClientRect().height + 'px');
+    /* Ordinateur : le téléphone d’aperçu garde ses proportions et rétrécit en entier si l’écran est peu haut */
+    const k = Math.max(0.6, Math.min(1, (window.innerHeight - (S.step === 3 ? 210 : 170)) / 760));
+    document.body.style.setProperty('--pv-k', k.toFixed(3));
   }
   window.addEventListener('resize', () => { clearTimeout(fitPreview.t); fitPreview.t = setTimeout(fitPreview, 150); });
   const icons = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.8 } }); };
