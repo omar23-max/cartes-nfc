@@ -317,7 +317,7 @@
     const tools = LEAD_CRM.filter(([k]) => svcOn('crm:' + k) || L.crmTool === k);
     const connect = (what) => `<button type="button" class="b sm" data-act="leadconnect" data-v="${what}">${ic('link', 15)}Connecter ${what}</button>`;
     const sendWays = [svcOn('crm:sendmail') ? 'courriel' : '', svcOn('crm:sendsms') ? 'texto' : ''].filter(Boolean).join(' et ');
-    return `<p class="f-l ld-t ld-t0">Ce que reçoit la personne rencontrée</p>
+    return `<div class="ld-sec ld-sec-a ld-t0"><span class="ld-sec-ic">${ic('send', 20)}</span><div><b>Ce que reçoit la personne rencontrée</b><small>Quand elle touche ou scanne votre carte.</small></div></div>
       <div class="ld">
         <div class="ld-o ld-fix"><span class="ld-ic">${ic('userplus', 18)}</span><span><b>Vos coordonnées dans ses contacts</b><small>« Enregistrer le contact » ajoute votre nom, téléphone, courriel et adresse à son téléphone, avec un lien cliquable vers votre carte digitale.</small></span><span class="ld-on">Toujours</span></div>
         ${sendWays ? `<div class="ld-o ld-fix"><span class="ld-ic">${ic('send', 18)}</span><span><b>Votre carte envoyée par ${sendWays}</b><small>Dès qu’elle vous laisse ses coordonnées, elle reçoit automatiquement le lien de votre carte et votre photo, pour la retrouver facilement.</small></span><span class="ld-on">Toujours</span></div>
@@ -326,7 +326,7 @@
         <div class="ld-o ld-fix"><span class="ld-ic">${ic('qr', 18)}</span><span><b>Votre QR code</b><small>Pour vos cartes, flyers, vitrine ou signature courriel.</small></span><span class="qr-dl">${qrDl()}</span></div>
         ${svcOn('crm:home') || c.homeScreen === true ? `<div class="ld-o"><label class="ck"><input type="checkbox" data-path="homeScreen" ${c.homeScreen !== false ? 'checked' : ''}><span><b>Proposer « Ajouter à l’écran d’accueil »</b><small>Votre carte devient une icône sur son téléphone, comme une application.</small></span></label></div>` : ''}
       </div>
-      <p class="f-l ld-t">Ce que vous recevez</p>
+      <div class="ld-sec ld-sec-b"><span class="ld-sec-ic">${ic('userplus', 20)}</span><div><b>Ce que vous recevez</b><small>Les coordonnées qu’elle vous laisse, et où vous les retrouvez.</small></div></div>
       <label class="ck ld-ex"><input type="checkbox" data-path="exchange" data-struct="re" ${c.exchange !== false ? 'checked' : ''}><span><b>Proposer l’échange de coordonnées</b><small>Après « Enregistrer le contact », la personne rencontrée peut vous laisser les siennes (ou scanner sa carte papier).</small></span></label>
       ${exOff ? (hasForms ? `<p class="ld-note">${ic('check', 15)}<span>Échange désactivé : vous recevrez seulement les demandes de vos formulaires, rendez-vous et commandes.</span></p>` : `<p class="ld-note warn">${ic('shield', 15)}<span><b>Attention :</b> aucun visiteur ne pourra vous laisser ses coordonnées. Réactivez l’échange ou ajoutez un formulaire de demande.</span></p>`) : ''}
       <p class="f-l ld-t">Comment voulez-vous recevoir ces coordonnées ?</p>

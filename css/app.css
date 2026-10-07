@@ -746,3 +746,11 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .split.s5 .side { max-width: none; }
 }
 .lk-mask { letter-spacing: .15em; color: var(--mut); }
+/* Échange de contacts : deux grandes parties bien visibles */
+.ld-sec { display: flex; align-items: center; gap: 12px; margin: 22px 0 12px; padding: 12px 14px; border-radius: 12px; border-left: 4px solid var(--ld-c); background: var(--ld-bg); }
+.ld-sec.ld-t0 { margin-top: 2px; }
+.ld-sec-a { --ld-c: #2563eb; --ld-bg: #eef4ff; }
+.ld-sec-b { --ld-c: #16a34a; --ld-bg: #edf8f0; }
+.ld-sec-ic { flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; background: var(--ld-c); color: #fff; }
+.ld-sec b { display: block; font-size: 15.5px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+.ld-sec small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--mut); }
