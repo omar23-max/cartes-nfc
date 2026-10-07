@@ -754,3 +754,17 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .ld-sec-ic { flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; background: var(--ld-c); color: #fff; }
 .ld-sec b { display: block; font-size: 15.5px; font-weight: 700; color: var(--ink); line-height: 1.25; }
 .ld-sec small { display: block; margin-top: 2px; font-size: 12.5px; color: var(--mut); }
+/* Onglets des produits NexTap (haut de page) */
+.ptabs { display: flex; justify-content: center; gap: 4px; padding: 6px 12px 0; background: #18181b; overflow-x: auto; scrollbar-width: none; }
+.ptabs::-webkit-scrollbar { display: none; }
+.ptabs a { flex: none; padding: 8px 16px 9px; border-radius: 10px 10px 0 0; color: #d4d4d8; font-size: 13.5px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.ptabs a:hover { color: #fff; background: rgba(255,255,255,.08); }
+.ptabs a.on { background: var(--bg, #f4f3ef); color: #111114; }
+.ptabs a.adm:not(.on) { color: #fbbf24; }
+.ptabs .pt-s { display: none; }
+@media (max-width: 640px) {
+  .ptabs { justify-content: flex-start; padding: 6px 10px 0; }
+  .ptabs a { padding: 7px 14px 8px; font-size: 13px; }
+  .ptabs .pt-l { display: none; }
+  .ptabs .pt-s { display: inline; }
+}

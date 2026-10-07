@@ -131,4 +131,12 @@ window.NFC = window.NFC || {};
     if (q === '1' || q === '0') NFC.cfg.set('adminMode', q === '1', q === '1' ? 'Mode administrateur activé' : 'Mode administrateur désactivé');
   } catch (e) { /* rien */ }
   NFC.isAdmin = () => !!(NFC.cfg && NFC.cfg.get('adminMode', false));
+  /* Onglets des produits NexTap en haut de page : cartes | boutiques (| admin, pour l’administrateur seulement).
+     Libellés courts sur téléphone : Cartes / Boutiques / Admin. */
+  NFC.prodTabs = (cur, root) => {
+    const g = (p, d) => NFC.cfg.get(p, '') || d;
+    const T = [['cards', root || './', g('brand.studio', 'NexTap Studio'), 'Cartes'], ['stores', (root || '') + 'stores/', g('brand.stores', 'NexTap Studio – Stores'), 'Boutiques']];
+    if (cur === 'admin' || NFC.isAdmin()) T.push(['admin', (root || '') + 'admin.html', 'Admin NexTap Studio', 'Admin']);
+    return `<nav class="ptabs" aria-label="Produits NexTap">${T.map(([k, h, l, s]) => `<a href="${h}" class="${k === cur ? 'on' : ''}${k === 'admin' ? ' adm' : ''}" ${k === cur ? 'aria-current="page"' : ''} data-ptab="${k}"><span class="pt-l">${l}</span><span class="pt-s">${s}</span></a>`).join('')}</nav>`;
+  };
 })();

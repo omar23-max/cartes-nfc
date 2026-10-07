@@ -32,6 +32,8 @@
 
   const fresh = () => ({ v: 1, step: 1, sectorId: null, design: null, palette: 0, cards: {}, id: rid() });
   let S = load();
+  /* Langue transmise par les onglets du haut (?ui=en) */
+  try { const qu = new URLSearchParams(location.search).get('ui'); if (qu === 'en' || qu === 'fr') S.ui = qu; } catch (e) { /* rien */ }
   /* Tous les panneaux de l’étape Contenu arrivent fermés : le client ouvre celui qu’il veut modifier */
   const openGroups = new Set();
   let mobileTab = 'edit';
@@ -518,6 +520,12 @@
     const bn = $('.brand-n'), bt = cfg(isStores ? 'brand.stores' : 'brand.studio', '');
     if (bn && bt) { bn.textContent = bt; document.title = bt; }
     fitPreview();
+    if (!document.querySelector('.ptabs') && NFC.prodTabs) {
+      document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs(isStores ? 'stores' : 'cards', isStores ? '../' : ''));
+      document.querySelector('.ptabs').addEventListener('click', (e) => { const a = e.target.closest('a[data-ptab]'); if (a && a.dataset.ptab !== 'admin') a.href = a.getAttribute('href').split('?')[0] + '?ui=' + ui(); });
+    }
+    const ptl = document.querySelectorAll('.ptabs .pt-s');
+    ptl.forEach((x) => { x.textContent = { cards: ui() === 'en' ? 'Cards' : 'Cartes', stores: ui() === 'en' ? 'Stores' : 'Boutiques', admin: 'Admin' }[x.parentNode.dataset.ptab]; });
   }
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
   function reword(root) {
