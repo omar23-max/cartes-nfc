@@ -690,6 +690,64 @@
     const p = qrPng(text);
     return p ? saveFile(p, name) : false;
   }
+  /* ---------- Affiche à imprimer (comptoir, vitrine) ----------
+     o = { url, name, sub, line, fmt: 'a6'|'a5'|'letter', p (couleur principale), a (accent) } */
+  const POSTER = { a6: [105, 148, 'A6'], a5: [148, 210, 'A5'], letter: [215.9, 279.4, 'letter'] };
+  const xesc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  function posterSvg(o) {
+    const M = qrMatrix(o.url);
+    if (!M) return '';
+    const F = POSTER[o.fmt] || POSTER.a5, W = 1000, H = Math.round((W * F[1]) / F[0]);
+    const p = o.p || '#111114', a = o.a || p, n = M.length, qs = Math.min(700, H - 600), cell = qs / n, qx = (W - qs) / 2, qy = Math.max(410, Math.round((H - qs) / 2 + 60));
+    let d = '';
+    M.forEach((row, r) => row.forEach((on, c) => { if (on) d += `M${(qx + c * cell).toFixed(2)} ${(qy + r * cell).toFixed(2)}h${cell.toFixed(2)}v${cell.toFixed(2)}h-${cell.toFixed(2)}z`; }));
+    const name = String(o.name || '').trim(), fs = Math.max(40, Math.min(84, Math.floor(1700 / Math.max(10, name.length))));
+    const line = String(o.line || ''), ls = Math.max(36, Math.min(58, Math.floor(1750 / Math.max(10, line.length))));
+    const u = String(o.url || '').replace(/^https?:\/\//, '');
+    const font = `font-family="Inter, 'Segoe UI', Helvetica, Arial, sans-serif"`;
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${F[0]}mm" height="${F[1]}mm">
+<rect width="${W}" height="${H}" fill="#ffffff"/>
+<rect width="${W}" height="250" fill="${p}"/><rect y="250" width="${W}" height="12" fill="${a}"/>
+<text x="${W / 2}" y="${o.sub ? 138 : 152}" text-anchor="middle" ${font} font-size="${fs}" font-weight="800" fill="#ffffff">${xesc(name)}</text>
+${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34" font-weight="500" fill="#ffffff" fill-opacity=".85">${xesc(o.sub)}</text>` : ''}
+<text x="${W / 2}" y="${qy - 70}" text-anchor="middle" ${font} font-size="${ls}" font-weight="800" fill="#111114">${xesc(line)}</text>
+<rect x="${qx - 34}" y="${qy - 34}" width="${qs + 68}" height="${qs + 68}" rx="36" fill="#ffffff" stroke="${p}" stroke-width="8"/>
+<path fill="#111114" d="${d}" shape-rendering="crispEdges"/>
+<text x="${W / 2}" y="${qy + qs + 110}" text-anchor="middle" ${font} font-size="30" font-weight="500" fill="#5b6477">${xesc(u)}</text>
+<rect y="${H - 26}" width="${W}" height="26" fill="${p}"/>
+</svg>`;
+  }
+  /* PNG haute définition (≈ 300 ppp) à partir de l’affiche vectorielle */
+  function posterPng(o, done) {
+    const svg = posterSvg(o);
+    if (!svg) return done(false);
+    const F = POSTER[o.fmt] || POSTER.a5, w = Math.round((F[0] / 25.4) * 300), h = Math.round((F[1] / 25.4) * 300);
+    const img = new Image();
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = w; cv.height = h;
+      const x = cv.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, w, h); x.drawImage(img, 0, 0, w, h);
+      done(cv.toDataURL('image/png'));
+    };
+    img.onerror = () => done(false);
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+  const fileBase = (s) => String(s || 'affiche').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\w-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'affiche';
+  function posterDownload(o, cb) {
+    posterPng(o, (png) => cb(png ? saveFile(png, fileBase(o.name) + '-affiche-' + o.fmt + '.png') : false));
+  }
+  /* Impression : nouvelle fenêtre au bon format de page, puis boîte d’impression du navigateur */
+  function posterPrint(o) {
+    const svg = posterSvg(o), F = POSTER[o.fmt] || POSTER.a5;
+    if (!svg || window.NFC_SANDBOX) return false;
+    const w = window.open('', '_blank');
+    if (!w) return false;
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${xesc(o.name)}</title><style>@page{size:${F[2]};margin:0}html,body{margin:0;background:#fff}svg{display:block;width:${F[0]}mm;height:${F[1]}mm;margin:0 auto}</style></head><body>${svg}<script>window.onload=function(){setTimeout(function(){window.print()},250)}<\/script></body></html>`);
+    w.document.close();
+    return true;
+  }
+
   /* Bouton « Mon QR code » : le titulaire le fait scanner sur son écran */
   const qrBtnOn = (m) => m.card.qrBtn !== false && (!(window.NFC && NFC.svc) || NFC.svc.on('share:qrbtn'));
   function openMyQr(from, m) {
@@ -1072,5 +1130,5 @@
     });
   }
 
-  window.VC = { S, gLinked, homeMeta, qrDownload, qrSvg, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
+  window.VC = { S, gLinked, homeMeta, qrDownload, qrSvg, posterSvg, posterDownload, posterPrint, L2: (fr, en) => L2(fr, en), lg: () => LG, nl, url, tel, overlay, toEn, render, bind, vcard, downloadVCard, img, ic, esc, SOC, SOC_BASE, socOn, brandIc, socOf, idb, vsrc, sectionOrder, PROVIDERS, providerOf, motifsOf, SLOTS, DAYS };
 })();

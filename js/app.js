@@ -344,7 +344,41 @@
   }
 
   /* Boutons de téléchargement du QR code de la carte */
-  const qrDl = () => `<button type="button" class="b xs" data-act="qrdl" data-v="png">${ic('download', 14)}PNG</button><button type="button" class="b xs" data-act="qrdl" data-v="svg">${ic('download', 14)}SVG</button>`;
+  const qrDl = () => `<button type="button" class="b xs" data-act="qrdl" data-v="png">${ic('download', 14)}PNG</button><button type="button" class="b xs" data-act="qrdl" data-v="svg">${ic('download', 14)}SVG</button><button type="button" class="b xs" data-act="poster">${ic('qr', 14)}Affiche à imprimer</button>`;
+
+  /* ---------- Affiche à imprimer : QR code + nom + « Scannez pour voir ma carte » ---------- */
+  const POSTER_LINES = isStores
+    ? [['Scannez pour voir notre boutique', 'Scan to see our store'], ['Scannez pour commander', 'Scan to order'], ['Scannez pour voir nos produits', 'Scan to see our products']]
+    : [['Scannez pour voir ma carte', 'Scan to see my profile'], ['Scannez pour enregistrer mes coordonnées', 'Scan to save my contact'], ['Scannez pour prendre rendez-vous', 'Scan to book an appointment']];
+  function posterOpts() {
+    const f = $('[data-poster]'), s = sec(), pal = (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0], id = (card() || {}).identity || {};
+    return { url: link(), fmt: f ? f.fmt.value : 'a5', name: f ? f.n.value : id.name, sub: f ? f.s.value : id.role || '', line: f ? f.l.value : '', p: pal.p, a: pal.a };
+  }
+  function openPoster() {
+    const id = (card() || {}).identity || {}, en = lang() === 'en';
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md md-poster" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
+        <h2 id="md-t">Affiche à imprimer</h2>
+        <p>Pour un comptoir, une vitrine ou un présentoir : vos clients scannent le code avec l’appareil photo de leur téléphone.</p>
+        <form class="poster-f" data-poster>
+          <div class="poster-pv" data-poster-pv></div>
+          <div class="poster-o">
+            <label class="f"><span class="f-l">Nom</span><input name="n" maxlength="40" value="${esc(id.name || '')}"></label>
+            <label class="f"><span class="f-l">Sous-titre (facultatif)</span><input name="s" maxlength="50" value="${esc(id.role || '')}"></label>
+            <label class="f"><span class="f-l">Phrase d’appel</span><select name="l">${POSTER_LINES.map(([fr, eng]) => `<option value="${esc(en ? eng : fr)}">${esc(en ? eng : fr)}</option>`).join('')}</select></label>
+            <label class="f"><span class="f-l">Format</span><select name="fmt"><option value="a6">A6 · 10,5 × 14,8 cm (comptoir)</option><option value="a5" selected>A5 · 14,8 × 21 cm (présentoir)</option><option value="letter">Lettre · 8,5 × 11 po (vitrine)</option></select></label>
+            <p class="f-h">Aux couleurs de votre palette. Le lien imprimé ne change jamais, même si vous modifiez votre carte.</p>
+            <div class="btns"><button type="button" class="b pri" data-act="poster-print">${ic('file', 15)}Imprimer</button><button type="button" class="b" data-act="poster-png">${ic('download', 15)}Télécharger PNG</button></div>
+          </div>
+        </form>
+      </div>`;
+    $('#modal').classList.add('on');
+    const f = $('[data-poster]'), draw = () => { $('[data-poster-pv]').innerHTML = VC.posterSvg(posterOpts()) || '<p class="muted small">Aperçu indisponible hors ligne.</p>'; };
+    f.addEventListener('input', draw);
+    f.addEventListener('change', draw);
+    draw();
+  }
 
   /* ---------- Mode administrateur dans le studio ----------
      Boutons « Désactiver / Activer » et « Supprimer » sur les secteurs, métiers, modèles et palettes,
@@ -1488,6 +1522,13 @@
       case 'modal-close': closeModal(); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
+      case 'poster': openPoster(); break;
+      case 'poster-print':
+        if (!VC.posterPrint(posterOpts())) toast(window.NFC_SANDBOX ? 'Impression bloquée dans cet aperçu : ouvrez le site test pour imprimer.' : 'Autorisez les fenêtres pop-up pour imprimer l’affiche.');
+        break;
+      case 'poster-png':
+        VC.posterDownload(posterOpts(), (ok) => toast(ok ? 'Affiche téléchargée (PNG haute définition).' : window.NFC_SANDBOX ? 'Téléchargement bloqué dans cet aperçu : ouvrez le site test pour télécharger.' : 'Affiche indisponible hors ligne.'));
+        break;
       case 'qrdl': {
         const ok = VC.qrDownload(link(), t.dataset.v, ((card() || {}).identity || {}).name);
         toast(ok ? `QR code téléchargé (${t.dataset.v.toUpperCase()}).` : window.NFC_SANDBOX ? 'Téléchargement bloqué dans cet aperçu : ouvrez le site test pour télécharger.' : 'QR code indisponible hors ligne.');

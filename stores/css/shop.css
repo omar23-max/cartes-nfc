@@ -104,3 +104,5 @@
 .pay-more { margin-top: 6px; }
 .pay-more summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--acc); padding: 4px 0; }
 .vc .shc-mode.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.vc .shs-tx { margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: var(--sf); border: 1px solid var(--ln); font-size: 11.5px; font-weight: 600; color: var(--mu); vertical-align: middle; }

@@ -11,13 +11,23 @@
   const num = (v) => { const n = parseFloat(String(v == null ? '' : v).replace(/\s/g, '').replace(',', '.').replace(/[^\d.]/g, '')); return isFinite(n) ? n : 0; };
   const money = (n) => { const o = { minimumFractionDigits: 2, maximumFractionDigits: 2 }; return lg() === 'en' ? '$' + n.toLocaleString('en-US', o) : n.toLocaleString('fr-CA', o) + ' $'; };
   const priceOf = (x) => (num(x.sp) > 0 && num(x.sp) < num(x.p) ? num(x.sp) : num(x.p));
+  /* Régime de taxes de la boutique : [code, libellé fr, libellé en, taux] */
   const TAX = {
-    qc: () => [['TPS (5 %)', 'GST (5%)', 0.05], ['TVQ (9,975 %)', 'QST (9.975%)', 0.09975]],
-    on: () => [['TVH (13 %)', 'HST (13%)', 0.13]],
-    tps: () => [['TPS (5 %)', 'GST (5%)', 0.05]],
-    us: (b) => (num(b.rate) > 0 ? [[`Taxe de vente (${b.rate} %)`, `Sales tax (${b.rate}%)`, num(b.rate) / 100]] : []),
+    qc: () => [['tps', 'TPS (5 %)', 'GST (5%)', 0.05], ['tvq', 'TVQ (9,975 %)', 'QST (9.975%)', 0.09975]],
+    on: () => [['tvh', 'TVH (13 %)', 'HST (13%)', 0.13]],
+    tps: () => [['tps', 'TPS (5 %)', 'GST (5%)', 0.05]],
+    us: (b) => (num(b.rate) > 0 ? [['us', `Taxe de vente (${b.rate} %)`, `Sales tax (${b.rate}%)`, num(b.rate) / 100]] : []),
     none: () => [],
   };
+  /* Taxe propre à un produit : '' = taxable, 'tps' = TPS seulement (ex. livres au Québec), 'none' = non taxé (ex. aliments de base) */
+  const TX_OPT = {
+    qc: [['', 'Taxable (TPS + TVQ)', 'Taxable (GST + QST)'], ['tps', 'TPS seulement (ex. livres)', 'GST only (e.g. books)'], ['none', 'Non taxé (ex. aliments de base)', 'Tax-free (e.g. basic groceries)']],
+    on: [['', 'Taxable (TVH)', 'Taxable (HST)'], ['none', 'Non taxé', 'Tax-free']],
+    tps: [['', 'Taxable (TPS)', 'Taxable (GST)'], ['none', 'Non taxé', 'Tax-free']],
+    us: [['', 'Taxable', 'Taxable'], ['none', 'Non taxé', 'Tax-free']],
+  };
+  const taxedBy = (b, x, code) => (x.tx === 'none' ? false : x.tx === 'tps' && b.tax === 'qc' ? code === 'tps' : true);
+  const taxNote = (b, x) => (!b.tax || b.tax === 'none' ? '' : x.tx === 'none' ? L2('Non taxé', 'Tax-free') : x.tx === 'tps' && b.tax === 'qc' ? L2('TPS seulement', 'GST only') : '');
   const cats = (b) => String(b.cats || '').split(',').map((c) => c.trim()).filter(Boolean);
   const opts = (x) => String(x.o || '').split(',').map((c) => c.trim()).filter(Boolean);
   const items = (b) => (b.items || []).filter((x) => x.t);
@@ -110,7 +120,7 @@
       <div class="shs-b">
         ${x.cat ? `<p class="shs-cat">${esc(x.cat)}</p>` : ''}
         <h3>${esc(x.t)}</h3>
-        <p class="shs-p">${sale ? `<s>${money(num(x.p))}</s>` : ''}<b>${money(priceOf(x))}</b></p>
+        <p class="shs-p">${sale ? `<s>${money(num(x.p))}</s>` : ''}<b>${money(priceOf(x))}</b>${taxNote(b, x) ? `<span class="shs-tx">${taxNote(b, x)}</span>` : ''}</p>
         ${x.l || x.d ? `<p class="shs-l">${VC.nl(x.l || x.d)}</p>` : ''}
         ${os.length ? `<p class="shs-lb">${L2('Choisissez', 'Choose')}</p><div class="shs-o">${os.map((v) => `<button type="button" data-o="${esc(v)}" class="${o === v ? 'on' : ''}">${esc(v)}</button>`).join('')}</div>` : ''}
         <div class="shs-row"><div class="qty"><button type="button" data-q="-1" aria-label="${L2('Moins', 'Less')}">−</button><span>1</span><button type="button" data-q="1" aria-label="${L2('Plus', 'More')}">+</button></div>
@@ -163,7 +173,8 @@
       const lines = CART.map((l) => ({ l, x: lineItem(b, l) })).filter((r) => r.x);
       const sub = lines.reduce((a, r) => a + priceOf(r.x) * r.l.q, 0);
       const fee = mode === 'ship' && !(num(b.freeFrom) && sub >= num(b.freeFrom)) ? num(b.fee) : 0;
-      const taxes = (TAX[b.tax] || TAX.none)(b).map(([fr, en, r]) => [L2(fr, en), (sub + fee) * r]);
+      /* Chaque taxe porte seulement sur les produits concernés (et sur la livraison) */
+      const taxes = (TAX[b.tax] || TAX.none)(b).map(([code, fr, en, r]) => [L2(fr, en), (lines.filter((rr) => taxedBy(b, rr.x, code)).reduce((a, rr) => a + priceOf(rr.x) * rr.l.q, 0) + fee) * r]).filter((t) => t[1] > 0);
       return { lines, sub, fee, taxes, total: sub + fee + taxes.reduce((a, x) => a + x[1], 0) };
     };
     const draw = () => {
@@ -276,7 +287,7 @@
     if (b.pay) Object.keys(b.pay).forEach((k) => { if (!on('pay:' + k) || (!online && /^(stripe|paypal|etr|zelle)$/.test(k))) b.pay[k] = false; });
     if (!on('order:' + (b.order || 'sms'))) b.order = ['sms', 'wa', 'email'].find((v) => on('order:' + v)) || b.order;
   };
-  app.tpl = Object.assign(app.tpl || {}, { prod: { t: '', d: '', l: '', p: '', sp: '', b: '', img: '', cat: '', o: '' } });
+  app.tpl = Object.assign(app.tpl || {}, { prod: { t: '', d: '', l: '', p: '', sp: '', b: '', img: '', cat: '', o: '', tx: '' } });
   app.editors = Object.assign(app.editors || {}, {
     shop(b, base, h) {
       const { inp, area, mini, add, del, thumbF } = h;
@@ -304,6 +315,7 @@
           <div class="shop-row">${mini(p + '.p', 'Prix (ex. 89)', 'price')}${mini(p + '.sp', 'Prix soldé', 'price')}${mini(p + '.b', 'Badge (Nouveau…)')}</div>
           <span class="shop-lb">Catégorie · Tailles ou options</span>
           <div class="shop-row two">${catSel(p + '.cat', x.cat)}${mini(p + '.o', 'Tailles ou options : S, M, L')}</div>
+          ${TX_OPT[b.tax] ? `<span class="shop-lb">Taxe</span><select class="mini" data-path="${p}.tx">${TX_OPT[b.tax].map(([v, fr]) => `<option value="${v}" ${(x.tx || '') === v || (v === '' && x.tx === 'tps' && b.tax !== 'qc') ? 'selected' : ''}>${fr}</option>`).join('')}</select>` : ''}
           ${mini(p + '.l', 'Description complète (fiche produit)')}</div>${del(base + '.items', i, 'Supprimer le produit')}</div>`;
       }).join('');
       const seg = (path, cur, list) => `<div class="seg wrap">${list.map(([v, l]) => `<button type="button" class="${cur === v ? 'on' : ''}" data-act="bkmode" data-path="${path}" data-v="${v}">${l}</button>`).join('')}</div>`;
@@ -326,8 +338,9 @@
           <label class="ck"><input type="checkbox" data-path="${base}.delivery" ${b.delivery ? 'checked' : ''}><span>Livraison</span></label></div>
         <div class="row2">${inp('Frais de livraison ($)', base + '.fee', { ph: '10' })}${inp('Livraison gratuite dès ($)', base + '.freeFrom', { ph: '150' })}</div>
         ${inp('Zone de livraison', base + '.zone', { ph: 'Montréal et Laval' })}
-        <label class="f"><span class="f-l">Taxes ajoutées au total</span><select data-path="${base}.tax">${[['qc', 'Québec : TPS 5 % + TVQ 9,975 %'], ['on', 'Ontario : TVH 13 %'], ['tps', 'TPS 5 % seulement'], ['us', 'États-Unis : taxe de vente (taux à saisir)'], ['none', 'Aucune (prix taxes incluses)']].map(([v, l]) => `<option value="${v}" ${(b.tax || 'none') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+        <label class="f"><span class="f-l">Taxes ajoutées au total</span><select data-path="${base}.tax" data-struct="re">${[['qc', 'Québec : TPS 5 % + TVQ 9,975 %'], ['on', 'Ontario : TVH 13 %'], ['tps', 'TPS 5 % seulement'], ['us', 'États-Unis : taxe de vente (taux à saisir)'], ['none', 'Aucune (prix taxes incluses)']].map(([v, l]) => `<option value="${v}" ${(b.tax || 'none') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
         ${b.tax === 'us' ? inp('Taux de taxe de vente (%)', base + '.rate', { ph: '8.25', hint: 'Taux de votre ville ou de votre État.' }) : ''}
+        ${b.tax && b.tax !== 'none' ? '<p class="f-h">Le régime de la boutique s’applique à chaque produit, sauf choix contraire dans le produit (« Taxe »).</p>' : ''}
         ${area('Texte d’accueil de la boutique', base + '.text', { rows: 2 })}
         ${inp('Texte du gros bouton', base + '.label', { ph: 'Voir la boutique' })}`;
     },
@@ -343,7 +356,9 @@
     'Stripe et PayPal : créez un lien de paiement chez le prestataire, puis collez-le sous sa case. Avec PayPal.me, le montant du panier est ajouté automatiquement. Virement Interac : le client voit votre courriel et le montant à envoyer.': 'Stripe and PayPal: create a payment link with the provider, then paste it under its box. With PayPal.me, the cart amount is added automatically. Interac e-Transfer: customers see your email and the amount to send.',
     'Le client choisit entre': 'Customers choose between', 'Cochez selon votre commerce : sur place pour un restaurant ou un café, à emporter ou ramassage, livraison.': 'Tick what fits your business: dine in for a restaurant or café, takeout or pickup, delivery.',
     'Sur place': 'Dine in', 'À emporter': 'Takeout', 'À emporter (ramassage en boutique)': 'Takeout (in-store pickup)',
-    'Produits': 'Products', 'Prix · Prix soldé · Badge': 'Price · Sale price · Badge', 'Catégorie · Tailles ou options': 'Category · Sizes or options', 'Nom du produit': 'Product name', 'Description courte': 'Short description', 'Prix (ex. 89)': 'Price (e.g. 89)', 'Prix soldé': 'Sale price',
+    'Produits': 'Products', 'Taxe': 'Tax', 'Taxable (TPS + TVQ)': 'Taxable (GST + QST)', 'TPS seulement (ex. livres)': 'GST only (e.g. books)', 'Non taxé (ex. aliments de base)': 'Tax-free (e.g. basic groceries)',
+    'Taxable (TVH)': 'Taxable (HST)', 'Taxable (TPS)': 'Taxable (GST)', 'Non taxé': 'Tax-free', 'Taxable': 'Taxable',
+    'Le régime de la boutique s’applique à chaque produit, sauf choix contraire dans le produit (« Taxe »).': 'The store’s tax regime applies to every product, unless set otherwise in the product (“Tax”).', 'Prix · Prix soldé · Badge': 'Price · Sale price · Badge', 'Catégorie · Tailles ou options': 'Category · Sizes or options', 'Nom du produit': 'Product name', 'Description courte': 'Short description', 'Prix (ex. 89)': 'Price (e.g. 89)', 'Prix soldé': 'Sale price',
     'Badge (Nouveau…)': 'Badge (New…)', 'Sans catégorie': 'No category', 'Tailles ou options : S, M, L': 'Sizes or options: S, M, L', 'Description complète (fiche produit)': 'Full description (product page)',
     'Supprimer le produit': 'Delete product', 'Ajouter un produit': 'Add a product', 'Catégories': 'Categories',
     'Séparez-les par des virgules, puis choisissez la catégorie de chaque produit.': 'Separate them with commas, then pick each product’s category.',

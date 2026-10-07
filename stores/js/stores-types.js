@@ -28,7 +28,7 @@
         blocks: {
           shop: {
             on: true, label: '', text: x.text, cats: cats.join(', '),
-            items: c.prods.map((p) => ({ t: p[0][i], d: p[1][i], l: p[8] ? p[8][i] : '', p: p[2], sp: p[3] || '', b: p[4] ? p[4][i] : '', img: U(p[5]), cat: cats[p[6]], o: p[7] ? (Array.isArray(p[7]) ? p[7][i] : p[7]) : '', on: true })),
+            items: c.prods.map((p) => ({ t: p[0][i], d: p[1][i], l: p[8] ? p[8][i] : '', p: p[2], sp: p[3] || '', b: p[4] ? p[4][i] : '', img: U(p[5]), cat: cats[p[6]], o: p[7] ? (Array.isArray(p[7]) ? p[7][i] : p[7]) : '', on: true, tx: (lg === 'en' ? '' : p[9]) || c.txAll || '' })),
             order: c.order || 'sms', phone: '', wa: '', email: '', payUrl: '',
             pay: c.pay ? Object.assign({}, c.pay, lg === 'en' ? { interac: false, etr: false, zelle: true } : {}) : (lg === 'en' ? { cash: true, card: true, zelle: true } : { cash: true, card: true, interac: true, etr: true }),
             payLinks: {}, payInfo: lg === 'en' ? { zelle: x.email } : { interac: x.email }, dinein: !!c.dinein, food: !!c.food,
@@ -200,8 +200,8 @@
     cats: [['Livres', 'Books'], ['Jeunesse', 'Kids'], ['Papeterie', 'Stationery'], ['Cartes et cadeaux', 'Cards & gifts']],
     prods: [
       [['Le coup de cœur du mois', 'Book of the month'], ['Roman choisi par l’équipe', 'A novel picked by our staff'], '27.95', '', ['Coup de cœur', 'Staff pick'], '1610116306796-6fea9f4fae38', 0, '',
-        ['Chaque mois, l’équipe choisit un roman qu’elle a adoré. Demandez-nous le titre par texto, ou laissez-vous surprendre : il arrive avec un signet offert.', 'Every month our team picks a novel they loved. Text us for the title, or let us surprise you: it comes with a free bookmark.']],
-      [['Albums jeunesse', 'Picture books'], ['Sélection 3 à 6 ans', 'Selection for ages 3 to 6'], '19.95', '', '', '1497633762265-9d179a990aa6', 1, ''],
+        ['Chaque mois, l’équipe choisit un roman qu’elle a adoré. Demandez-nous le titre par texto, ou laissez-vous surprendre : il arrive avec un signet offert.', 'Every month our team picks a novel they loved. Text us for the title, or let us surprise you: it comes with a free bookmark.'], 'tps'],
+      [['Albums jeunesse', 'Picture books'], ['Sélection 3 à 6 ans', 'Selection for ages 3 to 6'], '19.95', '', '', '1497633762265-9d179a990aa6', 1, '', null, 'tps'],
       [['Carnet ligné', 'Lined notebook'], ['Couverture rigide, 192 pages', 'Hardcover, 192 pages'], '18', '', ['Nouveau', 'New'], '1531346878377-a5be20888e57', 2, [['Ligné', 'Quadrillé', 'Uni'].join(', '), 'Lined, Grid, Blank']],
       [['Stylo plume', 'Fountain pen'], ['Plume moyenne, cartouches incluses', 'Medium nib, cartridges included'], '45', '', '', '1471107340929-a87cd0f5b5f3', 2, ''],
       [['Agenda 2027', '2027 planner'], ['Semaine sur deux pages', 'Weekly spread'], '32', '26', ['Solde', 'Sale'], '1435527173128-983b87201f4d', 2, ''],

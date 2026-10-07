@@ -707,3 +707,11 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 
 .qr-dl { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .ld-fix .qr-dl { margin-top: 0; }
+
+/* Affiche à imprimer */
+.md.md-poster { max-width: 760px; }
+.poster-f { display: grid; grid-template-columns: 240px 1fr; gap: 20px; align-items: start; }
+.poster-pv { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 6px 20px rgba(0,0,0,.08); }
+.poster-pv svg { display: block; width: 100%; height: auto; }
+.poster-o .btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+@media (max-width: 640px) { .poster-f { grid-template-columns: 1fr; } .poster-pv { width: min(220px, 70%); margin: 0 auto; } }

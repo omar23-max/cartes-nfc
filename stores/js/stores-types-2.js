@@ -140,7 +140,7 @@
   /* ---------- Supermarché et épicerie ---------- */
   TYPES.push(T({
     id: 'epicerie', code: 'B11', name: 'Supermarché et épicerie', icon: 'shopping-basket', ex: 'Épicerie fine, dépanneur, marché…', rec: 'd1',
-    biz: 'Épicerie Le Marché', handle: 'epicerielemarche', shopTitle: 'Commandez votre épicerie', cta: 'Faire mon épicerie', fee: '6', freeFrom: '75', tax: 'none',
+    biz: 'Épicerie Le Marché', handle: 'epicerielemarche', shopTitle: 'Commandez votre épicerie', cta: 'Faire mon épicerie', fee: '6', freeFrom: '75', tax: 'qc', txAll: 'none',
     pal: [['Vert marché', '#2f6b2f', '#f4c542'], ['Tomate', '#a3261b', '#fbbf24'], ['Bleu', '#1d4f7a', '#facc15'], ['Terre', '#6b4a2b', '#a3d977'], ['Olive', '#4d5b16', '#f2b05e'], ['Noir', '#1c1c1c', '#7ed957']],
     cover: '1604719312566-8912e9227c6a', rating: [4.6, 289],
     cats: [['Fruits et légumes', 'Produce'], ['Boulangerie', 'Bakery'], ['Fromagerie', 'Cheese'], ['Épicerie fine', 'Pantry'], ['Frais', 'Fresh']],
@@ -157,7 +157,7 @@
     gallery: [['1488459716781-31db52582fe9', 'Le marché', 'The market'], ['1609780447631-05b93e5a88ea', 'Fruits frais', 'Fresh fruit'], ['1568254183919-78a4f43a2877', 'La boulangerie', 'The bakery'], ['1681276145283-dc19e0ffb8d1', 'La devanture', 'Storefront']],
     reviews: [R('Lauren M.', ['Panier de légumes', 'Veggie box'], ['Commande par texto le matin, livrée le soir. Les légumes sont superbes.', 'Ordered by text in the morning, delivered by evening. Beautiful produce.']), R('Eric S.', ['Pain au levain', 'Sourdough bread'], ['Une vraie épicerie de quartier, avec le sourire en prime.', 'A real neighborhood grocer, with a smile on top.'])],
     fr: { role: 'Épicerie de quartier', spec: 'Produits frais et locaux · Livraison le jour même', phone: '418 555-0124', wa: '+1 418 555-0124', email: 'commandes@epicerielemarche.ca', web: 'epicerielemarche.ca',
-      text: 'Commandez avant 14 h : livraison le jour même à Rimouski. Les prix incluent les taxes lorsqu’elles s’appliquent.', zone: 'Rimouski et Le Bic',
+      text: 'Commandez avant 14 h : livraison le jour même à Rimouski. Aliments de base non taxés.', zone: 'Rimouski et Le Bic',
       about: 'L’Épicerie Le Marché travaille avec une trentaine de producteurs du Bas-Saint-Laurent.\nFruits, légumes, pain, fromages et épicerie fine : tout pour bien manger, à deux pas de chez vous.',
       addr: '145, rue Saint-Germain Est, Rimouski (Québec) G5L 1A9', access: 'Centre-ville · Stationnement gratuit derrière l’épicerie',
       hours: [['Lundi – Vendredi', '8 h – 21 h'], ['Samedi – Dimanche', '8 h – 19 h']], hoursNote: 'Livraison le jour même pour toute commande avant 14 h',
