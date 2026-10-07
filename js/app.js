@@ -346,6 +346,41 @@
   /* Boutons de téléchargement du QR code de la carte */
   const qrDl = () => `<button type="button" class="b xs" data-act="qrdl" data-v="png">${ic('download', 14)}PNG</button><button type="button" class="b xs" data-act="qrdl" data-v="svg">${ic('download', 14)}SVG</button><button type="button" class="b xs" data-act="poster">${ic('qr', 14)}Affiche à imprimer</button>`;
 
+  /* ---------- Commande de la carte NFC sur Shopify ----------
+     Le bouton n’apparaît que si la carte n’est pas encore payée (pas de QR code déjà imprimé, pas de commande payée).
+     Le panier Shopify reçoit la variante du forfait choisi et le code de la carte (attribut « Code carte »). */
+  const PLAN_L = [['gratuit', 'Gratuit'], ['pro', 'Pro'], ['premium', 'Premium']];
+  const paidOf = () => (S.paid || {})[S.id];
+  const orderPlan = () => S.orderPlan || 'pro';
+  function orderUrl() {
+    const shop = String(cfg('shop.url', '') || '').replace(/\/+$/, ''), v = cfg('shop.var.' + orderPlan(), '') || 'VARIANTE-' + orderPlan().toUpperCase();
+    return `${shop || 'https://votre-boutique.myshopify.com'}/cart/${encodeURIComponent(v)}:1?attributes[Code carte]=${encodeURIComponent(S.id)}&attributes[Lien]=${encodeURIComponent(link())}&attributes[Forfait]=${orderPlan()}`;
+  }
+  function orderBox() {
+    if (hasQR()) return '';
+    const paid = paidOf();
+    if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien.</p></div>`;
+    return `<div class="box order">
+      <span class="box-l">Votre carte NFC</span>
+      <p>Commandez la carte physique : elle sera programmée avec le lien ci-dessus et livrée chez vous.</p>
+      <div class="order-pl">${PLAN_L.filter(([p]) => cfg('shop.var.' + p, '') || !cfg('shop.url', '')).map(([p, l]) => `<button type="button" class="${orderPlan() === p ? 'on' : ''}" data-act="orderplan" data-v="${p}">${l}</button>`).join('')}</div>
+      <button type="button" class="b pri order-go" data-act="order">${ic('bag', 16)}Commander ma carte NFC</button>
+      <p class="muted small">Paiement sécurisé sur notre boutique Shopify. Votre carte est enregistrée : vous la retrouverez telle quelle après le paiement.</p>
+    </div>`;
+  }
+  function openOrderSim() {
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
+        <h2 id="md-t">Paiement sur Shopify (simulé)</h2>
+        <p>Sur le vrai site, ce bouton ouvre directement le panier Shopify, déjà rempli avec la carte NFC, le forfait <b>${esc((PLAN_L.find((p) => p[0] === orderPlan()) || [])[1] || '')}</b> et le code de votre carte :</p>
+        <code class="order-url">${esc(orderUrl())}</code>
+        <p class="muted small">Après le paiement, Shopify prévient GoBiz : compte créé, carte reliée, forfait activé, courriel de bienvenue envoyé. Le bouton « Commander » disparaît alors du studio.</p>
+        <div class="btns"><button type="button" class="b pri" data-act="order-paid">${ic('check', 15)}Simuler le paiement</button><button type="button" class="b" data-act="modal-close">Annuler</button></div>
+      </div>`;
+    $('#modal').classList.add('on');
+  }
+
   /* ---------- Affiche à imprimer : QR code + nom + « Scannez pour voir ma carte » ---------- */
   const POSTER_LINES = isStores
     ? [['Scannez pour voir notre boutique', 'Scan to see our store'], ['Scannez pour commander', 'Scan to order'], ['Scannez pour voir nos produits', 'Scan to see our products']]
@@ -1408,6 +1443,7 @@
             <div id="qr" class="qr"></div>
             <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
           </div>
+          ${orderBox()}
           <div class="box">
             <span class="box-l">Recevoir le lien et le QR code par email</span>
             <form class="linkrow mailrow" data-mailform novalidate>
@@ -1523,6 +1559,19 @@
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
       case 'poster': openPoster(); break;
+      case 'orderplan': S.orderPlan = t.dataset.v; save(); document.querySelectorAll('.order-pl button').forEach((x) => x.classList.toggle('on', x === t)); break;
+      case 'order':
+        save();
+        if (cfg('shop.url', '') && !window.NFC_SANDBOX) location.href = orderUrl();
+        else openOrderSim();
+        break;
+      case 'order-paid':
+        S.paid = Object.assign({}, S.paid, { [S.id]: orderPlan() });
+        save();
+        $('#modal').classList.remove('on');
+        render();
+        toast('Paiement simulé : carte payée, bouton « Commander » retiré.');
+        break;
       case 'poster-print':
         if (!VC.posterPrint(posterOpts())) toast(window.NFC_SANDBOX ? 'Impression bloquée dans cet aperçu : ouvrez le site test pour imprimer.' : 'Autorisez les fenêtres pop-up pour imprimer l’affiche.');
         break;

@@ -67,6 +67,7 @@ window.NFC = window.NFC || {};
     },
     planSim: 'premium',
     brand: { studio: '', stores: '', footCards: '', footStores: '', hideFoot: [], linkBase: '' },
+    shop: { url: '', var: { gratuit: '', pro: '', premium: '' } },
     storeDef: { tax: '', currency: 'CAD', fee: '', freeFrom: '', maxCats: '', dine: false, pick: true, ship: true },
     lang: { bili: true, market: 'auto', reword: [] },
     ai: { quota: 20 },
