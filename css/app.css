@@ -690,3 +690,9 @@ textarea.mini { resize: vertical; line-height: 1.45; }
 .ld-fix > span:nth-child(2) { display: flex; flex-direction: column; gap: 2px; }
 .ld-ic { color: var(--acc); margin-top: 1px; }
 .ld-on { font-size: 11.5px; font-weight: 700; color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+
+.ld-h { margin: -4px 0 10px; }
+.ld-note { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0 4px; padding: 9px 12px; border-radius: 10px; background: #ecf7ef; color: #14532d; font-size: 13px; }
+.ld-note.warn { background: #fff7ed; color: #9a3412; }
+.ld-note svg { flex: none; margin-top: 1px; }
+.ld-dim { opacity: .45; pointer-events: none; }

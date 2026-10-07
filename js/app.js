@@ -308,6 +308,10 @@
     const c = card();
     if (!c.leads) c.leads = { email: true, emailTo: '', phone: true, mini: true, excel: true, sheets: false, crm: false, crmTool: '' };
     const L = c.leads, ce = (c.contact || {}).email || '';
+    /* L’échange n’est qu’un des chemins : formulaires, rendez-vous et commandes envoient aussi des contacts */
+    const exOff = c.exchange === false;
+    const FORMS = ['form', 'booking', 'contact', 'shop'];
+    const hasForms = sec().blocks.some((d) => FORMS.includes(d.type) && (c.blocks[d.key] || {}).on) || (c.custom || []).some((x) => x.on !== false && FORMS.includes(x.type === 'block' ? (x.def || {}).type : x.type));
     const opt = (svc, key, title, desc, extra = '') => (!svcOn('crm:' + svc) && !L[key] ? '' : `<div class="ld-o">
         <label class="ck"><input type="checkbox" data-path="leads.${key}" ${L[key] ? 'checked' : ''}><span><b>${title}</b><small>${desc}</small></span></label>${extra ? `<div class="ld-x">${extra}</div>` : ''}</div>`);
     const tools = LEAD_CRM.filter(([k]) => svcOn('crm:' + k) || L.crmTool === k);
@@ -321,9 +325,11 @@
         ${svcOn('crm:home') || c.homeScreen === true ? `<div class="ld-o"><label class="ck"><input type="checkbox" data-path="homeScreen" ${c.homeScreen !== false ? 'checked' : ''}><span><b>Proposer « Ajouter à l’écran d’accueil »</b><small>Votre carte devient une icône sur son téléphone, comme une application.</small></span></label></div>` : ''}
       </div>
       <p class="f-l ld-t">Ce que vous recevez</p>
-      <label class="ck ld-ex"><input type="checkbox" data-path="exchange" ${c.exchange !== false ? 'checked' : ''}><span><b>Proposer l’échange de coordonnées</b><small>Après « Enregistrer le contact », la personne rencontrée peut vous laisser les siennes (ou scanner sa carte papier).</small></span></label>
+      <label class="ck ld-ex"><input type="checkbox" data-path="exchange" data-struct="re" ${c.exchange !== false ? 'checked' : ''}><span><b>Proposer l’échange de coordonnées</b><small>Après « Enregistrer le contact », la personne rencontrée peut vous laisser les siennes (ou scanner sa carte papier).</small></span></label>
+      ${exOff ? (hasForms ? `<p class="ld-note">${ic('check', 15)}<span>Échange désactivé : vous recevrez seulement les demandes de vos formulaires, rendez-vous et commandes.</span></p>` : `<p class="ld-note warn">${ic('shield', 15)}<span><b>Attention :</b> aucun visiteur ne pourra vous laisser ses coordonnées. Réactivez l’échange ou ajoutez un formulaire de demande.</span></p>`) : ''}
       <p class="f-l ld-t">Comment voulez-vous recevoir ces coordonnées ?</p>
-      <div class="ld">
+      <p class="f-h ld-h">Ces choix valent pour tous les contacts reçus : échange de coordonnées, formulaires, rendez-vous et commandes.</p>
+      <div class="ld${exOff && !hasForms ? ' ld-dim' : ''}">
         ${opt('email', 'email', 'Courriel à chaque nouveau contact', '« Nouveau contact : Julie Tremblay, 514… » dans votre boîte.', inp('Adresse qui reçoit les contacts', 'leads.emailTo', { type: 'email', ph: ce, hint: 'Vide = votre courriel.' }))}
         ${opt('phone', 'phone', '« Ajouter à mes contacts »', 'Un bouton sur chaque contact reçu l’enregistre dans votre téléphone, comme un contact normal.')}
         ${opt('mini', 'mini', 'Mini-CRM NexTap', 'Une liste claire de vos contacts : statut (nouveau, rappelé, client), notes et recherche.')}
@@ -1664,7 +1670,12 @@
       structChanged();
       return;
     }
-    if (t.dataset.struct === 'toggle') { t.closest('.grp').classList.toggle('off', !t.checked); renderPreview(); }
+    if (t.dataset.struct === 'toggle') {
+      t.closest('.grp').classList.toggle('off', !t.checked); renderPreview();
+      /* Une section affichée ou masquée peut changer les messages du panneau « Échange de contacts » */
+      const lb = document.querySelector('[data-grp="leads"] .grp-b');
+      if (lb) { lb.innerHTML = leadsEd() + `<button type="button" class="b sm done-b" data-act="done" data-id="leads">${ic('check', 15)}Terminé</button>`; translateTree(lb); }
+    }
     else if (t.type === 'checkbox' || t.tagName === 'SELECT') renderPreview();
     else schedulePv();
   });
