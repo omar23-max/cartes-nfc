@@ -1099,7 +1099,18 @@
   const CAT_SUGGEST_BY = { boutiques: ['products'], producteurs: ['products'], restaurant: ['products'], influence: ['products'], coaching: ['products'] };
   const CAT_SUGGEST = ['google', 'reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
   const catOn = (x) => x && (x.id !== 'google' || svcOn('google:reviews')) && !cfg('catOff', []).includes(x.id);
-  const catTile = (x, en) => `<button type="button" class="as-t" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`;
+  /* Nombre de sections de ce type déjà sur la carte (pastille « Déjà sur votre carte ») */
+  function catCount(id) {
+    const s = sec(), c = card(), defs = s.blocks.filter((b) => (c.blocks[b.key] || {}).on)
+      .concat((c.custom || []).filter((x) => x.on !== false).map((x) => (x.type === 'block' ? x.def : { type: x.type })));
+    return defs.filter((d) => {
+      if (id === 'faq') return d.type === 'list' && /question|faq/i.test(d.title || '');
+      if (id === 'services') return (d.type === 'list' && d.price) || d.type === 'menu';
+      if (id === 'google') return d.type === 'greviews';
+      return d.type === id;
+    }).length;
+  }
+  const catTile = (x, en) => { const n = catCount(x.id); return `<button type="button" class="as-t${n ? ' has' : ''}" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}${n ? `<span class="as-has">${en ? 'Already on your card' : 'Déjà sur votre carte'}${n > 1 ? ' ×' + n : ''}</span>` : ''}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`; };
   function catGroups(en) {
     return CAT_GROUPS.map(([g, fr, eng]) => `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${CAT.filter((x) => x.g === g && catOn(x)).map((x) => catTile(x, en)).join('')}</div></div>`).join('');
   }
