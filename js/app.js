@@ -283,7 +283,7 @@
   const mdl = (d = S.design, p = S.palette) => {
     const s = sec();
     const ps = NFC.palsOf ? NFC.palsOf(s) : s.palettes;
-    return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: ps[p] || ps[0], link: link(), lang: lang(), bilingual: bili() };
+    return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: ps[p] || ps[0], link: link(), locked: locked(), lang: lang(), bilingual: bili() };
   };
   const designOf = (id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id) || DESIGNS[0];
   /* Mises en page proposées : les 10 communes + celles propres au secteur (ex. beauté) */
@@ -344,7 +344,9 @@
   }
 
   /* Boutons de téléchargement du QR code de la carte */
-  const qrDl = () => `<button type="button" class="b xs" data-act="qrdl" data-v="png">${ic('download', 14)}PNG</button><button type="button" class="b xs" data-act="qrdl" data-v="svg">${ic('download', 14)}SVG</button><button type="button" class="b xs" data-act="poster">${ic('qr', 14)}Affiche à imprimer</button>`;
+  /* Avant le paiement (carte commandée depuis le studio) : QR code en aperçu seulement, sans téléchargement ni copie */
+  const locked = () => !hasQR() && !paidOf();
+  const qrDl = () => locked() ? `<span class="qr-lock-n">${ic('lock', 14)}PNG, SVG et affiche à imprimer disponibles après le paiement.</span>` : `<button type="button" class="b xs" data-act="qrdl" data-v="png">${ic('download', 14)}PNG</button><button type="button" class="b xs" data-act="qrdl" data-v="svg">${ic('download', 14)}SVG</button><button type="button" class="b xs" data-act="poster">${ic('qr', 14)}Affiche à imprimer</button>`;
 
   /* ---------- Commande de la carte NFC sur Shopify ----------
      Le bouton n’apparaît que si la carte n’est pas encore payée (pas de QR code déjà imprimé, pas de commande payée).
@@ -359,12 +361,13 @@
   function orderBox() {
     if (hasQR()) return '';
     const paid = paidOf();
-    if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien.</p></div>`;
+    if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien. Votre lien et votre QR code vous ont été envoyés par courriel.</p></div>`;
     return `<div class="box order">
       <span class="box-l">Votre carte NFC</span>
       <p>Commandez la carte physique : elle sera programmée avec le lien ci-dessus et livrée chez vous.</p>
       <div class="order-pl">${PLAN_L.filter(([p]) => cfg('shop.var.' + p, '') || !cfg('shop.url', '')).map(([p, l]) => `<button type="button" class="${orderPlan() === p ? 'on' : ''}" data-act="orderplan" data-v="${p}">${l}</button>`).join('')}</div>
       <button type="button" class="b pri order-go" data-act="order">${ic('bag', 16)}Commander ma carte NFC</button>
+      <p class="order-mail">${ic('send', 15)}<span>Votre lien et votre QR code vous seront envoyés automatiquement par courriel après le paiement.</span></p>
       <p class="muted small">Paiement sécurisé sur notre boutique Shopify. Votre carte est enregistrée : vous la retrouverez telle quelle après le paiement.</p>
     </div>`;
   }
@@ -1436,15 +1439,15 @@
         <div class="side pub">
           <div class="box">
             <span class="box-l">${hasQR() ? 'Lien de votre carte · déjà imprimé' : `Lien permanent · modèle ${code()}`}</span>
-            <div class="linkrow"><code>${esc(link())}</code><button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button></div>
+            <div class="linkrow"><code>${esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
             <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
           </div>
-          <div class="box qrbox">
+          <div class="box qrbox${locked() ? ' locked' : ''}">
             <div id="qr" class="qr"></div>
             <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
           </div>
           ${orderBox()}
-          <div class="box">
+          ${hasQR() ? `<div class="box">
             <span class="box-l">Recevoir le lien et le QR code par email</span>
             <form class="linkrow mailrow" data-mailform novalidate>
               <input id="sendto" type="email" autocomplete="email" placeholder="nom@exemple.com" aria-label="Adresse email du destinataire" value="${esc(S.sendTo || '')}">
@@ -1452,7 +1455,7 @@
             </form>
             <p class="muted small">À l’adresse de votre choix : la vôtre, celle de votre graphiste ou de votre imprimeur.</p>
             ${(S.sent || []).length ? `<ul class="sent">${S.sent.slice(0, 3).map((x) => `<li>${ic('check', 13)}<span>Envoyé à <b>${esc(x)}</b></span></li>`).join('')}</ul>` : ''}
-          </div>
+          </div>` : ''}
           <div class="box">
             <span class="box-l">Comment ça marche</span>
             <ol class="how">
@@ -1558,7 +1561,7 @@
       case 'modal-close': closeModal(); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
-      case 'poster': openPoster(); break;
+      case 'poster': if (!locked()) openPoster(); break;
       case 'orderplan': S.orderPlan = t.dataset.v; save(); document.querySelectorAll('.order-pl button').forEach((x) => x.classList.toggle('on', x === t)); break;
       case 'order':
         save();
@@ -1579,6 +1582,7 @@
         VC.posterDownload(posterOpts(), (ok) => toast(ok ? 'Affiche téléchargée (PNG haute définition).' : window.NFC_SANDBOX ? 'Téléchargement bloqué dans cet aperçu : ouvrez le site test pour télécharger.' : 'Affiche indisponible hors ligne.'));
         break;
       case 'qrdl': {
+        if (locked()) break;
         const ok = VC.qrDownload(link(), t.dataset.v, ((card() || {}).identity || {}).name);
         toast(ok ? `QR code téléchargé (${t.dataset.v.toUpperCase()}).` : window.NFC_SANDBOX ? 'Téléchargement bloqué dans cet aperçu : ouvrez le site test pour télécharger.' : 'QR code indisponible hors ligne.');
         break;
@@ -1720,6 +1724,7 @@
         break;
       }
       case 'copy':
+        if (locked()) break;
         if (navigator.clipboard) navigator.clipboard.writeText(link()).then(() => toast('Lien copié'));
         break;
       case 'vcf': VC.downloadVCard(card(), link(), lang()); break;

@@ -19,6 +19,7 @@
     play: '<polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/>',
     file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/>',
     check: '<path d="M20 6 9 17l-5-5"/>',
+    lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
     utensils: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
     bag: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>',
@@ -756,9 +757,9 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="xch myqr">
       <button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>
       <h3>${esc(ownerName(m.card))}</h3>
-      <p>${L2('Faites scanner ce code avec l’appareil photo d’un téléphone.', 'Have someone scan this code with their phone camera.')}</p>
-      <div class="myqr-c">${svg || `<p>${L2('QR code indisponible hors ligne', 'QR code unavailable offline')}</p>`}</div>
-      <code>${esc(u)}</code>
+      <p>${m.locked ? L2('Aperçu : votre QR code sera actif après le paiement de votre carte.', 'Preview: your QR code will be active once your card is paid.') : L2('Faites scanner ce code avec l’appareil photo d’un téléphone.', 'Have someone scan this code with their phone camera.')}</p>
+      <div class="myqr-c${m.locked ? ' locked' : ''}" data-l="${L2('APERÇU', 'PREVIEW')}">${svg || `<p>${L2('QR code indisponible hors ligne', 'QR code unavailable offline')}</p>`}</div>
+      ${m.locked ? '' : `<code>${esc(u)}</code>`}
       <div><button type="button" class="btn ov-x">${L2('Fermer', 'Close')}</button></div></div></div>`);
   }
 

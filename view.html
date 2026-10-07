@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/card.css?v=85">
-  <link rel="stylesheet" href="css/card-plus.css?v=85">
+  <link rel="stylesheet" href="css/card.css?v=88">
+  <link rel="stylesheet" href="css/card-plus.css?v=88">
   <style>
     html, body { margin: 0; min-height: 100%; }
     body { background: #e9e8e4; }
@@ -20,23 +20,23 @@
 <body>
   <div id="app"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="js/services.js?v=85"></script>
-  <script src="js/data.js?v=85"></script>
-  <script src="js/sectors.js?v=85"></script>
-  <script src="js/media.js?v=85"></script>
-  <script src="js/extras.js?v=85"></script>
-  <script src="js/locale-na.js?v=85"></script>
-  <script src="js/locale-na-en.js?v=85"></script>
-  <script src="js/google.js?v=85"></script>
-  <script src="js/profiles.js?v=85"></script>
-  <script src="js/profiles-sport.js?v=85"></script>
-  <script src="js/profiles-sante.js?v=85"></script>
-  <script src="js/profiles-archi.js?v=85"></script>
-  <script src="js/profiles-resto.js?v=85"></script>
-  <script src="js/profiles-auto.js?v=85"></script>
-  <script src="js/profiles-edu.js?v=85"></script>
-  <script src="js/i18n-en.js?v=85"></script>
-  <script src="js/render.js?v=85"></script>
+  <script src="js/services.js?v=88"></script>
+  <script src="js/data.js?v=88"></script>
+  <script src="js/sectors.js?v=88"></script>
+  <script src="js/media.js?v=88"></script>
+  <script src="js/extras.js?v=88"></script>
+  <script src="js/locale-na.js?v=88"></script>
+  <script src="js/locale-na-en.js?v=88"></script>
+  <script src="js/google.js?v=88"></script>
+  <script src="js/profiles.js?v=88"></script>
+  <script src="js/profiles-sport.js?v=88"></script>
+  <script src="js/profiles-sante.js?v=88"></script>
+  <script src="js/profiles-archi.js?v=88"></script>
+  <script src="js/profiles-resto.js?v=88"></script>
+  <script src="js/profiles-auto.js?v=88"></script>
+  <script src="js/profiles-edu.js?v=88"></script>
+  <script src="js/i18n-en.js?v=88"></script>
+  <script src="js/render.js?v=88"></script>
   <script>
     /* Affiche la carte enregistrée dans l’assistant, ou une démo : view.html?s=artisans&d=d3&c=1 */
     (function () {
@@ -57,7 +57,7 @@
             const want = q.get('lang') || (bi ? ((navigator.language || '').toLowerCase().startsWith('en') ? 'en' : 'fr') : S.lang);
             const cardOf = (l) => S.cards[l === 'en' ? kid + ':en' : kid] || (l === 'en' && s.demoEn) || s.demo;
             const en = want === 'en';
-            m = { card: cardOf(en ? 'en' : 'fr'), sec: s, d: S.design || s.rec, pal: (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0], link: S.qr && S.qr.url ? S.qr.url : ((NFC.cfg && NFC.cfg.get('brand.linkBase', '')) || 'https://votre-site.com/c/') + S.id, lang: en ? 'en' : 'fr', bilingual: bi };
+            m = { locked: !(S.qr && S.qr.url) && !(S.paid || {})[S.id], card: cardOf(en ? 'en' : 'fr'), sec: s, d: S.design || s.rec, pal: (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0], link: S.qr && S.qr.url ? S.qr.url : ((NFC.cfg && NFC.cfg.get('brand.linkBase', '')) || 'https://votre-site.com/c/') + S.id, lang: en ? 'en' : 'fr', bilingual: bi };
             VC.onLangSwitch = (l) => { if (l === m.lang) return; m.card = cardOf(l); m.lang = l; draw(); };
           }
         } catch (e) { /* pas de brouillon : démo par défaut */ }
