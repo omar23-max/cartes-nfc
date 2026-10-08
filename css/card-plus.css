@@ -421,3 +421,7 @@ button.map.map-static { width: 100%; border: 0; cursor: pointer; font: inherit; 
 @keyframes shrPop { 0% { transform: scale(.96); background: #fde68a; } 100% { transform: none; } }
 .vc .cg-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 16px; border: 2px dashed var(--ln); border-radius: 14px; color: var(--mu); text-align: center; font-weight: 600; font-size: 14px; }
 .vc .cg-empty small { font-weight: 400; font-size: 12px; max-width: 260px; }
+
+/* Rappel « Laissez-nous un avis Google » */
+.vc .gr-rem { margin-top: 8px; }
+.vc .grem-f input[name=to] { width: 100%; box-sizing: border-box; min-height: 46px; padding: 0 14px; border: 1px solid var(--ln); border-radius: 12px; font: inherit; margin: 6px 0 10px; background: var(--sf); color: var(--tx); }

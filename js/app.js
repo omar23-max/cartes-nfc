@@ -1263,7 +1263,14 @@
         return `${inp('Lien de votre fiche Google', base + '.mapsUrl', { ph: 'https://maps.app.goo.gl/…', hint: 'Cherchez votre commerce sur Google Maps, puis « Partager » et « Copier le lien ».' })}
           ${gSync(b)}
           ${inp('Lien « Laisser un avis »', base + '.reviewUrl', { ph: 'https://g.page/r/…/review', hint: 'Dans votre profil d’entreprise Google : « Demander des avis », puis copiez le lien.' })}
-          ${area('Petit mot pour vos clients', base + '.text', { rows: 2, ph: 'Votre avis nous aide à grandir. Merci !' })}`;
+          ${area('Petit mot pour vos clients', base + '.text', { rows: 2, ph: 'Votre avis nous aide à grandir. Merci !' })}
+          ${svcOn('google:remind') || b.remind ? `<div class="ld-o gr-rem-ed"><label class="ck"><input type="checkbox" data-path="${base}.remind" data-struct="re" ${b.remind ? 'checked' : ''}><span><b>Envoyer un rappel pour laisser un avis Google</b><small>Sur votre carte, le visiteur peut demander « Recevez un rappel » : il reçoit plus tard, chez lui, le lien pour laisser son avis.</small></span></label>
+            ${b.remind ? `<div class="ld-x">
+              <label class="f"><span class="f-l">Délai avant le rappel</span><select data-path="${base}.remDelay">${[['2h', '2 heures après'], ['soir', 'Le soir même (19 h)'], ['lendemain', 'Le lendemain (10 h)'], ['3j', '3 jours après']].map(([v, l]) => `<option value="${v}" ${(b.remDelay || 'lendemain') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+              <div class="f"><span class="f-l">Envoyer par</span><div style="display:flex;gap:16px;flex-wrap:wrap"><label class="ck"><input type="checkbox" data-path="${base}.remMail" ${b.remMail !== false ? 'checked' : ''}><span>Courriel</span></label><label class="ck"><input type="checkbox" data-path="${base}.remSms" ${b.remSms ? 'checked' : ''}><span>Texto <small>(quelques centimes par envoi)</small></span></label></div></div>
+              ${area('Message du rappel', base + '.remMsg', { rows: 3, ph: 'Merci pour votre visite ! Votre avis Google nous aiderait beaucoup : il ne prend qu’une minute.' })}
+              <p class="f-h">Un seul rappel, envoyé à tous les visiteurs qui le demandent (Google interdit de ne solliciter que les clients satisfaits ou d’offrir une récompense). Lien de désabonnement inclus.${b.reviewUrl ? '' : ' <b>Ajoutez votre lien « Laisser un avis » ci-dessus</b> : le rappel l’utilise.'}</p>
+            </div>` : ''}</div>` : ''}`;
       case 'chef':
         return `<div class="it">${thumbF(base + '.photo')}<div class="it-f">${mini(base + '.name', 'Nom du chef', 'strong')}${mini(base + '.role', 'Titre (ex. Chef propriétaire)', 'full')}</div></div>
           ${area('Présentation', base + '.text', { rows: 4 })}

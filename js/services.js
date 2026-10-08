@@ -28,7 +28,7 @@ window.NFC = window.NFC || {};
       ['email', 'Courriel à chaque nouveau contact', 'Email for each new contact'], ['phone', '« Ajouter à mes contacts »', '“Add to my contacts”'], ['mini', 'Mini-CRM NexTap', 'NexTap mini-CRM'],
       ['excel', 'Télécharger en Excel', 'Download as Excel'], ['sheets', 'Google Sheets', 'Google Sheets'], ['hubspot', 'HubSpot', 'HubSpot'], ['ghl', 'GoHighLevel', 'GoHighLevel'], ['zoho', 'Zoho CRM', 'Zoho CRM'], ['pipedrive', 'Pipedrive', 'Pipedrive'] ] },
     { id: 'google', n: ['Google', 'Google'], d: ['Services Google affichés sur les cartes.', 'Google services shown on profiles.'], items: [
-      ['maps', 'Google Maps (plan intégré)', 'Google Maps (embedded map)'], ['reviews', 'Avis Google (section)', 'Google reviews (section)'] ] },
+      ['maps', 'Google Maps (plan intégré)', 'Google Maps (embedded map)'], ['reviews', 'Avis Google (section)', 'Google reviews (section)'], ['remind', 'Rappel « Laissez-nous un avis » (courriel ou texto, après un délai)', '“Leave us a review” reminder (email or text, after a delay)'] ] },
     { id: 'ai', n: ['Intelligence artificielle', 'Artificial intelligence'], d: ['Fonctions qui utilisent l’IA.', 'Features that use AI.'], items: [
       ['edit', 'Bouton « Éditer avec l’IA »', '“Edit with AI” button'], ['scan', 'Scan d’une carte de visite papier', 'Paper business card scan'] ] },
   ];

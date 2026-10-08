@@ -514,12 +514,12 @@
       return `<div class="menu-x">${body}${b.note ? `<p class="menu-note">${esc(b.note)}</p>` : ''}</div>`;
     },
     /* Avis Google : note, étoiles, nombre d’avis, bouton « Laisser un avis » */
-    greviews(def, b) {
+    greviews(def, b, m) {
       const r = gLinked(b.mapsUrl) ? parseFloat(String(b.rating || '').replace(',', '.')) : 0;
       if (!b.reviewUrl && !b.mapsUrl && !r) return '';
       const pct = r ? Math.max(0, Math.min(100, (r / 5) * 100)) : 0;
       const rTxt = r ? (LG === 'en' ? r.toFixed(1) : r.toFixed(1).replace('.', ',')) : '';
-      return `<div class="gr">${r ? `<div class="gr-top"><svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span class="gr-n">${rTxt}</span><span class="gr-st" aria-label="${rTxt} / 5"><span class="gr-st-b">★★★★★</span><span class="gr-st-f" style="width:${pct}%">★★★★★</span></span></div>${b.count ? `<p class="gr-c">${L2(`${esc(b.count)} avis sur Google`, `${esc(b.count)} Google reviews`)}</p>` : ''}` : ''}${b.text ? `<p class="gr-t">${nl(b.text)}</p>` : ''}<div class="gr-btns">${b.reviewUrl ? `<a class="btn" href="${esc(url(b.reviewUrl))}" target="_blank" rel="noopener">${ic('pen', 17)}<span>${L2('Laisser un avis', 'Leave a review')}</span></a>` : ''}${b.mapsUrl ? `<a class="btn ghost" href="${esc(url(b.mapsUrl))}" target="_blank" rel="noopener"><span>${L2('Voir tous les avis', 'See all reviews')}</span>${ic('arrowur', 16)}</a>` : ''}</div></div>`;
+      return `<div class="gr">${r ? `<div class="gr-top"><svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><span class="gr-n">${rTxt}</span><span class="gr-st" aria-label="${rTxt} / 5"><span class="gr-st-b">★★★★★</span><span class="gr-st-f" style="width:${pct}%">★★★★★</span></span></div>${b.count ? `<p class="gr-c">${L2(`${esc(b.count)} avis sur Google`, `${esc(b.count)} Google reviews`)}</p>` : ''}` : ''}${b.text ? `<p class="gr-t">${nl(b.text)}</p>` : ''}<div class="gr-btns">${b.reviewUrl ? `<a class="btn" href="${esc(url(b.reviewUrl))}" target="_blank" rel="noopener">${ic('pen', 17)}<span>${L2('Laisser un avis', 'Leave a review')}</span></a>${remOn(b) ? `<button type="button" class="btn ghost gr-rem" data-vc="grem">${ic('clock', 17)}<span>${L2('Pas maintenant ? Recevez un rappel', 'Not now? Get a reminder')}</span></button>` : ''}` : ''}${b.mapsUrl ? `<a class="btn ghost" href="${esc(url(b.mapsUrl))}" target="_blank" rel="noopener"><span>${L2('Voir tous les avis', 'See all reviews')}</span>${ic('arrowur', 16)}</a>` : ''}</div></div>`;
     },
     /* Le chef : photo, titre, présentation et parcours (comme un CV) */
     chef(def, b, m) {
@@ -1051,6 +1051,46 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     const how = w.length === 2 ? L2('par courriel ou texto', 'by email or text') : w[0] === 'mail' ? L2('par courriel', 'by email') : L2('par texto', 'by text');
     return `<p class="xch-send">${ic('send', 14)}<span>${L2(`Vous recevrez la carte de ${esc(name)} ${how}, pour la retrouver facilement.`, `You’ll receive ${esc(name)}’s profile ${how}, so you can find it easily.`)}</span></p>`;
   };
+  /* ---------- Rappel « Laissez-nous un avis Google » ----------
+     Le visiteur donne un courriel ou un numéro et accepte un seul rappel ; l’envoi programmé se fait côté serveur (GoBiz). */
+  const REM_DELAY = { '2h': ['dans 2 heures', 'in 2 hours'], soir: ['ce soir', 'this evening'], lendemain: ['demain', 'tomorrow'], '3j': ['dans 3 jours', 'in 3 days'] };
+  const remOn = (b) => !!(b && b.remind && b.reviewUrl && (!(window.NFC && NFC.svc) || NFC.svc.on('google:remind')));
+  function remBlock(m) {
+    const c = m.card || {}, defs = (m.sec && m.sec.blocks) || [];
+    const d = defs.find((x) => x.type === 'greviews'), b = d && (c.blocks || {})[d.key];
+    if (b && b.on !== false && remOn(b)) return b;
+    const cu = (c.custom || []).find((x) => x.on !== false && x.type === 'block' && x.def && x.def.type === 'greviews' && remOn(x.data));
+    return cu ? cu.data : null;
+  }
+  const remWhen = (b) => L2(...(REM_DELAY[b.remDelay || 'lendemain'] || REM_DELAY.lendemain));
+  function saveRemind(r) {
+    try { const a = JSON.parse(localStorage.getItem('nfc-reminders') || '[]'); a.unshift(r); localStorage.setItem('nfc-reminders', JSON.stringify(a.slice(0, 200))); } catch (e) { /* rien */ }
+  }
+  function openRemind(from, m) {
+    const b = remBlock(m);
+    if (!b) return;
+    const name = ownerName(m.card), ways = [b.remMail !== false ? L2('courriel', 'email') : '', b.remSms ? L2('numéro de cellulaire', 'mobile number') : ''].filter(Boolean).join(L2(' ou ', ' or '));
+    const { ov, close } = overlay(from, 'ov-xch');
+    ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="xch grem">
+      <button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>
+      <h3>${L2('Recevez un rappel', 'Get a reminder')}</h3>
+      <p>${L2(`Pas le temps maintenant ? ${esc(name)} vous enverra ${remWhen(b)} le lien pour laisser votre avis Google.`, `No time now? ${esc(name)} will send you the link to leave your Google review ${remWhen(b)}.`)}</p>
+      <form class="xch-f grem-f" novalidate>
+        <input name="to" type="${b.remSms && b.remMail === false ? 'tel' : 'text'}" autocomplete="email" placeholder="${esc(ways.charAt(0).toUpperCase() + ways.slice(1))}" aria-label="${esc(ways)}">
+        <label class="vc-consent"><input type="checkbox" name="ok"><span>${L2(`J’accepte de recevoir <b>un seul rappel</b> de ${esc(name)} pour laisser un avis. Désabonnement en un clic.`, `I agree to receive <b>one reminder</b> from ${esc(name)} to leave a review. One-click unsubscribe.`)}</span></label>
+        <p class="xch-err" hidden>${L2('Indiquez votre courriel ou votre numéro, et cochez la case.', 'Enter your email or number, and tick the box.')}</p>
+        <button type="submit" class="btn">${ic('clock', 18)}<span>${L2('Programmer mon rappel', 'Schedule my reminder')}</span></button>
+      </form></div></div>`);
+    ov.querySelector('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = e.target, to = f.to.value.trim();
+      const okTo = (b.remMail !== false && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) || (b.remSms && to.replace(/\D/g, '').length >= 10);
+      if (!okTo || !f.ok.checked) { f.querySelector('.xch-err').hidden = false; return; }
+      saveRemind({ date: new Date().toISOString(), pour: name, to, delay: b.remDelay || 'lendemain', source: 'bouton' });
+      ov.querySelector('.xch').innerHTML = `<button type="button" class="ov-x" aria-label="${L2('Fermer', 'Close')}">${ic('x', 18)}</button><div class="xch-top"><span class="xch-ok">${ic('check', 22)}</span><div><h3>${L2('Rappel programmé', 'Reminder scheduled')}</h3><p>${L2(`Vous recevrez le lien ${remWhen(b)}. Merci !`, `You will get the link ${remWhen(b)}. Thank you!`)}</p></div></div><div><button type="button" class="btn ov-x">${L2('Fermer', 'Close')}</button></div>`;
+    });
+  }
+
   function openExchange(from, m) {
     const who = firstName(m.card, m.sec), name = ownerName(m.card);
     const { ov, close } = overlay(from, 'ov-xch');
@@ -1072,6 +1112,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
         ${f('email', 'Email', 'email', 'email')}
         ${fileField({ files: true }, 'Joindre un document (photo, image, fichier)')}
         ${consentBox()}
+        ${remBlock(m) ? `<label class="vc-consent"><input type="checkbox" name="grem"><span>${L2(`M’envoyer ${remWhen(remBlock(m))} un rappel pour laisser un avis Google (un seul message)`, `Send me a reminder ${remWhen(remBlock(m))} to leave a Google review (one message only)`)}</span></label>` : ''}
         <p class="xch-err" hidden>Indiquez au moins votre nom et un téléphone ou un email.</p>
         <button type="submit" class="btn">${ic('send', 18)}<span>Envoyer mes coordonnées</span></button>
         <button type="button" class="xch-skip ov-x">Passer</button>
@@ -1086,6 +1127,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       if (!(v('prenom') || v('nom')) || !(v('tel') || v('email'))) { ov.querySelector('.xch-err').hidden = false; return; }
       if (e.target.querySelector('[name=consent]') && !fd.get('consent')) { const x = ov.querySelector('.xch-err'); x.textContent = L2('Cochez la case pour accepter la transmission de vos coordonnées.', 'Please tick the box to agree to share your details.'); x.hidden = false; return; }
       saveLead({ date: new Date().toISOString(), pour: name, prenom: v('prenom'), nom: v('nom'), entreprise: v('entreprise'), tel: v('tel'), email: v('email'), fichiers: attached(e.target) });
+      if (e.target.grem && e.target.grem.checked) saveRemind({ date: new Date().toISOString(), pour: name, to: v('email') || v('tel'), delay: (remBlock(m) || {}).remDelay || 'lendemain', source: 'échange' });
       ov.querySelector('.xch').innerHTML = toEn(`<div class="xch-done"><span class="xch-ok big">${ic('check', 30)}</span><h3>${L2(`Merci ${esc(v('prenom'))} !`, `Thank you ${esc(v('prenom'))}!`)}</h3><p>${esc(name)} ${L2('a bien reçu vos coordonnées.', 'has received your details.')}</p>${(() => { const w = sendWays().filter((k) => (k === 'mail' ? v('email') : v('tel'))); if (!w.length) return ''; const dest = w.map((k) => (k === 'mail' ? esc(v('email')) : esc(v('tel')))).join(L2(' et au ', ' and ')); return `<p class="xch-send">${ic('send', 14)}<span>${L2(`Sa carte vous est envoyée à ${dest}.`, `Their profile is on its way to ${dest}.`)}</span></p>`; })()}${homeOn(m) ? `<button type="button" class="btn ghost" data-vc="a2hs">${ic('phone', 17)}<span>${L2('Ajouter sa carte à l’écran d’accueil', 'Add their profile to my home screen')}</span></button>` : ''}<p class="xch-legal">Démo : dans la version finale, vos coordonnées arrivent chez le professionnel et sa carte vous est envoyée automatiquement.</p><button type="button" class="btn ov-x">Revenir à la carte</button></div>`);
     });
   }
@@ -1128,6 +1170,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       } else if (a === 'lb') openLB(t);
       else if (a === 'a2hs') { e.preventDefault(); openA2hs(t, getModel()); }
       else if (a === 'myqr') { e.preventDefault(); openMyQr(t, getModel()); }
+      else if (a === 'grem') { e.preventDefault(); openRemind(t, getModel()); }
       else if (a === 'mapload') { e.preventDefault(); const d = document.createElement('div'); d.className = 'map'; d.innerHTML = `<iframe src="https://maps.google.com/maps?q=${t.dataset.q}&z=15&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Map"></iframe>`; t.replaceWith(d); }
       else if (window.VC.onAct && window.VC.onAct(a, t, e, getModel())) { /* action d’un module (ex. panier) */ }
       else if (a === 'more') { const s = t.closest('.sec'); s.classList.toggle('open'); t.textContent = tx(s.classList.contains('open') ? 'Réduire' : 'Lire la suite'); }
