@@ -1875,6 +1875,7 @@
       return 'b-' + k;
     }
     if (el.closest('.soc')) return 'socials';
+    if (el.closest('.ft')) return 'leads';
     if (el.closest('.qa, .qa-list, .sticky')) return 'contact';
     if (el.closest('.hd')) return 'identity';
     return null;
@@ -1906,7 +1907,14 @@
   let followId = '';
   const follow = (e) => {
     const gEl = e.target.closest && e.target.closest('#ed .grp[data-grp]');
-    if (!gEl || !gEl.classList.contains('open') || gEl.dataset.grp === followId || e.target.closest('.grp-h')) return;
+    if (!gEl || !gEl.classList.contains('open') || e.target.closest('.grp-h')) return;
+    /* Même panneau qu’au dernier clic : on ne re-défile que si sa section est sortie de l’aperçu */
+    if (gEl.dataset.grp === followId) {
+      const el = previewOf(followId), pv = $('#pv');
+      if (!el || !pv) return;
+      const r = el.getBoundingClientRect(), p = pv.getBoundingClientRect();
+      if (r.bottom > p.top + 40 && r.top < p.bottom - 40) return;
+    }
     followId = gEl.dataset.grp;
     showInPreview(followId);
   };
