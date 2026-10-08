@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=103">
+  <link rel="stylesheet" href="css/app.css?v=106">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -106,23 +106,24 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=103"></script>
-  <script src="js/data.js?v=103"></script>
-  <script src="js/sectors.js?v=103"></script>
-  <script src="js/media.js?v=103"></script>
-  <script src="js/extras.js?v=103"></script>
-  <script src="js/locale-na.js?v=103"></script>
-  <script src="js/locale-na-en.js?v=103"></script>
-  <script src="js/google.js?v=103"></script>
-  <script src="js/profiles.js?v=103"></script>
-  <script src="js/profiles-sport.js?v=103"></script>
-  <script src="js/profiles-sante.js?v=103"></script>
-  <script src="js/profiles-archi.js?v=103"></script>
-  <script src="js/profiles-resto.js?v=103"></script>
-  <script src="js/profiles-auto.js?v=103"></script>
-  <script src="js/profiles-edu.js?v=103"></script>
-  <script src="js/jobs.js?v=103"></script>
-  <script src="js/render.js?v=103"></script>
+  <script src="js/services.js?v=106"></script>
+  <script src="js/data.js?v=106"></script>
+  <script src="js/sectors.js?v=106"></script>
+  <script src="js/media.js?v=106"></script>
+  <script src="js/extras.js?v=106"></script>
+  <script src="js/locale-na.js?v=106"></script>
+  <script src="js/locale-na-en.js?v=106"></script>
+  <script src="js/google.js?v=106"></script>
+  <script src="js/profiles.js?v=106"></script>
+  <script src="js/profiles-sport.js?v=106"></script>
+  <script src="js/profiles-sante.js?v=106"></script>
+  <script src="js/profiles-archi.js?v=106"></script>
+  <script src="js/profiles-resto.js?v=106"></script>
+  <script src="js/profiles-auto.js?v=106"></script>
+  <script src="js/profiles-edu.js?v=106"></script>
+  <script src="js/custom-catalog.js?v=106"></script>
+  <script src="js/jobs.js?v=106"></script>
+  <script src="js/render.js?v=106"></script>
   <script>
   (function () {
     'use strict';
@@ -136,9 +137,10 @@
 
     /* Données des deux studios */
     const CARDS = NFC.SECTORS.slice();
-    const STORES = [['mode', 'Mode et vêtements'], ['friperie', 'Friperie et seconde main'], ['bijoux', 'Bijouterie'], ['fleuriste', 'Fleuriste'], ['deco', 'Décoration et mobilier'], ['librairie', 'Librairie et papeterie'], ['cadeaux', 'Cadeaux et souvenirs'], ['velos', 'Vélos'], ['cosmetiques', 'Cosmétiques naturels'], ['telephones', 'Réparation de téléphones'], ['epicerie', 'Supermarché et épicerie'], ['traiteur', 'Traiteur'], ['animalerie', 'Animalerie'], ['resto', 'Restaurant (pour emporter)'], ['coiffure', 'Coiffure (produits)'], ['esthetique', 'Esthétique (produits de soin)']].map(([id, name]) => ({ id, name, active: true }));
+    const STORES0 = [['mode', 'Mode et vêtements'], ['friperie', 'Friperie et seconde main'], ['bijoux', 'Bijouterie'], ['fleuriste', 'Fleuriste'], ['deco', 'Décoration et mobilier'], ['librairie', 'Librairie et papeterie'], ['cadeaux', 'Cadeaux et souvenirs'], ['velos', 'Vélos'], ['cosmetiques', 'Cosmétiques naturels'], ['telephones', 'Réparation de téléphones'], ['epicerie', 'Supermarché et épicerie'], ['traiteur', 'Traiteur'], ['animalerie', 'Animalerie'], ['resto', 'Restaurant (pour emporter)'], ['coiffure', 'Coiffure (produits)'], ['esthetique', 'Esthétique (produits de soin)']].map(([id, name]) => ({ id, name, active: true }));
     const DESIGNS = NFC.DESIGNS_ALL || NFC.DESIGNS;
     const CATSEC = [['text', 'Texte libre'], ['services', 'Services et tarifs'], ['faq', 'Questions fréquentes'], ['hours', 'Horaires'], ['location', 'Adresse et plan'], ['cards', 'Fiches avec photo'], ['reviews', 'Avis clients'], ['google', 'Avis Google'], ['stats', 'Chiffres clés'], ['tags', 'Engagements'], ['booking', 'Prise de rendez-vous'], ['form', 'Formulaire de demande'], ['products', 'Produits'], ['action', 'Bouton vers un lien'], ['links', 'Liens et documents'], ['gallery', 'Galerie photos'], ['imgcar', 'Carrousel de photos'], ['vidcar', 'Carrousel de vidéos']];
+    const STORES = STORES0.concat((NFC.cfg.get('secAdd', []) || []).filter((x) => x.kind === 'stores').map((x) => ({ id: x.id, name: x.name, active: true, custom: true })));
     const PLANS = [['gratuit', 'Gratuit'], ['pro', 'Pro'], ['premium', 'Premium']];
     const SECNAME = (id) => (CARDS.concat(STORES).find((s) => s.id === id) || {}).name || id;
 
@@ -187,7 +189,12 @@
       C.get('designsDel', []).forEach((id) => del.push([`Modèle : ${(DESIGNS.find((d) => d.id === id) || {}).name || id}`, 'designsDel', id]));
       Object.entries(C.get('palDel', {})).forEach(([k, arr]) => (arr || []).forEach((i) => del.push([`Palette n° ${i + 1} : ${SECNAME(k.split('~')[0])}${k.includes('~') ? ' – ' + k.split('~')[1] : ''}`, 'pal', k + '|' + i])));
       const added = Object.entries(C.get('palAdd', {})).filter(([, a]) => a && a.length);
+      const sa = C.get('secAdd', []), pa = Object.entries(C.get('profAdd', {})).flatMap(([sid, l]) => (l || []).map((x) => [sid, x]));
+      const addedList = sa.map((x, i) => `<div class="adm-f"><div>${x.kind === 'stores' ? 'Type de boutique' : 'Secteur'} : <b>${esc(x.name)}</b><small>Basé sur ${esc(x.kind === 'stores' ? ((STORES.find((s) => s.id === x.base) || {}).name || x.base) : SECNAME(x.base))}${x.ai ? ' · proposé par l’IA (simulation)' : ''}</small></div><div><button type="button" class="adm-t" data-secrm="${i}">Retirer</button></div></div>`)
+        .concat(pa.map(([sid, x]) => `<div class="adm-f"><div>Métier : <b>${esc(x.name)}</b><small>${esc(SECNAME(sid))}${x.ai ? ' · proposé par l’IA (simulation)' : ''}</small></div><div><button type="button" class="adm-t" data-profrm="${esc(sid)}|${esc(x.id)}">Retirer</button></div></div>`)).join('');
       return `<div class="sh"><h1>Catalogue</h1><p>Ce que vos clients voient : secteurs, métiers, modèles, sections et recherche.</p></div>
+      ${box('Ajouter au catalogue', LIVE, 'Chaque ajout part d’un secteur ou d’un métier existant (mêmes sections, modèles et couleurs) : vous remplacez le nom, les exemples, les photos et la personne d’exemple. Remplissage manuel, ou proposition de l’IA.',
+        `<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="b pri" data-catadd="sector">+ Ajouter un secteur</button><button type="button" class="b" data-catadd="prof">+ Ajouter un métier</button><button type="button" class="b" data-catadd="store">+ Ajouter un type de boutique</button></div>${addedList ? `<p class="adm-d" style="margin:14px 0 4px"><b>Ajoutés par vous</b></p>${addedList}` : ''}`)}
       ${box('Mode administrateur dans les studios', LIVE, 'Affiche, directement dans les studios, les boutons Désactiver, Supprimer, Recommander et Ajouter une palette. Vos clients ne les voient pas (sur GoBiz : réservé à l’administrateur connecté).', fBool('adminMode', 'Activer le mode administrateur', 'Raccourci : ajoutez ?admin=1 à l’adresse d’un studio (?admin=0 pour quitter).') + '<p class="adm-d" style="margin-top:10px"><a class="adm-btn pri" style="text-decoration:none" href="index.html">Ouvrir le studio des cartes</a> <a class="adm-btn" style="text-decoration:none" href="stores/">Ouvrir le studio des boutiques</a></p>')}
       ${box('Éléments supprimés', LIVE, 'Supprimés depuis le studio en mode administrateur. Restaurez-les pour les proposer de nouveau.', del.length ? del.map(([l, path, v]) => `<div class="adm-f"><div>${esc(l)}</div><div><button type="button" class="adm-btn" data-restore="${esc(path)}" data-v="${esc(v)}">Restaurer</button></div></div>`).join('') : '<p class="adm-empty">Rien n’a été supprimé.</p>')}
       ${box('Palettes ajoutées', LIVE, 'Ajoutées depuis l’étape Couleurs du studio, en mode administrateur.', added.length ? added.map(([k, a]) => a.map((x) => `<div class="adm-f"><div><span style="display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px"><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.p)};display:inline-block"></i><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.a)};display:inline-block"></i></span>${esc(x.name)}<small>${esc(SECNAME(k.split('~')[0]))}${k.includes('~') ? ' – ' + esc(k.split('~')[1]) : ''}</small></div><div><span class="adm-d">Pour la retirer : « Supprimer » sur la palette, dans le studio.</span></div></div>`).join('')).join('') : '<p class="adm-empty">Aucune palette ajoutée.</p>')}
@@ -297,6 +304,89 @@
         const b = c.querySelector('.adm-moreb'); if (b) b.hidden = !!v;
       });
     }
+    /* ---------- Ajouter un secteur, un métier ou un type de boutique (manuel ou IA) ---------- */
+    const slug = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30);
+    let catKind = 'sector';
+    function openCatAdd(k) {
+      catKind = k;
+      const T = { sector: 'Ajouter un secteur', prof: 'Ajouter un métier', store: 'Ajouter un type de boutique' }[k];
+      const secOpts = CARDS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+      const baseSel = k === 'store' ? STORES.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('') : secOpts;
+      const f2 = (n1, l1, n2, l2, ph1 = '', ph2 = '') => `<div class="row2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 10px"><label class="f"><span class="f-l">${l1}</span><input name="${n1}" placeholder="${ph1}"></label><label class="f"><span class="f-l">${l2}</span><input name="${n2}" placeholder="${ph2}"></label></div>`;
+      $('#modal').innerHTML = `<div class="mb" data-assistx="1"></div>
+        <div class="md" role="dialog" aria-modal="true" aria-labelledby="ca-t" style="width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto">
+          <h2 id="ca-t">${T}</h2>
+          <p>${k === 'prof' ? 'Le métier apparaîtra après le choix du secteur (« Quel est votre métier ? ») et dans la recherche.' : 'Il apparaîtra dans la liste du studio et dans la recherche, avec les mêmes boutons Désactiver, Bientôt et Supprimer que les autres.'}</p>
+          <form data-catf onsubmit="return false">
+            ${k === 'prof' ? `<label class="f"><span class="f-l">Secteur</span><select name="sec">${secOpts}</select></label><label class="f"><span class="f-l">Basé sur le métier</span><select name="base"></select></label>`
+              : `<label class="f"><span class="f-l">Basé sur ${k === 'store' ? 'le type de boutique' : 'le secteur'}</span><select name="base">${baseSel}</select></label>`}
+            ${f2('name', 'Nom (français) *', 'nameEn', 'Nom (anglais)', k === 'prof' ? 'Ex. Vétérinaire' : 'Ex. Animaux et vétérinaires', k === 'prof' ? 'Ex. Veterinarian' : 'Ex. Pets & vets')}
+            <div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button type="button" class="b sm" data-catai="1" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;border:0">✨ Générer avec l’IA</button></div>
+            <p class="ai-note" hidden style="margin:0 0 10px;padding:8px 10px;border-radius:9px;background:#f3e8ff;color:#5b21b6;font-size:12.5px">Simulation : sur le site test, la proposition suit un gabarit. Sur GoBiz, l’IA (clé côté serveur) rédigera des textes adaptés au métier, en français et en anglais. Relisez et corrigez avant d’ajouter.</p>
+            ${k !== 'prof' ? f2('ex', 'Exemples (français)', 'exEn', 'Exemples (anglais)', 'Vétérinaire, toiletteur, éleveur…', 'Vet, groomer, breeder…') : ''}
+            <label class="f"><span class="f-l">Mots-clés pour la recherche</span><input name="kw" placeholder="animaux chien chat clinique veterinaire pet"></label>
+            <label class="f"><span class="f-l">Photos (une adresse https par ligne : photo de la personne, couverture, galerie)</span><textarea name="photos" rows="3" placeholder="https://images.unsplash.com/photo-…"></textarea></label>
+            <p class="adm-d" style="margin:12px 0 4px"><b>${k === 'store' ? 'Boutique d’exemple' : 'Personne d’exemple'}</b> (carte de démonstration)</p>
+            ${k === 'store' ? f2('pname', 'Nom de la boutique', 'role', 'Accroche (français)', 'Ex. Chocolaterie Laurier', 'Ex. Chocolats faits main') : f2('pname', 'Nom', 'role', 'Fonction (français)', 'Ex. Dre Sarah Collins', 'Ex. Médecin vétérinaire')}
+            ${f2('spec', k === 'store' ? 'Précision (français)' : 'Spécialité (français)', 'roleEn', k === 'store' ? 'Accroche (anglais)' : 'Fonction (anglais)', k === 'store' ? 'Ex. Artisan chocolatier depuis 2009' : 'Ex. Chiens, chats et NAC', k === 'store' ? 'Ex. Handmade chocolates' : 'Ex. Veterinarian')}
+            <label class="f"><span class="f-l">Présentation (français)</span><textarea name="about" rows="3"></textarea></label>
+            <label class="f"><span class="f-l">Présentation (anglais)</span><textarea name="aboutEn" rows="3"></textarea></label>
+            <p class="ca-err" hidden style="color:#b91c1c;font-size:13px;margin:8px 0 0">Indiquez au moins le nom en français.</p>
+            <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b pri" data-catsave="1">Ajouter au catalogue</button><button type="button" class="b" data-assistx="1">Annuler</button></div>
+          </form>
+        </div>`;
+      $('#modal').classList.add('on');
+      const f = $('[data-catf]');
+      if (k === 'prof') {
+        const fillBase = () => { const s = CARDS.find((z) => z.id === f.sec.value); f.base.innerHTML = s && s.profiles ? s.profiles.map((p) => `<option value="${p.id}">${esc(p.n[0])}</option>`).join('') : '<option value="">Exemple actuel du secteur</option>'; };
+        f.sec.addEventListener('change', fillBase); fillBase();
+      }
+    }
+    /* Proposition « IA » (simulation par gabarit sur le site test) */
+    function aiFill() {
+      const f = $('[data-catf]'), n = f.name.value.trim();
+      if (!n) { $('.ca-err').hidden = false; f.name.focus(); return; }
+      const en = f.nameEn.value.trim() || n, low = n.toLowerCase();
+      const set = (k, v) => { if (f[k] && !f[k].value.trim()) f[k].value = v; };
+      set('nameEn', en);
+      if (catKind === 'store') { set('ex', `${n}, produits artisanaux, commande en ligne…`); set('exEn', `${en}, handmade products, online orders…`); }
+      else { set('ex', `${n}, conseil, accompagnement…`); set('exEn', `${en}, advice, support…`); }
+      set('kw', [...new Set((slug(n) + '-' + slug(en)).split('-').filter((t) => t.length > 2))].join(' '));
+      if (catKind === 'store') { set('pname', `${n} Laurier`); set('role', `${n} artisanale`); set('roleEn', `Handcrafted ${en.toLowerCase()}`); set('spec', 'Commande en ligne, ramassage ou livraison'); }
+      else { set('pname', 'Alex Morgan'); set('role', n); set('roleEn', en); set('spec', 'Accompagnement personnalisé'); }
+      if (catKind === 'store') {
+        set('about', `Bienvenue chez ${n} Laurier ! Des produits choisis avec soin, préparés sur place et proposés au juste prix. Commandez en ligne et passez les chercher, ou faites-vous livrer.`);
+        set('aboutEn', `Welcome to ${en} Laurier! Carefully selected products, made on site and fairly priced. Order online and pick up, or get them delivered.`);
+      }
+      set('about', `Passionné par mon métier (${low}), j’accompagne mes clients avec écoute, rigueur et transparence. Chaque demande est unique : je prends le temps de comprendre vos besoins avant de vous proposer une solution claire. Écrivez-moi ou appelez-moi pour en discuter.`);
+      set('aboutEn', `Passionate about my work (${en.toLowerCase()}), I support my clients with care, rigor and transparency. Every request is unique: I take the time to understand your needs before suggesting a clear solution. Message or call me to talk it through.`);
+      f.dataset.ai = '1';
+      $('.ai-note').hidden = false;
+    }
+    function catSave() {
+      const f = $('[data-catf]'), v = (k) => (f[k] ? f[k].value.trim() : ''), name = v('name');
+      if (!name) { $('.ca-err').hidden = false; return; }
+      const photos = v('photos').split(/\s+/).filter((u) => /^https:\/\//.test(u)).slice(0, 8);
+      const x = { name, nameEn: v('nameEn'), kw: v('kw'), photos, base: v('base'), ai: f.dataset.ai === '1',
+        fr: { name: v('pname'), role: v('role'), specialty: v('spec'), about: v('about') },
+        en: { name: v('pname'), role: v('roleEn') || v('role'), specialty: v('spec'), about: v('aboutEn') || v('about') } };
+      if (catKind === 'prof') {
+        const sid = v('sec'), o = Object.assign({}, C.get('profAdd', {})), list = (o[sid] || []).slice();
+        const s = CARDS.find((z) => z.id === sid) || {};
+        let id = 'x-' + slug(name); while ((s.profiles || []).some((p) => p.id === id) || list.some((p) => p.id === id)) id += '2';
+        list.push(Object.assign(x, { id })); o[sid] = list;
+        C.set('profAdd', o, `Catalogue : métier « ${name} » ajouté (${SECNAME(sid)})${x.ai ? ' — proposé par l’IA' : ''}`);
+      } else {
+        const kind = catKind === 'store' ? 'stores' : 'cards', a = C.get('secAdd', []).slice();
+        let id = 'x-' + slug(name); while (CARDS.some((s) => s.id === id) || STORES.some((s) => s.id === id) || a.some((z) => z.id === id)) id += '2';
+        a.push(Object.assign(x, { id, kind, ex: v('ex'), exEn: v('exEn') }));
+        C.set('secAdd', a, `Catalogue : ${kind === 'stores' ? 'type de boutique' : 'secteur'} « ${name} » ajouté${x.ai ? ' — proposé par l’IA' : ''}`);
+      }
+      $('#modal').classList.remove('on');
+      toast(`« ${name} » ajouté : il est déjà visible dans le studio.`);
+      setTimeout(() => location.reload(), 900);
+    }
+
     /* Mode assistance : l’administrateur modifie la carte d’un client, à sa demande (motif + accord notés au journal) */
     function openAssist(id, key, name) {
       const m = $('#modal');
@@ -345,6 +435,11 @@
       const d = t.dataset;
       if (d.tab) { e.preventDefault(); tab = d.tab; history.replaceState(null, '', '#' + tab); window.scrollTo(0, 0); draw(); return; }
       if (d.assist) { openAssist(d.assist, d.key, d.name); return; }
+      if (d.catadd) { openCatAdd(d.catadd); return; }
+      if (d.catai) { aiFill(); return; }
+      if (d.catsave) { catSave(); return; }
+      if (d.secrm !== undefined) { const a = C.get('secAdd', []).slice(), x = a.splice(+d.secrm, 1)[0]; if (x && confirm(`Retirer « ${x.name} » du catalogue ?`)) { C.set('secAdd', a, `Catalogue : « ${x.name} » retiré`); draw(); } return; }
+      if (d.profrm) { const [sid, pid] = d.profrm.split('|'), o = Object.assign({}, C.get('profAdd', {})), x = (o[sid] || []).find((z) => z.id === pid); if (x && confirm(`Retirer le métier « ${x.name} » ?`)) { o[sid] = o[sid].filter((z) => z.id !== pid); C.set('profAdd', o, `Catalogue : métier « ${x.name} » retiré`); location.reload(); } return; }
       if (d.assistgo) {
         const f = $('[data-assistf]');
         if (!f.motif.value.trim() || !f.ok.checked) { $('.as-err').hidden = false; return; }
