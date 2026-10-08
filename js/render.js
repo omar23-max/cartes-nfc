@@ -1133,13 +1133,14 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       <p>${L2(`Pas le temps maintenant ? Recevez ${remWhen(b)} le lien pour laisser votre avis Google sur ${esc(name)}.`, `No time now? Get the link to review ${esc(name)} on Google ${remWhen(b)}.`)}</p>
       <button type="button" class="btn grem-cal">${ic('cal', 18)}<span>${L2('Ajouter un rappel à mon calendrier', 'Add a reminder to my calendar')}</span></button>
       <p class="grem-n">${L2(`Sans donner vos coordonnées : votre téléphone vous préviendra ${remWhen(b)}.`, `No details needed: your phone will remind you ${remWhen(b)}.`)}</p>
-      ${b.remMail !== false || b.remSms ? `<div class="xch-or"><span>${L2(`ou par ${ways}`, `or by ${ways}`)}</span></div>
+      ${(b.remMail !== false || b.remSms) && !refused() ? `<div class="xch-or"><span>${L2(`ou par ${ways}`, `or by ${ways}`)}</span></div>
       <form class="xch-f grem-f" novalidate>
         <input name="to" value="${esc((prefill && ((b.remMail !== false && prefill.email) || (b.remSms && prefill.tel))) || '')}" type="${b.remSms && b.remMail === false ? 'tel' : 'text'}" autocomplete="email" placeholder="${esc(ways.charAt(0).toUpperCase() + ways.slice(1))}" aria-label="${esc(ways)}">
         <label class="vc-consent"><input type="checkbox" name="ok"><span>${L2(`J’accepte de recevoir <b>un seul rappel</b> de ${esc(name)} pour laisser un avis. Désabonnement en un clic.`, `I agree to receive <b>one reminder</b> from ${esc(name)} to leave a review. One-click unsubscribe.`)}</span></label>
         <p class="xch-err" hidden>${L2('Indiquez votre courriel ou votre numéro, et cochez la case.', 'Enter your email or number, and tick the box.')}</p>
         <button type="submit" class="btn ghost">${ic('clock', 18)}<span>${L2('Programmer mon rappel', 'Schedule my reminder')}</span></button>
-      </form>` : ''}<p class="grem-msg" role="status"></p></div></div>`);
+      </form>` : ''}<p class="grem-msg" role="status"></p>
+      <div class="grem-no"><button type="button" class="xch-skip ov-x">${L2('Non merci, je ne souhaite pas laisser d’avis', 'No thanks, I’d rather not leave a review')}</button></div></div></div>`);
     ov.querySelector('.grem-cal').addEventListener('click', () => {
       const ok = saveFile('data:text/calendar;charset=utf-8,' + encodeURIComponent(remIcs(b, name)), 'rappel-avis.ics');
       saveRemind({ date: new Date().toISOString(), pour: name, to: L2('(calendrier du visiteur)', '(visitor calendar)'), delay: b.remDelay || 'lendemain', source: 'calendrier' });
@@ -1156,6 +1157,9 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     });
   }
 
+  /* Le visiteur a refusé de laisser ses coordonnées (« Passer ») : on ne les lui redemande plus pendant cette visite */
+  const refused = () => { try { return sessionStorage.getItem('nfc-xch-refused') === '1'; } catch (e) { return false; } };
+  const setRefused = () => { try { sessionStorage.setItem('nfc-xch-refused', '1'); } catch (e) { /* rien */ } };
   const offersOn = (m) => !!((m.card || {}).leads || {}).offers;
   function openExchange(from, m) {
     const who = firstName(m.card, m.sec), name = ownerName(m.card);
@@ -1190,6 +1194,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     /* « Passer » : on propose quand même l’avis Google (maintenant ou rappel dans le calendrier) */
     const sk = ov.querySelector('[data-xskip]');
     if (sk) sk.addEventListener('click', () => {
+      setRefused();
       const b = askBlock(m);
       ov.querySelector('.xch').innerHTML = toEn(`<button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>${reviewAsk(b, m, null)}`);
       bindReviewAsk(ov, b, m, null);

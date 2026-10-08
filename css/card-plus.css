@@ -437,3 +437,4 @@ button.map.map-static { width: 100%; border: 0; cursor: pointer; font: inherit; 
 .vc .xch-rev h3 { margin: 4px 0 0; }
 .vc .xch-rev p { margin: 0 0 4px; }
 .vc .xch-rev .btn { justify-content: center; }
+.vc .grem-no { text-align: center; margin-top: 6px; }
