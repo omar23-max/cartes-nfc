@@ -429,3 +429,11 @@ button.map.map-static { width: 100%; border: 0; cursor: pointer; font: inherit; 
 .vc .grem-n { margin: 8px 0 4px; font-size: 13px; color: var(--mu); text-align: center; }
 .vc .grem-msg { margin: 10px 0 0; font-size: 13.5px; font-weight: 600; color: #15803d; text-align: center; }
 .vc .grem-msg:empty { display: none; }
+
+/* Demande d’avis Google après l’échange */
+.vc .xch-rev { text-align: center; display: flex; flex-direction: column; align-items: stretch; gap: 8px; margin-top: 14px; padding-top: 16px; border-top: 1px solid var(--ln); }
+.vc .xch .xch-rev:first-of-type:not(.xch-done .xch-rev) { border-top: 0; margin-top: 4px; }
+.vc .xch-rev-ic { align-self: center; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: #fef3c7; color: #d97706; }
+.vc .xch-rev h3 { margin: 4px 0 0; }
+.vc .xch-rev p { margin: 0 0 4px; }
+.vc .xch-rev .btn { justify-content: center; }

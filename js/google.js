@@ -4,13 +4,15 @@
 (function () {
   'use strict';
 
-  const OFF = ['sante', 'conseil'];
+  /* Professions encadrées, salariés, artistes et créateurs : pas de section Avis Google au départ (le titulaire peut l’ajouter) */
+  const OFF = ['sante', 'conseil', 'pro', 'portfolio', 'musique', 'influence'];
   /* Note d’exemple par secteur (note, nombre d’avis) */
   const NOTE = { artisans: [4.9, 87], beaute: [4.8, 214], restaurant: [4.7, 532], coaching: [4.9, 64], auto: [4.6, 158], archi: [4.9, 41],
     immobilier: [4.9, 73], producteurs: [4.8, 96], evenementiel: [5, 38], hebergement: [4.8, 187], tourisme: [4.9, 129], animaux: [4.9, 112], boutiques: [4.8, 66] };
 
   NFC.SECTORS.forEach((s) => {
-    if (!s.demo || s.blocks.some((b) => b.type === 'greviews')) return;
+    /* Secteurs où les avis ne se justifient pas d’office : pas de section au départ ; elle reste disponible dans « Ajouter une section » (ex. école privée) */
+    if (!s.demo || OFF.includes(s.id) || s.blocks.some((b) => b.type === 'greviews')) return;
     const i = s.blocks.findIndex((b) => b.type === 'reviews');
     s.blocks.splice(i < 0 ? s.blocks.length : i, 0, { key: 'google', type: 'greviews', title: 'Avis Google', help: 'Votre note Google et un bouton pour laisser un avis' });
     const [r, n] = NOTE[s.id] || [4.8, 52];

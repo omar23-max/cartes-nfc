@@ -19,6 +19,7 @@
     play: '<polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/>',
     file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/>',
     check: '<path d="M20 6 9 17l-5-5"/>',
+    star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
     lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
     shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
     utensils: '<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
@@ -1062,6 +1063,43 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     const cu = (c.custom || []).find((x) => x.on !== false && x.type === 'block' && x.def && x.def.type === 'greviews' && remOn(x.data));
     return cu ? cu.data : null;
   }
+  /* Demande d’avis après l’échange : seulement si la section Avis Google est active, avec un lien « Laisser un avis » */
+  function askBlock(m) {
+    if (window.NFC && NFC.svc && !NFC.svc.on('google:reviews')) return null;
+    const c = m.card || {}, defs = (m.sec && m.sec.blocks) || [];
+    const ok = (b) => b && b.on !== false && b.reviewUrl && b.ask !== false;
+    const d = defs.find((x) => x.type === 'greviews'), b = d && (c.blocks || {})[d.key];
+    if (ok(b)) return b;
+    const cu = (c.custom || []).find((x) => x.on !== false && x.type === 'block' && x.def && x.def.type === 'greviews' && ok(x.data));
+    return cu ? cu.data : null;
+  }
+  /* Écran « Un petit avis Google ? » (après l’échange : prefill = coordonnées laissées ; après « Passer » : rien) */
+  function reviewAsk(b, m, prefill) {
+    const name = ownerName(m.card), later = prefill && remOn(b);
+    return `<div class="xch-rev"><span class="xch-rev-ic">${ic('star', 22)}</span><h3>${L2('Un petit avis Google ?', 'A quick Google review?')}</h3>
+      <p>${b.text ? esc(b.text) : L2(`Votre avis aide ${esc(name)} à se faire connaître. Une minute suffit.`, `Your review helps ${esc(name)} get noticed. It only takes a minute.`)}</p>
+      <a class="btn" href="${esc(url(b.reviewUrl))}" target="_blank" rel="noopener" data-revnow>${ic('pen', 17)}<span>${L2('Laisser un avis maintenant', 'Leave a review now')}</span></a>
+      <button type="button" class="btn ghost" data-revlater="${later ? 'remind' : 'cal'}">${ic(later ? 'clock' : 'cal', 17)}<span>${later ? L2('Me le rappeler plus tard', 'Remind me later') : L2('Me le rappeler dans mon calendrier', 'Remind me in my calendar')}</span></button>
+      <p class="grem-msg" role="status"></p>
+      <button type="button" class="xch-skip ov-x">${L2('Non merci', 'No thanks')}</button></div>`;
+  }
+  function bindReviewAsk(ov, b, m, prefill) {
+    ov.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-revlater], [data-revnow]');
+      if (!t || !ov.contains(t)) return;
+      if (t.hasAttribute('data-revnow')) { setTimeout(() => { const x = ov.querySelector('.ov-x'); if (x) x.click(); }, 300); return; }
+      if (t.dataset.revlater === 'remind') {
+        /* On ferme cette fenêtre avant d’ouvrir celle du rappel (sinon elles se superposent) */
+        const vc = ov.closest('.vc'), x = ov.querySelector('.ov-x');
+        if (x) x.click();
+        setTimeout(() => openRemind((vc && vc.querySelector('[data-vc="grem"]')) || vc || t, m, prefill), 260);
+        return;
+      }
+      const name = ownerName(m.card), okf = saveFile('data:text/calendar;charset=utf-8,' + encodeURIComponent(remIcs(b, name)), 'rappel-avis.ics');
+      saveRemind({ date: new Date().toISOString(), pour: name, to: L2('(calendrier du visiteur)', '(visitor calendar)'), delay: b.remDelay || 'lendemain', source: 'calendrier' });
+      ov.querySelector('.grem-msg').textContent = okf ? L2(`Rappel prêt : confirmez l’ajout à votre calendrier. Votre téléphone vous préviendra ${remWhen(b)}.`, `Reminder ready: confirm adding it to your calendar. Your phone will remind you ${remWhen(b)}.`) : L2('Aperçu : sur la vraie carte, le rappel s’ajoute à votre calendrier.', 'Preview: on the live profile, the reminder is added to your calendar.');
+    });
+  }
   const remWhen = (b) => L2(...(REM_DELAY[b.remDelay || 'lendemain'] || REM_DELAY.lendemain));
   function saveRemind(r) {
     try { const a = JSON.parse(localStorage.getItem('nfc-reminders') || '[]'); a.unshift(r); localStorage.setItem('nfc-reminders', JSON.stringify(a.slice(0, 200))); } catch (e) { /* rien */ }
@@ -1084,7 +1122,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       'SUMMARY:' + tx(title), 'DESCRIPTION:' + tx(desc), 'URL:' + link,
       'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + tx(title), 'TRIGGER:PT0M', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
   }
-  function openRemind(from, m) {
+  function openRemind(from, m, prefill) {
     const b = remBlock(m);
     if (!b) return;
     const name = ownerName(m.card), ways = [b.remMail !== false ? L2('courriel', 'email') : '', b.remSms ? L2('numéro de cellulaire', 'mobile number') : ''].filter(Boolean).join(L2(' ou ', ' or '));
@@ -1097,7 +1135,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       <p class="grem-n">${L2(`Sans donner vos coordonnées : votre téléphone vous préviendra ${remWhen(b)}.`, `No details needed: your phone will remind you ${remWhen(b)}.`)}</p>
       ${b.remMail !== false || b.remSms ? `<div class="xch-or"><span>${L2(`ou par ${ways}`, `or by ${ways}`)}</span></div>
       <form class="xch-f grem-f" novalidate>
-        <input name="to" type="${b.remSms && b.remMail === false ? 'tel' : 'text'}" autocomplete="email" placeholder="${esc(ways.charAt(0).toUpperCase() + ways.slice(1))}" aria-label="${esc(ways)}">
+        <input name="to" value="${esc((prefill && ((b.remMail !== false && prefill.email) || (b.remSms && prefill.tel))) || '')}" type="${b.remSms && b.remMail === false ? 'tel' : 'text'}" autocomplete="email" placeholder="${esc(ways.charAt(0).toUpperCase() + ways.slice(1))}" aria-label="${esc(ways)}">
         <label class="vc-consent"><input type="checkbox" name="ok"><span>${L2(`J’accepte de recevoir <b>un seul rappel</b> de ${esc(name)} pour laisser un avis. Désabonnement en un clic.`, `I agree to receive <b>one reminder</b> from ${esc(name)} to leave a review. One-click unsubscribe.`)}</span></label>
         <p class="xch-err" hidden>${L2('Indiquez votre courriel ou votre numéro, et cochez la case.', 'Enter your email or number, and tick the box.')}</p>
         <button type="submit" class="btn ghost">${ic('clock', 18)}<span>${L2('Programmer mon rappel', 'Schedule my reminder')}</span></button>
@@ -1118,6 +1156,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     });
   }
 
+  const offersOn = (m) => !!((m.card || {}).leads || {}).offers;
   function openExchange(from, m) {
     const who = firstName(m.card, m.sec), name = ownerName(m.card);
     const { ov, close } = overlay(from, 'ov-xch');
@@ -1125,7 +1164,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="xch">
       <button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>
       <div class="xch-top"><span class="xch-ok">${ic('check', 22)}</span><div><h3>${window.NFC_SANDBOX ? 'Fiche contact prête' : 'Contact enregistré'}</h3><p>${window.NFC_SANDBOX ? 'Aperçu : sur la version finale, le contact s’ajoute à votre téléphone.' : esc(name) + L2(' est dans votre téléphone.', ' is now in your phone.')}</p></div></div>
-      <div class="xch-ask"><h4>Et vous ?</h4><p>${L2(`Laissez vos coordonnées à ${esc(who)} pour faciliter la prise de contact.`, `Leave your details for ${esc(who)} so you can stay in touch.`)}</p></div>
+      <div class="xch-ask"><h4>Et vous ?</h4><p>${offersOn(m) ? esc((m.card.leads || {}).offerText || L2('Recevez nos offres, réductions et invitations à nos événements.', 'Get our offers, discounts and event invitations.')) + ' ' + L2('Laissez-nous vos coordonnées.', 'Leave us your details.') : L2(`Laissez vos coordonnées à ${esc(who)} pour faciliter la prise de contact.`, `Leave your details for ${esc(who)} so you can stay in touch.`)}</p></div>
       <div class="xch-scan"${window.NFC && NFC.svc && !NFC.svc.on('ai:scan') ? ' hidden' : ''}>
         <label class="btn scan-box">${ic('camera', 19)}<span class="scan-l">Scanner ma carte de visite pour remplir les champs</span><input class="scan-in" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden></label>
         <p class="xch-scan-note">Scannez votre carte papier : les champs se remplissent tout seuls.</p>
@@ -1139,23 +1178,30 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
         ${f('email', 'Email', 'email', 'email')}
         ${fileField({ files: true }, 'Joindre un document (photo, image, fichier)')}
         ${consentBox()}
-        ${remBlock(m) ? `<label class="vc-consent"><input type="checkbox" name="grem"><span>${L2(`M’envoyer ${remWhen(remBlock(m))} un rappel pour laisser un avis Google (un seul message)`, `Send me a reminder ${remWhen(remBlock(m))} to leave a Google review (one message only)`)}</span></label>` : ''}
+        ${offersOn(m) ? `<label class="vc-consent"><input type="checkbox" name="offres"><span>${L2(`J’accepte de recevoir les offres et nouveautés de ${esc(name)} par courriel ou texto. Désabonnement en un clic.`, `I agree to receive offers and news from ${esc(name)} by email or text. One-click unsubscribe.`)}</span></label>` : ''}
         <p class="xch-err" hidden>Indiquez au moins votre nom et un téléphone ou un email.</p>
         <button type="submit" class="btn">${ic('send', 18)}<span>Envoyer mes coordonnées</span></button>
-        <button type="button" class="xch-skip ov-x">Passer</button>
+        <button type="button" class="xch-skip${askBlock(m) ? '" data-xskip="1' : ' ov-x'}">Passer</button>
         ${sendNote(name)}
         <p class="xch-legal">${L2(`Vos coordonnées sont transmises uniquement à ${esc(name)}.`, `Your details are shared only with ${esc(name)}.`)}</p>
       </form>
     </div></div>`);
     bindScan(ov);
+    /* « Passer » : on propose quand même l’avis Google (maintenant ou rappel dans le calendrier) */
+    const sk = ov.querySelector('[data-xskip]');
+    if (sk) sk.addEventListener('click', () => {
+      const b = askBlock(m);
+      ov.querySelector('.xch').innerHTML = toEn(`<button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>${reviewAsk(b, m, null)}`);
+      bindReviewAsk(ov, b, m, null);
+    });
     ov.querySelector('form').addEventListener('submit', (e) => {
       e.preventDefault();
       const fd = new FormData(e.target), v = (k) => String(fd.get(k) || '').trim();
       if (!(v('prenom') || v('nom')) || !(v('tel') || v('email'))) { ov.querySelector('.xch-err').hidden = false; return; }
       if (e.target.querySelector('[name=consent]') && !fd.get('consent')) { const x = ov.querySelector('.xch-err'); x.textContent = L2('Cochez la case pour accepter la transmission de vos coordonnées.', 'Please tick the box to agree to share your details.'); x.hidden = false; return; }
-      saveLead({ date: new Date().toISOString(), pour: name, prenom: v('prenom'), nom: v('nom'), entreprise: v('entreprise'), tel: v('tel'), email: v('email'), fichiers: attached(e.target) });
-      if (e.target.grem && e.target.grem.checked) saveRemind({ date: new Date().toISOString(), pour: name, to: v('email') || v('tel'), delay: (remBlock(m) || {}).remDelay || 'lendemain', source: 'échange' });
-      ov.querySelector('.xch').innerHTML = toEn(`<div class="xch-done"><span class="xch-ok big">${ic('check', 30)}</span><h3>${L2(`Merci ${esc(v('prenom'))} !`, `Thank you ${esc(v('prenom'))}!`)}</h3><p>${esc(name)} ${L2('a bien reçu vos coordonnées.', 'has received your details.')}</p>${(() => { const w = sendWays().filter((k) => (k === 'mail' ? v('email') : v('tel'))); if (!w.length) return ''; const dest = w.map((k) => (k === 'mail' ? esc(v('email')) : esc(v('tel')))).join(L2(' et au ', ' and ')); return `<p class="xch-send">${ic('send', 14)}<span>${L2(`Sa carte vous est envoyée à ${dest}.`, `Their profile is on its way to ${dest}.`)}</span></p>`; })()}${homeOn(m) ? `<button type="button" class="btn ghost" data-vc="a2hs">${ic('phone', 17)}<span>${L2('Ajouter sa carte à l’écran d’accueil', 'Add their profile to my home screen')}</span></button>` : ''}<p class="xch-legal">Démo : dans la version finale, vos coordonnées arrivent chez le professionnel et sa carte vous est envoyée automatiquement.</p><button type="button" class="btn ov-x">Revenir à la carte</button></div>`);
+      saveLead({ date: new Date().toISOString(), pour: name, prenom: v('prenom'), nom: v('nom'), entreprise: v('entreprise'), tel: v('tel'), email: v('email'), offres: !!fd.get('offres'), fichiers: attached(e.target) });
+      ov.querySelector('.xch').innerHTML = toEn(`<div class="xch-done"><span class="xch-ok big">${ic('check', 30)}</span><h3>${L2(`Merci ${esc(v('prenom'))} !`, `Thank you ${esc(v('prenom'))}!`)}</h3><p>${esc(name)} ${L2('a bien reçu vos coordonnées.', 'has received your details.')}</p>${(() => { const w = sendWays().filter((k) => (k === 'mail' ? v('email') : v('tel'))); if (!w.length) return ''; const dest = w.map((k) => (k === 'mail' ? esc(v('email')) : esc(v('tel')))).join(L2(' et au ', ' and ')); return `<p class="xch-send">${ic('send', 14)}<span>${L2(`Sa carte vous est envoyée à ${dest}.`, `Their profile is on its way to ${dest}.`)}</span></p>`; })()}${homeOn(m) ? `<button type="button" class="btn ghost" data-vc="a2hs">${ic('phone', 17)}<span>${L2('Ajouter sa carte à l’écran d’accueil', 'Add their profile to my home screen')}</span></button>` : ''}${askBlock(m) ? reviewAsk(askBlock(m), m, { email: v('email'), tel: v('tel') }) : `<p class="xch-legal">Démo : dans la version finale, vos coordonnées arrivent chez le professionnel et sa carte vous est envoyée automatiquement.</p><button type="button" class="btn ov-x">Revenir à la carte</button>`}</div>`);
+      if (askBlock(m)) bindReviewAsk(ov, askBlock(m), m, { email: v('email'), tel: v('tel') });
     });
   }
 
