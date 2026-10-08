@@ -1066,6 +1066,24 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
   function saveRemind(r) {
     try { const a = JSON.parse(localStorage.getItem('nfc-reminders') || '[]'); a.unshift(r); localStorage.setItem('nfc-reminders', JSON.stringify(a.slice(0, 200))); } catch (e) { /* rien */ }
   }
+  /* Rappel dans le calendrier du visiteur (fichier .ics) : aucune coordonnée demandée, son téléphone le prévient */
+  function remDate(k) {
+    const d = new Date();
+    if (k === '2h') return new Date(d.getTime() + 2 * 3600e3);
+    if (k === 'soir') { const t = new Date(d); t.setHours(19, 0, 0, 0); if (t <= d) t.setDate(t.getDate() + 1); return t; }
+    const t = new Date(d); t.setDate(t.getDate() + (k === '3j' ? 3 : 1)); t.setHours(10, 0, 0, 0); return t;
+  }
+  function remIcs(b, name) {
+    const st = remDate(b.remDelay || 'lendemain'), en = new Date(st.getTime() + 15 * 60e3);
+    const z = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const tx = (t) => String(t || '').replace(/\\/g, '\\\\').replace(/[,;]/g, (c) => '\\' + c).replace(/\r?\n/g, '\\n');
+    const link = url(b.reviewUrl), title = L2(`Laisser un avis : ${name}`, `Leave a review: ${name}`);
+    const desc = (b.remMsg || L2('Merci pour votre visite ! Votre avis Google nous aiderait beaucoup : il ne prend qu’une minute.', 'Thanks for your visit! Your Google review would help us a lot: it only takes a minute.')) + '\n' + link;
+    return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//NexTap//Rappel avis//FR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'BEGIN:VEVENT',
+      'UID:' + Date.now().toString(36) + '@nextap', 'DTSTAMP:' + z(new Date()), 'DTSTART:' + z(st), 'DTEND:' + z(en),
+      'SUMMARY:' + tx(title), 'DESCRIPTION:' + tx(desc), 'URL:' + link,
+      'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + tx(title), 'TRIGGER:PT0M', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+  }
   function openRemind(from, m) {
     const b = remBlock(m);
     if (!b) return;
@@ -1074,13 +1092,22 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="xch grem">
       <button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button>
       <h3>${L2('Recevez un rappel', 'Get a reminder')}</h3>
-      <p>${L2(`Pas le temps maintenant ? ${esc(name)} vous enverra ${remWhen(b)} le lien pour laisser votre avis Google.`, `No time now? ${esc(name)} will send you the link to leave your Google review ${remWhen(b)}.`)}</p>
+      <p>${L2(`Pas le temps maintenant ? Recevez ${remWhen(b)} le lien pour laisser votre avis Google sur ${esc(name)}.`, `No time now? Get the link to review ${esc(name)} on Google ${remWhen(b)}.`)}</p>
+      <button type="button" class="btn grem-cal">${ic('cal', 18)}<span>${L2('Ajouter un rappel à mon calendrier', 'Add a reminder to my calendar')}</span></button>
+      <p class="grem-n">${L2(`Sans donner vos coordonnées : votre téléphone vous préviendra ${remWhen(b)}.`, `No details needed: your phone will remind you ${remWhen(b)}.`)}</p>
+      ${b.remMail !== false || b.remSms ? `<div class="xch-or"><span>${L2(`ou par ${ways}`, `or by ${ways}`)}</span></div>
       <form class="xch-f grem-f" novalidate>
         <input name="to" type="${b.remSms && b.remMail === false ? 'tel' : 'text'}" autocomplete="email" placeholder="${esc(ways.charAt(0).toUpperCase() + ways.slice(1))}" aria-label="${esc(ways)}">
         <label class="vc-consent"><input type="checkbox" name="ok"><span>${L2(`J’accepte de recevoir <b>un seul rappel</b> de ${esc(name)} pour laisser un avis. Désabonnement en un clic.`, `I agree to receive <b>one reminder</b> from ${esc(name)} to leave a review. One-click unsubscribe.`)}</span></label>
         <p class="xch-err" hidden>${L2('Indiquez votre courriel ou votre numéro, et cochez la case.', 'Enter your email or number, and tick the box.')}</p>
-        <button type="submit" class="btn">${ic('clock', 18)}<span>${L2('Programmer mon rappel', 'Schedule my reminder')}</span></button>
-      </form></div></div>`);
+        <button type="submit" class="btn ghost">${ic('clock', 18)}<span>${L2('Programmer mon rappel', 'Schedule my reminder')}</span></button>
+      </form>` : ''}<p class="grem-msg" role="status"></p></div></div>`);
+    ov.querySelector('.grem-cal').addEventListener('click', () => {
+      const ok = saveFile('data:text/calendar;charset=utf-8,' + encodeURIComponent(remIcs(b, name)), 'rappel-avis.ics');
+      saveRemind({ date: new Date().toISOString(), pour: name, to: L2('(calendrier du visiteur)', '(visitor calendar)'), delay: b.remDelay || 'lendemain', source: 'calendrier' });
+      ov.querySelector('.grem-msg').textContent = ok ? L2(`Rappel prêt : confirmez l’ajout à votre calendrier. Votre téléphone vous préviendra ${remWhen(b)}.`, `Reminder ready: confirm adding it to your calendar. Your phone will remind you ${remWhen(b)}.`) : L2('Aperçu : sur la vraie carte, le rappel s’ajoute à votre calendrier.', 'Preview: on the live profile, the reminder is added to your calendar.');
+    });
+    if (!ov.querySelector('form')) return;
     ov.querySelector('form').addEventListener('submit', (e) => {
       e.preventDefault();
       const f = e.target, to = f.to.value.trim();

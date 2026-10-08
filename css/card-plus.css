@@ -425,3 +425,7 @@ button.map.map-static { width: 100%; border: 0; cursor: pointer; font: inherit; 
 /* Rappel « Laissez-nous un avis Google » */
 .vc .gr-rem { margin-top: 8px; }
 .vc .grem-f input[name=to] { width: 100%; box-sizing: border-box; min-height: 46px; padding: 0 14px; border: 1px solid var(--ln); border-radius: 12px; font: inherit; margin: 6px 0 10px; background: var(--sf); color: var(--tx); }
+.vc .grem-cal { width: 100%; justify-content: center; margin-top: 6px; }
+.vc .grem-n { margin: 8px 0 4px; font-size: 13px; color: var(--mu); text-align: center; }
+.vc .grem-msg { margin: 10px 0 0; font-size: 13.5px; font-weight: 600; color: #15803d; text-align: center; }
+.vc .grem-msg:empty { display: none; }
