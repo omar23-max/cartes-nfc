@@ -778,3 +778,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .assist-bar .ab-t { flex: 1; min-width: 220px; }
 .assist-bar .ab-t small { display: block; color: #9a3412; font-size: 12.5px; }
 .assist-bar .ab-b { display: flex; gap: 8px; flex-wrap: wrap; }
+/* Mode administrateur : tuile « Ajouter un métier » */
+.tile.adm-addt { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 6px; border: 2px dashed #f59e0b; background: #fffbeb; color: #92400e; text-decoration: none; }
+.tile.adm-addt .tile-ic { background: #f59e0b; color: #fff; }
+.tile.adm-addt .tile-ex { color: #b45309; }

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=106">
+  <link rel="stylesheet" href="css/app.css?v=107">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -106,24 +106,24 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=106"></script>
-  <script src="js/data.js?v=106"></script>
-  <script src="js/sectors.js?v=106"></script>
-  <script src="js/media.js?v=106"></script>
-  <script src="js/extras.js?v=106"></script>
-  <script src="js/locale-na.js?v=106"></script>
-  <script src="js/locale-na-en.js?v=106"></script>
-  <script src="js/google.js?v=106"></script>
-  <script src="js/profiles.js?v=106"></script>
-  <script src="js/profiles-sport.js?v=106"></script>
-  <script src="js/profiles-sante.js?v=106"></script>
-  <script src="js/profiles-archi.js?v=106"></script>
-  <script src="js/profiles-resto.js?v=106"></script>
-  <script src="js/profiles-auto.js?v=106"></script>
-  <script src="js/profiles-edu.js?v=106"></script>
-  <script src="js/custom-catalog.js?v=106"></script>
-  <script src="js/jobs.js?v=106"></script>
-  <script src="js/render.js?v=106"></script>
+  <script src="js/services.js?v=107"></script>
+  <script src="js/data.js?v=107"></script>
+  <script src="js/sectors.js?v=107"></script>
+  <script src="js/media.js?v=107"></script>
+  <script src="js/extras.js?v=107"></script>
+  <script src="js/locale-na.js?v=107"></script>
+  <script src="js/locale-na-en.js?v=107"></script>
+  <script src="js/google.js?v=107"></script>
+  <script src="js/profiles.js?v=107"></script>
+  <script src="js/profiles-sport.js?v=107"></script>
+  <script src="js/profiles-sante.js?v=107"></script>
+  <script src="js/profiles-archi.js?v=107"></script>
+  <script src="js/profiles-resto.js?v=107"></script>
+  <script src="js/profiles-auto.js?v=107"></script>
+  <script src="js/profiles-edu.js?v=107"></script>
+  <script src="js/custom-catalog.js?v=107"></script>
+  <script src="js/jobs.js?v=107"></script>
+  <script src="js/render.js?v=107"></script>
   <script>
   (function () {
     'use strict';
@@ -200,11 +200,12 @@
       ${box('Palettes ajoutées', LIVE, 'Ajoutées depuis l’étape Couleurs du studio, en mode administrateur.', added.length ? added.map(([k, a]) => a.map((x) => `<div class="adm-f"><div><span style="display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px"><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.p)};display:inline-block"></i><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.a)};display:inline-block"></i></span>${esc(x.name)}<small>${esc(SECNAME(k.split('~')[0]))}${k.includes('~') ? ' – ' + esc(k.split('~')[1]) : ''}</small></div><div><span class="adm-d">Pour la retirer : « Supprimer » sur la palette, dans le studio.</span></div></div>`).join('')).join('') : '<p class="adm-empty">Aucune palette ajoutée.</p>')}
       ${box('Secteurs des cartes', LIVE, 'Visible, « Bientôt » (affiché mais pas encore ouvert) ou masqué. Les flèches changent l’ordre d’affichage.', secRows(CARDS, 'cards'))}
       ${box('Types de boutique', LIVE, 'Même principe pour le studio des boutiques.', secRows(STORES, 'stores'))}
-      ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<p class="adm-d" style="margin:10px 0 4px"><b>${esc(s.name)}</b></p><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div>`).join(''))}
+      ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<p class="adm-d" style="margin:10px 0 4px"><b>${esc(s.name)}</b></p><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div><button type="button" class="adm-t" style="margin-top:6px" data-catadd="prof" data-sec="${s.id}">+ Ajouter un métier à ce secteur</button>`).join('')
+        + `<p class="adm-d" style="margin:16px 0 6px"><b>Secteurs sans métiers</b> : ajoutez-leur un premier métier (l’exemple actuel devient alors le métier « par défaut »).</p><div style="display:flex;flex-wrap:wrap;gap:6px">${CARDS.filter((s) => !s.profiles).map((s) => `<button type="button" class="adm-t" data-catadd="prof" data-sec="${s.id}">+ ${esc(s.name)}</button>`).join('')}</div>`)}
       ${box('Modèles (mises en page)', LIVE, 'Un modèle désactivé n’est plus proposé ; un client qui l’a déjà choisi le garde.', `<div class="adm-list">${DESIGNS.map((d) => { const on = !C.get('designsOff', []).includes(d.id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(d.name)} <small style="color:var(--mut)">${esc(d.id.toUpperCase())}</small></span>${sw(`data-des="${d.id}"`, on)}</label>`; }).join('')}</div>`)}
       ${box('Modèle recommandé par secteur', LIVE, 'Le badge « Recommandé » à l’étape Modèle.', CARDS.filter((s) => s.active).map((s) => `<div class="adm-f"><div>${esc(s.name)}</div><div><select data-rec="${s.id}"><option value="">Par défaut (${esc(String(s.rec || '').toUpperCase())})</option>${DESIGNS.map((d) => `<option value="${d.id}" ${C.get('rec', {})[s.id] === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></div></div>`).join(''))}
       ${box('Sections de « Ajouter une section »', LIVE, 'Types de sections que le client peut ajouter à sa carte.', `<div class="adm-list">${CATSEC.map(([id, n]) => { const on = !C.get('catOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(n)}</span>${sw(`data-catsec="${id}"`, on)}</label>`; }).join('')}</div>`)}
-      ${box('Recherche : métiers ajoutés', LIVE, `${jobsN} métiers sont déjà reconnus. Ajoutez-en d’autres et choisissez leur secteur.`, `${C.get('jobs', []).map((j, i) => `<div class="adm-row"><input type="text" data-job="${i}" data-f="0" value="${esc(j[0])}" placeholder="Nom du métier"><select data-job="${i}" data-f="1">${CARDS.map((s) => `<option value="${s.id}" ${j[1] === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select><button type="button" class="adm-btn" data-jobdel="${i}">Retirer</button></div>`).join('') || '<p class="adm-empty">Aucun métier ajouté pour l’instant.</p>'}`, '<button type="button" class="adm-btn pri" data-jobadd>Ajouter un métier</button>')}
+      ${box('Recherche : mots reconnus (sans carte)', LIVE, `${jobsN} métiers sont déjà reconnus par la recherche : taper l’un d’eux mène au bon secteur. Ajoutez-en d’autres ici (simple mot de recherche, sans carte d’exemple). Pour un vrai métier avec sa carte, utilisez « Ajouter au catalogue ».`, `${C.get('jobs', []).map((j, i) => `<div class="adm-row"><input type="text" data-job="${i}" data-f="0" value="${esc(j[0])}" placeholder="Nom du métier"><select data-job="${i}" data-f="1">${CARDS.map((s) => `<option value="${s.id}" ${j[1] === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select><button type="button" class="adm-btn" data-jobdel="${i}">Retirer</button></div>`).join('') || '<p class="adm-empty">Aucun métier ajouté pour l’instant.</p>'}`, '<button type="button" class="adm-btn pri" data-jobadd>Ajouter un mot de recherche</button>')}
       ${box('Palettes de couleurs', GB, 'Ajout de palettes personnalisées et couleur extraite du logo.', fBool('palettes.custom', 'Autoriser une couleur personnalisée', 'Le client choisit sa propre couleur principale.'))}`;
     };
 
@@ -307,7 +308,7 @@
     /* ---------- Ajouter un secteur, un métier ou un type de boutique (manuel ou IA) ---------- */
     const slug = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30);
     let catKind = 'sector';
-    function openCatAdd(k) {
+    function openCatAdd(k, sid) {
       catKind = k;
       const T = { sector: 'Ajouter un secteur', prof: 'Ajouter un métier', store: 'Ajouter un type de boutique' }[k];
       const secOpts = CARDS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
@@ -339,6 +340,7 @@
       const f = $('[data-catf]');
       if (k === 'prof') {
         const fillBase = () => { const s = CARDS.find((z) => z.id === f.sec.value); f.base.innerHTML = s && s.profiles ? s.profiles.map((p) => `<option value="${p.id}">${esc(p.n[0])}</option>`).join('') : '<option value="">Exemple actuel du secteur</option>'; };
+        if (sid && CARDS.some((z) => z.id === sid)) f.sec.value = sid;
         f.sec.addEventListener('change', fillBase); fillBase();
       }
     }
@@ -384,7 +386,9 @@
       }
       $('#modal').classList.remove('on');
       toast(`« ${name} » ajouté : il est déjà visible dans le studio.`);
-      setTimeout(() => location.reload(), 900);
+      /* Venu du studio (écran « Quel est votre métier ? ») : on y retourne */
+      const back = new URLSearchParams(location.search).get('back') || '';
+      setTimeout(() => { if (/^(index\.html|stores\/)[\w.?=&%~-]*$/.test(back)) location.href = back; else location.reload(); }, 900);
     }
 
     /* Mode assistance : l’administrateur modifie la carte d’un client, à sa demande (motif + accord notés au journal) */
@@ -435,7 +439,7 @@
       const d = t.dataset;
       if (d.tab) { e.preventDefault(); tab = d.tab; history.replaceState(null, '', '#' + tab); window.scrollTo(0, 0); draw(); return; }
       if (d.assist) { openAssist(d.assist, d.key, d.name); return; }
-      if (d.catadd) { openCatAdd(d.catadd); return; }
+      if (d.catadd) { openCatAdd(d.catadd, d.sec); return; }
       if (d.catai) { aiFill(); return; }
       if (d.catsave) { catSave(); return; }
       if (d.secrm !== undefined) { const a = C.get('secAdd', []).slice(), x = a.splice(+d.secrm, 1)[0]; if (x && confirm(`Retirer « ${x.name} » du catalogue ?`)) { C.set('secAdd', a, `Catalogue : « ${x.name} » retiré`); draw(); } return; }
@@ -477,6 +481,9 @@
     });
     window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if (TABS.some((x) => x[0] === h)) { tab = h; draw(); } });
     draw();
+    /* Ouvert depuis le studio : formulaire « Ajouter un métier » avec le secteur déjà choisi */
+    const qp = new URLSearchParams(location.search).get('addprof');
+    if (qp) openCatAdd('prof', qp);
   })();
   </script>
 </body>

@@ -618,6 +618,8 @@
 
   /* ---------- Étape 1 bis : le métier, pour les secteurs qui en proposent plusieurs ---------- */
   let profPick = false;
+  /* Retour de l’admin après l’ajout d’un métier : on rouvre l’écran des métiers du secteur */
+  try { const pp = new URLSearchParams(location.search).get('profpick'); if (pp && SECTORS.some((x) => x.id === pp && x.profiles)) { S.sectorId = pp; S.step = 1; profPick = true; } } catch (e) { /* rien */ }
   function stepProf() {
     const b = baseSec(), cur = prof(), en = ui() === 'en';
     const tiles = b.profiles.filter((p) => (ADM() ? !profDel(b, p) : profOk(b, p))).map((p) => admWrap(`
@@ -629,7 +631,7 @@
     return `<section class="wrap">${admBar()}
       <button class="back" data-act="profback">${ic('arrowl', 16)}${en ? 'Change industry' : 'Changer de secteur'}</button>
       ${head(en ? 'What is your profession?' : 'Quel est votre métier ?', en ? `${b.profiles.length} profiles for <b>${b.name}</b>, each with its own example, colors and photos. Everything stays customizable.` : `${b.profiles.length} métiers pour <b>${b.name}</b>, chacun avec son exemple, ses couleurs et ses photos. Tout reste personnalisable.`)}
-      <div class="tiles">${tiles}</div>
+      <div class="tiles">${tiles}${ADM() ? `<a class="tile adm-addt" href="${isStores ? '../' : ''}admin.html?addprof=${b.id}&back=${encodeURIComponent('index.html?profpick=' + b.id)}#cat"><span class="tile-ic"><i data-lucide="plus"></i></span><span class="tile-n">Ajouter un métier</span><span class="tile-ex">Visible seulement par vous · manuel ou IA</span></a>` : ''}</div>
     </section>`;
   }
   function pickProfile(pid) {
