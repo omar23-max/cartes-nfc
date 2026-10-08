@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=102">
+  <link rel="stylesheet" href="css/app.css?v=103">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -103,25 +103,26 @@
       <div id="pane"></div>
     </main>
   </div>
+  <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=102"></script>
-  <script src="js/data.js?v=102"></script>
-  <script src="js/sectors.js?v=102"></script>
-  <script src="js/media.js?v=102"></script>
-  <script src="js/extras.js?v=102"></script>
-  <script src="js/locale-na.js?v=102"></script>
-  <script src="js/locale-na-en.js?v=102"></script>
-  <script src="js/google.js?v=102"></script>
-  <script src="js/profiles.js?v=102"></script>
-  <script src="js/profiles-sport.js?v=102"></script>
-  <script src="js/profiles-sante.js?v=102"></script>
-  <script src="js/profiles-archi.js?v=102"></script>
-  <script src="js/profiles-resto.js?v=102"></script>
-  <script src="js/profiles-auto.js?v=102"></script>
-  <script src="js/profiles-edu.js?v=102"></script>
-  <script src="js/jobs.js?v=102"></script>
-  <script src="js/render.js?v=102"></script>
+  <script src="js/services.js?v=103"></script>
+  <script src="js/data.js?v=103"></script>
+  <script src="js/sectors.js?v=103"></script>
+  <script src="js/media.js?v=103"></script>
+  <script src="js/extras.js?v=103"></script>
+  <script src="js/locale-na.js?v=103"></script>
+  <script src="js/locale-na-en.js?v=103"></script>
+  <script src="js/google.js?v=103"></script>
+  <script src="js/profiles.js?v=103"></script>
+  <script src="js/profiles-sport.js?v=103"></script>
+  <script src="js/profiles-sante.js?v=103"></script>
+  <script src="js/profiles-archi.js?v=103"></script>
+  <script src="js/profiles-resto.js?v=103"></script>
+  <script src="js/profiles-auto.js?v=103"></script>
+  <script src="js/profiles-edu.js?v=103"></script>
+  <script src="js/jobs.js?v=103"></script>
+  <script src="js/render.js?v=103"></script>
   <script>
   (function () {
     'use strict';
@@ -257,15 +258,17 @@
         try {
           const st = JSON.parse(localStorage.getItem(key) || 'null');
           if (!st || !st.id) return;
-          const first = Object.values(st.cards || {})[0] || {};
-          rows.push({ id: st.id, studio, view, name: ((first.identity || {}).name) || '—', sec: SECNAME(st.sectorId) });
+          /* Carte en cours : secteur (+ métier) choisi, sinon la première enregistrée */
+          const pf = (st.prof || {})[st.sectorId], cur = (st.cards || {})[st.sectorId + (pf ? '~' + pf : '')];
+          const first = cur || Object.values(st.cards || {})[0] || {};
+          rows.push({ id: st.id, studio, view, key, name: ((first.identity || {}).name) || '—', sec: SECNAME(st.sectorId) });
         } catch (e) { /* ignoré */ }
       });
       let leads = [];
       try { leads = JSON.parse(localStorage.getItem('nfc-leads') || '[]'); } catch (e) { leads = []; }
       const stat = (n, l, b) => `<div class="adm-stat"><b>${n}</b><span>${l} ${b}</span></div>`;
       return `<div class="sh"><h1>Cartes et statistiques</h1><p>Sur GoBiz : toutes les cartes de tous les clients. Dans la maquette : les cartes créées dans ce navigateur.</p></div>
-      ${box('Cartes publiées', LIVE, 'Une carte suspendue affiche « Carte momentanément indisponible » à ses visiteurs.', rows.length ? `<div class="adm-tbl-w"><table class="adm-tbl"><thead><tr><th>Carte</th><th>Studio</th><th>Secteur</th><th>Code</th><th>Voir</th><th>Suspendue</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.name)}</td><td>${r.studio}</td><td>${esc(r.sec)}</td><td>${esc(r.id)}</td><td><a href="${r.view}" target="_blank" rel="noopener">Ouvrir</a></td><td>${sw(`data-susp="${esc(r.id)}"`, C.get('suspended', []).includes(r.id))}</td></tr>`).join('')}</tbody></table></div>` : '<p class="adm-empty">Aucune carte créée dans ce navigateur pour l’instant.</p>')}
+      ${box('Cartes publiées', LIVE, 'Une carte suspendue affiche « Carte momentanément indisponible » à ses visiteurs.', rows.length ? `<div class="adm-tbl-w"><table class="adm-tbl"><thead><tr><th>Carte</th><th>Studio</th><th>Secteur</th><th>Code</th><th>Voir</th><th>Assistance</th><th>Suspendue</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.name)}</td><td>${r.studio}</td><td>${esc(r.sec)}</td><td>${esc(r.id)}</td><td><a href="${r.view}" target="_blank" rel="noopener">Ouvrir</a></td><td><button type="button" class="adm-t" data-assist="${esc(r.id)}" data-key="${r.key}" data-name="${esc(r.name)}">Modifier à la demande du client</button></td><td>${sw(`data-susp="${esc(r.id)}"`, C.get('suspended', []).includes(r.id))}</td></tr>`).join('')}</tbody></table></div>` : '<p class="adm-empty">Aucune carte créée dans ce navigateur pour l’instant.</p>')}
       ${box('Statistiques', '', '', `<div class="adm-stats">${stat(leads.length, 'contacts reçus (formulaires et échanges)', LIVE)}${stat('—', 'vues des cartes', GB)}${stat('—', 'clics sur « Appeler »', GB)}${stat('—', 'contacts enregistrés (.vcf)', GB)}${stat('—', 'commandes des boutiques', GB)}</div>`)}`;
     };
 
@@ -293,6 +296,24 @@
         c.hidden = !any;
         const b = c.querySelector('.adm-moreb'); if (b) b.hidden = !!v;
       });
+    }
+    /* Mode assistance : l’administrateur modifie la carte d’un client, à sa demande (motif + accord notés au journal) */
+    function openAssist(id, key, name) {
+      const m = $('#modal');
+      m.innerHTML = `<div class="mb" data-assistx="1"></div>
+        <div class="md" role="dialog" aria-modal="true" aria-labelledby="as-t">
+          <h2 id="as-t">Modifier la carte de ${esc(name)}</h2>
+          <p>Vous allez ouvrir le studio sur la carte <b>${esc(id)}</b> pour la modifier à la place du client. L’intervention est notée au journal et le client en est prévenu par courriel (sur GoBiz).</p>
+          <form data-assistf onsubmit="return false">
+            <input type="hidden" name="id" value="${esc(id)}"><input type="hidden" name="key" value="${esc(key)}"><input type="hidden" name="nm" value="${esc(name)}">
+            <label class="f"><span class="f-l">Demande reçue par</span><select name="by"><option>téléphone</option><option>courriel</option><option>le bouton « Demander l’aide de NexTap »</option><option>en personne</option></select></label>
+            <label class="f"><span class="f-l">Ce que le client demande (motif)</span><textarea name="motif" rows="3" placeholder="Ex. changer son numéro de téléphone et ajouter ses photos de chantier"></textarea></label>
+            <label class="ck"><input type="checkbox" name="ok"><span><b>Le client m’a demandé de modifier sa carte</b><small style="display:block">Obligatoire : sans demande du client, on ne touche pas à sa carte (Loi 25).</small></span></label>
+            <p class="as-err" hidden style="color:#b91c1c;font-size:13px;margin:8px 0 0">Indiquez le motif et confirmez la demande du client.</p>
+            <div class="btns" style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b pri" data-assistgo="1">Ouvrir sa carte dans le studio</button><button type="button" class="b" data-assistx="1">Annuler</button></div>
+          </form>
+        </div>`;
+      m.classList.add('on');
     }
     const toast = (m) => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1600); };
     const saved = (m) => { toast(m || 'Enregistré'); };
@@ -323,6 +344,18 @@
       if (!t) return;
       const d = t.dataset;
       if (d.tab) { e.preventDefault(); tab = d.tab; history.replaceState(null, '', '#' + tab); window.scrollTo(0, 0); draw(); return; }
+      if (d.assist) { openAssist(d.assist, d.key, d.name); return; }
+      if (d.assistgo) {
+        const f = $('[data-assistf]');
+        if (!f.motif.value.trim() || !f.ok.checked) { $('.as-err').hidden = false; return; }
+        /* Copie de la carte avant intervention : le client pourra revenir en arrière */
+        try { localStorage.setItem('nextap-assist-backup', localStorage.getItem(f.key.value) || ''); } catch (err) { /* rien */ }
+        C.set('assistNow', { id: f.id.value, key: f.key.value, name: f.nm.value, motif: f.motif.value.trim(), by: f.by.value, start: new Date().toISOString() },
+          `Assistance commencée : carte ${f.id.value} (${f.nm.value}) — demande par ${f.by.value} — motif : ${f.motif.value.trim()}`);
+        location.href = (f.key.value === 'nfc-stores-v1' ? 'stores/' : 'index.html') + '?assist=1';
+        return;
+      }
+      if (d.assistx) { $('#modal').classList.remove('on'); return; }
       if (d.morecat) { if (OPEN.has(d.morecat)) OPEN.delete(d.morecat); else OPEN.add(d.morecat); draw(); return; }
       if (d.svcall) { const c = S.all().find((x) => x.id === d.svcall); c.items.forEach(([id]) => S.set(c.id + ':' + id, d.v === '1')); C.set('log', C.get('log', []).concat([{ t: new Date().toISOString(), w: `${d.v === '1' ? 'Activé' : 'Désactivé'} : catégorie ${c.n[0]}` }]).slice(-200)); draw(); return saved(); }
       if (d.mv) {

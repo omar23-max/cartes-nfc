@@ -32,6 +32,9 @@
 
   const fresh = () => ({ v: 1, step: 1, sectorId: null, design: null, palette: 0, cards: {}, id: rid() });
   let S = load();
+  /* Mode assistance (admin) : la carte du client s’ouvre directement à l’étape Contenu */
+  const assistNow = () => { const a = cfg('assistNow', null); return a && a.key === KEY && a.id === S.id ? a : null; };
+  try { if (new URLSearchParams(location.search).get('assist') === '1' && assistNow()) S.step = 4; } catch (e) { /* rien */ }
   /* Langue transmise par les onglets du haut (?ui=en) */
   try { const qu = new URLSearchParams(location.search).get('ui'); if (qu === 'en' || qu === 'fr') S.ui = qu; } catch (e) { /* rien */ }
   /* Tous les panneaux de l’étape Contenu arrivent fermés : le client ouvre celui qu’il veut modifier */
@@ -524,6 +527,15 @@
       document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs(isStores ? 'stores' : 'cards', isStores ? '../' : ''));
       document.querySelector('.ptabs').addEventListener('click', (e) => { const a = e.target.closest('a[data-ptab]'); if (a && a.dataset.ptab !== 'admin') a.href = a.getAttribute('href').split('?')[0] + '?ui=' + ui(); });
     }
+    /* Bandeau du mode assistance, sous les onglets */
+    const A = assistNow(), bar = document.querySelector('.assist-bar');
+    if (A && !bar) {
+      const el = document.createElement('div');
+      el.className = 'assist-bar';
+      el.innerHTML = `<span class="ab-ic">${ic('shield', 18)}</span><span class="ab-t"><b>Mode assistance</b> : vous modifiez la carte de <b>${esc(A.name)}</b> à sa demande<small>Motif : ${esc(A.motif)} · demande reçue par ${esc(A.by)}</small></span><span class="ab-b"><button type="button" class="b sm" data-act="assist-undo">Annuler mes modifications</button><button type="button" class="b sm pri" data-act="assist-end">Terminer</button></span>`;
+      const pt = document.querySelector('.ptabs');
+      if (pt) pt.after(el); else document.body.prepend(el);
+    } else if (!A && bar) bar.remove();
     const ptl = document.querySelectorAll('.ptabs .pt-s');
     ptl.forEach((x) => { x.textContent = { cards: ui() === 'en' ? 'Cards' : 'Cartes', stores: ui() === 'en' ? 'Stores' : 'Boutiques', admin: 'Admin' }[x.parentNode.dataset.ptab]; });
   }
@@ -1581,6 +1593,28 @@
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
       case 'poster': if (!locked()) openPoster(); break;
+      case 'assist-undo': {
+        const bk = localStorage.getItem('nextap-assist-backup');
+        if (!bk || !ask('Revenir à la carte telle qu’elle était avant votre intervention ?')) break;
+        S = JSON.parse(bk); S.step = 4; save(); render();
+        NFC.cfg.set('log', NFC.cfg.get('log', []).concat([{ t: new Date().toISOString(), w: `Assistance : modifications annulées sur la carte ${S.id}` }]));
+        toast('Modifications annulées : la carte est revenue à son état d’avant.');
+        break;
+      }
+      case 'assist-end': {
+        const A = assistNow();
+        if (!A) break;
+        save();
+        const min = Math.max(1, Math.round((Date.now() - new Date(A.start)) / 60000));
+        NFC.cfg.set('assistNow', null, `Assistance terminée : carte ${A.id} (${A.name}), ${min} min — courriel envoyé au client (simulé)`);
+        $('#modal').innerHTML = `<div class="mb"></div><div class="md" role="dialog" aria-modal="true"><h2>Intervention terminée</h2>
+          <p>Les modifications de la carte de <b>${esc(A.name)}</b> sont enregistrées et notées au journal.</p>
+          <p class="muted small">Sur GoBiz, le client reçoit un courriel « NexTap a modifié votre carte à votre demande », avec la liste des changements et un lien pour la voir. La version d’avant reste disponible pour revenir en arrière.</p>
+          <div class="btns"><a class="b pri" href="${isStores ? '../' : ''}admin.html#cards">Retour à l’admin</a></div></div>`;
+        $('#modal').classList.add('on');
+        document.querySelector('.assist-bar')?.remove();
+        break;
+      }
       case 'orderplan': S.orderPlan = t.dataset.v; save(); document.querySelectorAll('.order-pl button').forEach((x) => x.classList.toggle('on', x === t)); break;
       case 'order':
         save();

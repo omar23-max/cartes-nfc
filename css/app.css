@@ -771,3 +771,10 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 /* Catalogue des sections : déjà présentes sur la carte */
 .as-has { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 999px; background: #e8f5ec; color: #166534; font-size: 11px; font-weight: 600; white-space: nowrap; vertical-align: 1px; }
 .as-t.has { background: #fbfdfb; }
+
+/* Mode assistance (administrateur qui modifie la carte d’un client) */
+.assist-bar { position: sticky; top: 0; z-index: 25; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 20px; background: #fff4e5; border-bottom: 2px solid #f59e0b; color: #7c2d12; font-size: 14px; }
+.assist-bar .ab-ic { flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 9px; background: #f59e0b; color: #fff; }
+.assist-bar .ab-t { flex: 1; min-width: 220px; }
+.assist-bar .ab-t small { display: block; color: #9a3412; font-size: 12.5px; }
+.assist-bar .ab-b { display: flex; gap: 8px; flex-wrap: wrap; }
