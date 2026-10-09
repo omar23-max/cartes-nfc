@@ -923,14 +923,13 @@
   function pfBar() {
     const P = pfInit(), n = P.list.length, same = P.cur === P.live;
     return `<div class="pf-bar">
-      <div class="pf-h"><span class="pf-l">${ic('copy', 15)}Profils de ma carte <em>${n} / ${pfMax()}</em></span><button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer</button></div>
-      <div class="pf-chips">
-        ${P.list.map((x) => `<button type="button" class="pf-c${x.id === P.cur ? ' on' : ''}" data-act="pfsw" data-v="${x.id}" title="${x.id === P.cur ? 'Profil en cours de modification' : 'Modifier ce profil'}">${x.id === P.live ? `<span class="pf-dot" title="Ouvert par la carte">${ic('nfc', 12)}</span>` : ''}<span>${esc(x.name)}</span></button>`).join('')}
-        <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouveau</button>
-      </div>
-      <div class="pf-st${same ? '' : ' warn'}">${same
-        ? `${ic('nfc', 14)}<span>Votre carte ouvre ce profil.</span>`
-        : `${ic('nfc', 14)}<span>Votre carte ouvre « <b>${esc(pfName(P.live))}</b> ». Vous modifiez « ${esc(pfName(P.cur))} ».</span><button type="button" class="pf-go" data-act="pflive">Ouvrir celui-ci avec ma carte</button>`}</div>
+      <label class="pf-sel"><span class="pf-l">${ic('copy', 15)}Profil modifié</span>
+        <span class="pf-sw"><select data-pfsel aria-label="Profil en cours de modification">${P.list.map((x) => `<option value="${x.id}" ${x.id === P.cur ? 'selected' : ''}>${esc(x.name)}${x.id === P.live ? ' — ouvert par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
+      <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouveau profil</button>
+      <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
+      <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
+        ? `<span>Votre carte ouvre ce profil.</span>`
+        : `<span>Votre carte ouvre « <b>${esc(pfName(P.live))}</b> », pas celui-ci.</span><button type="button" class="pf-go" data-act="pflive">Ouvrir « ${esc(pfName(P.cur))} » avec ma carte</button>`}</div>
     </div>`;
   }
   function pfModal(mode) {
@@ -2078,6 +2077,7 @@
     return (n / 1024 / 1024).toFixed(1).replace('.', ui() === 'en' ? '.' : ',') + ' Mo';
   }
   /* PDF téléversé dans « Liens et documents » */
+  document.addEventListener('change', (e) => { if (e.target.matches && e.target.matches('[data-pfsel]')) pfSwitch(e.target.value); });
   document.addEventListener('change', async (e) => {
     const t = e.target;
     if (t.type !== 'file' || !t.dataset.pdf) return;
