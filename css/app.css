@@ -932,3 +932,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-row > .pf-o span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pf-row > .pf-o svg { flex: none; color: var(--mut); }
 .pf-row > .pf-o:hover { border-color: var(--ink); border-style: solid; }
+/* Bouton « Activer » (colonne État) */
+.pf-row > .pf-act { grid-column: 3; justify-self: stretch; height: 40px; box-sizing: border-box; border: 1px solid #86efac; border-radius: 9px; background: #fff; font: inherit; font-size: 13px; font-weight: 700; color: #166534; cursor: pointer; padding: 0 4px; }
+.pf-row > .pf-act:hover { background: #dcfce7; }
+@media (max-width: 640px) { .pf-row > .pf-act { font-size: 11.5px; } }
