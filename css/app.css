@@ -939,3 +939,15 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 /* « active » et « Activer » : même police, même taille, même graisse */
 .pf-row > .pf-live, .pf-row > .pf-act { font-family: inherit; font-size: 13px; font-weight: 700; letter-spacing: 0; line-height: 1; }
 @media (max-width: 640px) { .pf-row > .pf-live, .pf-row > .pf-act { font-size: 11.5px; } }
+
+/* Suppression d’une version : choix de ce que verra un ancien lien */
+.pf-delf { display: flex; flex-direction: column; gap: 8px; }
+.pf-opt { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line2); border-radius: 12px; cursor: pointer; }
+.pf-opt:has(input:checked) { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.pf-opt.off { opacity: .55; cursor: default; }
+.pf-opt input[type=radio] { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--ink); }
+.pf-opt b { display: block; font-size: 14px; }
+.pf-opt small { display: block; font-size: 12.5px; color: var(--mut); }
+.pf-opt select { margin-top: 6px; height: 36px; padding: 0 8px; border: 1px solid var(--line2); border-radius: 8px; font: inherit; max-width: 100%; }
+.pf-row > .pf-resume { border-color: #fcd34d; color: #92400e; }
+.pf-row > .pf-resume:hover { background: #fef3c7; }

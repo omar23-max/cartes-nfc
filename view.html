@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/card.css?v=150">
-  <link rel="stylesheet" href="css/card-plus.css?v=150">
+  <link rel="stylesheet" href="css/card.css?v=152">
+  <link rel="stylesheet" href="css/card-plus.css?v=152">
   <style>
     html, body { margin: 0; min-height: 100%; }
     body { background: #e9e8e4; }
@@ -20,24 +20,25 @@
 <body>
   <div id="app"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="js/services.js?v=150"></script>
-  <script src="js/data.js?v=150"></script>
-  <script src="js/sectors.js?v=150"></script>
-  <script src="js/media.js?v=150"></script>
-  <script src="js/extras.js?v=150"></script>
-  <script src="js/locale-na.js?v=150"></script>
-  <script src="js/locale-na-en.js?v=150"></script>
-  <script src="js/google.js?v=150"></script>
-  <script src="js/profiles.js?v=150"></script>
-  <script src="js/profiles-sport.js?v=150"></script>
-  <script src="js/profiles-sante.js?v=150"></script>
-  <script src="js/profiles-archi.js?v=150"></script>
-  <script src="js/profiles-resto.js?v=150"></script>
-  <script src="js/profiles-auto.js?v=150"></script>
-  <script src="js/profiles-edu.js?v=150"></script>
-  <script src="js/custom-catalog.js?v=150"></script>
-  <script src="js/i18n-en.js?v=150"></script>
-  <script src="js/render.js?v=150"></script>
+  <script src="js/services.js?v=152"></script>
+  <script src="js/data.js?v=152"></script>
+  <script src="js/sectors.js?v=152"></script>
+  <script src="js/media.js?v=152"></script>
+  <script src="js/extras.js?v=152"></script>
+  <script src="js/locale-na.js?v=152"></script>
+  <script src="js/locale-na-en.js?v=152"></script>
+  <script src="js/google.js?v=152"></script>
+  <script src="js/profiles.js?v=152"></script>
+  <script src="js/profiles-sport.js?v=152"></script>
+  <script src="js/profiles-sante.js?v=152"></script>
+  <script src="js/profiles-archi.js?v=152"></script>
+  <script src="js/profiles-resto.js?v=152"></script>
+  <script src="js/profiles-auto.js?v=152"></script>
+  <script src="js/profiles-edu.js?v=152"></script>
+  <script src="js/custom-catalog.js?v=152"></script>
+  <script src="js/i18n-en.js?v=152"></script>
+  <script src="js/versions-view.js?v=152"></script>
+  <script src="js/render.js?v=152"></script>
   <script>
     /* Affiche la carte enregistrée dans l’assistant, ou une démo : view.html?s=artisans&d=d3&c=1 */
     (function () {
@@ -50,12 +51,11 @@
       } else {
         try {
           const S = JSON.parse(localStorage.getItem('nfc-studio-v6'));
-          /* Plusieurs profils : la carte ouvre le profil choisi par le titulaire (S.pf.live) */
-          const RG = (() => { try { return JSON.parse(localStorage.getItem('nextap-pages') || 'null'); } catch (e) { return null; } })();
-          /* La version affichée par la carte est une boutique : on ouvre l’autre page */
-          if (RG && RG.live && RG.live.k && RG.live.k !== 'cards') { location.replace('stores/view.html' + location.search); return; }
-          const LIVE = RG && RG.live && RG.live.k === 'cards' ? RG.live.id : (S && S.pf ? S.pf.live : null);
-          if (S && S.pf && LIVE && LIVE !== S.pf.cur) { const L = (S.pf.list || []).find((x) => x.id === LIVE); if (L && L.data) Object.assign(S, L.data); }
+          /* Version à afficher : lien fixe d’une version (?ver=) ou version active ; versions supprimées ou en pause */
+          const PFR = NFC.pfResolve ? NFC.pfResolve('cards', q) : {};
+          if (PFR.redirect) { location.replace(PFR.redirect); return; }
+          if (PFR.page) { document.getElementById('app').innerHTML = PFR.page; return; }
+          if (S && S.pf && PFR.id && PFR.id !== S.pf.cur) { const L = (S.pf.list || []).find((x) => x.id === PFR.id); if (L && L.data) Object.assign(S, L.data); }
           const base = find(S.sectorId), pr = NFC.profileOf(base, S.prof), s = pr ? NFC.withProfile(base, pr) : base;
           const kid = base ? base.id + (pr ? '~' + pr.id : '') : '';
           if (s) {
@@ -65,6 +65,7 @@
             const cardOf = (l) => S.cards[l === 'en' ? kid + ':en' : kid] || (l === 'en' && s.demoEn) || s.demo;
             const en = want === 'en';
             m = { locked: !(S.qr && S.qr.url) && !(S.paid || {})[S.id], card: cardOf(en ? 'en' : 'fr'), sec: s, d: S.design || s.rec, pal: (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0], link: S.qr && S.qr.url ? S.qr.url : ((NFC.cfg && NFC.cfg.get('brand.linkBase', '')) || 'https://votre-site.com/c/') + S.id, lang: en ? 'en' : 'fr', bilingual: bi };
+            if (PFR.key) m.link = String(m.link).replace(/\/+$/, '') + '/v/' + PFR.key.replace(':', '-');
             VC.onLangSwitch = (l) => { if (l === m.lang) return; m.card = cardOf(l); m.lang = l; draw(); };
           }
         } catch (e) { /* pas de brouillon : démo par défaut */ }
@@ -72,6 +73,7 @@
       if (!m) { const s = find('artisans'); m = { card: s.demo, sec: s, d: 'd1', pal: s.palettes[0] }; }
       function draw() { document.getElementById('app').innerHTML = VC.render(m); document.documentElement.lang = m.lang; if (VC.homeMeta) VC.homeMeta(m); }
       draw();
+      if (NFC.pfOwnerBar) NFC.pfOwnerBar('cards', q);
       VC.idb.loadAll().then(() => { if (Object.keys(window.NFC_BLOBS).length) draw(); });
       document.body.style.background = m.d === 'd5' ? '#050506' : '';
       document.title = (m.card.identity.name || 'Carte de visite') + ' · Carte de visite';
