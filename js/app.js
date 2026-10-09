@@ -958,6 +958,29 @@
     save(); render();
     toast(TT(`Vous modifiez maintenant la version « ${nx.name} ».`, `You are now editing the “${nx.name}” version.`));
   }
+  /* Supprime une version de l’autre studio (ses données sont dans son propre enregistrement) */
+  function pfDelOther(id) {
+    const key = KIND === 'stores' ? 'nfc-studio-v6' : 'nfc-stores-v1';
+    let O = null;
+    try { O = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { O = null; }
+    if (O) {
+      const keys = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
+      const wipe = () => { keys.forEach((k) => delete O[k]); O.palette = 0; O.cards = {}; O.step = 1; delete O.pf; };
+      if (!O.pf) wipe();
+      else {
+        if (id === O.pf.cur) {
+          const other = O.pf.list.find((z) => z.id !== id && z.data);
+          if (!other) wipe();
+          else { keys.forEach((k) => { if (other.data[k] === undefined) delete O[k]; else O[k] = other.data[k]; }); other.data = null; O.pf.cur = other.id; }
+        }
+        if (O.pf) O.pf.list = O.pf.list.filter((z) => z.id !== id);
+      }
+      try { localStorage.setItem(key, JSON.stringify(O)); } catch (e) { /* rien */ }
+    }
+    const r = regGet() || { list: [] };
+    r.list = (r.list || []).filter((z) => !(z.k !== KIND && z.id === id));
+    regSet(r);
+  }
   /* Version de l’autre studio : on y va (la version s’y ouvre) */
   function goOther(id) { save(); location.href = `${OTHER_URL}?ver=${encodeURIComponent(id)}&ui=${ui()}`; }
   /* Nouvelle version vide (type choisi dans l’autre studio, ou dans celui-ci) : on repart du choix du secteur / type */
@@ -1013,10 +1036,10 @@
             <p class="muted small pf-hint">${S.sectorId ? TT(`Une version du même type part d’une copie de « ${esc(cur.name)} » ; une version de l’autre type s’ouvre dans l’autre studio, au choix du secteur ou du type de boutique.`, `A version of the same type starts as a copy of “${esc(cur.name)}”; a version of the other type opens in the other studio, at the industry or store type choice.`) : TT('La version s’ouvre au choix du secteur ou du type de boutique.', 'The version opens at the industry or store type choice.')}</p>
             <div class="btns"><button type="submit" class="b pri">${TT('Créer la version', 'Create version')}</button><button type="button" class="b" data-act="modal-close">${TT('Annuler', 'Cancel')}</button></div></form>`
         : `<h2 id="md-t">${TT('Versions de ma carte', 'My card’s versions')}</h2>
-          <p>${TT('Toutes les versions de votre carte, cartes de visite et boutiques. La version active ne peut pas être supprimée.', 'All your card’s versions, business cards and stores. The active version cannot be deleted.')}</p>
+          <p>${TT('Toutes les versions de votre carte, cartes de visite et boutiques. Touchez le nom d’une version de l’autre studio (↗) pour l’ouvrir. La version active ne peut pas être supprimée.', 'All your card’s versions, business cards and stores. Tap the name of a version from the other studio (↗) to open it. The active version cannot be deleted.')}</p>
           <form data-pfm>${all.map((x) => x.k === KIND
-            ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('active', 'active')}</span>` : '<span class="pf-nil"></span>'}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`
-            : `<div class="pf-row"><span class="pf-o">${esc(x.name)}</span><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('active', 'active')}</span>` : '<span class="pf-nil"></span>'}<button type="button" class="b sm" data-act="pfother" data-v="${x.id}">${TT('Ouvrir', 'Open')}</button></div>`).join('')}
+            ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('active', 'active')}</span>` : '<span class="pf-nil"></span>'}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`
+            : `<div class="pf-row"><button type="button" class="pf-o" data-act="pfother" data-v="${x.id}" title="${TT('Ouvrir cette version dans l’autre studio', 'Open this version in the other studio')}"><span>${esc(x.name)}</span>${ic('arrowur', 14)}</button><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('active', 'active')}</span>` : '<span class="pf-nil"></span>'}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`).join('')}
           <div class="btns"><button type="submit" class="b pri">${TT('Enregistrer', 'Save')}</button><button type="button" class="b" data-act="pfadd">${ic('plus', 14)}${TT('Nouvelle version', 'New version')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div></form>`}
       </div>`;
     $('#modal').classList.add('on');
@@ -1777,11 +1800,21 @@
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
       case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': {
-        const P = pfInit(), id = t.dataset.v, x = P.list.find((z) => z.id === id);
-        if (!x || isLive(KIND, id) || !ask(`Supprimer la version « ${x.name} » ?`)) break;
-        if (id === P.cur) { const other = P.list.find((z) => z.id !== id && z.data); if (!other) { toast('C’est la seule version de ce studio : elle ne peut pas être supprimée ici.'); break; } pfApply(other.data); other.data = null; P.cur = other.id; }
-        P.list = P.list.filter((z) => z.id !== id);
-        save(); pfModal('manage'); render();
+        const k = t.dataset.k || KIND, id = t.dataset.v, x = regAll().find((z) => z.k === k && z.id === id);
+        if (!x || isLive(k, id) || !ask(TT(`Supprimer la version « ${x.name} » ?`, `Delete the “${x.name}” version?`))) break;
+        if (k === KIND) {
+          const P = pfInit();
+          if (id === P.cur) {
+            const other = P.list.find((z) => z.id !== id && z.data);
+            /* Seule version de ce studio : le studio repart à zéro (choix du secteur / type) */
+            if (!other) { delete S.pf; pfApply({ palette: 0, cards: {} }); S.step = 1; save(); closeModal(); render(); toast(TT('Version supprimée.', 'Version deleted.')); break; }
+            pfApply(other.data); other.data = null; P.cur = other.id;
+          }
+          P.list = P.list.filter((z) => z.id !== id);
+          save();
+        } else pfDelOther(id);
+        pfModal('manage'); render();
+        toast(TT(`Version « ${x.name} » supprimée.`, `“${x.name}” version deleted.`));
         break;
       }
       case 'pflive': {

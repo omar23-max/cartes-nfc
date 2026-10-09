@@ -926,3 +926,9 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .pf-row > .pf-live { font-size: 11.5px; padding: 0 2px; }
   .pf-row > .b { font-size: 12px; padding: 0 4px; }
 }
+
+/* Versions de l’autre studio : le nom est un bouton qui l’ouvre (↗) ; la dernière colonne = Supprimer */
+.pf-row > .pf-o { justify-content: space-between; gap: 6px; background: #fff; font: inherit; font-size: 14px; color: var(--ink); cursor: pointer; text-align: left; }
+.pf-row > .pf-o span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-row > .pf-o svg { flex: none; color: var(--mut); }
+.pf-row > .pf-o:hover { border-color: var(--ink); border-style: solid; }
