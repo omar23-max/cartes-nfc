@@ -1163,6 +1163,7 @@
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 1 ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
+        ${regAll().length < 2 ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span><span class="pf-owns"><button type="button" class="pf-own" data-act="pfphone">${ic('qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><a class="pf-own" href="view.html?owner=1" target="_blank" rel="noopener">${TT('Ma carte en mode titulaire', 'My card in owner mode')}${ic('arrowur', 13)}</a></span></div>` : ''}
         ${biliNote()}
       </div>
       <div class="mtabs">

@@ -959,3 +959,4 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-phone .pf-qr svg { display: block; width: 100%; height: auto; }
 .pf-phone .pf-warn { padding: 10px 12px; border-radius: 10px; background: #fff7ed; color: #9a3412; font-size: 12.5px; }
 .b.pf-tb em { font-style: normal; font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: #f1f0ec; color: var(--mut); }
+.ed-tools > .pf-solo { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--mut); }
