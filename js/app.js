@@ -978,8 +978,8 @@
         <span class="pf-sw">${pfVal(all.find((x) => x.k === KIND && x.id === P.cur))}<select data-pfsel aria-label="Version de la carte en cours de modification">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? ' — active' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <label class="pf-sel"><span class="pf-l pf-l-live">${ic('nfc', 15)}Version active&nbsp;:</span>
         <span class="pf-sw">${pfVal(liveE)}<select data-pflivesel aria-label="Version active de la carte">${all.map((x) => `<option value="${x.k}:${x.id}" ${isLive(x.k, x.id) ? 'selected' : ''}>${verLabel(x)}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
+      <button type="button" class="pf-vers" data-act="pfmanage" title="Voir, renommer ou supprimer vos versions">${ic('copy', 15)}Versions <em>${n} / ${pfMax()}</em></button>
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button>
-      <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
         ? `<span>Vous modifiez la version active de votre carte.</span>`
         : `<span>La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? (liveE.k === 'cards' ? ' (carte de visite)' : ' (boutique)') : ''}, pas celle que vous modifiez.</span>`}</div>
@@ -1052,7 +1052,7 @@
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
-          <button class="b sm" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions${regAll().length > 1 ? ` (${regAll().length})` : ''}</span><span class="lbl-s">Versions</span></button>
+          ${regAll().length > 1 ? '' : '<button class="b sm" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span></button>'}
         </div>
       </div>
       ${pfBar()}
