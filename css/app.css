@@ -936,3 +936,6 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-row > .pf-act { grid-column: 3; justify-self: stretch; height: 40px; box-sizing: border-box; border: 1px solid #86efac; border-radius: 9px; background: #fff; font: inherit; font-size: 13px; font-weight: 700; color: #166534; cursor: pointer; padding: 0 4px; }
 .pf-row > .pf-act:hover { background: #dcfce7; }
 @media (max-width: 640px) { .pf-row > .pf-act { font-size: 11.5px; } }
+/* « active » et « Activer » : même police, même taille, même graisse */
+.pf-row > .pf-live, .pf-row > .pf-act { font-family: inherit; font-size: 13px; font-weight: 700; letter-spacing: 0; line-height: 1; }
+@media (max-width: 640px) { .pf-row > .pf-live, .pf-row > .pf-act { font-size: 11.5px; } }
