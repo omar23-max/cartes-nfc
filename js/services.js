@@ -53,7 +53,7 @@ window.NFC = window.NFC || {};
 (function () {
   'use strict';
   const KEY = 'nextap-admin-config';
-  const plan = (sections, photos, products, o) => Object.assign({ sections, photos, products, docs: 5, bili: true, video: true, shop: true, online: true, ai: true, domain: false, size: 10 }, o || {});
+  const plan = (sections, photos, products, o) => Object.assign({ sections, photos, products, profiles: 5, docs: 5, bili: true, video: true, shop: true, online: true, ai: true, domain: false, size: 10 }, o || {});
   const DEF = {
     sectors: { off: [], soon: [], order: [] },
     profOff: [],

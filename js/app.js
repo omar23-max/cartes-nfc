@@ -901,6 +901,67 @@
   }
 
   /* ---------- Étape 4 : contenu ---------- */
+  /* ---------- Plusieurs profils pour une même carte (option A) ----------
+     Le profil en cours de modification vit dans S ; les autres sont gardés dans S.pf.list[].data.
+     Le lien, le QR code et la commande de la carte sont communs ; S.pf.live = profil ouvert par la carte. */
+  const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
+  const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
+  const pfMax = () => Math.max(1, +plan().profiles || 1);
+  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: ui() === 'en' ? 'Main' : 'Principal', data: null }] }; return S.pf; }
+  const pfName = (id) => (pfInit().list.find((x) => x.id === id) || {}).name || '';
+  function pfSwitch(id) {
+    const P = pfInit();
+    if (id === P.cur) return;
+    const cur = P.list.find((x) => x.id === P.cur), nx = P.list.find((x) => x.id === id);
+    if (!nx || !nx.data) return;
+    cur.data = pfSnap();
+    PF_KEYS.forEach((k) => { if (nx.data[k] === undefined) delete S[k]; else S[k] = clone(nx.data[k]); });
+    nx.data = null; P.cur = id;
+    save(); render();
+    toast(`Vous modifiez maintenant le profil « ${nx.name} ».`);
+  }
+  function pfBar() {
+    const P = pfInit(), n = P.list.length;
+    return `<div class="pf-bar"><span class="pf-l">${ic('copy', 15)}Profils de ma carte</span>
+      ${P.list.map((x) => `<button type="button" class="pf-c${x.id === P.cur ? ' on' : ''}" data-act="pfsw" data-v="${x.id}" title="${x.id === P.cur ? 'Profil en cours de modification' : 'Modifier ce profil'}"><span>${esc(x.name)}</span>${x.id === P.live ? `<span class="pf-live">${ic('nfc', 12)}sur la carte</span>` : ''}</button>`).join('')}
+      <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouveau profil</button>
+      <span class="pf-n">${n} / ${pfMax()}</span>
+      ${P.cur !== P.live ? `<button type="button" class="b sm pri pf-go" data-act="pflive">Faire ouvrir « ${esc(pfName(P.cur))} » par ma carte</button>` : ''}
+      <button type="button" class="pf-more" data-act="pfmanage" title="Renommer ou supprimer">${ic('pen', 14)}</button>
+    </div>`;
+  }
+  function pfModal(mode) {
+    const P = pfInit(), cur = P.list.find((x) => x.id === P.cur);
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
+        ${mode === 'add' ? `<h2 id="md-t">Nouveau profil</h2>
+          <p>Il part d’une copie du profil « ${esc(cur.name)} » : changez ensuite les textes, le modèle, les couleurs ou même le secteur. Votre carte garde le même lien et le même QR code ; vous choisissez quel profil elle ouvre.</p>
+          <form data-pff><label class="f"><span class="f-l">Nom du profil (pour vous seulement)</span><input name="n" maxlength="24" required placeholder="Ex. Salon de l’habitation, Perso, Promo d’été"></label>
+          <div class="btns"><button type="submit" class="b pri">Créer le profil</button><button type="button" class="b" data-act="modal-close">Annuler</button></div></form>`
+        : `<h2 id="md-t">Mes profils</h2>
+          <p>Renommez vos profils ou supprimez ceux dont vous n’avez plus besoin. Le profil ouvert par la carte ne peut pas être supprimé.</p>
+          <form data-pfm>${P.list.map((x) => `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24">${x.id === P.live ? '<span class="pf-live">sur la carte</span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">Supprimer</button>`}</div>`).join('')}
+          <div class="btns"><button type="submit" class="b pri">Enregistrer</button><button type="button" class="b" data-act="modal-close">Fermer</button></div></form>`}
+      </div>`;
+    $('#modal').classList.add('on');
+    const f = $('[data-pff]') || $('[data-pfm]');
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (mode === 'add') {
+        const name = f.n.value.trim(); if (!name) return;
+        const curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
+        curE.data = pfSnap();
+        P.list.push({ id, name, data: null }); P.cur = id;
+        closeModal(); save(); render();
+        toast(`Profil « ${name} » créé (copie). Modifiez-le librement : votre carte ouvre toujours « ${pfName(P.live)} ».`);
+      } else {
+        P.list.forEach((x) => { const v = (f[x.id] && f[x.id].value.trim()) || x.name; x.name = v; });
+        closeModal(); save(); render(); toast('Profils enregistrés.');
+      }
+    });
+  }
+
   function step4() {
     const s = sec(), p = (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0];
     return `<section class="wrap wide">
@@ -913,6 +974,7 @@
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
         </div>
       </div>
+      ${pfBar()}
       <div class="mtabs">
         <button class="${mobileTab === 'edit' ? 'on' : ''}" data-act="mtab" data-t="edit">Modifier</button>
         <button class="${mobileTab === 'view' ? 'on' : ''}" data-act="mtab" data-t="view">Aperçu</button>
@@ -1485,6 +1547,7 @@
             <div class="linkrow"><code>${locked() ? esc(link().replace(/[^/]+$/, '')) + '<span class="lk-mask">••••••</span>' : esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
             <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : locked() ? 'Votre lien complet vous sera envoyé par courriel après le paiement, avec votre QR code.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
           </div>
+          ${S.pf && S.pf.list.length > 1 ? `<div class="box"><span class="box-l">Profil ouvert par votre carte</span><div class="pf-pub">${S.pf.list.map((x) => `<button type="button" class="pf-c${x.id === S.pf.live ? ' on' : ''}" data-act="pflive" data-v="${x.id}">${x.id === S.pf.live ? ic('nfc', 13) : ''}${esc(x.name)}</button>`).join('')}</div><p class="muted small">Changez-le quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.</p></div>` : ''}
           <div class="box qrbox${locked() ? ' locked' : ''}">
             <div id="qr" class="qr"></div>
             <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
@@ -1605,6 +1668,25 @@
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
       case 'poster': if (!locked()) openPoster(); break;
+      case 'pfsw': pfSwitch(t.dataset.v); break;
+      case 'pfadd':
+        if (pfInit().list.length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} profil${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
+        pfModal('add'); break;
+      case 'pfmanage': pfModal('manage'); break;
+      case 'pfdel': {
+        const P = pfInit(), id = t.dataset.v, x = P.list.find((z) => z.id === id);
+        if (!x || id === P.live || !ask(`Supprimer le profil « ${x.name} » ?`)) break;
+        if (id === P.cur) { const other = P.list.find((z) => z.id !== id && z.data); if (other) { PF_KEYS.forEach((k) => { if (other.data[k] === undefined) delete S[k]; else S[k] = clone(other.data[k]); }); other.data = null; P.cur = other.id; } }
+        P.list = P.list.filter((z) => z.id !== id);
+        save(); pfModal('manage'); render();
+        break;
+      }
+      case 'pflive': {
+        const P = pfInit(), id = t.dataset.v || P.cur;
+        P.live = id; save(); render();
+        toast(`Votre carte ouvre maintenant le profil « ${pfName(id)} ». Même lien, même QR code.`);
+        break;
+      }
       case 'assist-undo': {
         const bk = localStorage.getItem('nextap-assist-backup');
         if (!bk || !ask('Revenir à la carte telle qu’elle était avant votre intervention ?')) break;
