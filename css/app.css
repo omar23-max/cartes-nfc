@@ -846,3 +846,29 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-vers:hover { border-color: var(--ink); }
 .pf-vers em { font-style: normal; font-size: 12px; font-weight: 600; padding: 1px 7px; border-radius: 999px; background: #f1f0ec; color: var(--mut); }
 @media (max-width: 760px) { .pf-bar .pf-vers { justify-self: start; } .pf-bar .pf-add { justify-self: end; } }
+/* ---------- Outils de la carte + versions : un seul cadre, tout aligné (hauteur unique 40 px) ---------- */
+.ed-bar { margin-bottom: 12px; }
+.ed-tools { --h: 40px; margin: 0 0 18px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.ed-tools .ed-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ed-tools .ed-links .lang-sw { margin-right: auto; display: inline-flex; align-items: center; gap: 12px; }
+.ed-tools .ed-links .lang-sw .seg { padding: 4px; border-radius: 10px; }
+.ed-tools .ed-links .lang-sw .seg button { min-height: calc(var(--h) - 8px); border-radius: 7px; font-size: 13.5px; }
+.ed-tools .b.sm, .ed-tools .pf-add, .ed-tools .pf-vers { box-sizing: border-box; height: var(--h); min-height: var(--h); padding: 0 14px; border-radius: 10px; font-size: 13.5px; font-weight: 600; gap: 7px; }
+.ed-tools .pf-add { font-weight: 700; }
+.ed-tools .pf-bar { margin: 14px 0 0; padding: 14px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: none; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 150px 170px; gap: 8px 12px; }
+.ed-tools .pf-bar .pf-sw select { height: var(--h); min-height: var(--h); border-radius: 10px; }
+.ed-tools .pf-bar .pf-vers, .ed-tools .pf-bar .pf-add { width: 100%; justify-content: center; }
+.ed-tools .pf-bar .pf-st { margin-top: 0; padding-top: 10px; }
+@media (max-width: 760px) {
+  .ed-tools { padding: 12px; }
+  .ed-tools .ed-links .lang-sw { flex: 1 1 100%; margin-right: 0; }
+  .ed-tools .pf-bar { grid-template-columns: 1fr 1fr; }
+  .ed-tools .pf-bar .pf-sel { grid-column: 1 / -1; }
+}
+@media (max-width: 760px) {
+  .ed-tools .ed-links { display: grid; grid-template-columns: 1.35fr 1fr 1fr; gap: 8px; }
+  .ed-tools .ed-links .lang-sw { grid-column: 1 / -1; flex-wrap: wrap; }
+  .ed-tools .ed-links > .b.sm { width: 100%; min-width: 0; justify-content: center; padding: 0 8px; font-size: 13px; gap: 5px; }
+  .ed-tools .pf-bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ed-tools .pf-bar .pf-vers, .ed-tools .pf-bar .pf-add { min-width: 0; padding: 0 8px; font-size: 13px; }
+}

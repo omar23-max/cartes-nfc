@@ -1047,6 +1047,8 @@
     return `<section class="wrap wide">
       <div class="ed-bar">
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
+      </div>
+      <div class="ed-tools">
         <div class="ed-links">
           ${langSwitch()}
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
@@ -1054,8 +1056,8 @@
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 1 ? '' : '<button class="b sm" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span></button>'}
         </div>
+        ${pfBar()}
       </div>
-      ${pfBar()}
       <div class="mtabs">
         <button class="${mobileTab === 'edit' ? 'on' : ''}" data-act="mtab" data-t="edit">Modifier</button>
         <button class="${mobileTab === 'view' ? 'on' : ''}" data-act="mtab" data-t="view">Aperçu</button>
