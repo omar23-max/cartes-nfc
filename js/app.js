@@ -940,6 +940,8 @@
   const regAll = () => (regGet() || {}).list || [];
   const regLive = () => (regGet() || {}).live || { k: KIND, id: pfInit().cur };
   const isLive = (k, id) => { const l = regLive(); return l.k === k && l.id === id; };
+  /* Valeur visible d’une liste : nom de la version en gras, type en petit et fin */
+  const pfVal = (x) => (x && x.name ? `<span class="pf-val"><b>${esc(x.name)}</b><small>${x.k === 'cards' ? 'Carte de visite' : 'Boutique'}</small></span>` : '');
   const verLabel = (x) => `${esc(x.name)} · ${x.k === 'cards' ? 'Carte de visite' : 'Boutique'}`;
   function pfSwitch(id) {
     const P = pfInit();
@@ -973,14 +975,14 @@
     const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {};
     return `<div class="pf-bar no-rw">
       <label class="pf-sel"><span class="pf-l">${ic('pen', 15)}Vous modifiez</span>
-        <span class="pf-sw"><select data-pfsel aria-label="Version de la carte en cours de modification">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? ' — affichée par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
-      <label class="pf-sel"><span class="pf-l pf-l-live">${ic('nfc', 15)}Version affichée</span>
-        <span class="pf-sw"><select data-pflivesel aria-label="Version affichée par la carte">${all.map((x) => `<option value="${x.k}:${x.id}" ${isLive(x.k, x.id) ? 'selected' : ''}>${verLabel(x)}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
+        <span class="pf-sw">${pfVal(all.find((x) => x.k === KIND && x.id === P.cur))}<select data-pfsel aria-label="Version de la carte en cours de modification">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? ' — active' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
+      <label class="pf-sel"><span class="pf-l pf-l-live">${ic('nfc', 15)}Version active</span>
+        <span class="pf-sw">${pfVal(liveE)}<select data-pflivesel aria-label="Version active de la carte">${all.map((x) => `<option value="${x.k}:${x.id}" ${isLive(x.k, x.id) ? 'selected' : ''}>${verLabel(x)}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button>
       <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
-        ? `<span>Votre carte affiche la version que vous modifiez.</span>`
-        : `<span>Votre carte affiche la version « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? (liveE.k === 'cards' ? ' (carte de visite)' : ' (boutique)') : ''}, pas celle que vous modifiez.</span>`}</div>
+        ? `<span>Vous modifiez la version active de votre carte.</span>`
+        : `<span>La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? (liveE.k === 'cards' ? ' (carte de visite)' : ' (boutique)') : ''}, pas celle que vous modifiez.</span>`}</div>
     </div>`;
   }
   function pfModal(mode) {
@@ -999,10 +1001,10 @@
             <p class="muted small pf-hint">${S.sectorId ? `Une version du même type part d’une copie de « ${esc(cur.name)} » ; une version de l’autre type s’ouvre dans l’autre studio, au choix du secteur ou du type de boutique.` : 'La version s’ouvre au choix du secteur ou du type de boutique.'}</p>
             <div class="btns"><button type="submit" class="b pri">Créer la version</button><button type="button" class="b" data-act="modal-close">Annuler</button></div></form>`
         : `<h2 id="md-t">Versions de ma carte</h2>
-          <p>Toutes les versions de votre carte, cartes de visite et boutiques. La version affichée par la carte ne peut pas être supprimée.</p>
+          <p>Toutes les versions de votre carte, cartes de visite et boutiques. La version active ne peut pas être supprimée.</p>
           <form data-pfm>${all.map((x) => x.k === KIND
-            ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k">${KIND_L[x.k]}</span>${isLive(x.k, x.id) ? '<span class="pf-live">affichée</span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">Supprimer</button>`}</div>`
-            : `<div class="pf-row"><span class="pf-o">${esc(x.name)}</span><span class="pf-k">${KIND_L[x.k]}</span>${isLive(x.k, x.id) ? '<span class="pf-live">affichée</span>' : ''}<button type="button" class="b sm" data-act="pfother" data-v="${x.id}">Ouvrir</button></div>`).join('')}
+            ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k">${KIND_L[x.k]}</span>${isLive(x.k, x.id) ? '<span class="pf-live">active</span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">Supprimer</button>`}</div>`
+            : `<div class="pf-row"><span class="pf-o">${esc(x.name)}</span><span class="pf-k">${KIND_L[x.k]}</span>${isLive(x.k, x.id) ? '<span class="pf-live">active</span>' : ''}<button type="button" class="b sm" data-act="pfother" data-v="${x.id}">Ouvrir</button></div>`).join('')}
           <div class="btns"><button type="submit" class="b pri">Enregistrer</button><button type="button" class="b" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button><button type="button" class="b" data-act="modal-close">Fermer</button></div></form>`}
       </div>`;
     $('#modal').classList.add('on');
@@ -1626,7 +1628,7 @@
             <div class="linkrow"><code>${locked() ? esc(link().replace(/[^/]+$/, '')) + '<span class="lk-mask">••••••</span>' : esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
             <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : locked() ? 'Votre lien complet vous sera envoyé par courriel après le paiement, avec votre QR code.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
           </div>
-          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">Version affichée par votre carte</span><div class="pf-pub">${regAll().map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.</p></div>` : ''}
+          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">Version active de votre carte</span><div class="pf-pub">${regAll().map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.</p></div>` : ''}
           <div class="box qrbox${locked() ? ' locked' : ''}">
             <div id="qr" class="qr"></div>
             <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
@@ -1766,7 +1768,7 @@
         const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur;
         const r = regSync(); r.live = { k, id }; regSet(r); P.live = k === KIND ? id : null; save(); render();
         const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
-        toast(`Votre carte affiche maintenant la version « ${e2.name || ''} ». Même lien, même QR code.`);
+        toast(`Version active : « ${e2.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`);
         break;
       }
       case 'assist-undo': {
@@ -2163,7 +2165,7 @@
     const [k, id] = e.target.value.split(':'), r = regSync();
     r.live = { k, id }; regSet(r); if (S.pf) S.pf.live = k === KIND ? id : null; save(); render();
     const x = regAll().find((z) => z.k === k && z.id === id) || {};
-    toast(`Votre carte affiche maintenant la version « ${x.name || ''} ». Même lien, même QR code.`);
+    toast(`Version active : « ${x.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`);
   });
   document.addEventListener('change', (e) => { if (e.target.matches && e.target.matches('[data-pfsel]')) { const v = e.target.value; if (v.startsWith('x:')) goOther(v.slice(2)); else pfSwitch(v); } });
   document.addEventListener('change', async (e) => {
