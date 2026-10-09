@@ -973,3 +973,8 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .pf-mbtns > .b:nth-child(3) { grid-column: 1 / -1; }
   .pf-mbtns > .b { font-size: 13px; }
 }
+
+/* Connecter mon téléphone : ce QR code n’est pas celui de la carte */
+.pf-phone .pf-qr { border: 2px dashed #f59e0b; }
+.pf-qrnote { margin: 0 auto 10px; max-width: 320px; text-align: center; font-size: 12.5px; color: #92400e; }
+.pf-qrnote b { display: block; font-size: 13.5px; color: #78350f; }

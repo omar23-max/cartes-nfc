@@ -778,7 +778,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     const ua = navigator.userAgent || '', ios = /iPhone|iPad|iPod/i.test(ua), android = /Android/i.test(ua);
     const steps = ios
       ? [L2('Touchez le bouton Partager', 'Tap the Share button') + ` <span class="a2-k">${ic('share', 15)}</span> ${L2('en bas de Safari', 'at the bottom of Safari')}`, L2('Choisissez « Sur l’écran d’accueil »', 'Choose “Add to Home Screen”'), L2('Touchez « Ajouter »', 'Tap “Add”')]
-      : android ? [L2('Touchez le menu ⋮ en haut à droite de Chrome', 'Tap the ⋮ menu at the top right of Chrome'), L2('Choisissez « Ajouter à l’écran d’accueil »', 'Choose “Add to Home screen”'), L2('Touchez « Ajouter »', 'Tap “Add”')]
+      : android ? [L2('Touchez le menu ⋮ en haut à droite de Chrome', 'Tap the ⋮ menu at the top right of Chrome'), L2('Choisissez « Ajouter à l’écran d’accueil » ou « Installer et créer un raccourci » (selon votre version de Chrome)', 'Choose “Add to Home screen” or “Install and create shortcut” (depending on your Chrome version)'), L2('Choisissez « Créer un raccourci », puis « Ajouter ». Si Chrome indique qu’il ne peut pas installer l’appli, c’est normal : le raccourci suffit.', 'Choose “Create shortcut”, then “Add”. If Chrome says it can’t install the app, that’s normal: the shortcut is enough.')]
         : [L2('Ouvrez cette carte sur votre téléphone (scannez son QR code)', 'Open this profile on your phone (scan its QR code)'), L2('Puis ajoutez-la à l’écran d’accueil depuis le menu du navigateur', 'Then add it to the home screen from the browser menu')];
     const { ov } = overlay(from, 'ov-xch');
     ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="xch a2">

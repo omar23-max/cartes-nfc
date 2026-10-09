@@ -1019,6 +1019,7 @@
         <h2 id="md-t">${TT('Connecter mon téléphone', 'Connect my phone')}</h2>
         <p>${TT('Scannez ce code avec l’appareil photo de votre téléphone : votre carte s’ouvre en <b>mode titulaire</b>, avec la liste « Version active ». Ajoutez-la ensuite à votre écran d’accueil (icône « Ma carte »).', 'Scan this code with your phone camera: your card opens in <b>owner mode</b>, with the “Active version” list. Then add it to your home screen (“My card” icon).')}</p>
         <div class="pf-qr">${svg || TT('QR code indisponible hors ligne', 'QR code unavailable offline')}</div>
+        <p class="pf-qrnote">${TT('<b>Code de connexion de votre téléphone</b>Ce n’est pas le QR code de votre carte : ne l’imprimez pas et ne le partagez pas.', '<b>Your phone’s sign-in code</b>This is not your card’s QR code: do not print or share it.')}</p>
         <p class="pf-warn">${TT('<b>Site test :</b> votre carte est enregistrée seulement dans ce navigateur. Le téléphone ouvrira le mode titulaire avec ses propres données (exemple). Sur GoBiz, ce code connectera vraiment votre téléphone à votre compte : usage unique, valable 5 minutes, puis votre téléphone reste connecté.', '<b>Test site:</b> your card is saved only in this browser. The phone will open owner mode with its own data (sample). On GoBiz, this code will truly connect your phone to your account: single use, valid 5 minutes, then your phone stays signed in.')}</p>
         <div class="btns"><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div>
       </div>`;
