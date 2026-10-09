@@ -972,7 +972,7 @@
     if (n < 2) return '';
     const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {};
     return `<div class="pf-bar no-rw">
-      <label class="pf-sel"><span class="pf-l">${ic('copy', 15)}Version modifiée</span>
+      <label class="pf-sel"><span class="pf-l">${ic('pen', 15)}Vous modifiez</span>
         <span class="pf-sw"><select data-pfsel aria-label="Version de la carte en cours de modification">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? ' — affichée par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button>
       <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
