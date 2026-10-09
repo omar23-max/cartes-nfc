@@ -884,3 +884,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .ed-tools .ed-links .lang-sw .bili-note { grid-column: 1 / -1; }
 }
 .ed-tools .ed-links > .b { order: 2; }
+/* Ordre du cadre : message bilingue, versions, puis outils de la carte */
+.ed-tools > .bili-note { margin: 12px 0 0; }
+.ed-tools > .pf-bar { margin: 0 0 14px; padding: 0 0 14px; border-top: 0; border-bottom: 1px solid var(--line); }
+.ed-tools > .pf-bar .pf-st { border-top: 0; padding-top: 0; }

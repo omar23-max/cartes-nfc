@@ -579,15 +579,17 @@
   const schedulePv = () => { clearTimeout(pvTimer); pvTimer = setTimeout(renderPreview, 120); };
 
   /* Langue de la carte : « Carte en français | Carte en anglais » et « Bilingue », libellés dans la langue du site */
+  /* Message de la carte bilingue (affiché en haut du cadre des outils) */
+  const biliNote = () => (!bili() ? '' : ui() === 'en'
+    ? `<p class="bili-note">${ic('globe', 15)}<span><b>Bilingual profile:</b> visitors tap FR or EN on your profile to pick their language. Make sure to fill in both versions.</span></p>`
+    : `<p class="bili-note">${ic('globe', 15)}<span><b>Carte bilingue :</b> sur votre carte, le visiteur touche FR ou EN pour choisir sa langue. Il faut veiller à renseigner les deux versions.</span></p>`);
   const langSwitch = () => {
     const en = ui() === 'en', bi = bili(), fr = lang() === 'fr';
     /* Carte bilingue : les deux boutons choisissent la version à modifier, et un message permanent l’explique */
     const lab = bi ? (en ? ['French version', 'English version'] : ['Version française', 'Version anglaise']) : (en ? ['French card', 'English card'] : ['Carte en français', 'Carte en anglais']);
     /* Hors carte bilingue, seule la version dans la langue du site est accessible */
     const off = en ? 'Tick “Bilingual” to add the French version' : 'Cochez « Bilingue » pour ajouter la version anglaise';
-    const note = !bi ? '' : en
-      ? `<p class="bili-note">${ic('globe', 15)}<span><b>Bilingual profile:</b> visitors tap FR or EN on your profile to pick their language. Make sure to fill in both versions.</span></p>`
-      : `<p class="bili-note">${ic('globe', 15)}<span><b>Carte bilingue :</b> sur votre carte, le visiteur touche FR ou EN pour choisir sa langue. Il faut veiller à renseigner les deux versions.</span></p>`;
+    const note = ''; /* message bilingue : voir biliNote(), en haut du cadre */
     return `<div class="lang-sw"><div class="seg" role="group" aria-label="${bi ? (en ? 'Version to edit' : 'Version à modifier') : (en ? 'Card language' : 'Langue de la carte')}">
       <button type="button" class="${fr ? 'on' : ''}" data-act="lang" data-v="fr" ${!bi && !fr ? `disabled title="${off}"` : ''}>${lab[0]}</button><button type="button" class="${!fr ? 'on' : ''}" data-act="lang" data-v="en" ${!bi && fr ? `disabled title="${off}"` : ''}>${lab[1]}</button></div>
       ${!cfg('lang.bili', true) || !plan().bili ? '' : `<label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bi ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label>`}${note}</div>`;
@@ -1050,6 +1052,7 @@
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
       </div>
       <div class="ed-tools">
+        ${pfBar()}
         <div class="ed-links">
           ${langSwitch()}
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
@@ -1057,7 +1060,7 @@
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 1 ? '' : '<button class="b sm" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span></button>'}
         </div>
-        ${pfBar()}
+        ${biliNote()}
       </div>
       <div class="mtabs">
         <button class="${mobileTab === 'edit' ? 'on' : ''}" data-act="mtab" data-t="edit">Modifier</button>
