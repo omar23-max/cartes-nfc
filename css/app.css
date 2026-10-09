@@ -888,3 +888,15 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .ed-tools > .bili-note { margin: 12px 0 0; }
 .ed-tools > .pf-bar { margin: 0 0 14px; padding: 0 0 14px; border-top: 0; border-bottom: 1px solid var(--line); }
 .ed-tools > .pf-bar .pf-st { border-top: 0; padding-top: 0; }
+/* Fenêtres sur téléphone : jamais plus larges que l'écran (versions de la carte, etc.) */
+.md { box-sizing: border-box; max-width: 100%; }
+.md .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.pf-row { flex-wrap: wrap; }
+.pf-row input { min-width: 0; }
+@media (max-width: 640px) {
+  .md { padding: 22px 18px; }
+  .pf-row { gap: 6px 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  .pf-row input, .pf-row .pf-o { flex: 1 1 100%; }
+  .md .btns .b { flex: 1 1 auto; justify-content: center; }
+}
+.pf-kind input[type=radio] { flex: none; width: 18px; height: 18px; min-height: 0; margin: 2px 0 0; padding: 0; accent-color: var(--ink); }
