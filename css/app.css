@@ -872,3 +872,15 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .ed-tools .pf-bar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .ed-tools .pf-bar .pf-vers, .ed-tools .pf-bar .pf-add { min-width: 0; padding: 0 8px; font-size: 13px; }
 }
+
+/* Mode bilingue : le message passe sous la rangée, les boutons restent à droite */
+.ed-tools .ed-links .lang-sw { display: contents; }
+.ed-tools .ed-links .lang-sw .seg { order: 0; }
+.ed-tools .ed-links .lang-sw .bili-ck { order: 1; margin-right: auto; }
+.ed-tools .ed-links .lang-sw .bili-note { order: 99; flex-basis: 100%; margin: 4px 0 0; }
+@media (max-width: 760px) {
+  .ed-tools .ed-links .lang-sw .seg { grid-column: 1 / 3; }
+  .ed-tools .ed-links .lang-sw .bili-ck { grid-column: 3 / 4; margin-right: 0; align-self: center; }
+  .ed-tools .ed-links .lang-sw .bili-note { grid-column: 1 / -1; }
+}
+.ed-tools .ed-links > .b { order: 2; }
