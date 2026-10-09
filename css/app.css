@@ -982,3 +982,17 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .btns.pub-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .pub-btns > .b { justify-content: center; min-width: 0; margin: 0; white-space: nowrap; }
 @media (max-width: 420px) { .pub-btns > .b { font-size: 13.5px; padding: 0 8px; gap: 6px; } }
+/* Publication : lien + QR code dans un seul bloc (QR à gauche, lien et une phrase à droite) */
+.qrbox.lqbox { display: block; }
+.lq { display: flex; align-items: center; gap: 14px; }
+.lq-r { flex: 1; min-width: 0; }
+.lq-r .muted { margin: 8px 0 0; }
+.lq-r .muted svg { vertical-align: -2px; margin-right: 4px; }
+@media (max-width: 560px) {
+  .lq { gap: 12px; }
+  .lq .qr { padding: 6px; }
+  .lq .qr img, .lq .qr canvas { width: 92px; height: 92px; }
+  .lq-r .linkrow code { padding: 8px 10px; font-size: 12.5px; }
+}
+.lq-r .linkrow code { white-space: normal; word-break: break-all; }
+.lq-r .lk-mask { display: inline-block; white-space: nowrap; word-break: keep-all; }

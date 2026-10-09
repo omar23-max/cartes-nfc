@@ -1734,16 +1734,18 @@
       ${head('Votre carte est prête', hasQR()
         ? 'Elle est reliée au lien et au QR code déjà imprimés sur votre carte NFC : scannez-les, votre nouvelle carte s’affiche.'
         : 'Voici le lien permanent de votre carte. C’est lui qui est programmé dans votre carte NFC et encodé dans votre QR code.')}
-          <div class="box">
-            <span class="box-l">${hasQR() ? 'Lien de votre carte · déjà imprimé' : `Lien permanent · modèle ${code()}`}</span>
-            <div class="linkrow"><code>${locked() ? esc(link().replace(/[^/]+$/, '')) + '<span class="lk-mask">••••••</span>' : esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
-            <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : locked() ? 'Votre lien complet vous sera envoyé par courriel après le paiement, avec votre QR code.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
+          <div class="box lqbox qrbox${locked() ? ' locked' : ''}">
+            <span class="box-l">${hasQR() ? 'Votre lien et votre QR code · déjà imprimés' : 'Votre lien et votre QR code'}</span>
+            <div class="lq">
+              <div id="qr" class="qr"></div>
+              <div class="lq-r">
+                <div class="linkrow"><code>${locked() ? esc(link().replace(/^https?:\/\//, '').replace(/[^/]+$/, '')) + '<span class="lk-mask">••••••</span>' : esc(link().replace(/^https?:\/\//, ''))}</code></div>
+                <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ils affichent maintenant votre nouvelle carte.' : locked() ? `${ic('lock', 13)}Envoyés par courriel après le paiement, avec le QR code et l’affiche à imprimer.` : 'À imprimer au dos de la carte, sur une vitrine ou un flyer.'}</p>
+              </div>
+            </div>
+            ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
           ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p><a class="b sm" href="view.html?owner=1" target="_blank" rel="noopener">${ic('nfc', 14)}${TT('Ouvrir ma carte en mode titulaire', 'Open my card in owner mode')}</a></div>` : ''}
-          <div class="box qrbox${locked() ? ' locked' : ''}">
-            <div id="qr" class="qr"></div>
-            <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
-          </div>
           ${orderBox()}
           ${hasQR() ? `<div class="box">
             <span class="box-l">Recevoir le lien et le QR code par email</span>
