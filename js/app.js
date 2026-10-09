@@ -974,11 +974,13 @@
     return `<div class="pf-bar no-rw">
       <label class="pf-sel"><span class="pf-l">${ic('pen', 15)}Vous modifiez</span>
         <span class="pf-sw"><select data-pfsel aria-label="Version de la carte en cours de modification">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? ' — affichée par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
+      <label class="pf-sel"><span class="pf-l">${ic('nfc', 15)}Version affichée</span>
+        <span class="pf-sw"><select data-pflivesel aria-label="Version affichée par la carte">${all.map((x) => `<option value="${x.k}:${x.id}" ${isLive(x.k, x.id) ? 'selected' : ''}>${verLabel(x)}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button>
       <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
-        ? `<span>Votre carte affiche cette version.</span>`
-        : `<span>Votre carte affiche la version « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? (liveE.k === 'cards' ? ' (carte de visite)' : ' (boutique)') : ''}, pas celle-ci.</span><button type="button" class="pf-go" data-act="pflive">Afficher « ${esc(pfName(P.cur))} » sur ma carte</button>`}</div>
+        ? `<span>Votre carte affiche la version que vous modifiez.</span>`
+        : `<span>Votre carte affiche la version « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? (liveE.k === 'cards' ? ' (carte de visite)' : ' (boutique)') : ''}, pas celle que vous modifiez.</span>`}</div>
     </div>`;
   }
   function pfModal(mode) {
@@ -2155,6 +2157,14 @@
     return (n / 1024 / 1024).toFixed(1).replace('.', ui() === 'en' ? '.' : ',') + ' Mo';
   }
   /* PDF téléversé dans « Liens et documents » */
+  /* Version affichée par la carte : choix direct dans la liste */
+  document.addEventListener('change', (e) => {
+    if (!e.target.matches || !e.target.matches('[data-pflivesel]')) return;
+    const [k, id] = e.target.value.split(':'), r = regSync();
+    r.live = { k, id }; regSet(r); if (S.pf) S.pf.live = k === KIND ? id : null; save(); render();
+    const x = regAll().find((z) => z.k === k && z.id === id) || {};
+    toast(`Votre carte affiche maintenant la version « ${x.name || ''} ». Même lien, même QR code.`);
+  });
   document.addEventListener('change', (e) => { if (e.target.matches && e.target.matches('[data-pfsel]')) { const v = e.target.value; if (v.startsWith('x:')) goOther(v.slice(2)); else pfSwitch(v); } });
   document.addEventListener('change', async (e) => {
     const t = e.target;
