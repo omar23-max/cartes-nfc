@@ -900,3 +900,17 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .md .btns .b { flex: 1 1 auto; justify-content: center; }
 }
 .pf-kind input[type=radio] { flex: none; width: 18px; height: 18px; min-height: 0; margin: 2px 0 0; padding: 0; accent-color: var(--ink); }
+/* Versions de ma carte : une version par ligne, en 3 colonnes alignées (nom | type | action) */
+.pf-row { display: grid; grid-template-columns: minmax(0, 1fr) 128px 104px; align-items: center; gap: 8px; flex-wrap: nowrap; }
+.pf-row > input, .pf-row > .pf-o { grid-column: 1; height: 40px; box-sizing: border-box; }
+.pf-row > .pf-o { display: flex; align-items: center; padding: 0 11px; border: 1px dashed var(--line2); border-radius: 9px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-row > .pf-k { grid-column: 2; justify-self: stretch; text-align: center; height: 40px; display: grid; place-items: center; box-sizing: border-box; border-radius: 9px; padding: 0 6px; }
+.pf-row > .pf-live, .pf-row > .b { grid-column: 3; justify-self: stretch; height: 40px; min-height: 40px; display: grid; place-items: center; box-sizing: border-box; border-radius: 9px; padding: 0 6px; margin: 0; }
+.pf-k .pf-ks { display: none; }
+@media (max-width: 640px) {
+  .pf-row { grid-template-columns: minmax(0, 1fr) 76px 84px; gap: 6px; padding-bottom: 0; border-bottom: 0; }
+  .pf-row > input, .pf-row > .pf-o { flex: none; }
+  .pf-k .pf-kl { display: none; }
+  .pf-k .pf-ks { display: inline; }
+  .pf-row > .b { font-size: 12.5px; }
+}
