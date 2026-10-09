@@ -1766,7 +1766,6 @@
           <div class="btns">
             <button class="b pri" data-act="full">${ic('eye', 17)}Voir en plein écran</button>
             <button class="b" data-act="vcf">${ic('userplus', 17)}Fiche contact (.vcf)</button>
-            <button class="b" data-act="json">${ic('download', 17)}Exporter la configuration</button>
           </div>
         </div>
         <div class="pv-col stick">${phone()}</div>
