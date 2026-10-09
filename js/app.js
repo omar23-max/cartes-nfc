@@ -1763,7 +1763,7 @@
             </ol>
           </div>
           ${leadsBox()}
-          <div class="btns">
+          <div class="btns pub-btns">
             <button class="b pri" data-act="full">${ic('eye', 17)}Voir en plein écran</button>
             <button class="b" data-act="vcf">${ic('userplus', 17)}Fiche contact (.vcf)</button>
           </div>
