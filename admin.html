@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=122">
+  <link rel="stylesheet" href="css/app.css?v=123">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -106,24 +106,24 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=122"></script>
-  <script src="js/data.js?v=122"></script>
-  <script src="js/sectors.js?v=122"></script>
-  <script src="js/media.js?v=122"></script>
-  <script src="js/extras.js?v=122"></script>
-  <script src="js/locale-na.js?v=122"></script>
-  <script src="js/locale-na-en.js?v=122"></script>
-  <script src="js/google.js?v=122"></script>
-  <script src="js/profiles.js?v=122"></script>
-  <script src="js/profiles-sport.js?v=122"></script>
-  <script src="js/profiles-sante.js?v=122"></script>
-  <script src="js/profiles-archi.js?v=122"></script>
-  <script src="js/profiles-resto.js?v=122"></script>
-  <script src="js/profiles-auto.js?v=122"></script>
-  <script src="js/profiles-edu.js?v=122"></script>
-  <script src="js/custom-catalog.js?v=122"></script>
-  <script src="js/jobs.js?v=122"></script>
-  <script src="js/render.js?v=122"></script>
+  <script src="js/services.js?v=123"></script>
+  <script src="js/data.js?v=123"></script>
+  <script src="js/sectors.js?v=123"></script>
+  <script src="js/media.js?v=123"></script>
+  <script src="js/extras.js?v=123"></script>
+  <script src="js/locale-na.js?v=123"></script>
+  <script src="js/locale-na-en.js?v=123"></script>
+  <script src="js/google.js?v=123"></script>
+  <script src="js/profiles.js?v=123"></script>
+  <script src="js/profiles-sport.js?v=123"></script>
+  <script src="js/profiles-sante.js?v=123"></script>
+  <script src="js/profiles-archi.js?v=123"></script>
+  <script src="js/profiles-resto.js?v=123"></script>
+  <script src="js/profiles-auto.js?v=123"></script>
+  <script src="js/profiles-edu.js?v=123"></script>
+  <script src="js/custom-catalog.js?v=123"></script>
+  <script src="js/jobs.js?v=123"></script>
+  <script src="js/render.js?v=123"></script>
   <script>
   (function () {
     'use strict';
@@ -211,7 +211,7 @@
 
     /* 3. Forfaits et limites */
     P.plans = () => {
-      const rows = [['sections', 'Sections ajoutées (maximum)', 'n', 1], ['photos', 'Photos par galerie (maximum)', 'n', 1], ['products', 'Produits par boutique (maximum)', 'n', 1], ['docs', 'Documents PDF téléversés (maximum)', 'n', 1], ['profiles', 'Profils par carte (interchangeables)', 'n', 1], ['size', 'Taille maximale d’un fichier (Mo)', 'n', 1],
+      const rows = [['sections', 'Sections ajoutées (maximum)', 'n', 1], ['photos', 'Photos par galerie (maximum)', 'n', 1], ['products', 'Produits par boutique (maximum)', 'n', 1], ['docs', 'Documents PDF téléversés (maximum)', 'n', 1], ['profiles', 'Versions par carte (interchangeables)', 'n', 1], ['size', 'Taille maximale d’un fichier (Mo)', 'n', 1],
         ['bili', 'Carte bilingue', 'b', 1], ['video', 'Vidéo de couverture', 'b', 1], ['shop', 'Boutique en ligne', 'b', 0], ['online', 'Paiement en ligne (Stripe, PayPal, Interac, Zelle)', 'b', 1], ['ai', 'Éditer avec l’IA', 'b', 1], ['domain', 'Domaine personnalisé', 'b', 0]];
       return `<div class="sh"><h1>Forfaits et limites</h1><p>Ce que chaque forfait permet. Sur GoBiz, ces limites suivent le forfait réel du client.</p></div>
       ${box('Commande sur Shopify', LIVE, 'Bouton « Commander ma carte NFC » de l’étape Publication. Chaque forfait correspond à une variante du produit Shopify : le paiement de cette variante active ce forfait dans GoBiz. Les prix se règlent dans Shopify.',

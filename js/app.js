@@ -907,7 +907,7 @@
   const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
   const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
   const pfMax = () => Math.max(1, +plan().profiles || 1);
-  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: ui() === 'en' ? 'Main' : 'Principal', data: null }] }; return S.pf; }
+  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: ui() === 'en' ? 'Main' : 'Principale', data: null }] }; return S.pf; }
   const pfName = (id) => (pfInit().list.find((x) => x.id === id) || {}).name || '';
   function pfSwitch(id) {
     const P = pfInit();
@@ -918,18 +918,19 @@
     PF_KEYS.forEach((k) => { if (nx.data[k] === undefined) delete S[k]; else S[k] = clone(nx.data[k]); });
     nx.data = null; P.cur = id;
     save(); render();
-    toast(`Vous modifiez maintenant le profil « ${nx.name} ».`);
+    toast(`Vous modifiez maintenant la version « ${nx.name} ».`);
   }
   function pfBar() {
     const P = pfInit(), n = P.list.length, same = P.cur === P.live;
+    if (n < 2) return '';
     return `<div class="pf-bar">
-      <label class="pf-sel"><span class="pf-l">${ic('copy', 15)}Profil modifié</span>
-        <span class="pf-sw"><select data-pfsel aria-label="Profil en cours de modification">${P.list.map((x) => `<option value="${x.id}" ${x.id === P.cur ? 'selected' : ''}>${esc(x.name)}${x.id === P.live ? ' — ouvert par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
-      <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouveau profil</button>
+      <label class="pf-sel"><span class="pf-l">${ic('copy', 15)}Version modifiée</span>
+        <span class="pf-sw"><select data-pfsel aria-label="Version de la carte en cours de modification">${P.list.map((x) => `<option value="${x.id}" ${x.id === P.cur ? 'selected' : ''}>${esc(x.name)}${x.id === P.live ? ' — affichée par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
+      <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button>
       <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
-        ? `<span>Votre carte ouvre ce profil.</span>`
-        : `<span>Votre carte ouvre « <b>${esc(pfName(P.live))}</b> », pas celui-ci.</span><button type="button" class="pf-go" data-act="pflive">Ouvrir « ${esc(pfName(P.cur))} » avec ma carte</button>`}</div>
+        ? `<span>Votre carte affiche cette version.</span>`
+        : `<span>Votre carte affiche la version « <b>${esc(pfName(P.live))}</b> », pas celle-ci.</span><button type="button" class="pf-go" data-act="pflive">Afficher « ${esc(pfName(P.cur))} » sur ma carte</button>`}</div>
     </div>`;
   }
   function pfModal(mode) {
@@ -937,14 +938,15 @@
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
       <div class="md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
-        ${mode === 'add' ? `<h2 id="md-t">Nouveau profil</h2>
-          <p>Il part d’une copie du profil « ${esc(cur.name)} » : changez ensuite les textes, le modèle, les couleurs ou même le secteur. Votre carte garde le même lien et le même QR code ; vous choisissez quel profil elle ouvre.</p>
-          <form data-pff><label class="f"><span class="f-l">Nom du profil (pour vous seulement)</span><input name="n" maxlength="24" required placeholder="Ex. Salon de l’habitation, Perso, Promo d’été"></label>
-          <div class="btns"><button type="submit" class="b pri">Créer le profil</button><button type="button" class="b" data-act="modal-close">Annuler</button></div></form>`
-        : `<h2 id="md-t">Mes profils</h2>
-          <p>Renommez vos profils ou supprimez ceux dont vous n’avez plus besoin. Le profil ouvert par la carte ne peut pas être supprimé.</p>
-          <form data-pfm>${P.list.map((x) => `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24">${x.id === P.live ? '<span class="pf-live">sur la carte</span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">Supprimer</button>`}</div>`).join('')}
-          <div class="btns"><button type="submit" class="b pri">Enregistrer</button><button type="button" class="b" data-act="modal-close">Fermer</button></div></form>`}
+        ${mode === 'add' ? `<h2 id="md-t">${P.list.length < 2 ? 'Versions de ma carte' : 'Nouvelle version'}</h2>
+          <p>Une <b>version</b> est une autre présentation de <b>la même carte</b> : une pour un salon, une pour l’été, une plus personnelle… Votre carte garde le même lien et le même QR code ; vous choisissez la version qu’elle affiche, quand vous voulez.</p>
+          <p class="muted small">La nouvelle version part d’une copie de « ${esc(cur.name)} ». Modifiez-la ensuite librement : textes, modèle, couleurs.</p>
+          <form data-pff><label class="f"><span class="f-l">Nom de la version (pour vous seulement)</span><input name="n" maxlength="24" required placeholder="Ex. Salon de l’habitation, Été, Perso"></label>
+          <div class="btns"><button type="submit" class="b pri">Créer la version</button><button type="button" class="b" data-act="modal-close">Annuler</button></div></form>`
+        : `<h2 id="md-t">Versions de ma carte</h2>
+          <p>Renommez vos versions ou supprimez celles dont vous n’avez plus besoin. La version affichée par la carte ne peut pas être supprimée.</p>
+          <form data-pfm>${P.list.map((x) => `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24">${x.id === P.live ? '<span class="pf-live">affichée</span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">Supprimer</button>`}</div>`).join('')}
+          <div class="btns"><button type="submit" class="b pri">Enregistrer</button><button type="button" class="b" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button><button type="button" class="b" data-act="modal-close">Fermer</button></div></form>`}
       </div>`;
     $('#modal').classList.add('on');
     const f = $('[data-pff]') || $('[data-pfm]');
@@ -956,10 +958,10 @@
         curE.data = pfSnap();
         P.list.push({ id, name, data: null }); P.cur = id;
         closeModal(); save(); render();
-        toast(`Profil « ${name} » créé (copie). Modifiez-le librement : votre carte ouvre toujours « ${pfName(P.live)} ».`);
+        toast(`Version « ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${pfName(P.live)} ».`);
       } else {
         P.list.forEach((x) => { const v = (f[x.id] && f[x.id].value.trim()) || x.name; x.name = v; });
-        closeModal(); save(); render(); toast('Profils enregistrés.');
+        closeModal(); save(); render(); toast('Versions enregistrées.');
       }
     });
   }
@@ -974,6 +976,7 @@
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
+          <button class="b sm" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions${S.pf && S.pf.list.length > 1 ? ` (${S.pf.list.length})` : ''}</span><span class="lbl-s">Versions</span></button>
         </div>
       </div>
       ${pfBar()}
@@ -1549,7 +1552,7 @@
             <div class="linkrow"><code>${locked() ? esc(link().replace(/[^/]+$/, '')) + '<span class="lk-mask">••••••</span>' : esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
             <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : locked() ? 'Votre lien complet vous sera envoyé par courriel après le paiement, avec votre QR code.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
           </div>
-          ${S.pf && S.pf.list.length > 1 ? `<div class="box"><span class="box-l">Profil ouvert par votre carte</span><div class="pf-pub">${S.pf.list.map((x) => `<button type="button" class="pf-c${x.id === S.pf.live ? ' on' : ''}" data-act="pflive" data-v="${x.id}">${x.id === S.pf.live ? ic('nfc', 13) : ''}${esc(x.name)}</button>`).join('')}</div><p class="muted small">Changez-le quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.</p></div>` : ''}
+          ${S.pf && S.pf.list.length > 1 ? `<div class="box"><span class="box-l">Version affichée par votre carte</span><div class="pf-pub">${S.pf.list.map((x) => `<button type="button" class="pf-c${x.id === S.pf.live ? ' on' : ''}" data-act="pflive" data-v="${x.id}">${x.id === S.pf.live ? ic('nfc', 13) : ''}${esc(x.name)}</button>`).join('')}</div><p class="muted small">Changez-le quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.</p></div>` : ''}
           <div class="box qrbox${locked() ? ' locked' : ''}">
             <div id="qr" class="qr"></div>
             <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
@@ -1672,12 +1675,13 @@
       case 'poster': if (!locked()) openPoster(); break;
       case 'pfsw': pfSwitch(t.dataset.v); break;
       case 'pfadd':
-        if (pfInit().list.length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} profil${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
-        pfModal('add'); break;
+        if (pfInit().list.length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} version${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
+        closeModal(); pfModal('add'); break;
       case 'pfmanage': pfModal('manage'); break;
+      case 'pfopen': pfModal(pfInit().list.length < 2 ? 'add' : 'manage'); break;
       case 'pfdel': {
         const P = pfInit(), id = t.dataset.v, x = P.list.find((z) => z.id === id);
-        if (!x || id === P.live || !ask(`Supprimer le profil « ${x.name} » ?`)) break;
+        if (!x || id === P.live || !ask(`Supprimer la version « ${x.name} » ?`)) break;
         if (id === P.cur) { const other = P.list.find((z) => z.id !== id && z.data); if (other) { PF_KEYS.forEach((k) => { if (other.data[k] === undefined) delete S[k]; else S[k] = clone(other.data[k]); }); other.data = null; P.cur = other.id; } }
         P.list = P.list.filter((z) => z.id !== id);
         save(); pfModal('manage'); render();
@@ -1686,7 +1690,7 @@
       case 'pflive': {
         const P = pfInit(), id = t.dataset.v || P.cur;
         P.live = id; save(); render();
-        toast(`Votre carte ouvre maintenant le profil « ${pfName(id)} ». Même lien, même QR code.`);
+        toast(`Votre carte affiche maintenant la version « ${pfName(id)} ». Même lien, même QR code.`);
         break;
       }
       case 'assist-undo': {
