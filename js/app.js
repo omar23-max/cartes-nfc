@@ -974,9 +974,9 @@
     if (n < 2) return '';
     const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {};
     return `<div class="pf-bar no-rw">
-      <label class="pf-sel"><span class="pf-l">${ic('pen', 15)}Vous modifiez</span>
+      <label class="pf-sel"><span class="pf-l">${ic('pen', 15)}Vous modifiez&nbsp;:</span>
         <span class="pf-sw">${pfVal(all.find((x) => x.k === KIND && x.id === P.cur))}<select data-pfsel aria-label="Version de la carte en cours de modification">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? ' — active' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
-      <label class="pf-sel"><span class="pf-l pf-l-live">${ic('nfc', 15)}Version active</span>
+      <label class="pf-sel"><span class="pf-l pf-l-live">${ic('nfc', 15)}Version active&nbsp;:</span>
         <span class="pf-sw">${pfVal(liveE)}<select data-pflivesel aria-label="Version active de la carte">${all.map((x) => `<option value="${x.k}:${x.id}" ${isLive(x.k, x.id) ? 'selected' : ''}>${verLabel(x)}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button>
       <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
