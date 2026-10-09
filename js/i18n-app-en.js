@@ -10,6 +10,7 @@ window.NFC_EN_APP = {
   'Choisissez le secteur le plus proche de votre activité. Votre fonction, vos textes et vos blocs restent entièrement personnalisables ensuite.': 'Pick the industry closest to your business. Your job title, texts and sections stay fully customizable afterwards.',
   'Je ne trouve pas mon secteur': 'I can’t find my industry', 'Répondez à une question, nous vous orientons vers le bon modèle.': 'Answer one question and we’ll point you to the right template.',
   'Bientôt': 'Coming soon',
+  'Gérer': 'Manage', 'Nouveau': 'New', 'Votre carte ouvre ce profil.': 'Your card opens this profile.', 'Ouvrir celui-ci avec ma carte': 'Open this one with my card',
   'Profils de ma carte': 'My card’s profiles', 'Nouveau profil': 'New profile', 'sur la carte': 'on the card', 'Profil ouvert par votre carte': 'Profile opened by your card', 'Mes profils': 'My profiles', 'Créer le profil': 'Create profile', 'Nom du profil (pour vous seulement)': 'Profile name (only for you)',
   'Proposer l’inscription à vos offres et nouveautés': 'Offer sign-up to your offers and news', 'Demander un avis Google après l’échange de contacts': 'Ask for a Google review after the contact exchange',
   'Envoyer un rappel pour laisser un avis Google': 'Send a reminder to leave a Google review', 'Délai avant le rappel': 'Delay before the reminder', '2 heures après': '2 hours later', 'Le soir même (19 h)': 'Same evening (7 pm)', 'Le lendemain (10 h)': 'Next day (10 am)', '3 jours après': '3 days later',

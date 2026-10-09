@@ -784,16 +784,27 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .tile.adm-addt .tile-ex { color: #b45309; }
 
 /* Plusieurs profils pour une même carte */
-.pf-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
-.pf-l { display: inline-flex; align-items: center; gap: 6px; margin-right: 4px; font-size: 12.5px; font-weight: 700; color: var(--mut); text-transform: uppercase; letter-spacing: .04em; }
-.pf-c { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid var(--line2); border-radius: 999px; background: #fff; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink); }
+.pf-bar { margin: 0 0 14px; padding: 12px 14px 10px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); }
+.pf-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.pf-l { display: inline-flex; align-items: center; gap: 7px; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.pf-l em { font-style: normal; font-weight: 600; font-size: 12px; color: var(--mut); padding: 1px 7px; border-radius: 999px; background: #f1f0ec; }
+.pf-more { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--mut); cursor: pointer; }
+.pf-more:hover { background: #f1f0ec; color: var(--ink); }
+.pf-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pf-chips::-webkit-scrollbar { display: none; }
+.pf-c { flex: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid var(--line2); border-radius: 10px; background: #fff; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--ink); white-space: nowrap; }
+.pf-c:hover { border-color: var(--ink); }
 .pf-c.on { background: var(--ink); color: #fff; border-color: var(--ink); }
-.pf-live { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 700; }
-.pf-add, .pf-more { display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border: 1px dashed var(--line2); border-radius: 999px; background: none; font: inherit; font-size: 13px; color: var(--acc); cursor: pointer; }
-.pf-more { border-style: solid; color: var(--mut); padding: 6px 8px; }
-.pf-n { font-size: 12px; color: var(--mut); }
-.pf-go { margin-left: auto; }
+.pf-dot { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #16a34a; color: #fff; }
+.pf-add { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 7px 12px; border: 1px dashed var(--line2); border-radius: 10px; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--acc); cursor: pointer; white-space: nowrap; }
+.pf-st { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 8px; margin-top: 8px; font-size: 12.5px; color: #166534; }
+.pf-st svg { flex: none; align-self: flex-start; margin-top: 2px; }
+.pf-st > span { flex: 1 1 180px; min-width: 0; }
+.pf-st.warn { color: #9a3412; }
+.pf-go { margin-left: auto; padding: 5px 10px; border: 1px solid currentColor; border-radius: 8px; background: none; font: inherit; font-size: 12.5px; font-weight: 700; color: #9a3412; cursor: pointer; }
+.pf-go:hover { background: #fff7ed; }
 .pf-pub { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
 .pf-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
 .pf-row input { flex: 1; min-width: 0; min-height: 38px; padding: 0 10px; border: 1px solid var(--line2); border-radius: 9px; font: inherit; }
-@media (max-width: 640px) { .pf-go { margin-left: 0; width: 100%; } }
+.pf-row .pf-live { display: inline-flex; padding: 1px 7px; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 700; }
+@media (max-width: 640px) { .pf-go { margin-left: 0; } }

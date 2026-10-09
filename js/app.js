@@ -921,13 +921,16 @@
     toast(`Vous modifiez maintenant le profil « ${nx.name} ».`);
   }
   function pfBar() {
-    const P = pfInit(), n = P.list.length;
-    return `<div class="pf-bar"><span class="pf-l">${ic('copy', 15)}Profils de ma carte</span>
-      ${P.list.map((x) => `<button type="button" class="pf-c${x.id === P.cur ? ' on' : ''}" data-act="pfsw" data-v="${x.id}" title="${x.id === P.cur ? 'Profil en cours de modification' : 'Modifier ce profil'}"><span>${esc(x.name)}</span>${x.id === P.live ? `<span class="pf-live">${ic('nfc', 12)}sur la carte</span>` : ''}</button>`).join('')}
-      <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouveau profil</button>
-      <span class="pf-n">${n} / ${pfMax()}</span>
-      ${P.cur !== P.live ? `<button type="button" class="b sm pri pf-go" data-act="pflive">Faire ouvrir « ${esc(pfName(P.cur))} » par ma carte</button>` : ''}
-      <button type="button" class="pf-more" data-act="pfmanage" title="Renommer ou supprimer">${ic('pen', 14)}</button>
+    const P = pfInit(), n = P.list.length, same = P.cur === P.live;
+    return `<div class="pf-bar">
+      <div class="pf-h"><span class="pf-l">${ic('copy', 15)}Profils de ma carte <em>${n} / ${pfMax()}</em></span><button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer</button></div>
+      <div class="pf-chips">
+        ${P.list.map((x) => `<button type="button" class="pf-c${x.id === P.cur ? ' on' : ''}" data-act="pfsw" data-v="${x.id}" title="${x.id === P.cur ? 'Profil en cours de modification' : 'Modifier ce profil'}">${x.id === P.live ? `<span class="pf-dot" title="Ouvert par la carte">${ic('nfc', 12)}</span>` : ''}<span>${esc(x.name)}</span></button>`).join('')}
+        <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouveau</button>
+      </div>
+      <div class="pf-st${same ? '' : ' warn'}">${same
+        ? `${ic('nfc', 14)}<span>Votre carte ouvre ce profil.</span>`
+        : `${ic('nfc', 14)}<span>Votre carte ouvre « <b>${esc(pfName(P.live))}</b> ». Vous modifiez « ${esc(pfName(P.cur))} ».</span><button type="button" class="pf-go" data-act="pflive">Ouvrir celui-ci avec ma carte</button>`}</div>
     </div>`;
   }
   function pfModal(mode) {
