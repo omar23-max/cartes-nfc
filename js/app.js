@@ -920,7 +920,7 @@
   const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
   const pfApply = (d) => PF_KEYS.forEach((k) => { if (!d || d[k] === undefined) delete S[k]; else S[k] = clone(d[k]); });
   const pfMax = () => Math.max(1, +plan().profiles || 1);
-  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: TT('Principale', 'Main'), data: null }] }; return S.pf; }
+  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: KIND === 'stores' ? TT('Boutique principale', 'Main store') : TT('Carte principale', 'Main card'), data: null }] }; return S.pf; }
   const pfName = (id) => (pfInit().list.find((x) => x.id === id) || {}).name || '';
   const regGet = () => { try { return JSON.parse(localStorage.getItem('nextap-pages') || 'null'); } catch (e) { return null; } };
   const regSet = (r) => { try { localStorage.setItem('nextap-pages', JSON.stringify(r)); } catch (e) { /* rien */ } };
@@ -988,6 +988,15 @@
         : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}</div>
     </div>`;
   }
+  /* Noms de versions : comparaison sans majuscules, accents ni espaces superflus */
+  const pfNorm = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+  /* Nom déjà pris par une autre version (des deux studios) ; except = id de la version de ce studio à ignorer */
+  const pfTaken = (name, except) => regAll().some((x) => pfNorm(x.name) === pfNorm(name) && !(x.k === KIND && x.id === except));
+  function pfErr(f, msg) {
+    let e = f.querySelector('.pf-err');
+    if (!e) { e = document.createElement('p'); e.className = 'pf-err'; e.setAttribute('role', 'alert'); f.querySelector('.btns').before(e); }
+    e.textContent = msg;
+  }
   function pfModal(mode) {
     const P = pfInit(), cur = P.list.find((x) => x.id === P.cur), all = regAll();
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
@@ -1017,6 +1026,8 @@
       if (mode === 'add') {
         const name = f.n.value.trim(), k = (f.querySelector('[name=k]:checked') || {}).value || KIND;
         if (!name) return;
+        /* Deux versions ne peuvent pas porter le même nom (cartes de visite et boutiques confondues) */
+        if (pfTaken(name)) { pfErr(f, TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`)); f.n.focus(); return; }
         if (k !== KIND) { save(); location.href = `${OTHER_URL}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
         if (!S.sectorId) { pfNewFresh(name); closeModal(); save(); render(); return; }
         const curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
@@ -1026,7 +1037,10 @@
         const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
         toast(TT(`Version « ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${lv.name || ''} ».`, `“${name}” version created (copy). Edit it freely: your card still shows “${lv.name || ''}”.`));
       } else {
-        P.list.forEach((x) => { const v = (f[x.id] && f[x.id].value.trim()) || x.name; x.name = v; });
+        const nv = P.list.map((x) => ({ x, v: (f[x.id] && f[x.id].value.trim()) || x.name }));
+        const dup = nv.find((a, i) => nv.some((b, j) => j !== i && pfNorm(a.v) === pfNorm(b.v)) || pfTaken(a.v, a.x.id));
+        if (dup) { pfErr(f, TT(`Le nom « ${dup.v} » existe déjà. Chaque version doit avoir un nom différent.`, `The name “${dup.v}” already exists. Each version needs a different name.`)); if (f[dup.x.id]) f[dup.x.id].focus(); return; }
+        nv.forEach(({ x, v }) => { x.name = v; });
         closeModal(); save(); render(); toast(TT('Versions enregistrées.', 'Versions saved.'));
       }
     });
