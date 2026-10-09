@@ -1009,6 +1009,21 @@
     pfModal('manage'); render();
     toast(TT(`Version « ${x.name} » supprimée.`, `“${x.name}” version deleted.`));
   }
+  /* « Connecter mon téléphone » : QR code qui ouvre la carte en mode titulaire sur le téléphone
+     (sur GoBiz : jeton de connexion à usage unique, valable quelques minutes, puis session mémorisée sur le téléphone) */
+  function pfPhone() {
+    const url = new URL('view.html?owner=1', location.href).href, svg = VC.qrSvg ? VC.qrSvg(url) : '';
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md no-rw pf-phone" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+        <h2 id="md-t">${TT('Connecter mon téléphone', 'Connect my phone')}</h2>
+        <p>${TT('Scannez ce code avec l’appareil photo de votre téléphone : votre carte s’ouvre en <b>mode titulaire</b>, avec la liste « Version active ». Ajoutez-la ensuite à votre écran d’accueil (icône « Ma carte »).', 'Scan this code with your phone camera: your card opens in <b>owner mode</b>, with the “Active version” list. Then add it to your home screen (“My card” icon).')}</p>
+        <div class="pf-qr">${svg || TT('QR code indisponible hors ligne', 'QR code unavailable offline')}</div>
+        <p class="pf-warn">${TT('<b>Site test :</b> votre carte est enregistrée seulement dans ce navigateur. Le téléphone ouvrira le mode titulaire avec ses propres données (exemple). Sur GoBiz, ce code connectera vraiment votre téléphone à votre compte : usage unique, valable 5 minutes, puis votre téléphone reste connecté.', '<b>Test site:</b> your card is saved only in this browser. The phone will open owner mode with its own data (sample). On GoBiz, this code will truly connect your phone to your account: single use, valid 5 minutes, then your phone stays signed in.')}</p>
+        <div class="btns"><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div>
+      </div>`;
+    $('#modal').classList.add('on');
+  }
   /* Supprime une version de l’autre studio (ses données sont dans son propre enregistrement) */
   function pfDelOther(id) {
     const key = KIND === 'stores' ? 'nfc-studio-v6' : 'nfc-stores-v1';
@@ -1059,7 +1074,7 @@
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}${TT('Nouvelle version', 'New version')}</button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
         ? `<span>${TT('Vous modifiez la version active de votre carte.', 'You are editing your card’s active version.')}</span>`
-        : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}</div>
+        : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}<span class="pf-owns"><button type="button" class="pf-own" data-act="pfphone">${ic('qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><a class="pf-own" href="view.html?owner=1" target="_blank" rel="noopener">${TT('Ma carte en mode titulaire', 'My card in owner mode')}${ic('arrowur', 13)}</a></span></div>
     </div>`;
   }
   /* Noms de versions : comparaison sans majuscules, accents ni espaces superflus */
@@ -1848,6 +1863,7 @@
         if (regAll().length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} version${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
         closeModal(); pfModal('add'); break;
       case 'pfmanage': pfModal('manage'); break;
+      case 'pfphone': pfPhone(); break;
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
       case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;

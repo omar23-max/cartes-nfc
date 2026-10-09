@@ -951,3 +951,10 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-opt select { margin-top: 6px; height: 36px; padding: 0 8px; border: 1px solid var(--line2); border-radius: 8px; font: inherit; max-width: 100%; }
 .pf-row > .pf-resume { border-color: #fcd34d; color: #92400e; }
 .pf-row > .pf-resume:hover { background: #fef3c7; }
+.pf-st .pf-own { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; font-weight: 700; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.pf-st .pf-own:hover { text-decoration: underline; }
+.pf-st .pf-owns { margin-left: auto; display: inline-flex; flex-wrap: wrap; gap: 4px 14px; }
+.pf-st .pf-owns .pf-own { margin-left: 0; border: 0; background: none; padding: 0; font: inherit; font-weight: 700; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.pf-phone .pf-qr { width: min(240px, 70vw); margin: 10px auto; padding: 10px; border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+.pf-phone .pf-qr svg { display: block; width: 100%; height: auto; }
+.pf-phone .pf-warn { padding: 10px 12px; border-radius: 10px; background: #fff7ed; color: #9a3412; font-size: 12.5px; }

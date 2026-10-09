@@ -53,7 +53,7 @@
     const lab = (x) => `${x.name} · ${x.k === 'cards' ? T('Carte de visite', 'Business card') : T('Boutique', 'Store')}`;
     const bar = document.createElement('div');
     bar.className = 'own-bar';
-    bar.innerHTML = `<span class="own-l">${T('Version active', 'Active version')}</span><select aria-label="${T('Version active de ma carte', 'My card’s active version')}">${list.map((x) => `<option value="${x.k}:${x.id}" ${x.k === live.k && x.id === live.id ? 'selected' : ''}>${lab(x).replace(/</g, '&lt;')}</option>`).join('')}</select><small>${T('Visible par vous seulement', 'Only visible to you')}</small>`;
+    bar.innerHTML = `<span class="own-l">${T('Version active', 'Active version')}</span><select aria-label="${T('Version active de ma carte', 'My card’s active version')}">${list.map((x) => `<option value="${x.k}:${x.id}" ${x.k === live.k && x.id === live.id ? 'selected' : ''}>${lab(x).replace(/</g, '&lt;')}</option>`).join('')}</select><button type="button" class="own-home">${T('Mettre sur mon écran d’accueil', 'Add to my home screen')}</button><small>${T('Visible par vous seulement', 'Only visible to you')}</small>`;
     bar.querySelector('select').addEventListener('change', (e) => {
       const [k, ...rest] = e.target.value.split(':');
       const r = reg() || R;
@@ -63,5 +63,19 @@
       location.replace((k === kind ? location.pathname : other) + '?owner=1');
     });
     document.body.prepend(bar);
+    /* Le raccourci garde « ?owner=1 » : le titulaire retrouve sa barre à chaque ouverture */
+    const t = document.querySelector('meta[name="apple-mobile-web-app-title"]') || Object.assign(document.createElement('meta'), { name: 'apple-mobile-web-app-title' });
+    t.content = T('Ma carte', 'My card'); document.head.appendChild(t);
+    bar.querySelector('.own-home').addEventListener('click', () => {
+      const ua = navigator.userAgent || '', ios = /iPhone|iPad|iPod/i.test(ua), android = /Android/i.test(ua);
+      const steps = ios ? [T('Touchez le bouton Partager en bas de Safari', 'Tap the Share button at the bottom of Safari'), T('Choisissez « Sur l’écran d’accueil »', 'Choose “Add to Home Screen”'), T('Touchez « Ajouter »', 'Tap “Add”')]
+        : android ? [T('Touchez le menu ⋮ en haut à droite de Chrome', 'Tap the ⋮ menu at the top right of Chrome'), T('Choisissez « Ajouter à l’écran d’accueil »', 'Choose “Add to home screen”'), T('Confirmez', 'Confirm')]
+        : [T('Ouvrez cette page sur votre téléphone', 'Open this page on your phone'), T('Puis ajoutez-la à l’écran d’accueil depuis le menu du navigateur', 'Then add it to the home screen from the browser menu')];
+      const ov = document.createElement('div');
+      ov.className = 'own-ov';
+      ov.innerHTML = `<div class="own-box" role="dialog" aria-modal="true"><h3>${T('Votre carte sur votre écran d’accueil', 'Your card on your home screen')}</h3><p>${T('Une icône « Ma carte » sur votre téléphone : vous la touchez, vous choisissez la version active, puis vous tapez votre carte sur le téléphone de votre client.', 'A “My card” icon on your phone: tap it, choose the active version, then tap your card on your client’s phone.')}</p><ol>${steps.map((x) => `<li>${x}</li>`).join('')}</ol><p class="own-note">${T('Ce raccourci est pour vous seul : ne le partagez pas. Sur la version finale, il demande d’être connecté à votre compte.', 'This shortcut is for you only: do not share it. On the final version, it requires being signed in to your account.')}</p><button type="button" class="own-x">${T('J’ai compris', 'Got it')}</button></div>`;
+      ov.addEventListener('click', (e) => { if (e.target === ov || e.target.closest('.own-x')) ov.remove(); });
+      document.body.appendChild(ov);
+    });
   };
 })();
