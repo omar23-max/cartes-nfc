@@ -32,6 +32,11 @@
 
   const fresh = () => ({ v: 1, step: 1, sectorId: null, design: null, palette: 0, cards: {}, id: rid() });
   let S = load();
+  /* Une seule carte pour les deux studios : même lien, même QR code, même paiement */
+  try {
+    const R0 = JSON.parse(localStorage.getItem('nextap-pages') || 'null');
+    if (R0 && R0.link) { S.id = R0.link; if (S.qr === undefined && R0.qr !== undefined) S.qr = R0.qr; S.paid = Object.assign({}, S.paid || {}, R0.paid || {}); }
+  } catch (e) { /* rien */ }
   /* Mode assistance (admin) : la carte du client s’ouvre directement à l’étape Contenu */
   const assistNow = () => { const a = cfg('assistNow', null); return a && a.key === KEY && a.id === S.id ? a : null; };
   try { if (new URLSearchParams(location.search).get('assist') === '1' && assistNow()) S.step = 4; } catch (e) { /* rien */ }
@@ -59,6 +64,7 @@
   }
   function save() {
     syncMedia();
+    if (typeof regSync === 'function') try { regSync(); } catch (e) { /* rien */ }
     try { localStorage.setItem(KEY, JSON.stringify(S)); }
     catch (e) { toast('Stockage du navigateur plein : retirez quelques photos.'); }
   }
@@ -546,7 +552,7 @@
     /* Textes remplacés par l’administrateur (en français) */
     const list = ((X.reword && X.reword[ui()]) || []).concat(ui() === 'fr' ? cfg('lang.reword', []).filter((r) => r && r[0]) : []);
     if (!list.length || !root) return;
-    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && n.parentElement.closest('.vc, script, style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: (n) => (n.parentElement && n.parentElement.closest('.vc, .no-rw, script, style') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT) });
     for (let n = w.nextNode(); n; n = w.nextNode()) {
       let t = n.nodeValue;
       list.forEach(([a, b]) => { if (t.includes(a)) t = t.split(a).join(b); });
@@ -901,51 +907,100 @@
   }
 
   /* ---------- Étape 4 : contenu ---------- */
-  /* ---------- Plusieurs profils pour une même carte (option A) ----------
-     Le profil en cours de modification vit dans S ; les autres sont gardés dans S.pf.list[].data.
-     Le lien, le QR code et la commande de la carte sont communs ; S.pf.live = profil ouvert par la carte. */
+  /* ---------- Versions de ma carte (option A), communes aux deux studios ----------
+     Une carte = un lien = plusieurs versions, de type carte de visite (studio des cartes) ou boutique (studio Stores).
+     Dans chaque studio, la version en cours vit dans S et les autres dans S.pf.list[].data.
+     Registre commun (localStorage « nextap-pages ») : lien, QR, paiement, liste de toutes les versions et version affichée. */
+  const KIND = isStores ? 'stores' : 'cards', OTHER_URL = isStores ? '../index.html' : 'stores/index.html';
+  const KIND_L = { cards: 'Carte de visite', stores: 'Boutique' };
   const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
   const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
+  const pfApply = (d) => PF_KEYS.forEach((k) => { if (!d || d[k] === undefined) delete S[k]; else S[k] = clone(d[k]); });
   const pfMax = () => Math.max(1, +plan().profiles || 1);
   function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: ui() === 'en' ? 'Main' : 'Principale', data: null }] }; return S.pf; }
   const pfName = (id) => (pfInit().list.find((x) => x.id === id) || {}).name || '';
+  const regGet = () => { try { return JSON.parse(localStorage.getItem('nextap-pages') || 'null'); } catch (e) { return null; } };
+  const regSet = (r) => { try { localStorage.setItem('nextap-pages', JSON.stringify(r)); } catch (e) { /* rien */ } };
+  /* Met le registre à jour à partir de ce studio (appelé à chaque enregistrement) */
+  function regSync() {
+    const r = regGet() || { list: [] }, used = !!(S.pf || S.sectorId);
+    r.link = S.id;
+    if (S.qr !== undefined) r.qr = S.qr;
+    r.paid = Object.assign({}, r.paid || {}, S.paid || {});
+    const own = used ? pfInit().list.map((x) => ({ k: KIND, id: x.id, name: x.name })) : [];
+    const keep = (r.list || []).filter((x) => x.k !== KIND || own.some((o) => o.id === x.id));
+    keep.forEach((x) => { const o = own.find((z) => x.k === KIND && z.id === x.id); if (o) x.name = o.name; });
+    own.forEach((o) => { if (!keep.some((x) => x.k === KIND && x.id === o.id)) keep.push(o); });
+    r.list = keep;
+    if ((!r.live || !r.list.some((x) => x.k === r.live.k && x.id === r.live.id)) && r.list.length) r.live = { k: r.list[0].k, id: r.list[0].id };
+    if (S.pf) S.pf.live = r.live && r.live.k === KIND ? r.live.id : null;
+    regSet(r);
+    return r;
+  }
+  const regAll = () => (regGet() || {}).list || [];
+  const regLive = () => (regGet() || {}).live || { k: KIND, id: pfInit().cur };
+  const isLive = (k, id) => { const l = regLive(); return l.k === k && l.id === id; };
+  const verLabel = (x) => `${esc(x.name)} · ${x.k === 'cards' ? 'Carte de visite' : 'Boutique'}`;
   function pfSwitch(id) {
     const P = pfInit();
     if (id === P.cur) return;
     const cur = P.list.find((x) => x.id === P.cur), nx = P.list.find((x) => x.id === id);
     if (!nx || !nx.data) return;
     cur.data = pfSnap();
-    PF_KEYS.forEach((k) => { if (nx.data[k] === undefined) delete S[k]; else S[k] = clone(nx.data[k]); });
+    pfApply(nx.data);
     nx.data = null; P.cur = id;
+    if (S.sectorId && S.design) S.step = Math.max(S.step || 1, 4);
     save(); render();
     toast(`Vous modifiez maintenant la version « ${nx.name} ».`);
   }
+  /* Version de l’autre studio : on y va (la version s’y ouvre) */
+  function goOther(id) { save(); location.href = `${OTHER_URL}?ver=${encodeURIComponent(id)}&ui=${ui()}`; }
+  /* Nouvelle version vide (type choisi dans l’autre studio, ou dans celui-ci) : on repart du choix du secteur / type */
+  function pfNewFresh(name) {
+    const used = !!(S.pf || S.sectorId), P = pfInit();
+    if (!used || (!S.sectorId && P.list.length === 1)) { P.list[0].name = name; }
+    else {
+      P.list.find((x) => x.id === P.cur).data = pfSnap();
+      const id = 'p' + rid();
+      P.list.push({ id, name, data: null }); P.cur = id;
+      pfApply({ palette: 0, cards: {} });
+    }
+    S.step = 1;
+  }
   function pfBar() {
-    const P = pfInit(), n = P.list.length, same = P.cur === P.live;
+    const all = regAll(), n = all.length, P = pfInit(), live = regLive(), same = live.k === KIND && live.id === P.cur;
     if (n < 2) return '';
-    return `<div class="pf-bar">
+    const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {};
+    return `<div class="pf-bar no-rw">
       <label class="pf-sel"><span class="pf-l">${ic('copy', 15)}Version modifiée</span>
-        <span class="pf-sw"><select data-pfsel aria-label="Version de la carte en cours de modification">${P.list.map((x) => `<option value="${x.id}" ${x.id === P.cur ? 'selected' : ''}>${esc(x.name)}${x.id === P.live ? ' — affichée par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
+        <span class="pf-sw"><select data-pfsel aria-label="Version de la carte en cours de modification">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? ' — affichée par la carte' : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button>
       <button type="button" class="pf-more" data-act="pfmanage">${ic('pen', 13)}Gérer <em>${n} / ${pfMax()}</em></button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
         ? `<span>Votre carte affiche cette version.</span>`
-        : `<span>Votre carte affiche la version « <b>${esc(pfName(P.live))}</b> », pas celle-ci.</span><button type="button" class="pf-go" data-act="pflive">Afficher « ${esc(pfName(P.cur))} » sur ma carte</button>`}</div>
+        : `<span>Votre carte affiche la version « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? (liveE.k === 'cards' ? ' (carte de visite)' : ' (boutique)') : ''}, pas celle-ci.</span><button type="button" class="pf-go" data-act="pflive">Afficher « ${esc(pfName(P.cur))} » sur ma carte</button>`}</div>
     </div>`;
   }
   function pfModal(mode) {
-    const P = pfInit(), cur = P.list.find((x) => x.id === P.cur);
+    const P = pfInit(), cur = P.list.find((x) => x.id === P.cur), all = regAll();
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
-      <div class="md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+      <div class="md no-rw" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
-        ${mode === 'add' ? `<h2 id="md-t">${P.list.length < 2 ? 'Versions de ma carte' : 'Nouvelle version'}</h2>
-          <p>Une <b>version</b> est une autre présentation de <b>la même carte</b> : une pour un salon, une pour l’été, une plus personnelle… Votre carte garde le même lien et le même QR code ; vous choisissez la version qu’elle affiche, quand vous voulez.</p>
-          <p class="muted small">La nouvelle version part d’une copie de « ${esc(cur.name)} ». Modifiez-la ensuite librement : textes, modèle, couleurs.</p>
-          <form data-pff><label class="f"><span class="f-l">Nom de la version (pour vous seulement)</span><input name="n" maxlength="24" required placeholder="Ex. Salon de l’habitation, Été, Perso"></label>
-          <div class="btns"><button type="submit" class="b pri">Créer la version</button><button type="button" class="b" data-act="modal-close">Annuler</button></div></form>`
+        ${mode === 'add' ? `<h2 id="md-t">${all.length < 2 ? 'Versions de ma carte' : 'Nouvelle version'}</h2>
+          <p>Une <b>version</b> est une autre présentation de <b>la même carte</b> : une pour un salon, une pour l’été, une boutique pour les fêtes… Votre carte garde le même lien et le même QR code ; vous choisissez la version qu’elle affiche, quand vous voulez.</p>
+          <form data-pff>
+            <div class="f"><span class="f-l">Type de version</span><div class="pf-kind">
+              <label><input type="radio" name="k" value="cards" ${KIND === 'cards' ? 'checked' : ''}><span><b>Carte de visite</b><small>NexTap Studio</small></span></label>
+              <label><input type="radio" name="k" value="stores" ${KIND === 'stores' ? 'checked' : ''}><span><b>Boutique</b><small>NexTap Studio – Stores</small></span></label>
+            </div></div>
+            <label class="f"><span class="f-l">Nom de la version (pour vous seulement)</span><input name="n" maxlength="24" required placeholder="Ex. Salon de l’habitation, Été, Boutique de Noël"></label>
+            <p class="muted small pf-hint">${S.sectorId ? `Une version du même type part d’une copie de « ${esc(cur.name)} » ; une version de l’autre type s’ouvre dans l’autre studio, au choix du secteur ou du type de boutique.` : 'La version s’ouvre au choix du secteur ou du type de boutique.'}</p>
+            <div class="btns"><button type="submit" class="b pri">Créer la version</button><button type="button" class="b" data-act="modal-close">Annuler</button></div></form>`
         : `<h2 id="md-t">Versions de ma carte</h2>
-          <p>Renommez vos versions ou supprimez celles dont vous n’avez plus besoin. La version affichée par la carte ne peut pas être supprimée.</p>
-          <form data-pfm>${P.list.map((x) => `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24">${x.id === P.live ? '<span class="pf-live">affichée</span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">Supprimer</button>`}</div>`).join('')}
+          <p>Toutes les versions de votre carte, cartes de visite et boutiques. La version affichée par la carte ne peut pas être supprimée.</p>
+          <form data-pfm>${all.map((x) => x.k === KIND
+            ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k">${KIND_L[x.k]}</span>${isLive(x.k, x.id) ? '<span class="pf-live">affichée</span>' : `<button type="button" class="b sm" data-act="pfdel" data-v="${x.id}">Supprimer</button>`}</div>`
+            : `<div class="pf-row"><span class="pf-o">${esc(x.name)}</span><span class="pf-k">${KIND_L[x.k]}</span>${isLive(x.k, x.id) ? '<span class="pf-live">affichée</span>' : ''}<button type="button" class="b sm" data-act="pfother" data-v="${x.id}">Ouvrir</button></div>`).join('')}
           <div class="btns"><button type="submit" class="b pri">Enregistrer</button><button type="button" class="b" data-act="pfadd">${ic('plus', 14)}Nouvelle version</button><button type="button" class="b" data-act="modal-close">Fermer</button></div></form>`}
       </div>`;
     $('#modal').classList.add('on');
@@ -953,17 +1008,34 @@
     f.addEventListener('submit', (e) => {
       e.preventDefault();
       if (mode === 'add') {
-        const name = f.n.value.trim(); if (!name) return;
+        const name = f.n.value.trim(), k = (f.querySelector('[name=k]:checked') || {}).value || KIND;
+        if (!name) return;
+        if (k !== KIND) { save(); location.href = `${OTHER_URL}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
+        if (!S.sectorId) { pfNewFresh(name); closeModal(); save(); render(); return; }
         const curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
         curE.data = pfSnap();
         P.list.push({ id, name, data: null }); P.cur = id;
         closeModal(); save(); render();
-        toast(`Version « ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${pfName(P.live)} ».`);
+        const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
+        toast(`Version « ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${lv.name || ''} ».`);
       } else {
         P.list.forEach((x) => { const v = (f[x.id] && f[x.id].value.trim()) || x.name; x.name = v; });
         closeModal(); save(); render(); toast('Versions enregistrées.');
       }
     });
+  }
+  /* Ouverture du studio sur une version donnée (?ver=) ou création d’une version venue de l’autre studio (?newver=) */
+  function pfFromUrl() {
+    try {
+      const q = new URLSearchParams(location.search), ver = q.get('ver'), nv = q.get('newver');
+      if (ver && S.pf && S.pf.list.some((x) => x.id === ver) && ver !== S.pf.cur) {
+        const P = S.pf, cur = P.list.find((x) => x.id === P.cur), nx = P.list.find((x) => x.id === ver);
+        if (nx && nx.data) { cur.data = pfSnap(); pfApply(nx.data); nx.data = null; P.cur = ver; }
+      }
+      if (ver && S.sectorId && S.design) S.step = 4;
+      if (nv) { pfNewFresh(nv.slice(0, 24)); toast(`Nouvelle version « ${nv.slice(0, 24)} » : choisissez ${isStores ? 'le type de boutique' : 'votre secteur'}.`); }
+      if (ver || nv) { save(); history.replaceState(null, '', location.pathname); }
+    } catch (e) { /* rien */ }
   }
 
   function step4() {
@@ -976,7 +1048,7 @@
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
-          <button class="b sm" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions${S.pf && S.pf.list.length > 1 ? ` (${S.pf.list.length})` : ''}</span><span class="lbl-s">Versions</span></button>
+          <button class="b sm" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions${regAll().length > 1 ? ` (${regAll().length})` : ''}</span><span class="lbl-s">Versions</span></button>
         </div>
       </div>
       ${pfBar()}
@@ -1552,7 +1624,7 @@
             <div class="linkrow"><code>${locked() ? esc(link().replace(/[^/]+$/, '')) + '<span class="lk-mask">••••••</span>' : esc(link())}</code>${locked() ? '' : `<button class="b sm" data-act="copy">${ic('copy', 15)}Copier</button>`}</div>
             <p class="muted small">${hasQR() ? 'Rien à réimprimer ni à reprogrammer : ce lien affiche maintenant votre nouvelle carte.' : locked() ? 'Votre lien complet vous sera envoyé par courriel après le paiement, avec votre QR code.' : 'Lien simulé pour le site test : il deviendra actif une fois le site en ligne.'}</p>
           </div>
-          ${S.pf && S.pf.list.length > 1 ? `<div class="box"><span class="box-l">Version affichée par votre carte</span><div class="pf-pub">${S.pf.list.map((x) => `<button type="button" class="pf-c${x.id === S.pf.live ? ' on' : ''}" data-act="pflive" data-v="${x.id}">${x.id === S.pf.live ? ic('nfc', 13) : ''}${esc(x.name)}</button>`).join('')}</div><p class="muted small">Changez-le quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.</p></div>` : ''}
+          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">Version affichée par votre carte</span><div class="pf-pub">${regAll().map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.</p></div>` : ''}
           <div class="box qrbox${locked() ? ' locked' : ''}">
             <div id="qr" class="qr"></div>
             <div><span class="box-l">QR code</span><p>${hasQR() ? 'Le même QR code que celui imprimé sur votre carte. Réutilisez-le sur une vitrine, un flyer ou une signature email.' : 'À imprimer au dos de la carte NFC, sur une vitrine, un flyer ou une signature email.'}</p><div class="qr-dl">${qrDl()}</div></div>
@@ -1675,22 +1747,24 @@
       case 'poster': if (!locked()) openPoster(); break;
       case 'pfsw': pfSwitch(t.dataset.v); break;
       case 'pfadd':
-        if (pfInit().list.length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} version${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
+        if (regAll().length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} version${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
         closeModal(); pfModal('add'); break;
       case 'pfmanage': pfModal('manage'); break;
-      case 'pfopen': pfModal(pfInit().list.length < 2 ? 'add' : 'manage'); break;
+      case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
+      case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': {
         const P = pfInit(), id = t.dataset.v, x = P.list.find((z) => z.id === id);
-        if (!x || id === P.live || !ask(`Supprimer la version « ${x.name} » ?`)) break;
-        if (id === P.cur) { const other = P.list.find((z) => z.id !== id && z.data); if (other) { PF_KEYS.forEach((k) => { if (other.data[k] === undefined) delete S[k]; else S[k] = clone(other.data[k]); }); other.data = null; P.cur = other.id; } }
+        if (!x || isLive(KIND, id) || !ask(`Supprimer la version « ${x.name} » ?`)) break;
+        if (id === P.cur) { const other = P.list.find((z) => z.id !== id && z.data); if (!other) { toast('C’est la seule version de ce studio : elle ne peut pas être supprimée ici.'); break; } pfApply(other.data); other.data = null; P.cur = other.id; }
         P.list = P.list.filter((z) => z.id !== id);
         save(); pfModal('manage'); render();
         break;
       }
       case 'pflive': {
-        const P = pfInit(), id = t.dataset.v || P.cur;
-        P.live = id; save(); render();
-        toast(`Votre carte affiche maintenant la version « ${pfName(id)} ». Même lien, même QR code.`);
+        const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur;
+        const r = regSync(); r.live = { k, id }; regSet(r); P.live = k === KIND ? id : null; save(); render();
+        const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
+        toast(`Votre carte affiche maintenant la version « ${e2.name || ''} ». Même lien, même QR code.`);
         break;
       }
       case 'assist-undo': {
@@ -2081,7 +2155,7 @@
     return (n / 1024 / 1024).toFixed(1).replace('.', ui() === 'en' ? '.' : ',') + ' Mo';
   }
   /* PDF téléversé dans « Liens et documents » */
-  document.addEventListener('change', (e) => { if (e.target.matches && e.target.matches('[data-pfsel]')) pfSwitch(e.target.value); });
+  document.addEventListener('change', (e) => { if (e.target.matches && e.target.matches('[data-pfsel]')) { const v = e.target.value; if (v.startsWith('x:')) goOther(v.slice(2)); else pfSwitch(v); } });
   document.addEventListener('change', async (e) => {
     const t = e.target;
     if (t.type !== 'file' || !t.dataset.pdf) return;
@@ -2242,6 +2316,8 @@
     if (S.step === 5) setTimeout(() => { const pv = $('#pv'), st = pv ? pv.scrollTop : 0; render(); const n = $('#pv'); if (n) n.scrollTop = st; }, 1800);
   };
   VC.bind(document, () => mdl());
+  pfFromUrl();
+  try { regSync(); } catch (e) { /* rien */ }
   render();
   VC.idb.loadAll().then(() => { if (Object.keys(window.NFC_BLOBS).length && S.step > 1) render(); });
 })();

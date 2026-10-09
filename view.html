@@ -7,8 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/card.css?v=123">
-  <link rel="stylesheet" href="css/card-plus.css?v=123">
+  <link rel="stylesheet" href="css/card.css?v=127">
+  <link rel="stylesheet" href="css/card-plus.css?v=127">
   <style>
     html, body { margin: 0; min-height: 100%; }
     body { background: #e9e8e4; }
@@ -20,24 +20,24 @@
 <body>
   <div id="app"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="js/services.js?v=123"></script>
-  <script src="js/data.js?v=123"></script>
-  <script src="js/sectors.js?v=123"></script>
-  <script src="js/media.js?v=123"></script>
-  <script src="js/extras.js?v=123"></script>
-  <script src="js/locale-na.js?v=123"></script>
-  <script src="js/locale-na-en.js?v=123"></script>
-  <script src="js/google.js?v=123"></script>
-  <script src="js/profiles.js?v=123"></script>
-  <script src="js/profiles-sport.js?v=123"></script>
-  <script src="js/profiles-sante.js?v=123"></script>
-  <script src="js/profiles-archi.js?v=123"></script>
-  <script src="js/profiles-resto.js?v=123"></script>
-  <script src="js/profiles-auto.js?v=123"></script>
-  <script src="js/profiles-edu.js?v=123"></script>
-  <script src="js/custom-catalog.js?v=123"></script>
-  <script src="js/i18n-en.js?v=123"></script>
-  <script src="js/render.js?v=123"></script>
+  <script src="js/services.js?v=127"></script>
+  <script src="js/data.js?v=127"></script>
+  <script src="js/sectors.js?v=127"></script>
+  <script src="js/media.js?v=127"></script>
+  <script src="js/extras.js?v=127"></script>
+  <script src="js/locale-na.js?v=127"></script>
+  <script src="js/locale-na-en.js?v=127"></script>
+  <script src="js/google.js?v=127"></script>
+  <script src="js/profiles.js?v=127"></script>
+  <script src="js/profiles-sport.js?v=127"></script>
+  <script src="js/profiles-sante.js?v=127"></script>
+  <script src="js/profiles-archi.js?v=127"></script>
+  <script src="js/profiles-resto.js?v=127"></script>
+  <script src="js/profiles-auto.js?v=127"></script>
+  <script src="js/profiles-edu.js?v=127"></script>
+  <script src="js/custom-catalog.js?v=127"></script>
+  <script src="js/i18n-en.js?v=127"></script>
+  <script src="js/render.js?v=127"></script>
   <script>
     /* Affiche la carte enregistrée dans l’assistant, ou une démo : view.html?s=artisans&d=d3&c=1 */
     (function () {
@@ -51,7 +51,11 @@
         try {
           const S = JSON.parse(localStorage.getItem('nfc-studio-v6'));
           /* Plusieurs profils : la carte ouvre le profil choisi par le titulaire (S.pf.live) */
-          if (S && S.pf && S.pf.live !== S.pf.cur) { const L = (S.pf.list || []).find((x) => x.id === S.pf.live); if (L && L.data) Object.assign(S, L.data); }
+          const RG = (() => { try { return JSON.parse(localStorage.getItem('nextap-pages') || 'null'); } catch (e) { return null; } })();
+          /* La version affichée par la carte est une boutique : on ouvre l’autre page */
+          if (RG && RG.live && RG.live.k && RG.live.k !== 'cards') { location.replace('stores/view.html' + location.search); return; }
+          const LIVE = RG && RG.live && RG.live.k === 'cards' ? RG.live.id : (S && S.pf ? S.pf.live : null);
+          if (S && S.pf && LIVE && LIVE !== S.pf.cur) { const L = (S.pf.list || []).find((x) => x.id === LIVE); if (L && L.data) Object.assign(S, L.data); }
           const base = find(S.sectorId), pr = NFC.profileOf(base, S.prof), s = pr ? NFC.withProfile(base, pr) : base;
           const kid = base ? base.id + (pr ? '~' + pr.id : '') : '';
           if (s) {
