@@ -996,3 +996,9 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 }
 .lq-r .linkrow code { white-space: normal; word-break: break-all; }
 .lq-r .lk-mask { display: inline-block; white-space: nowrap; word-break: keep-all; }
+/* Plein écran : jamais plus large que l’écran (le contenu d’une boutique, onglets et grille de produits, l’élargissait sur téléphone) */
+.full-wrap { width: min(420px, calc(100vw - 32px)); min-width: 0; }
+/* Publication, « Version active » : une version par ligne, même largeur, icône NFC à gauche */
+.pf-pub { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.pf-pub .pf-c { width: 100%; box-sizing: border-box; justify-content: flex-start; min-height: 40px; padding: 8px 12px; text-align: left; }
+.pf-pub .pf-c:not(.on)::before { content: ""; flex: none; width: 13px; }
