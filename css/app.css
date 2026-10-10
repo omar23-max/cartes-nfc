@@ -1012,3 +1012,8 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .ownbox .qr-lock-n { margin: 8px 0 0; }
 @media (max-width: 420px) { .ownbox .own2 { grid-template-columns: 1fr; } }
 .pf-own.lk { opacity: .6; }
+/* Publication : crayon à droite de chaque version (modifier) */
+.pf-pub .pf-pr { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 6px; }
+.pf-pub .pf-pr .pf-c { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; }
+.pf-pub .pf-ed { display: inline-flex; align-items: center; justify-content: center; height: 100%; min-height: 40px; border: 1px solid var(--line2); border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; }
+.pf-pub .pf-ed:hover { border-color: var(--ink); }
