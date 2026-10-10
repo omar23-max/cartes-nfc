@@ -1087,11 +1087,14 @@
     }
     S.step = 1;
   }
+  let pfOpen = false;
   function pfBar() {
     const all = regAll(), n = all.length, P = pfInit(), live = regLive(), same = live.k === KIND && live.id === P.cur;
     if (n < 2) return '';
-    const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {};
-    return `<div class="pf-bar no-rw">
+    const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {}, curE = all.find((x) => x.k === KIND && x.id === P.cur) || {};
+    /* Sur téléphone : une seule ligne résumée, qu’on déplie pour changer de version */
+    const sum = `<button type="button" class="pf-sum${same ? '' : ' warn'}" data-act="pffold" aria-expanded="${pfOpen}">${ic('pen', 15)}<span class="pf-sum-t"><b>${esc(curE.name || '')}</b>${same ? `<em class="pf-sum-on">${ic('nfc', 12)}${TT('Active', 'Active')}</em>` : `<small>${ic('nfc', 12)}${TT('Active', 'Active')} : ${esc(liveE.name || '')}</small>`}</span><span class="pf-sum-c">${TT('Versions', 'Versions')} ${ic('chevd', 15)}</span></button>`;
+    return `<div class="pf-bar no-rw${pfOpen ? ' open' : ''}">${sum}
       <label class="pf-sel"><span class="pf-l">${ic('pen', 15)}${TT('Vous modifiez&nbsp;:', 'You are editing:')}</span>
         <span class="pf-sw">${pfVal(all.find((x) => x.k === KIND && x.id === P.cur))}<select data-pfsel aria-label="${TT('Version de la carte en cours de modification', 'Version being edited')}">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? TT(' — Active', ' — Active') : isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <label class="pf-sel"><span class="pf-l pf-l-live">${ic('nfc', 15)}${TT('Version active&nbsp;:', 'Active version:')}</span>
@@ -1919,6 +1922,7 @@
         break;
       }
       /* Crayon (Publication) : retour à l’éditeur sur cette version ; autre studio si c’est une version de l’autre type */
+      case 'pffold': pfOpen = !pfOpen; render(); break;
       case 'pfedit': {
         const k = t.dataset.k || KIND, id = t.dataset.v;
         if (k !== KIND) { goOther(id); break; }
