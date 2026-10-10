@@ -2469,14 +2469,16 @@
   pfFromUrl();
   try { regSync(); } catch (e) { /* rien */ }
   render();
-  /* Depuis la barre du titulaire (« Modifier mes versions ») : ouvre directement la liste des versions */
-  const wantManage = /[?&]pfmanage=1/.test(location.search);
-  if (wantManage) history.replaceState(null, '', location.pathname);
-  const openManage = () => {
-    if (!wantManage || !S.sectorId || !S.design || $('#modal').classList.contains('on')) return;
-    if ((S.step || 1) < 4) { S.step = 4; save(); render(); }
-    pfModal('manage');
-  };
-  openManage();
-  VC.idb.loadAll().then(() => { if (Object.keys(window.NFC_BLOBS).length && S.step > 1) render(); setTimeout(openManage, 50); });
+  /* Depuis la barre du titulaire (« Modifier mes versions ») : on arrive directement dans l’éditeur, sur la version active, sans fenêtre */
+  if (/[?&]pfmanage=1/.test(location.search)) {
+    history.replaceState(null, '', location.pathname);
+    const l = regLive();
+    if (l && l.k && l.k !== KIND) goOther(l.id);
+    else {
+      if (l && S.pf && l.id !== S.pf.cur) pfSwitch(l.id);
+      if (S.sectorId && S.design && S.step !== 4) { S.step = 4; save(); render(); }
+      window.scrollTo(0, 0);
+    }
+  }
+  VC.idb.loadAll().then(() => { if (Object.keys(window.NFC_BLOBS).length && S.step > 1) render(); });
 })();
