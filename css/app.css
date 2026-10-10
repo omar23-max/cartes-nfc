@@ -1052,3 +1052,15 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .how-box > summary::after { content: "+"; font-size: 18px; font-weight: 500; color: var(--mut); }
 .how-box[open] > summary::after { content: "−"; }
 .how-box[open] > summary { margin-bottom: 10px; }
+/* Téléphone : les 5 étapes sur leur propre ligne, avec leur nom (on sait où on en est) */
+@media (max-width: 560px) {
+  .top { flex-wrap: wrap; row-gap: 6px; }
+  .top .brand { flex: 1; }
+  .steps { order: 10; flex: 1 0 100%; justify-content: space-between; gap: 0; overflow: visible; margin: 0 -6px; }
+  .st { flex: 1 1 0; flex-direction: column; gap: 3px; padding: 4px 0; min-width: 0; border-radius: 10px; }
+  .st .st-t, .st.cur .st-t { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10.5px; line-height: 1.2; }
+  .st.cur { padding-right: 0; }
+  .st-n { width: 22px; height: 22px; font-size: 11px; }
+}
+.st-ts { display: none; }
+@media (max-width: 560px) { .st-tl { display: none; } .st-ts { display: inline; } }

@@ -520,7 +520,7 @@
     $('#steps').innerHTML = STEPS.map((t, i) => {
       const n = i + 1, m = maxStep();
       const cls = n === S.step ? 'cur' : n < S.step ? 'done' : '';
-      return `<button class="st ${cls}" data-act="go" data-n="${n}" ${n > m ? 'disabled' : ''}><span class="st-n">${n < S.step ? ic('check', 13) : n}</span><span class="st-t">${t}</span></button>`;
+      return `<button class="st ${cls}" data-act="go" data-n="${n}" ${n > m ? 'disabled' : ''}><span class="st-n">${n < S.step ? ic('check', 13) : n}</span><span class="st-t"><span class="st-tl">${t}</span><span class="st-ts">${t.split(' ')[0]}</span></span></button>`;
     }).join('');
     $('.reset').innerHTML = `${ic('reset', 16)}<span>Recommencer</span>`;
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
