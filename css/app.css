@@ -1046,3 +1046,9 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .pf-mbtns > .b:nth-child(2) { grid-column: 2 / 4; }
   .pf-mbtns > .b:nth-child(3) { grid-column: 1 / -1; }
 }
+/* Publication : « Comment ça marche ? » replié par défaut */
+.how-box > summary { display: flex; align-items: center; justify-content: space-between; margin: 0; cursor: pointer; list-style: none; }
+.how-box > summary::-webkit-details-marker { display: none; }
+.how-box > summary::after { content: "+"; font-size: 18px; font-weight: 500; color: var(--mut); }
+.how-box[open] > summary::after { content: "−"; }
+.how-box[open] > summary { margin-bottom: 10px; }

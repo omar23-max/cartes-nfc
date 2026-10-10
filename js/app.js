@@ -1790,14 +1790,14 @@
             <p class="muted small">À l’adresse de votre choix : la vôtre, celle de votre graphiste ou de votre imprimeur.</p>
             ${(S.sent || []).length ? `<ul class="sent">${S.sent.slice(0, 3).map((x) => `<li>${ic('check', 13)}<span>Envoyé à <b>${esc(x)}</b></span></li>`).join('')}</ul>` : ''}
           </div>` : ''}
-          <div class="box">
-            <span class="box-l">Comment ça marche</span>
+          <details class="box how-box">
+            <summary class="box-l">Comment ça marche ?</summary>
             <ol class="how">
               <li>${hasQR() ? '<b>Votre puce NFC et votre QR code pointent déjà</b> vers ce lien.' : '<b>La puce NFC est programmée une seule fois</b> avec ce lien.'}</li>
               <li><b>Vous modifiez votre carte quand vous voulez</b> : textes, photos, modèle, couleurs. La puce n’a jamais besoin d’être reprogrammée.</li>
               <li><b>Vos contacts approchent leur téléphone</b> et votre carte s’ouvre, sans application.</li>
             </ol>
-          </div>
+          </details>
           ${leadsBox()}
           <div class="btns pub-btns">
             <button class="b pri" data-act="full">${ic('eye', 17)}Voir en plein écran</button>
