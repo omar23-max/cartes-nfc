@@ -382,7 +382,7 @@
     if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien. Votre lien et votre QR code vous ont été envoyés par courriel.</p></div>`;
     return `<div class="box order">
       <span class="box-l">Votre carte NFC</span>
-      <p>Commandez la carte physique : elle sera programmée avec le lien ci-dessus et livrée chez vous.</p>
+      <p>Commandez la carte physique : elle sera programmée avec le lien de votre carte et livrée chez vous.</p>
       <div class="order-pl">${PLAN_L.filter(([p]) => cfg('shop.var.' + p, '') || !cfg('shop.url', '')).map(([p, l]) => `<button type="button" class="${orderPlan() === p ? 'on' : ''}" data-act="orderplan" data-v="${p}">${l}</button>`).join('')}</div>
       <button type="button" class="b pri order-go" data-act="order">${ic('bag', 16)}Commander ma carte NFC</button>
       <p class="order-mail">${ic('send', 15)}<span>Votre lien et votre QR code vous seront envoyés automatiquement par courriel après le paiement.</span></p>
@@ -1100,7 +1100,7 @@
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}${TT('Nouvelle version', 'New version')}</button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
         ? `<span>${TT('Vous modifiez la version active de votre carte.', 'You are editing your card’s active version.')}</span>`
-        : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span></div>
+        : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}${locked() ? '' : `<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span>`}</div>
     </div>`;
   }
   /* Noms de versions : comparaison sans majuscules, accents ni espaces superflus */
@@ -1189,7 +1189,7 @@
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 1 ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
-        ${regAll().length < 2 ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span><span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span></div>` : ''}
+        ${regAll().length < 2 && !locked() ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span>${locked() ? '' : `<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span>`}</div>` : ''}
         ${biliNote()}
       </div>
       <div class="mtabs">
@@ -1759,6 +1759,7 @@
       ${head('Votre carte est prête', hasQR()
         ? 'Elle est reliée au lien et au QR code déjà imprimés sur votre carte NFC : scannez-les, votre nouvelle carte s’affiche.'
         : 'Voici le lien permanent de votre carte. C’est lui qui est programmé dans votre carte NFC et encodé dans votre QR code.')}
+          ${locked() ? orderBox() : ''}
           <div class="box lqbox qrbox${locked() ? ' locked' : ''}">
             <span class="box-l">${hasQR() ? 'Votre lien et votre QR code · déjà imprimés' : 'Votre lien et votre QR code'}</span>
             <div class="lq">
@@ -1771,13 +1772,12 @@
             ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
           ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => `<div class="pf-pr"><button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button><button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${esc(x.name)} »`, `Edit “${esc(x.name)}”`)}">${ic('pen', 16)}</button></div>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
-          <div class="box no-rw ownbox${locked() ? ' locked' : ''}">
+          ${locked() ? '' : `<div class="box no-rw ownbox">
             <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
             <p class="muted small">${TT('Ouvrez-la en mode titulaire et mettez-la sur votre écran d’accueil.', 'Open it in owner mode and add it to your home screen.')}</p>
             <div class="own2"><button type="button" class="b sm" data-act="pfhome">${ic(locked() ? 'lock' : 'smartphone', 15)}${TT('Mettre sur mon écran d’accueil', 'Add to my home screen')}</button><button type="button" class="b sm" data-act="pfowner">${ic(locked() ? 'lock' : 'nfc', 15)}${TT('Ouvrir en mode titulaire', 'Open in owner mode')}</button></div>
-            ${locked() ? `<p class="qr-lock-n">${ic('lock', 14)}${TT('Disponible après le paiement.', 'Available after payment.')}</p>` : ''}
-          </div>
-          ${orderBox()}
+          </div>`}
+          ${locked() ? '' : orderBox()}
           ${hasQR() ? `<div class="box">
             <span class="box-l">Recevoir le lien et le QR code par email</span>
             <form class="linkrow mailrow" data-mailform novalidate>

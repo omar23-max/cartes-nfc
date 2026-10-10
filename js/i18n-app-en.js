@@ -20,7 +20,7 @@ window.NFC_EN_APP = {
   'Votre lien complet vous sera envoyé par courriel après le paiement, avec votre QR code.': 'Your full link will be emailed to you after payment, along with your QR code.',
   'PNG, SVG et affiche à imprimer disponibles après le paiement.': 'PNG, SVG and printable poster available after payment.', 'Aperçu': 'Preview',
   'Votre lien et votre QR code vous seront envoyés automatiquement par courriel après le paiement.': 'Your link and QR code will be emailed to you automatically after payment.',
-  'Votre carte NFC': 'Your NFC card', 'Commandez la carte physique : elle sera programmée avec le lien ci-dessus et livrée chez vous.': 'Order the physical card: it will be programmed with the link above and shipped to you.',
+  'Votre carte NFC': 'Your NFC card', 'Commandez la carte physique : elle sera programmée avec le lien de votre carte et livrée chez vous.': 'Order the physical card: it will be programmed with your card’s link and shipped to you.',
   'Commander ma carte NFC': 'Order my NFC card', 'Paiement sécurisé sur notre boutique Shopify. Votre carte est enregistrée : vous la retrouverez telle quelle après le paiement.': 'Secure payment on our Shopify store. Your profile is saved: you will find it unchanged after payment.',
   'Paiement sur Shopify (simulé)': 'Shopify checkout (simulated)', 'Simuler le paiement': 'Simulate payment', 'Commande': 'Order', 'Carte payée': 'Card paid', 'Gratuit': 'Free',
   'Paiement simulé : carte payée, bouton « Commander » retiré.': 'Payment simulated: card paid, “Order” button removed.',
