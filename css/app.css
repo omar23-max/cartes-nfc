@@ -1031,3 +1031,18 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .pf-bar:not(.open) > :not(.pf-sum) { display: none; }
   .pf-bar.open .pf-sum { margin-bottom: 4px; }
 }
+/* Versions de ma carte, sur téléphone : le nom sur toute la largeur (plus coupé), puis type | état | action dessous */
+@media (max-width: 640px) {
+  .pf-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--line); }
+  .pf-row > :first-child { grid-column: 1 / -1; }
+  .pf-row > .pf-k { grid-column: 1; }
+  .pf-row > .pf-live, .pf-row > .pf-nil:nth-child(3), .pf-row > .pf-act { grid-column: 2; }
+  .pf-row > .b, .pf-row > .pf-nil:nth-child(4) { grid-column: 3; }
+  .pf-row > .pf-k .pf-kl { display: inline; } .pf-row > .pf-k .pf-ks { display: none; }
+  .pf-row > .pf-live { font-size: 13px; }
+  .pf-row > .b { font-size: 13px; }
+  .md .btns.pf-mbtns { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .pf-mbtns > .b:nth-child(1) { grid-column: 1; }
+  .pf-mbtns > .b:nth-child(2) { grid-column: 2 / 4; }
+  .pf-mbtns > .b:nth-child(3) { grid-column: 1 / -1; }
+}
