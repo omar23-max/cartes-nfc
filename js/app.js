@@ -310,7 +310,12 @@
   const g = (p) => getP(card(), p);
 
   function maxStep() { return !S.sectorId ? 1 : !S.design ? 2 : 5; }
-  function go(n) { S.step = Math.max(1, Math.min(n, maxStep())); save(); render(); window.scrollTo(0, 0); }
+  function go(n) {
+    const pub = n === 5 && S.step !== 5;
+    S.step = Math.max(1, Math.min(n, maxStep()));
+    if (pub && S.step === 5) pfPublishCur();
+    save(); render(); window.scrollTo(0, 0);
+  }
 
   /* ---------- Réception des contacts (coordonnées laissées par les interlocuteurs) ----------
      Le titulaire choisit comment il les reçoit. L’envoi réel (courriel, Google Sheets, CRM) se fait sur le serveur. */
@@ -952,6 +957,18 @@
   /* Valeur visible d’une liste : nom de la version en gras, type en petit et fin */
   const pfVal = (x) => (x && x.name ? `<span class="pf-val"><b>${esc(x.name)}</b><small>${KIND_L[x.k]}</small></span>` : '');
   const verLabel = (x) => `${esc(x.name)} · ${KIND_L[x.k]}`;
+  /* « Publier » : la version qu’on vient de modifier devient la version active (publier = mettre en ligne) */
+  function pfPublishCur() {
+    if (!S.pf || regAll().length < 2) return;
+    const P = pfInit();
+    if (isLive(KIND, P.cur)) return;
+    const r = regSync();
+    r.live = { k: KIND, id: P.cur };
+    r.paused = (r.paused || []).filter((z) => z !== `${KIND}:${P.cur}`);
+    regSet(r); P.live = P.cur;
+    const x = P.list.find((z) => z.id === P.cur) || {};
+    toast(TT(`« ${x.name || ''} » est maintenant la version active de votre carte.`, `“${x.name || ''}” is now your card’s active version.`));
+  }
   function pfSwitch(id) {
     const P = pfInit();
     if (id === P.cur) return;
@@ -1753,7 +1770,7 @@
             </div>
             ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
-          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
+          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
           <div class="box no-rw ownbox${locked() ? ' locked' : ''}">
             <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
             <p class="muted small">${TT('Ouvrez-la en mode titulaire et mettez-la sur votre écran d’accueil.', 'Open it in owner mode and add it to your home screen.')}</p>
