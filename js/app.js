@@ -379,7 +379,7 @@
   function orderBox() {
     if (hasQR()) return '';
     const paid = paidOf();
-    if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien. Votre lien et votre QR code vous ont été envoyés par courriel.</p></div>`;
+    if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien. Votre lien et votre QR code vous ont été envoyés par courriel.</p><p class="test-only">${ic('reset', 13)}<span>Site test : <button type="button" class="lnk" data-act="order-unpay">annuler le paiement simulé</button> pour revoir le parcours avant paiement.</span></p></div>`;
     return `<div class="box order">
       <span class="box-l">Votre carte NFC</span>
       <p>Commandez la carte physique : elle sera programmée avec le lien de votre carte et livrée chez vous.</p>
@@ -1980,6 +1980,14 @@
         if (cfg('shop.url', '') && !window.NFC_SANDBOX) location.href = orderUrl();
         else openOrderSim();
         break;
+      /* Site test seulement : revenir à « non payée » pour retester le parcours avant paiement */
+      case 'order-unpay': {
+        if (S.paid) delete S.paid[S.id];
+        const r = regGet(); if (r && r.paid) { delete r.paid[S.id]; regSet(r); }
+        save(); render();
+        toast('Paiement simulé annulé : la carte est de nouveau « non payée ».');
+        break;
+      }
       case 'order-paid':
         S.paid = Object.assign({}, S.paid, { [S.id]: orderPlan() });
         save();

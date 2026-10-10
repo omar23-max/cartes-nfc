@@ -1070,3 +1070,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .toast-undo:hover { background: rgba(255,255,255,.12); }
 .toast.has-undo:not(.on) { pointer-events: none; }
 .toast.has-undo { width: min(560px, calc(100% - 32px)); box-sizing: border-box; justify-content: space-between; }
+/* Site test : lien discret pour annuler le paiement simulé */
+.test-only { display: flex; gap: 6px; align-items: flex-start; margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed var(--line2); font-size: 12.5px; color: var(--mut); }
+.test-only svg { flex: none; margin-top: 2px; }
+.test-only .lnk { padding: 0; border: 0; background: none; font: inherit; color: var(--acc); text-decoration: underline; cursor: pointer; }
