@@ -1064,3 +1064,9 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 }
 .st-ts { display: none; }
 @media (max-width: 560px) { .st-tl { display: none; } .st-ts { display: inline; } }
+/* Message avec « Annuler » */
+.toast.has-undo { display: flex; align-items: center; gap: 12px; pointer-events: auto; }
+.toast-undo { flex: none; padding: 6px 12px; border: 1px solid rgba(255,255,255,.4); border-radius: 8px; background: transparent; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.toast-undo:hover { background: rgba(255,255,255,.12); }
+.toast.has-undo:not(.on) { pointer-events: none; }
+.toast.has-undo { width: min(560px, calc(100% - 32px)); box-sizing: border-box; justify-content: space-between; }

@@ -962,12 +962,18 @@
     if (!S.pf || regAll().length < 2) return;
     const P = pfInit();
     if (isLive(KIND, P.cur)) return;
-    const r = regSync();
+    const r = regSync(), prev = Object.assign({}, r.live), prevPaused = (r.paused || []).slice();
     r.live = { k: KIND, id: P.cur };
     r.paused = (r.paused || []).filter((z) => z !== `${KIND}:${P.cur}`);
     regSet(r); P.live = P.cur;
     const x = P.list.find((z) => z.id === P.cur) || {};
-    toast(TT(`« ${x.name || ''} » est maintenant la version active de votre carte.`, `“${x.name || ''}” is now your card’s active version.`));
+    /* « Annuler » : la version active d’avant revient (et la pause, s’il y en avait une) */
+    toast(TT(`« ${x.name || ''} » est maintenant la version active de votre carte.`, `“${x.name || ''}” is now your card’s active version.`), () => {
+      const r2 = regSync(); r2.live = prev; r2.paused = prevPaused; regSet(r2);
+      P.live = prev.k === KIND ? prev.id : null; save(); render();
+      const p2 = regAll().find((z) => z.k === prev.k && z.id === prev.id) || {};
+      toast(TT(`Version active rétablie : « ${p2.name || ''} ».`, `Active version restored: “${p2.name || ''}”.`));
+    });
   }
   function pfSwitch(id) {
     const P = pfInit();
@@ -1851,12 +1857,20 @@
 
   /* ---------- Toast ---------- */
   let toastT;
-  function toast(msg) {
+  /* undo (facultatif) : bouton « Annuler » dans le message, affiché plus longtemps */
+  function toast(msg, undo) {
     const t = $('#toast');
     t.textContent = msg;
+    t.classList.toggle('has-undo', !!undo);
+    if (undo) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'toast-undo'; b.textContent = TT('Annuler', 'Undo');
+      b.addEventListener('click', () => { clearTimeout(toastT); t.classList.remove('on'); undo(); });
+      t.appendChild(b);
+    }
     t.classList.add('on');
     clearTimeout(toastT);
-    toastT = setTimeout(() => t.classList.remove('on'), 3600);
+    toastT = setTimeout(() => t.classList.remove('on'), undo ? 7000 : 3600);
   }
 
   /* ---------- Événements ---------- */
