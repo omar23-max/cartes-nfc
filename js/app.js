@@ -1017,6 +1017,8 @@
   }
   /* « Connecter mon téléphone » : QR code qui ouvre la carte en mode titulaire sur le téléphone
      (sur GoBiz : jeton de connexion à usage unique, valable quelques minutes, puis session mémorisée sur le téléphone) */
+  /* Avant le paiement : pas de mode titulaire (l’adresse de la carte s’afficherait dans le navigateur) */
+  const ownLocked = () => toast(TT('Disponible après le paiement : le mode titulaire montre l’adresse de votre carte.', 'Available after payment: owner mode shows your card’s address.'));
   function pfPhone() {
     const url = new URL('view.html?owner=1', location.href).href, svg = VC.qrSvg ? VC.qrSvg(url) : '';
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
@@ -1081,7 +1083,7 @@
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}${TT('Nouvelle version', 'New version')}</button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
         ? `<span>${TT('Vous modifiez la version active de votre carte.', 'You are editing your card’s active version.')}</span>`
-        : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}<span class="pf-owns"><button type="button" class="pf-own" data-act="pfphone">${ic('qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><a class="pf-own" href="view.html?owner=1" target="_blank" rel="noopener">${TT('Ma carte en mode titulaire', 'My card in owner mode')}${ic('arrowur', 13)}</a></span></div>
+        : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span></div>
     </div>`;
   }
   /* Noms de versions : comparaison sans majuscules, accents ni espaces superflus */
@@ -1170,7 +1172,7 @@
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 1 ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
-        ${regAll().length < 2 ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span><span class="pf-owns"><button type="button" class="pf-own" data-act="pfphone">${ic('qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><a class="pf-own" href="view.html?owner=1" target="_blank" rel="noopener">${TT('Ma carte en mode titulaire', 'My card in owner mode')}${ic('arrowur', 13)}</a></span></div>` : ''}
+        ${regAll().length < 2 ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span><span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span></div>` : ''}
         ${biliNote()}
       </div>
       <div class="mtabs">
@@ -1751,7 +1753,13 @@
             </div>
             ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
-          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p><a class="b sm" href="view.html?owner=1" target="_blank" rel="noopener">${ic('nfc', 14)}${TT('Ouvrir ma carte en mode titulaire', 'Open my card in owner mode')}</a></div>` : ''}
+          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).map((x) => `<button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
+          <div class="box no-rw ownbox${locked() ? ' locked' : ''}">
+            <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
+            <p class="muted small">${TT('Ouvrez-la en mode titulaire et mettez-la sur votre écran d’accueil.', 'Open it in owner mode and add it to your home screen.')}</p>
+            <div class="own2"><button type="button" class="b sm" data-act="pfhome">${ic(locked() ? 'lock' : 'smartphone', 15)}${TT('Mettre sur mon écran d’accueil', 'Add to my home screen')}</button><button type="button" class="b sm" data-act="pfowner">${ic(locked() ? 'lock' : 'nfc', 15)}${TT('Ouvrir en mode titulaire', 'Open in owner mode')}</button></div>
+            ${locked() ? `<p class="qr-lock-n">${ic('lock', 14)}${TT('Disponible après le paiement.', 'Available after payment.')}</p>` : ''}
+          </div>
           ${orderBox()}
           ${hasQR() ? `<div class="box">
             <span class="box-l">Recevoir le lien et le QR code par email</span>
@@ -1872,7 +1880,10 @@
         if (regAll().length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} version${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
         closeModal(); pfModal('add'); break;
       case 'pfmanage': pfModal('manage'); break;
-      case 'pfphone': pfPhone(); break;
+      case 'pfphone': if (locked()) ownLocked(); else pfPhone(); break;
+      case 'pfowner': if (locked()) ownLocked(); else window.open('view.html?owner=1', '_blank', 'noopener'); break;
+      /* Sur téléphone : la carte s’ouvre en mode titulaire avec les étapes « écran d’accueil » ; sur ordinateur : QR code de connexion */
+      case 'pfhome': if (locked()) ownLocked(); else if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) location.href = 'view.html?owner=1&home=1'; else pfPhone(); break;
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
       case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;
@@ -2458,5 +2469,10 @@
   pfFromUrl();
   try { regSync(); } catch (e) { /* rien */ }
   render();
+  /* Depuis la barre du titulaire (« Modifier mes versions ») : ouvre directement la liste des versions */
+  if (/[?&]pfmanage=1/.test(location.search)) {
+    history.replaceState(null, '', location.pathname);
+    if (S.sectorId && S.design) { if ((S.step || 1) < 4) { S.step = 4; save(); render(); } pfModal('manage'); }
+  }
   VC.idb.loadAll().then(() => { if (Object.keys(window.NFC_BLOBS).length && S.step > 1) render(); });
 })();

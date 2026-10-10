@@ -53,7 +53,8 @@
     const lab = (x) => `${x.name} · ${x.k === 'cards' ? T('Carte de visite', 'Business card') : T('Boutique', 'Store')}`;
     const bar = document.createElement('div');
     bar.className = 'own-bar';
-    bar.innerHTML = `<span class="own-l">${T('Version active', 'Active version')}</span>${list.length > 1 ? `<select aria-label="${T('Version active de ma carte', 'My card’s active version')}">${list.map((x) => `<option value="${x.k}:${x.id}" ${x.k === live.k && x.id === live.id ? 'selected' : ''}>${lab(x).replace(/</g, '&lt;')}</option>`).join('')}</select>` : `<span class="own-one">${lab(list[0]).replace(/</g, '&lt;')}</span>`}<button type="button" class="own-home">${T('Mettre sur mon écran d’accueil', 'Add to my home screen')}</button><small>${T('Visible par vous seulement', 'Only visible to you')}</small>`;
+    const SVG = (d) => `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+    bar.innerHTML = `<div class="own-top"><span class="own-l">${T('Version active', 'Active version')}</span><small>${T('Visible par vous seulement', 'Only visible to you')}</small></div>${list.length > 1 ? `<select aria-label="${T('Version active de ma carte', 'My card’s active version')}">${list.map((x) => `<option value="${x.k}:${x.id}" ${x.k === live.k && x.id === live.id ? 'selected' : ''}>${lab(x).replace(/</g, '&lt;')}</option>`).join('')}</select>` : `<span class="own-one">${lab(list[0]).replace(/</g, '&lt;')}</span>`}<div class="own-btns"><button type="button" class="own-home">${SVG('<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>')}${T('Écran d’accueil', 'Home screen')}</button><a class="own-edit" href="index.html?pfmanage=1">${SVG('<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>')}${T('Modifier mes versions', 'Edit my versions')}</a></div>`;
     if (bar.querySelector('select')) bar.querySelector('select').addEventListener('change', (e) => {
       const [k, ...rest] = e.target.value.split(':');
       const r = reg() || R;
@@ -79,5 +80,7 @@
       ov.addEventListener('click', (e) => { if (e.target === ov || e.target.closest('.own-x')) ov.remove(); });
       document.body.appendChild(ov);
     });
+    /* Venu du studio (« Mettre sur mon écran d’accueil ») : on affiche directement les étapes */
+    if (q.get('home') === '1') { history.replaceState(null, '', location.pathname + '?owner=1'); bar.querySelector('.own-home').click(); }
   };
 })();
