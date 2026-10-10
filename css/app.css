@@ -1002,3 +1002,6 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-pub { display: grid; grid-template-columns: 1fr; gap: 6px; }
 .pf-pub .pf-c { width: 100%; box-sizing: border-box; justify-content: flex-start; min-height: 40px; padding: 8px 12px; text-align: left; }
 .pf-pub .pf-c:not(.on)::before { content: ""; flex: none; width: 13px; }
+/* Publication : aperçu de la version active (page réelle de la carte) */
+.pv-frame { overflow: hidden; }
+.pv-frame iframe { display: block; width: 100%; height: 100%; border: 0; }

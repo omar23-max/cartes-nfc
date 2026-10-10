@@ -597,6 +597,12 @@
   const head = (t, p) => `<div class="sh"><h1>${t}</h1>${p ? `<p>${p}</p>` : ''}</div>`;
   const back = (n, label) => `<button class="back" data-act="go" data-n="${n}">${ic('arrowl', 16)}${label}</button>`;
   const phone = () => `<div class="phone live"><div class="phone-screen" id="pv" data-vc-scroll>${VC.render(mdl())}</div></div>`;
+  /* Publication : l’aperçu montre toujours la version active (celle que la carte ouvre), même si on en modifie une autre ou si c’est une boutique */
+  const pubPhone = () => {
+    if (regAll().length < 2) return phone();
+    const l = regLive(), x = regAll().find((z) => z.k === l.k && z.id === l.id);
+    return `<div class="phone live"><div class="phone-screen pv-frame"><iframe src="view.html?pv=${Date.now()}" onload="try{const d=this.contentDocument,st=d.createElement('style');st.textContent='html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';d.head.appendChild(st)}catch(e){}" title="${TT('Aperçu de la version active', 'Active version preview')}"></iframe></div></div>${x ? `<p class="pv-hint no-rw">${TT('Aperçu de la version active', 'Active version preview')} : <b>${verLabel(x)}</b></p>` : ''}`;
+  };
 
   /* ---------- Étape 1 : secteur ---------- */
   /* ---------- Avant l’étape 1 : avez-vous déjà un QR code ? ---------- */
@@ -1770,7 +1776,7 @@
             <button class="b" data-act="vcf">${ic('userplus', 17)}Fiche contact (.vcf)</button>
           </div>
         </div>
-        <div class="pv-col stick">${phone()}</div>
+        <div class="pv-col stick">${pubPhone()}</div>
       </div>
     </section>`;
   }
