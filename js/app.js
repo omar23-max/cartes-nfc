@@ -206,10 +206,11 @@
   }
   /* Textes par défaut proposés dans l’éditeur, dans la langue de la carte */
   const uiLang = (x) => (lang() === 'en' && window.NFC_EN_UI && window.NFC_EN_UI[x]) || x;
-  const QR_BASE = cfg('brand.linkBase', '') || 'https://votre-site.com/c/';
+  /* Adresse provisoire tant que l’admin n’a pas réglé la vraie : « your-site.com » quand le studio est en anglais */
+  const qrBase = () => cfg('brand.linkBase', '') || (S.ui === 'en' ? 'https://your-site.com/c/' : 'https://votre-site.com/c/');
   /* hasQR() : la carte NFC a été reçue avec un QR code et un lien déjà imprimés */
   const hasQR = () => !!(S.qr && S.qr.url);
-  const link = () => (hasQR() ? S.qr.url : QR_BASE + S.id);
+  const link = () => (hasQR() ? S.qr.url : qrBase() + S.id);
 
   /* ---------- Langue du site (menus, étapes, éditeur) ----------
      Indépendante de la langue de la carte. Les textes de l’interface sont traduits à l’affichage :
@@ -789,7 +790,7 @@
       } catch (e) { return null; }
     }
     if (/^[\w-]+(\.[\w-]+)+(\/\S*)?$/.test(t)) return parseQR('https://' + t);
-    if (/^[A-Za-z0-9-]{4,24}$/.test(t)) return { url: QR_BASE + t.toUpperCase(), id: t.toUpperCase() };
+    if (/^[A-Za-z0-9-]{4,24}$/.test(t)) return { url: qrBase() + t.toUpperCase(), id: t.toUpperCase() };
     return null;
   }
   function openScan() {
