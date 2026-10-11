@@ -1086,3 +1086,31 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .pf-sum-c em { font-style: normal; font-size: 12px; padding: 1px 6px; border-radius: 99px; background: #eeece6; }
 }
 @media (max-width: 560px) { .pf-sum:not(.pf-sum-x) .pf-sum-t small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .pf-sum:not(.pf-sum-x) .pf-sum-t small svg { vertical-align: -2px; margin-right: 3px; } }
+/* Assistant d’aide (maquette) : bulle en bas à droite, panneau de discussion */
+.hb { position: fixed; right: 18px; bottom: 18px; z-index: 70; font-family: inherit; }
+.hb-fab { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 18px 0 14px; border: 0; border-radius: 99px; background: var(--ink); color: #fff; font: inherit; font-weight: 700; box-shadow: 0 12px 30px -10px rgba(0,0,0,.5); cursor: pointer; }
+.hb-p { display: flex; flex-direction: column; width: min(360px, calc(100vw - 24px)); height: min(540px, calc(100vh - 110px)); border-radius: 18px; background: #fff; box-shadow: 0 24px 60px -20px rgba(0,0,0,.45); overflow: hidden; }
+.hb-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; background: var(--ink); color: #fff; }
+.hb-top b { display: block; font-size: 15px; } .hb-top small { display: block; font-size: 11.5px; opacity: .75; }
+.hb-x { width: 32px; height: 32px; border: 0; border-radius: 8px; background: rgba(255,255,255,.12); color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+.hb-log { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #f7f6f2; }
+.hb-m { max-width: 85%; padding: 9px 12px; border-radius: 14px; font-size: 14px; line-height: 1.45; }
+.hb-m.bot { align-self: flex-start; background: #fff; border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+.hb-m.me { align-self: flex-end; background: var(--ink); color: #fff; border-bottom-right-radius: 4px; }
+.hb-more { margin-top: 6px; } .hb-more button { padding: 0; border: 0; background: none; color: var(--acc); font: inherit; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.hb-s { display: flex; gap: 6px; overflow-x: auto; padding: 8px 12px 0; scrollbar-width: none; }
+.hb-s button { flex: none; padding: 6px 10px; border: 1px solid var(--line2); border-radius: 99px; background: #fff; font: inherit; font-size: 12.5px; white-space: nowrap; cursor: pointer; }
+.hb-in { display: flex; gap: 6px; padding: 10px 12px 12px; }
+.hb-in input { flex: 1; min-width: 0; height: 42px; padding: 0 12px; border: 1px solid var(--line2); border-radius: 10px; font: inherit; font-size: 14px; }
+.hb-in button { width: 42px; height: 42px; border: 0; border-radius: 10px; background: var(--ink); color: #fff; display: grid; place-items: center; cursor: pointer; }
+.hb-h { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+.hb-h p { margin: 0; font-size: 13px; }
+.hb-h input, .hb-h textarea { padding: 9px 12px; border: 1px solid var(--line2); border-radius: 10px; font: inherit; font-size: 14px; resize: none; }
+.hb-hb { display: flex; gap: 8px; } .hb-hb button { flex: 1; height: 40px; border: 1px solid var(--line2); border-radius: 10px; background: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+.hb-hb .hb-send { background: var(--ink); color: #fff; border-color: var(--ink); }
+.hb-h small { font-size: 11.5px; color: var(--mut); }
+@media (max-width: 900px) {
+  .hb { right: 12px; bottom: calc(var(--mbar-h, 66px) + 12px); }
+  .hb-fab { height: 42px; padding: 0 14px 0 12px; }
+  .hb-p { height: min(520px, calc(100vh - var(--mbar-h, 66px) - 90px)); }
+}
