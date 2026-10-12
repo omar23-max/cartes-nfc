@@ -276,3 +276,84 @@
 .vc-d20 .hd > .spec { padding: 16px 22px 20px; }
 .vc-d20 .qa-ic { border-radius: 0; background: #111; color: #fff; border: 0; }
 .vc-d20 .sec-t { font: 600 18px/1.2 var(--pf); letter-spacing: .02em; text-transform: none; color: var(--tx); }
+
+/* ============ Prestige & Art de vivre : 5 modèles luxe (l1 à l5) ============ */
+.vc-l1, .vc-l2, .vc-l3, .vc-l4, .vc-l5 { --gold: #c9a96e; --goldg: linear-gradient(135deg, #f3e2b3 0%, #c9a96e 40%, #9c7a43 70%, #e8d29f 100%); }
+.vc-l1 .sec-t, .vc-l2 .sec-t, .vc-l3 .sec-t, .vc-l4 .sec-t, .vc-l5 .sec-t { justify-content: center; font: italic 500 27px/1.1 var(--pf); text-transform: none; letter-spacing: 0; }
+.vc-l1 .sec, .vc-l2 .sec, .vc-l3 .sec, .vc-l4 .sec, .vc-l5 .sec { padding: 34px 22px; }
+.vc-l1 .txt, .vc-l2 .txt, .vc-l3 .txt, .vc-l4 .txt, .vc-l5 .txt { font: 400 18px/1.6 "Cormorant Garamond", Georgia, serif; text-align: center; }
+
+/* l1 · Gold : noir profond, cadre doré */
+.vc-l1 { --bg: #0c0b0a; --sf: #16140f; --tx: #f3ede2; --mu: #a8a091; --ln: rgba(201,169,110,.22); }
+.vc-l1 .hd { padding: 64px 18px 18px; }
+.vc-l1 .l1-frame { position: relative; padding: 34px 20px 30px; text-align: center; border: 1px solid var(--gold); outline: 1px solid rgba(201,169,110,.45); outline-offset: -8px; }
+.vc-l1 .l1-mono { font: 500 13px/1 var(--pf); letter-spacing: .5em; color: var(--gold); margin-bottom: 20px; }
+.vc-l1 .l1-av { width: 150px; height: 190px; margin: 0 auto; border-radius: 50%; padding: 4px; background: var(--goldg); }
+.vc-l1 .l1-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #0c0b0a; }
+.vc-l1 .hd h1 { margin-top: 22px; font: 500 38px/1.05 var(--pf); letter-spacing: .02em; background: var(--goldg); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.vc-l1 .role { margin-top: 10px; font-size: 11px; letter-spacing: .34em; text-transform: uppercase; color: var(--tx); }
+.vc-l1 .l1-orn { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0 12px; color: var(--gold); font-size: 12px; }
+.vc-l1 .l1-orn i { width: 56px; height: 1px; background: var(--gold); }
+.vc-l1 .spec { font: italic 400 18px/1.4 "Cormorant Garamond", serif; color: var(--tx); }
+.vc-l1 .co { margin-top: 6px; letter-spacing: .2em; text-transform: uppercase; font-size: 11px; color: var(--gold); }
+.vc-l1 .qa-ic { border-radius: 50%; background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+.vc-l1 .sec-t { color: var(--gold); }
+.vc-l1 .btn { background: var(--goldg); color: #0c0b0a; }
+
+/* l2 · Marble : ivoire veiné de marbre */
+.vc-l2 { --bg: #f7f4ee; --sf: #fffdf9; --tx: #2a251d; --mu: #7a7061; --ln: #e8dfcf;
+  background-image: radial-gradient(ellipse at 20% 10%, rgba(255,255,255,.9), transparent 60%), repeating-linear-gradient(118deg, rgba(160,150,135,.05) 0 2px, transparent 2px 46px), repeating-linear-gradient(38deg, rgba(170,160,140,.06) 0 1px, transparent 1px 80px); }
+.vc-l2 .hd { padding: 70px 24px 22px; text-align: center; }
+.vc-l2 .l2-arch { width: 200px; height: 262px; margin: 0 auto; padding: 5px; border-radius: 999px 999px 6px 6px; background: var(--goldg); }
+.vc-l2 .l2-arch img { width: 100%; height: 100%; object-fit: cover; border-radius: 999px 999px 3px 3px; border: 3px solid #f7f4ee; }
+.vc-l2 .hd h1 { margin-top: 22px; font: italic 500 40px/1.05 var(--pf); }
+.vc-l2 .role { margin-top: 10px; font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: #9c7a43; }
+.vc-l2 .spec { margin-top: 10px; font: 400 18px/1.4 "Cormorant Garamond", serif; color: var(--tx); }
+.vc-l2 .co { margin-top: 4px; letter-spacing: .18em; text-transform: uppercase; font-size: 11px; }
+.vc-l2 .qa-ic { border-radius: 50%; background: #fffdf9; border: 1px solid #c9a96e; color: #9c7a43; }
+.vc-l2 .btn { background: #2a251d; }
+
+/* l3 · Emerald : vert émeraude et or, blason */
+.vc-l3 { --bg: #0b2a20; --sf: #0f3328; --tx: #f2efe6; --mu: #b9c4b9; --ln: rgba(201,169,110,.25); }
+.vc-l3 .hd { padding: 64px 24px 24px; text-align: center; background: radial-gradient(ellipse at 50% 0%, rgba(201,169,110,.18), transparent 60%); }
+.vc-l3 .l3-crest { width: 70px; height: 82px; margin: 0 auto; display: grid; place-items: center; background: var(--goldg); clip-path: polygon(50% 0, 100% 14%, 100% 58%, 50% 100%, 0 58%, 0 14%); }
+.vc-l3 .l3-crest span { font: 600 22px/1 var(--pf); color: #0b2a20; letter-spacing: .04em; margin-top: -6px; }
+.vc-l3 .l3-co { margin-top: 14px; font-size: 11px; letter-spacing: .34em; text-transform: uppercase; color: var(--gold); }
+.vc-l3 .l3-av { width: 156px; height: 156px; margin: 22px auto 0; border-radius: 50%; padding: 4px; background: var(--goldg); }
+.vc-l3 .l3-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #0b2a20; }
+.vc-l3 .hd h1 { margin-top: 20px; font: 500 36px/1.05 var(--pf); color: #f2efe6; }
+.vc-l3 .role { margin-top: 8px; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); }
+.vc-l3 .spec { margin-top: 10px; font: italic 400 18px/1.4 "Cormorant Garamond", serif; color: var(--tx); }
+.vc-l3 .qa-ic { border-radius: 50%; background: transparent; border: 1px solid var(--gold); color: var(--gold); }
+.vc-l3 .sec-t { color: var(--gold); }
+.vc-l3 .btn { background: var(--goldg); color: #0b2a20; }
+
+/* l4 · Velvet : bordeaux velours, nom manuscrit doré */
+.vc-l4 { --bg: #2a0710; --sf: #3a0c18; --tx: #f6ece6; --mu: #cdb3ab; --ln: rgba(212,175,122,.22);
+  background-image: radial-gradient(ellipse at 50% 30%, rgba(122,20,40,.55), transparent 70%); }
+.vc-l4 .l4-ph { position: relative; height: 430px; overflow: hidden; }
+.vc-l4 .l4-ph img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+.vc-l4 .l4-sh { position: absolute; inset: 35% 0 0; background: linear-gradient(180deg, rgba(42,7,16,0), #2a0710 92%); }
+.vc-l4 .l4-id { position: relative; margin-top: -110px; padding: 0 22px 22px; text-align: center; }
+.vc-l4 .hd h1 { font: 400 58px/1 var(--script); background: var(--goldg); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.vc-l4 .role { margin-top: 8px; font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: #e8d29f; }
+.vc-l4 .spec { margin-top: 10px; font: italic 400 18px/1.4 "Cormorant Garamond", serif; color: var(--tx); }
+.vc-l4 .co { margin-top: 4px; color: var(--mu); }
+.vc-l4 .qa-ic { border-radius: 50%; background: transparent; border: 1px solid #d4af7a; color: #e8d29f; }
+.vc-l4 .sec-t { color: #e8d29f; font-family: var(--script); font-style: normal; font-size: 38px; }
+.vc-l4 .btn { background: var(--goldg); color: #2a0710; }
+
+/* l5 · Riviera : la demeure en grand, portrait en médaillon */
+.vc-l5 { --bg: #f8f5ef; --sf: #fff; --tx: #1f1c17; --mu: #7d7466; --ln: #e7dfd2; }
+.vc-l5 .l5-cv { position: relative; height: 420px; overflow: hidden; }
+.vc-l5 .l5-cv .cv { width: 100%; height: 100%; object-fit: cover; }
+.vc-l5 .l5-sh { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.05) 30%, rgba(0,0,0,.6)); }
+.vc-l5 .l5-id { position: absolute; left: 22px; right: 22px; bottom: 74px; text-align: center; color: #fff; }
+.vc-l5 .hd h1 { font: 400 34px/1.1 var(--pf); text-transform: uppercase; letter-spacing: .16em; color: #fff; }
+.vc-l5 .role { margin-top: 10px; font-size: 11px; letter-spacing: .32em; text-transform: uppercase; color: #f3e2b3; }
+.vc-l5 .l5-av { position: relative; width: 124px; height: 124px; margin: -62px auto 0; border-radius: 50%; padding: 4px; background: var(--goldg); }
+.vc-l5 .l5-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #f8f5ef; }
+.vc-l5 .hd > .spec { padding: 14px 22px 0; text-align: center; font: italic 400 18px/1.4 "Cormorant Garamond", serif; color: var(--tx); }
+.vc-l5 .hd > .co { padding: 4px 22px 20px; text-align: center; letter-spacing: .18em; text-transform: uppercase; font-size: 11px; }
+.vc-l5 .qa-ic { border-radius: 50%; background: transparent; border: 1px solid #c9a96e; color: #9c7a43; }
+.vc-l5 .btn { background: #1f1c17; }

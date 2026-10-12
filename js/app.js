@@ -714,6 +714,7 @@
     animaux: 'veterinaire toiletteur educateur canin promeneur chien chat vet groomer dog',
     boutiques: 'commerce magasin vendeur artisan createur shop store',
     auto: 'mecanicien garagiste carrossier chauffeur taxi vtc concessionnaire mechanic driver',
+    prestige: 'luxe luxury prestige mecene philanthrope investisseur collectionneur art de vivre lifestyle riche fortune demeure yacht chevaux opera gala',
     education: 'eleve etudiante orientation orthopedagogue directrice principal enseignement formation formatrice charge de cours conferencier enseignant enseignante professeure prof tuteur tutrice stage educatrice garderie cpe ecole universite cegep college teacher tutor school',
   };
   /* Liste de métiers sans carte propre (js/jobs.js) : chacun renvoie vers son secteur */

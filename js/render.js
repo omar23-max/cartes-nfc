@@ -420,6 +420,26 @@
       return `<header class="hd"><div class="m20-ph"><img src="${pic}" alt=""><div class="m20-sh"></div><div class="m20-id">${co ? `<p class="m20-k">${co}</p>` : ''}<h1>${name}</h1>${roleP}</div></div>${specP}</header>`;
     }
 
+    /* ---------- Prestige & Art de vivre : 5 modèles luxe (l1 à l5) ---------- */
+    if (/^l[1-5]$/.test(d)) {
+      const roleP = role ? `<p class="role">${role}</p>` : '', specP = spec ? `<p class="spec">${spec}</p>` : '';
+      const coP = co ? `<p class="co">${co}</p>` : '';
+      const initials = String(id.name || '?').split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
+      if (d === 'l1') {
+        return `<header class="hd"><div class="l1-frame"><p class="l1-mono">${esc(initials)}</p><div class="l1-av"><img src="${av}" alt=""></div><h1>${name}</h1>${roleP}<p class="l1-orn" aria-hidden="true"><i></i><b>✦</b><i></i></p>${specP}${coP}</div></header>`;
+      }
+      if (d === 'l2') {
+        return `<header class="hd"><div class="l2-arch"><img src="${av}" alt=""></div><h1>${name}</h1>${roleP}${specP}${coP}</header>`;
+      }
+      if (d === 'l3') {
+        return `<header class="hd"><div class="l3-crest"><span>${esc(initials)}</span></div>${co ? `<p class="l3-co">${co}</p>` : ''}<div class="l3-av"><img src="${av}" alt=""></div><h1>${name}</h1>${roleP}${specP}</header>`;
+      }
+      if (d === 'l4') {
+        return `<header class="hd"><div class="l4-ph"><img src="${av}" alt=""><div class="l4-sh"></div></div><div class="l4-id"><h1>${name}</h1>${roleP}${specP}${coP}</div></header>`;
+      }
+      return `<header class="hd"><div class="l5-cv">${media}<div class="l5-sh"></div><div class="l5-id"><h1>${name}</h1>${roleP}</div></div><div class="l5-av"><img src="${av}" alt=""></div>${specP}${coP}</header>`;
+    }
+
     /* ---------- Mises en page beauté (passe-partout) ---------- */
     if (d === 'd11') {
       return `<header class="hd"><div class="s11-cover">${media}</div><div class="s11-id"><img class="av" src="${av}" alt=""><p class="s11-co">${co || esc(sec.name)}</p><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<span class="s11-line" aria-hidden="true"></span>${spec ? `<p class="spec">${spec}</p>` : ''}</div></header>`;
