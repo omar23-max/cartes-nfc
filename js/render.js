@@ -393,6 +393,33 @@
       return `<header class="hd"><div class="i10-n"><h1>${name}</h1>${roleP}</div><div class="i10-ph"><img src="${portrait}" alt="">${co ? `<span class="i10-lg">${co}</span>` : ''}</div>${specP}</header>`;
     }
 
+    /* ---------- 5 modèles communs (d16 à d20) ---------- */
+    if (/^d(1[6-9]|20)$/.test(d)) {
+      const roleP = role ? `<p class="role">${role}</p>` : '', specP = spec ? `<p class="spec">${spec}</p>` : '';
+      const pic = hasFace && !sec.establishment ? img(id.photo || id.logo, m) : cover;
+      const coP = co ? `<p class="co">${logo ? `<img class="lg" src="${logo}" alt="">` : ''}${co}</p>` : '';
+      /* Polaroid : photo façon Polaroid légèrement inclinée, nom manuscrit */
+      if (d === 'd16') {
+        return `<header class="hd"><div class="p16-pol"><img src="${pic}" alt=""><span class="p16-cap">${sec.establishment ? '' : esc(String(id.name || '').replace(/^(Dr|Me)\.?\s+/i, '').split(' ')[0] || '')}</span></div><h1>${name}</h1>${roleP}${specP}${coP}</header>`;
+      }
+      /* Split : bloc de couleur avec le nom, portrait rond qui déborde */
+      if (d === 'd17') {
+        return `<header class="hd"><div class="s17-top"><p class="s17-k">${co || esc(sec.name)}</p><h1>${name}</h1>${roleP}</div><img class="av" src="${av}" alt="">${specP}</header>`;
+      }
+      /* Gallery : profil façon réseau social, chiffres et grille de photos */
+      if (d === 'd18') {
+        const st = ((blockOf(m, 'stats') || {}).items || []).filter((x) => x.v).slice(0, 3);
+        const gi = ((blockOf(m, 'gallery') || {}).images || []).filter((x) => x.src).slice(0, 6);
+        return `<header class="hd"><div class="g18-row"><div class="g18-av"><img src="${av}" alt=""></div><div class="g18-id"><h1>${name}</h1>${roleP}</div></div>${st.length ? `<div class="g18-st">${st.map((x) => `<div><b>${esc(x.v)}</b><span>${esc(x.l)}</span></div>`).join('')}</div>` : ''}${specP}${coP}${gi.length >= 3 ? `<div class="g18-grid">${gi.slice(0, gi.length >= 6 ? 6 : 3).map((x, j) => `<span class="gi"><img src="${img(x.src, m)}" alt="" loading="lazy"></span>`).join('')}</div>` : ''}</header>`;
+      }
+      /* Script : grande couverture, carte blanche posée dessus, signature manuscrite */
+      if (d === 'd19') {
+        return `<header class="hd"><div class="c19-cv">${media}</div><div class="c19-card"><img class="av" src="${av}" alt=""><h1>${name}</h1>${roleP}${specP}${coP}</div></header>`;
+      }
+      /* Duo : portrait noir et blanc plein cadre, nom en grand en bas */
+      return `<header class="hd"><div class="m20-ph"><img src="${pic}" alt=""><div class="m20-sh"></div><div class="m20-id">${co ? `<p class="m20-k">${co}</p>` : ''}<h1>${name}</h1>${roleP}</div></div>${specP}</header>`;
+    }
+
     /* ---------- Mises en page beauté (passe-partout) ---------- */
     if (d === 'd11') {
       return `<header class="hd"><div class="s11-cover">${media}</div><div class="s11-id"><img class="av" src="${av}" alt=""><p class="s11-co">${co || esc(sec.name)}</p><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<span class="s11-line" aria-hidden="true"></span>${spec ? `<p class="spec">${spec}</p>` : ''}</div></header>`;

@@ -24,6 +24,11 @@ window.NFC = window.NFC || {};
     { id: 'd8', name: 'Frame', desc: 'Monogramme, portrait dans un double cadre, typographie classique : élégant et intemporel.' },
     { id: 'd9', name: 'Wave', desc: 'En-tête en dégradé coloré, portrait centré, ton chaleureux.' },
     { id: 'd10', name: 'Noir', desc: 'Fond sombre, portrait cerclé, typographie fine : sobre et haut de gamme.' },
+    { id: 'd16', name: 'Polaroid', desc: 'Photo façon Polaroid, légèrement inclinée, prénom manuscrit : chaleureux et personnel.' },
+    { id: 'd17', name: 'Split', desc: 'Bloc de couleur avec votre nom en grand, portrait rond qui déborde : moderne et graphique.' },
+    { id: 'd18', name: 'Gallery', desc: 'Profil façon réseau social : portrait, chiffres clés et grille de vos photos.' },
+    { id: 'd19', name: 'Script', desc: 'Grande photo de couverture, carte blanche posée dessus, nom en signature manuscrite.' },
+    { id: 'd20', name: 'Duo', desc: 'Portrait noir et blanc plein cadre, nom en grand : intemporel et affirmé.' },
   ];
 
   const hours = (rows, note = '') => ({ on: true, rows: rows.map(([d, h]) => ({ d, h })), note });

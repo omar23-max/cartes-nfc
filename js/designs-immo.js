@@ -16,7 +16,7 @@
   ];
   const immo = (NFC.SECTORS || []).find((s) => s.id === 'immobilier');
   if (immo) {
-    immo.designs = IMMO_DESIGNS;
+    immo.designs = IMMO_DESIGNS.concat((NFC.DESIGNS || []).filter((x) => /^d(1[6-9]|20)$/.test(x.id)));
     immo.designsOnly = true; /* seuls ces modèles sont proposés pour l’immobilier */
     immo.rec = 'i1';
   }

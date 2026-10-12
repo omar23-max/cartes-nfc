@@ -291,7 +291,7 @@
       return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, rec: p.rec, palettes: p.pal,
         demo: build(beaute.demo, p.M, p.fr), demoEn: build(beaute.demoEn, p.M, p.en), media: mediaOf(p.M, p.fr) };
     });
-    beaute.designs = BEAUTY_DESIGNS;
+    beaute.designs = []; /* 15 modèles comme les autres métiers ; d11–d15 restent affichables pour les cartes existantes */
     /* La tuile du secteur et les exemples par défaut montrent désormais le salon de coiffure */
     NFC.MEDIA.beaute = beaute.profiles[0].media;
     beaute.ex = 'Coiffure, spa, ongles, maquillage, cils, massage…';

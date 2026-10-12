@@ -210,3 +210,69 @@
 .vc-d10 .qa-ic { border-radius: 50%; background: transparent; border-color: rgba(255,255,255,.4); color: #fff; }
 .vc-d10 .sec-t { font: italic 500 25px/1.1 var(--pf); color: #fff; text-transform: none; letter-spacing: 0; }
 .vc-d10 .btn { background: #fff; color: #111; }
+
+/* ============ 5 modèles communs : Polaroid (d16), Split (d17), Gallery (d18), Script (d19), Duo (d20) ============ */
+/* d16 · Polaroid : photo inclinée, prénom manuscrit, fond papier */
+.vc-d16 { --bg: color-mix(in srgb, var(--a) 10%, #f4efe6); --sf: #fffdf8; --ln: #e6dccb; }
+.vc-d16 .hd { padding: 70px 24px 22px; text-align: center; }
+.vc-d16 .p16-pol { width: 236px; margin: 0 auto; padding: 12px 12px 46px; background: #fff; box-shadow: 0 18px 40px -18px rgba(0,0,0,.45); transform: rotate(-3deg); position: relative; }
+.vc-d16 .p16-pol img { width: 100%; aspect-ratio: 1; object-fit: cover; object-position: center 25%; }
+.vc-d16 .p16-cap { position: absolute; left: 0; right: 0; bottom: 8px; font: 400 32px/1 var(--script); color: #2b2620; }
+.vc-d16 .hd h1 { margin-top: 26px; font: 600 28px/1.1 var(--pf); }
+.vc-d16 .role { margin-top: 6px; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--p); }
+.vc-d16 .spec { margin-top: 8px; } .vc-d16 .co { margin-top: 4px; }
+.vc-d16 .qa-ic { border-radius: 50%; }
+.vc-d16 .sec-t { font: 400 34px/1 var(--script); text-transform: none; letter-spacing: 0; color: var(--tx); }
+
+/* d17 · Split : bloc de couleur, portrait rond qui déborde */
+.vc-d17 { --bg: #fff; --sf: #f6f6f7; }
+.vc-d17 .hd { position: relative; }
+.vc-d17 .s17-top { padding: 72px 150px 34px 24px; background: var(--p); color: #fff; min-height: 220px; }
+.vc-d17 .s17-k { font-size: 11px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; opacity: .8; margin-bottom: 12px; }
+.vc-d17 .hd h1 { font: 800 36px/1 Inter, sans-serif; letter-spacing: -.02em; color: #fff; }
+.vc-d17 .role { margin-top: 10px; color: rgba(255,255,255,.88); font-weight: 600; }
+.vc-d17 .av { position: absolute; right: 18px; top: 150px; width: 124px; height: 124px; border-radius: 50%; object-fit: cover; border: 5px solid #fff; box-shadow: 0 14px 30px -14px rgba(0,0,0,.5); }
+.vc-d17 .hd > .spec { padding: 18px 150px 22px 24px; }
+.vc-d17 .qa-ic { border-radius: 14px; background: var(--p); color: #fff; border: 0; }
+.vc-d17 .sec-t { font: 800 13px/1.2 Inter, sans-serif; letter-spacing: .14em; color: var(--p); }
+.vc-d17 .sec-t::before { content: ""; width: 22px; height: 3px; background: var(--a); border-radius: 2px; align-self: center; }
+
+/* d18 · Gallery : profil façon réseau social */
+.vc-d18 { --bg: #fff; --sf: #f5f5f5; }
+.vc-d18 .hd { padding: 68px 18px 18px; }
+.vc-d18 .g18-row { display: flex; align-items: center; gap: 16px; }
+.vc-d18 .g18-av { flex: none; width: 96px; height: 96px; border-radius: 50%; padding: 3px; background: conic-gradient(from 210deg, var(--a), var(--p), var(--a)); }
+.vc-d18 .g18-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #fff; }
+.vc-d18 .hd h1 { font: 700 22px/1.15 Inter, sans-serif; }
+.vc-d18 .role { margin-top: 3px; font-size: 14px; }
+.vc-d18 .g18-st { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 16px; text-align: center; }
+.vc-d18 .g18-st b { display: block; font-size: 18px; font-weight: 800; }
+.vc-d18 .g18-st span { display: block; font-size: 11.5px; color: var(--mu); line-height: 1.25; padding: 0 4px; }
+.vc-d18 .hd > .spec { margin-top: 12px; color: var(--tx); } .vc-d18 .hd > .co { margin-top: 2px; }
+.vc-d18 .g18-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin: 16px -18px 0; }
+.vc-d18 .g18-grid .gi { display: block; aspect-ratio: 1; overflow: hidden; } .vc-d18 .g18-grid img { width: 100%; height: 100%; object-fit: cover; }
+.vc-d18 .qa-ic { border-radius: 10px; }
+
+/* d19 · Script : couverture, carte blanche posée dessus, signature manuscrite */
+.vc-d19 { --bg: color-mix(in srgb, var(--p) 5%, #f7f5f2); --sf: #fff; }
+.vc-d19 .c19-cv { height: 260px; overflow: hidden; } .vc-d19 .c19-cv .cv { width: 100%; height: 100%; object-fit: cover; }
+.vc-d19 .c19-card { position: relative; margin: -70px 18px 20px; padding: 66px 20px 22px; background: #fff; border-radius: 4px; text-align: center; box-shadow: 0 24px 50px -30px rgba(0,0,0,.45); }
+.vc-d19 .c19-card .av { position: absolute; left: 50%; top: -52px; transform: translateX(-50%); width: 104px; height: 104px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; }
+.vc-d19 .hd h1 { font: 400 50px/1 var(--script); letter-spacing: 0; color: var(--tx); }
+.vc-d19 .role { margin-top: 8px; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; color: var(--p); }
+.vc-d19 .spec { margin-top: 10px; font: italic 400 16px/1.4 var(--pf); color: var(--tx); } .vc-d19 .co { margin-top: 6px; }
+.vc-d19 .qa-ic { border-radius: 50%; }
+.vc-d19 .sec-t { font: 400 34px/1 var(--script); text-transform: none; letter-spacing: 0; color: var(--tx); }
+
+/* d20 · Duo : portrait noir et blanc plein cadre */
+.vc-d20 { --bg: #f4f4f2; --sf: #fff; }
+.vc-d20 .m20-ph { position: relative; height: 470px; overflow: hidden; background: #111; }
+.vc-d20 .m20-ph img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; filter: grayscale(1) contrast(1.05); }
+.vc-d20 .m20-sh { position: absolute; inset: 40% 0 0; background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.78)); }
+.vc-d20 .m20-id { position: absolute; left: 22px; right: 22px; bottom: 22px; color: #fff; }
+.vc-d20 .m20-k { font-size: 11px; font-weight: 700; letter-spacing: .26em; text-transform: uppercase; opacity: .85; margin-bottom: 8px; }
+.vc-d20 .hd h1 { font: 600 44px/.98 var(--pf); color: #fff; }
+.vc-d20 .role { margin-top: 10px; display: inline-block; padding-top: 10px; border-top: 3px solid var(--a); color: #fff; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; }
+.vc-d20 .hd > .spec { padding: 16px 22px 20px; }
+.vc-d20 .qa-ic { border-radius: 0; background: #111; color: #fff; border: 0; }
+.vc-d20 .sec-t { font: 600 18px/1.2 var(--pf); letter-spacing: .02em; text-transform: none; color: var(--tx); }
