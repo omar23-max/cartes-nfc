@@ -3,6 +3,10 @@
   'use strict';
 
   const P = {
+    bed: '<path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9"/>',
+    bath: '<path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-.5C4.68 3 4 3.68 4 4.5V17a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5M10 5 8 7M2 12h20M7 19v2M17 19v2"/>',
+    area: '<path d="M21 3 3 21M21 3h-6M21 3v6M3 21h6M3 21v-6"/>',
+    house: '<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"/>',
     smartphone: '<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
     phone: '<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>',
     mail: '<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>',
@@ -311,6 +315,14 @@
     return `<img class="cv" src="${poster}" alt="">`;
   }
 
+  /* ---------- Immobilier : libellés du bien vedette, caractéristiques ---------- */
+  const LK = (k) => ({ open: L2('Portes ouvertes', 'Open house'), sold: L2('Vendu', 'Just sold'), pending: L2('Vente en cours', 'Sale pending') }[k] || L2('Juste inscrit', 'Just listed'));
+  const feats = (b) => {
+    const f = [[b.beds, 'bed', L2('ch.', 'bd')], [b.baths, 'bath', L2('sdb', 'ba')], [b.area, 'area', '']].filter((x) => x[0]);
+    return f.length ? `<div class="lst-f">${f.map(([v, i, u]) => `<span>${ic(i, 16)}${esc(v)}${u ? ' ' + u : ''}</span>`).join('')}</div>` : '';
+  };
+  const blockOf = (m, type) => { const d = m.sec.blocks.find((x) => x.type === type && (m.card.blocks[x.key] || {}).on); return d ? m.card.blocks[d.key] : null; };
+
   /* ---------- En-têtes par design ---------- */
   function header(m) {
     const { card, sec, d } = m, id = card.identity || {};
@@ -338,6 +350,44 @@
     if (d === 'd10') {
       const initials = String(id.name || '?').replace(/^(Dr|Me)\.?\s+/i, '').split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
       return `<header class="hd">${co ? `<p class="p10-co">${co}</p>` : ''}<div class="p10-arch">${hasFace ? `<img src="${av}" alt="">` : `<span>${esc(initials)}</span>`}</div><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<p class="p10-orn" aria-hidden="true"><i></i>◆<i></i></p>${spec ? `<p class="spec">${spec}</p>` : ''}</header>`;
+    }
+
+    /* ---------- Modèles immobiliers (i1 à i10) ---------- */
+    if (/^i(10|[1-9])$/.test(d)) {
+      const roleP = role ? `<p class="role">${role}</p>` : '', specP = spec ? `<p class="spec">${spec}</p>` : '';
+      const portrait = id.photo ? img(id.photo, m) : av;
+      if (d === 'i1') {
+        return `<header class="hd"><div class="i1-top">${media}<div class="i1-shade"></div><p class="i1-hi"><span>${L2('Bonjour,', 'Hello,')}</span>${L2('voisin !', 'neighbor!')}</p></div><div class="i1-id"><img class="av" src="${portrait}" alt=""><div><h1>${name}</h1>${roleP}${co ? `<p class="co">${co}</p>` : ''}</div></div>${specP}</header>`;
+      }
+      if (d === 'i2') {
+        return `<header class="hd"><div class="i2-cv">${media}</div><img class="av" src="${portrait}" alt=""><h1>${name}</h1>${roleP}${specP}${co ? `<div class="i2-band">${ic('house', 15)}<span>${co}</span></div>` : ''}</header>`;
+      }
+      if (d === 'i3') {
+        return `<header class="hd"><div class="i3-top">${co ? `<p class="i3-co">${ic('house', 14)}<span>${co}</span></p>` : ''}<h1>${name}</h1>${roleP}</div><div class="i3-mid"><span class="i3-vert">${co || esc(sec.name)}</span><div class="i3-ph"><img src="${portrait}" alt=""></div></div>${specP}</header>`;
+      }
+      if (d === 'i4') {
+        return `<header class="hd">${co ? `<p class="i4-co">${co}</p>` : ''}<div class="i4-arch"><img src="${portrait}" alt=""></div><h1>${name}</h1>${roleP}${specP}</header>`;
+      }
+      if (d === 'i5') {
+        const L = blockOf(m, 'listing') || {};
+        const prop = L.img ? img(L.img, m) : cover;
+        return `<header class="hd"><div class="i5-hero"><img src="${prop}" alt=""><span class="i5-tag">${LK(L.kind)}</span>${L.price ? `<span class="i5-price">${esc(L.price)}</span>` : ''}</div>${L.address ? `<p class="i5-addr">${esc(L.address)}</p>` : ''}<p class="i5-s">${LK(L.kind)}</p>${feats(L)}<div class="i5-agent"><img class="av" src="${portrait}" alt=""><div><h1>${name}</h1><p class="role">${[role, co].filter(Boolean).join(' · ')}</p></div></div></header>`;
+      }
+      if (d === 'i6') {
+        return `<header class="hd"><span class="i6-hi">${L2('Bonjour, je suis', 'Hello, I am')}</span><h1>${name}</h1>${role ? `<p class="i6-script">${role}</p>` : ''}<div class="i6-ph"><img src="${portrait}" alt=""></div>${specP}${co ? `<p class="co">${co}</p>` : ''}</header>`;
+      }
+      if (d === 'i7') {
+        return `<header class="hd"><div class="i7-ph"><img src="${portrait}" alt=""><div class="i7-fade"></div></div><div class="i7-id"><h1>${name}</h1>${roleP}${co ? `<p class="co">${co}</p>` : ''}</div>${specP}</header>`;
+      }
+      if (d === 'i8') {
+        const st = (blockOf(m, 'stats') || {}).items || [];
+        const tiles = st.filter((x) => x.v).slice(0, 3);
+        return `<header class="hd"><div class="i8-top"><div class="i8-id"><p class="i8-k">${co || esc(sec.name)}</p><h1>${name}</h1>${roleP}</div><img class="av" src="${portrait}" alt=""></div>${tiles.length ? `<div class="i8-st">${tiles.map((x) => `<div><b>${esc(x.v)}</b><span>${esc(x.l)}</span></div>`).join('')}</div>` : ''}${specP}</header>`;
+      }
+      if (d === 'i9') {
+        return `<header class="hd"><div class="i9-av"><img src="${portrait}" alt=""></div><h1>${name}</h1>${roleP}<p class="i9-orn" aria-hidden="true"><i></i>${ic('house', 16)}<i></i></p>${specP}${co ? `<p class="co">${co}</p>` : ''}</header>`;
+      }
+      return `<header class="hd"><div class="i10-n"><h1>${name}</h1>${roleP}</div><div class="i10-ph"><img src="${portrait}" alt="">${co ? `<span class="i10-lg">${co}</span>` : ''}</div>${specP}</header>`;
     }
 
     /* ---------- Mises en page beauté (passe-partout) ---------- */
@@ -502,6 +552,19 @@
         const price = def.price && x.p ? `<span class="cd-p">${esc(x.p)}</span>` : '';
         return `<${tag} class="cd"${href}>${x.img ? `<div class="cd-im"><img src="${img(x.img, m)}" alt="" loading="lazy">${price}</div>` : ''}<div class="cd-b"><div class="cd-t">${esc(x.t)}</div>${x.d ? `<div class="cd-d">${esc(x.d)}</div>` : ''}${!x.img ? price : ''}</div></${tag}>`;
       }).join('')}</div>`;
+    },
+    /* Bien vedette : juste inscrit, portes ouvertes, vente en cours ou vendu */
+    listing(def, b, m) {
+      if (!b.address && !b.img) return '';
+      const k = LK(b.kind);
+      const f = feats(b);
+      return `<div class="lst lst-${esc(b.kind || 'just')}">${b.img ? `<div class="lst-im"><img src="${img(b.img, m)}" alt="" loading="lazy"><span class="lst-k">${k}</span>${b.price ? `<span class="lst-p">${esc(b.price)}</span>` : ''}</div>` : ''}<div class="lst-b"><p class="lst-s">${k}</p>${b.address ? `<p class="lst-a">${ic('pin', 15)}<span>${esc(b.address)}</span></p>` : ''}${f}${b.date || b.time ? `<p class="lst-d">${ic('cal', 15)}<span>${esc([b.date, b.time].filter(Boolean).join(' · '))}</span></p>` : ''}${b.text ? `<p class="lst-t">${nl(b.text)}</p>` : ''}${b.url ? `<a class="btn" href="${esc(url(b.url))}" target="_blank" rel="noopener">${esc(b.cta || L2('Voir la fiche du bien', 'View the listing'))}</a>` : ''}</div></div>`;
+    },
+    /* Étapes numérotées (ex. étapes de vente, d’achat) */
+    steps(def, b) {
+      const items = (b.items || []).filter((x) => x.t);
+      if (!items.length) return '';
+      return `<ol class="stp">${items.map((x, i) => `<li><span class="stp-n">${i + 1}</span><div class="stp-b"><b>${esc(x.t)}</b>${x.d ? `<p>${esc(x.d)}</p>` : ''}</div></li>`).join('')}</ol>`;
     },
     stats(def, b) {
       const items = (b.items || []).filter((x) => x.v);

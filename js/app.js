@@ -300,7 +300,8 @@
   const designOf = (id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id) || DESIGNS[0];
   /* Mises en page proposées : les 10 communes + celles propres au secteur (ex. beauté) */
   const designsNow = () => {
-    const all = DESIGNS.concat((sec() && sec().designs) || []), off = cfg('designsOff', []), del = cfg('designsDel', []);
+    /* Certains métiers (immobilier) ont leurs propres modèles, à la place des modèles communs */
+    const all = (sec() && sec().designsOnly ? [] : DESIGNS).concat((sec() && sec().designs) || []), off = cfg('designsOff', []), del = cfg('designsDel', []);
     const on = all.filter((d) => (ADM() ? !del.includes(d.id) : (!off.includes(d.id) && !del.includes(d.id))) || d.id === S.design);
     return on.length ? on : all;
   };
@@ -1541,6 +1542,19 @@
         return area('Texte', base + '.text', { rows: 6, hint: def.help });
       case 'list':
         return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.items.${i}.t`, 'Intitulé', 'strong')}${mini(`${base}.items.${i}.d`, 'Détail (facultatif)', def.price ? '' : 'full')}${def.price ? mini(`${base}.items.${i}.p`, 'Prix (ex. dès 89 €)', 'price') : ''}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'item', 'Ajouter une ligne')}`;
+      /* Immobilier : bien vedette (juste inscrit, portes ouvertes, vendu) */
+      case 'listing': {
+        const kinds = [['just', 'Juste inscrit'], ['open', 'Portes ouvertes'], ['pending', 'Vente en cours'], ['sold', 'Vendu']];
+        return `<label class="f"><span class="f-l">Type d’annonce</span><select data-path="${base}.kind">${kinds.map(([v, l]) => `<option value="${v}" ${(b.kind || 'just') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label>
+          <div class="it">${thumbF(base + '.img')}<div class="it-f">${mini(base + '.address', 'Adresse du bien', 'strong')}${mini(base + '.price', 'Prix (ex. 589 000 $)', 'price')}</div></div>
+          <div class="row3">${inp('Chambres', base + '.beds', { ph: '3' })}${inp('Salles de bain', base + '.baths', { ph: '2' })}${inp('Superficie', base + '.area', { ph: '1 450 pi²' })}</div>
+          <div class="row2">${inp('Date (portes ouvertes)', base + '.date', { ph: 'Samedi 14 juin' })}${inp('Heure', base + '.time', { ph: '14 h – 16 h' })}</div>
+          ${area('Description', base + '.text', { rows: 3 })}
+          <div class="row2">${inp('Lien vers la fiche du bien', base + '.url', { ph: 'https://…' })}${inp('Texte du bouton', base + '.cta', { ph: 'Voir la fiche du bien' })}</div>`;
+      }
+      /* Étapes numérotées */
+      case 'steps':
+        return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.items.${i}.t`, 'Étape', 'strong')}${mini(`${base}.items.${i}.d`, 'Détail (facultatif)', 'full')}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'item', 'Ajouter une étape')}`;
       case 'cards':
         return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it">${thumbF(p + '.img')}<div class="it-f">${mini(p + '.t', 'Titre', 'strong')}${mini(p + '.d', 'Description', def.price ? '' : 'full')}${def.price ? mini(p + '.p', 'Prix', 'price') : ''}${mini(p + '.url', 'Lien (facultatif)', 'full')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'card', 'Ajouter une fiche')}`;
       case 'stats':

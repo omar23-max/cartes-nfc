@@ -66,7 +66,14 @@
     'Courtière immobilière résidentielle': 'Residential real estate broker', 'Plateau-Mont-Royal · Ventes et évaluations': 'Plateau-Mont-Royal · Sales & home valuations',
     'Installée sur le Plateau depuis 10 ans, je connais chaque rue, chaque copropriété et les prix réels du quartier.\nJe vous accompagne de l’évaluation jusqu’à la signature chez le notaire, avec une seule interlocutrice du début à la fin.':
       'Based in the Plateau for 10 years, I know every street, every condo building and what homes really sell for.\nI’m with you from the valuation to the closing, as your one point of contact from start to finish.',
-    'Condo 5 ½ · 1 100 pi²': '2-bedroom condo · 1,100 sq ft', 'Plateau-Mont-Royal · Balcon · 3e étage': 'Plateau-Mont-Royal · Balcony · 3rd floor', '589 000 $': '$589,000',
+    'Condo 5 ½ · 1 100 pi²': '2-bedroom condo · 1,100 sq ft',
+    '4521, avenue de l’Esplanade, Montréal': '4521 Esplanade Avenue, Montreal', '1 149 000 $': '$1,149,000', '2 100 pi²': '2,100 sq ft', 'Samedi 14 juin': 'Saturday, June 14', '14 h – 16 h': '2 – 4 p.m.',
+    'Cottage lumineux entièrement rénové, cour arrière et stationnement. Visite libre, sans rendez-vous.': 'Bright, fully renovated cottage with a backyard and parking. Open house, no appointment needed.',
+    'Bilan du marché · Mai': 'Market update · May', 'nouvelles inscriptions': 'new listings', '615 000 $': '$615,000', 'prix médian': 'median price', 'du prix demandé obtenu': 'of asking price achieved',
+    'Évaluation de votre propriété': 'Home valuation', 'Analyse comparative du marché': 'Comparative market analysis', 'Préparation': 'Getting ready', 'Photos professionnelles, visite virtuelle': 'Professional photos, virtual tour',
+    'Mise en vente': 'Listing', 'Centris, réseaux sociaux, visites libres': 'MLS, social media, open houses', 'Offres et négociation': 'Offers & negotiation', 'Je défends votre prix': 'I protect your price',
+    'Signature': 'Closing', 'Jusqu’à l’acte chez le notaire': 'All the way to closing day',
+    'Inspection préachat': 'Home inspection', 'Notaire': 'Real estate attorney', 'Courtier hypothécaire': 'Mortgage broker', 'Déménagement': 'Movers', 'Déménagement Plateau': 'Park Slope Movers', 'Plateau-Mont-Royal · Balcon · 3e étage': 'Plateau-Mont-Royal · Balcony · 3rd floor', '589 000 $': '$589,000',
     'Maison unifamiliale · 4 chambres': 'Single-family home · 4 bedrooms', 'Laval · Terrain de 6 000 pi²': 'Laval · 6,000 sq ft lot', '849 000 $': '$849,000',
     'Condo 3 ½ · 650 pi²': '1-bedroom condo · 650 sq ft', 'Centre-ville · Idéal investisseur': 'Downtown · Great for investors', '329 000 $': '$329,000',
     'propriétés vendues en 2025': 'homes sold in 2025', '21 j': '21 days', 'délai moyen de vente': 'average time to sell', '99 %': '99%', 'du prix demandé obtenu': 'of asking price achieved',
@@ -328,7 +335,7 @@
     immobilier: { tel: '718', rep: [
       ['Plateau-Mont-Royal, Mile End, Rosemont, Outremont', 'Park Slope, Prospect Heights, Carroll Gardens, Windsor Terrace'],
       ['Based in the Plateau', 'Based in Park Slope'], ['Sellers in the Plateau', 'Sellers in Park Slope'], ['Plateau-Mont-Royal', 'Park Slope'],
-      ['Laval · ', 'Bay Ridge · '], ['parkerimmo', 'parkerhomes']] },
+      ['Laval · ', 'Bay Ridge · '], ['parkerimmo', 'parkerhomes'], ['4521 Esplanade Avenue, Montreal', '218 Prospect Park West, Brooklyn']] },
     archi: { tel: '215', rep: [['Montreal’s old plexes and houses', 'Philadelphia’s old rowhouses'], ['Plateau-Mont-Royal', 'Fishtown']] },
     artisans: { tel: '773', rep: [
       ['Montreal, Laval, Longueuil, Brossard, Boucherville', 'Chicago, Evanston, Oak Park, Skokie, Cicero'],

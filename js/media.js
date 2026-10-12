@@ -58,12 +58,18 @@
     }
   },
   "immobilier": {
-    "portrait": "media/immobilier/13126.jpg",
-    "cover": "media/immobilier/24945.jpg",
+    "portrait": "media/immobilier/px16846825.jpg",
+    "cover": "media/immobilier/px18285887.jpg",
     "cards": [
-      "media/immobilier/15851.jpg",
-      "media/immobilier/27543.jpg",
-      "media/immobilier/13126.jpg"
+      "media/immobilier/px7031581.jpg",
+      "media/immobilier/px20296321.jpg",
+      "media/immobilier/px36060480.jpg"
+    ],
+    "gallery": [
+      { "src": "media/immobilier/px276746.jpg", "cap": "Salon" },
+      { "src": "media/immobilier/px7166645.jpg", "cap": "Cuisine" },
+      { "src": "media/immobilier/px6903157.jpg", "cap": "Chambre principale" },
+      { "src": "media/immobilier/px4119832.jpg", "cap": "Salle à manger" }
     ],
     "video": {
       "src": "media/immobilier/video.mp4",
