@@ -20,10 +20,10 @@ window.NFC = window.NFC || {};
     { id: 'd4', name: 'Personal', desc: 'Portrait mis en avant, blocs arrondis, ton personnel.' },
     { id: 'd5', name: 'Immersive', desc: 'Ouverture plein écran, ambiance sombre et narrative.' },
     { id: 'd6', name: 'Classic', desc: 'Une fiche posée sur la couverture, comme une vraie carte de visite.' },
-    { id: 'd7', name: 'Minimal', desc: 'Noir et blanc, typographie forte, aucun superflu.' },
-    { id: 'd8', name: 'Mosaic', desc: 'Tuiles façon bento : photo, portrait et accroche d’un coup d’œil.' },
+    { id: 'd7', name: 'Signature', desc: 'Grand portrait et votre nom à la verticale sur un bandeau de couleur : affirmé, façon magazine.' },
+    { id: 'd8', name: 'Frame', desc: 'Monogramme, portrait dans un double cadre, typographie classique : élégant et intemporel.' },
     { id: 'd9', name: 'Wave', desc: 'En-tête en dégradé coloré, portrait centré, ton chaleureux.' },
-    { id: 'd10', name: 'Prestige', desc: 'Ivoire, typographie classique, portrait en arche : haut de gamme.' },
+    { id: 'd10', name: 'Noir', desc: 'Fond sombre, portrait cerclé, typographie fine : sobre et haut de gamme.' },
   ];
 
   const hours = (rows, note = '') => ({ on: true, rows: rows.map(([d, h]) => ({ d, h })), note });

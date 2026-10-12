@@ -160,3 +160,53 @@
 /* Fond noir : textes du bien vedette en doré */
 .vc-i9 .lst-s, .vc-i9 .lst-a svg, .vc-i9 .lst-d svg, .vc-i9 .lst-f svg { color: var(--gold); }
 .vc-i9 .lst-k { background: var(--gold); color: #0e0e10; }
+
+/* ============ Modèles communs remplaçants : Signature (d7), Frame (d8), Noir (d10) ============ */
+/* d7 · Signature : grand portrait, nom vertical sur bandeau de couleur */
+.vc-d7 { --bg: #fafaf8; --sf: #fff; }
+.vc-d7 .g7 { display: grid; grid-template-columns: minmax(0, 1fr) 78px; grid-template-rows: 440px; }
+.vc-d7 .g7-ph, .vc-d7 .g7-band { min-height: 0; }
+.vc-d7 .g7-ph { overflow: hidden; } .vc-d7 .g7-ph img { width: 100%; height: 100%; object-fit: cover; object-position: center 22%; }
+.vc-d7 .g7-band { display: flex; align-items: flex-end; justify-content: center; padding: 18px 0; background: var(--p); }
+.vc-d7 .g7-vn { writing-mode: vertical-rl; transform: rotate(180deg); font: 600 34px/1 var(--pf); letter-spacing: .08em; text-transform: uppercase; color: #fff; white-space: nowrap; overflow: hidden; max-height: 100%; }
+.vc-d7 .g7-id { padding: 22px 22px 20px; }
+.vc-d7 .g7-co { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--mu); margin-bottom: 10px; }
+.vc-d7 .hd h1 { font: 600 30px/1.1 var(--pf); }
+.vc-d7 .role { margin-top: 6px; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--p); }
+.vc-d7 .spec { margin-top: 8px; }
+.vc-d7 .qa-ic { border-radius: 0; background: var(--p); color: #fff; border: 0; }
+.vc-d7 .sec-t { font: 600 16px/1.2 var(--pf); letter-spacing: .14em; color: var(--tx); }
+.vc-d7 .sec { border-top: 0; } .vc-d7 .sec:nth-child(even) { background: color-mix(in srgb, var(--p) 5%, #fff); }
+
+/* d8 · Frame : monogramme, portrait en double cadre */
+.vc-d8 { --bg: color-mix(in srgb, var(--p) 6%, #f6f2ea); --sf: #fffdf9; --ln: color-mix(in srgb, var(--p) 14%, #e8e0d2); --r: 2px; }
+.vc-d8 .hd { padding: 70px 24px 24px; text-align: center; }
+.vc-d8 .g8-mono { width: 62px; height: 62px; margin: 0 auto 18px; border-radius: 50%; border: 1px solid var(--p); display: grid; place-items: center; }
+.vc-d8 .g8-mono span { font: 500 22px/1 var(--pf); letter-spacing: .06em; color: var(--p); }
+.vc-d8 .g8-frame { width: 210px; height: 260px; margin: 0 auto; padding: 8px; border: 1px solid var(--p); outline: 1px solid var(--p); outline-offset: 5px; }
+.vc-d8 .g8-frame img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+.vc-d8 .hd h1 { margin-top: 26px; font: 500 34px/1.1 var(--pf); }
+.vc-d8 .role { margin-top: 8px; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; color: var(--p); }
+.vc-d8 .g8-orn { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px 0 10px; color: var(--p); font-size: 9px; }
+.vc-d8 .g8-orn i { width: 46px; height: 1px; background: currentColor; }
+.vc-d8 .spec { font: italic 400 17px/1.4 var(--pf); color: var(--tx); }
+.vc-d8 .co { margin-top: 6px; letter-spacing: .14em; text-transform: uppercase; font-size: 11.5px; }
+.vc-d8 .qa-ic { border-radius: 50%; background: transparent; border-color: var(--p); color: var(--p); }
+.vc-d8 .sec { text-align: center; } .vc-d8 .sec-t { justify-content: center; font: italic 500 26px/1.1 var(--pf); text-transform: none; letter-spacing: 0; color: var(--tx); }
+.vc-d8 .list, .vc-d8 .hours, .vc-d8 .links, .vc-d8 .qform, .vc-d8 .cards, .vc-d8 .revs, .vc-d8 .menu-x { text-align: left; }
+
+/* d10 · Noir : fond sombre, portrait cerclé */
+.vc-d10 { --bg: color-mix(in srgb, var(--p) 18%, #0d0d10); --sf: color-mix(in srgb, var(--p) 14%, #17171b); --tx: #f4f1ec; --mu: #b1aca4; --ln: rgba(255,255,255,.1); }
+.vc-d10 .hd { position: relative; padding: 0 24px 24px; text-align: center; overflow: hidden; }
+.vc-d10 .g10-bg { position: absolute; inset: 0 0 auto; height: 230px; opacity: .35; }
+.vc-d10 .g10-bg .cv { width: 100%; height: 100%; object-fit: cover; filter: grayscale(.6); }
+.vc-d10 .g10-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0), var(--bg)); }
+.vc-d10 .g10-av { position: relative; width: 170px; height: 170px; margin: 74px auto 0; border-radius: 50%; padding: 5px; border: 1px solid rgba(255,255,255,.55); }
+.vc-d10 .g10-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.vc-d10 .hd h1 { position: relative; margin-top: 22px; font: 400 36px/1.1 var(--pf); letter-spacing: .02em; color: #fff; }
+.vc-d10 .role { position: relative; margin-top: 8px; font-size: 11.5px; letter-spacing: .3em; text-transform: uppercase; color: color-mix(in srgb, var(--a) 70%, #fff); }
+.vc-d10 .g10-line { display: block; width: 60px; height: 1px; margin: 16px auto 12px; background: rgba(255,255,255,.4); }
+.vc-d10 .co { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; letter-spacing: .12em; text-transform: uppercase; font-size: 12px; }
+.vc-d10 .qa-ic { border-radius: 50%; background: transparent; border-color: rgba(255,255,255,.4); color: #fff; }
+.vc-d10 .sec-t { font: italic 500 25px/1.1 var(--pf); color: #fff; text-transform: none; letter-spacing: 0; }
+.vc-d10 .btn { background: #fff; color: #111; }

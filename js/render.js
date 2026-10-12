@@ -335,21 +335,24 @@
     if (d === 'd6') {
       return `<header class="hd"><div class="c6-cover">${media}</div><div class="c6-card"><img class="av" src="${av}" alt=""><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}${spec ? `<p class="spec">${spec}</p>` : ''}${co ? `<p class="co">${logo ? `<img class="lg" src="${logo}" alt="">` : ''}${co}</p>` : ''}</div></header>`;
     }
+    /* Signature : grand portrait, nom vertical sur un bandeau de couleur */
     if (d === 'd7') {
-      /* Minimal : photo, nom, fonction. Le reste vient plus bas. */
-      return `<header class="hd"><img class="av" src="${av}" alt=""><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}</header>`;
+      const pic = hasFace && !sec.establishment ? img(id.photo || id.logo, m) : cover;
+      return `<header class="hd"><div class="g7"><div class="g7-ph"><img src="${pic}" alt=""></div><div class="g7-band"><span class="g7-vn" style="font-size:${Math.min(34, Math.floor(400 / (Math.max(String(id.name || '').length, 1) * 0.8)))}px">${name}</span></div></div><div class="g7-id">${co ? `<p class="g7-co">${logo ? `<img class="lg" src="${logo}" alt="">` : ''}<span>${co}</span></p>` : ''}<h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}${spec ? `<p class="spec">${spec}</p>` : ''}</div></header>`;
     }
+    /* Frame : monogramme, portrait dans un double cadre, typographie classique */
     if (d === 'd8') {
-      /* Mosaïque : une grande tuile de couverture, puis deux tuiles sobres */
-      const tag = spec || co;
-      return `<header class="hd"><div class="bento"><div class="b-cover">${media}<div class="b-ov"><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}</div></div><div class="b-id${tag ? '' : ' wide'}"><img class="av" src="${av}" alt=""><span>${co || esc(sec.name)}</span></div>${tag ? `<div class="b-spec">${spec || co}</div>` : ''}</div></header>`;
+      const initials = String(id.name || '?').replace(/^(Dr|Me)\.?\s+/i, '').split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
+      const pic = hasFace ? av : cover;
+      return `<header class="hd"><div class="g8-mono"><span>${esc(initials)}</span></div><div class="g8-frame"><img src="${pic}" alt=""></div><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<p class="g8-orn" aria-hidden="true"><i></i><b>◆</b><i></i></p>${spec ? `<p class="spec">${spec}</p>` : ''}${co ? `<p class="co">${co}</p>` : ''}</header>`;
     }
     if (d === 'd9') {
       return `<header class="hd"><div class="w9-bg">${media}<div class="w9-grad"></div><svg class="w9-wave" viewBox="0 0 400 60" preserveAspectRatio="none" aria-hidden="true"><path d="M0 30 C 80 60 150 0 230 22 C 300 42 350 38 400 18 L400 60 L0 60 Z" fill="var(--bg)"/></svg></div><div class="w9-id"><img class="av" src="${av}" alt=""><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}${spec ? `<p class="spec">${spec}</p>` : ''}${co ? `<p class="co">${co}</p>` : ''}</div></header>`;
     }
+    /* Noir : fond sombre, portrait cerclé, typographie fine */
     if (d === 'd10') {
-      const initials = String(id.name || '?').replace(/^(Dr|Me)\.?\s+/i, '').split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase();
-      return `<header class="hd">${co ? `<p class="p10-co">${co}</p>` : ''}<div class="p10-arch">${hasFace ? `<img src="${av}" alt="">` : `<span>${esc(initials)}</span>`}</div><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<p class="p10-orn" aria-hidden="true"><i></i>◆<i></i></p>${spec ? `<p class="spec">${spec}</p>` : ''}</header>`;
+      const pic = hasFace ? av : cover;
+      return `<header class="hd"><div class="g10-bg">${media}</div><div class="g10-av"><img src="${pic}" alt=""></div><h1>${name}</h1>${role ? `<p class="role">${role}</p>` : ''}<span class="g10-line" aria-hidden="true"></span>${spec ? `<p class="spec">${spec}</p>` : ''}${co ? `<p class="co">${logo ? `<img class="lg" src="${logo}" alt="">` : ''}${co}</p>` : ''}</header>`;
     }
 
     /* ---------- Modèles immobiliers (i1 à i10) ---------- */
