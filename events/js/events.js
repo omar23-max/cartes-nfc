@@ -227,4 +227,13 @@
       setTimeout(() => ov.remove(), 2800);
     });
   };
+  /* Photo d’exemple par modèle : tant que l’invitation garde la photo de démonstration */
+  const R0 = V.render;
+  V.render = (m) => {
+    const F = m && m.sec && (NFC.EV_FACE || {})[m.sec.id], n = F && F[m.d || m.sec.rec];
+    const id = (m && m.card && m.card.identity) || {}, demo = 'media/' + (m && m.sec && m.sec.id) + '-1.jpg';
+    if (!n || (id.photo && id.photo !== demo)) return R0(m);
+    const src = 'media/' + m.sec.id + '-' + n + '.jpg';
+    return R0(Object.assign({}, m, { card: Object.assign({}, m.card, { identity: Object.assign({}, id, { photo: src, cover: !id.cover || id.cover === demo ? src : id.cover }) }) }));
+  };
 })();

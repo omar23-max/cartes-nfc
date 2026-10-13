@@ -30,6 +30,8 @@
   /* Modèle d’enveloppe proposé par événement (modifiable dans l’éditeur) */
   const ENV_OF = { mariage: 'sauge', bapteme: 'sauge', cremaillere: 'sauge', fetemeres: 'sauge', demande: 'blanc', demoiselles: 'blanc', naissance: 'blanc', babyshower: 'blanc', hommage: 'blanc', anniversaire: 'ruban', halloween: 'ruban', valentin: 'ruban', fetesperes: 'ruban' };
   NFC.EV_ENV_OF = ENV_OF;
+  /* Photo d’exemple propre à chaque modèle (photos fournies par l’utilisateur pour le mariage : n° 3 à 6) */
+  NFC.EV_FACE = { mariage: { e1: 3, e2: 5, e3: 6, e4: 1, e5: 2, d16: 3, d19: 5, d20: 4 } };
   /* Construit l’exemple d’un événement dans une langue */
   function demo(e, L, en) {
     const t = (fr, enText) => (en ? enText : fr);
@@ -44,7 +46,7 @@
         countdown: { on: e.countdown !== false, title: '' },
         intro: { on: true, title: L.introTitle || '', text: L.intro },
         program: { on: !!(L.program && L.program.length), title: L.programTitle || '', items: (L.program || []).map(([tt, d]) => ({ t: tt, d, p: '' })) },
-        gallery: { on: true, title: L.galTitle || '', images: [{ src: IMG(e.id, 1), cap: '' }, { src: IMG(e.id, 2), cap: '' }] },
+        gallery: { on: true, title: L.galTitle || '', images: (e.pics || [1, 2]).map((n) => ({ src: IMG(e.id, n), cap: '' })) },
         video: { on: false, url: '', cap: '', cover: '' },
         registry: { on: !!(L.registry && L.registry.length), title: L.registryTitle || '', items: (L.registry || []).map(([label, url]) => ({ label, url })) },
         rsvp: { on: e.rsvp !== false, deadline: L.deadline || '', meals: L.meals || '', guests: e.guests || 4, email: L.mail || 'reponse@exemple.com', text: L.rsvpText || t('Merci de nous répondre avant la date indiquée.', 'Please let us know before the date below.') },
@@ -56,7 +58,7 @@
 
   /* Les 21 événements */
   const EV = [
-    { id: 'mariage', icon: 'heart', n: ['Mariage', 'Wedding'], ex: ['Faire-part, programme, liste de mariage, RSVP', 'Invitation, program, registry, RSVP'], music: 'romance', rec: 'e1', date: '2027-06-19', time: '15:30', guests: 2,
+    { id: 'mariage', icon: 'heart', pics: [3, 5, 4, 6, 1, 2], n: ['Mariage', 'Wedding'], ex: ['Faire-part, programme, liste de mariage, RSVP', 'Invitation, program, registry, RSVP'], music: 'romance', rec: 'e1', date: '2027-06-19', time: '15:30', guests: 2,
       pal: [['Ivoire & or', '#5b4a32', '#c9a96e'], ['Sauge', '#4f6b58', '#c9d6c3'], ['Rose poudré', '#9b5d6b', '#f1d3d9'], ['Bleu nuit', '#1f2a44', '#d4b483']],
       fr: { title: 'Sophie & Lucas', sub: 'Se disent oui', env: 'Vous êtes invités', seal: 'S&L', place: 'Domaine des Érables', address: '1200, chemin du Lac, Mont-Tremblant', dress: 'Tenue de cocktail · tons clairs', intro: 'Après huit ans d’amour, nous avons la joie de vous inviter à notre mariage. Votre présence à nos côtés sera notre plus beau cadeau.', program: [['15 h 30', 'Cérémonie dans les jardins'], ['17 h', 'Cocktail au bord du lac'], ['19 h', 'Dîner'], ['22 h', 'Soirée dansante']], registry: [['Notre liste de mariage', 'https://example.com/liste'], ['Cagnotte voyage de noces', 'https://example.com/cagnotte']], meals: 'Bœuf, Saumon, Végétarien', deadline: '1er mai 2027', mail: 'sophie.lucas@exemple.com' },
       en: { title: 'Sophie & Lucas', sub: 'Are getting married', env: 'You’re invited', seal: 'S&L', place: 'Maple Estate', address: '1200 Lake Road, Mont-Tremblant', dress: 'Cocktail attire · light tones', intro: 'After eight years together, we are thrilled to invite you to our wedding. Having you with us will be the greatest gift.', program: [['3:30 p.m.', 'Ceremony in the gardens'], ['5 p.m.', 'Cocktails by the lake'], ['7 p.m.', 'Dinner'], ['10 p.m.', 'Dancing']], registry: [['Our wedding registry', 'https://example.com/registry'], ['Honeymoon fund', 'https://example.com/fund']], meals: 'Beef, Salmon, Vegetarian', deadline: 'May 1, 2027', mail: 'sophie.lucas@example.com' } },
