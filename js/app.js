@@ -1870,10 +1870,10 @@
               <li><b>Vos contacts approchent leur téléphone</b> et votre carte s’ouvre, sans application.</li>
             </ol>
           </details>
-          ${leadsBox()}
+          ${isEvents ? '' : leadsBox()}
           <div class="btns pub-btns">
             <button class="b pri" data-act="full">${ic('eye', 17)}Voir en plein écran</button>
-            <button class="b" data-act="vcf">${ic('userplus', 17)}Fiche contact (.vcf)</button>
+            ${isEvents ? '' : `<button class="b" data-act="vcf">${ic('userplus', 17)}Fiche contact (.vcf)</button>`}
           </div>
         </div>
         <div class="pv-col stick">${pubPhone()}</div>
