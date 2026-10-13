@@ -153,29 +153,78 @@
     });
   }, 1000);
 
-  /* ---------- Page publique : enveloppe animée puis invitation (et musique) ---------- */
+  /* ---------- Enveloppe plein écran : 4 modèles (ruban, sceau doré, sauge gaufrée, blanc gaufré) ---------- */
+  const ENV_STYLES = ['ruban', 'or', 'sauge', 'blanc'];
+  NFC.EV_ENVS = [['ruban', 'Ruban', 'Ribbon'], ['or', 'Sceau doré', 'Gold seal'], ['sauge', 'Sauge', 'Sage'], ['blanc', 'Blanc', 'White']];
+  /* Couleurs du sceau : clair, base, foncé */
+  const WAX = { or: ['#f6dc95', '#c9973c', '#7d5a1c'], sauge: ['#fbf1d9', '#dcc79c', '#9c8459'], blanc: ['#ffffff', '#eceae4', '#b4b0a6'] };
+  /* Brin de feuillage (gravé dans le sceau et gaufré dans le papier) */
+  function sprig(x, y, s, rot) {
+    const leaf = (lx, ly, a) => `<path d="M0 0C${4 * s} ${-4.5 * s} ${11 * s} ${-4.5 * s} ${15 * s} 0C${11 * s} ${4.5 * s} ${4 * s} ${4.5 * s} 0 0Z" transform="translate(${lx} ${ly}) rotate(${a})"/>`;
+    let p = `<path d="M0 ${30 * s}C${2 * s} ${10 * s} 0 ${-12 * s} ${-2 * s} ${-30 * s}" fill="none"/>`;
+    for (let i = 0; i < 4; i++) { const yy = (20 - i * 14) * s; p += leaf(0, yy, -40 - i * 4) + leaf(0, yy - 5 * s, -140 + i * 4); }
+    p += leaf(-2 * s, -30 * s, -95);
+    return `<g transform="translate(${x} ${y}) rotate(${rot})">${p}</g>`;
+  }
+  /* Motif gaufré : reflet clair en haut à gauche, ombre en bas à droite */
+  const EMB = {};
+  function emboss(style) {
+    if (EMB[style]) return EMB[style];
+    const art = sprig(40, 45, 1.1, -25) + sprig(112, 108, 0.9, 30) + sprig(118, 28, 0.6, 70) + sprig(30, 125, 0.65, -60)
+      + [[78, 70], [140, 72], [8, 88], [75, 140]].map(([x, y]) => `<g transform="translate(${x} ${y})">${[0, 72, 144, 216, 288].map((a) => `<ellipse cx="0" cy="-4" rx="2.4" ry="4" transform="rotate(${a})"/>`).join('')}</g>`).join('');
+    const hi = style === 'sauge' ? 'rgba(255,255,255,.26)' : 'rgba(255,255,255,.95)', lo = style === 'sauge' ? 'rgba(40,50,30,.22)' : 'rgba(90,80,60,.13)';
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" viewBox="0 0 150 150"><g fill="none" stroke-width="1.1" stroke-linejoin="round"><g stroke="${hi}" transform="translate(-.7 -.7)">${art}</g><g stroke="${lo}" transform="translate(.7 .7)">${art}</g></g></svg>`;
+    return (EMB[style] = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`);
+  }
+  /* Sceau de cire au bord irrégulier, initiales ou brin gravés */
+  function waxSeal(style, txt) {
+    const [li, ba, da] = WAX[style] || WAX.or, id = 'evw-' + style;
+    const pts = []; for (let i = 0; i < 28; i++) { const a = (i / 28) * Math.PI * 2, r = 54 + Math.sin(i * 2.7) * 2.6 + Math.cos(i * 1.3) * 1.8; pts.push(`${(60 + Math.cos(a) * r).toFixed(1)} ${(60 + Math.sin(a) * r).toFixed(1)}`); }
+    const t = String(txt || '').trim().slice(0, 4), fs = t.length > 2 ? 22 : t.length > 1 ? 28 : 34;
+    const mark = t ? `<text x="60" y="${60 + fs * 0.35}" text-anchor="middle" font-family="Playfair Display, Georgia, serif" font-size="${fs}" font-weight="600">${esc(t)}</text>` : sprig(60, 62, 0.9, 0);
+    return `<svg viewBox="0 0 120 120" aria-hidden="true"><defs><radialGradient id="${id}" cx="38%" cy="32%" r="78%"><stop offset="0" stop-color="${li}"/><stop offset=".45" stop-color="${ba}"/><stop offset="1" stop-color="${da}"/></radialGradient>
+      <radialGradient id="${id}i" cx="62%" cy="66%" r="70%"><stop offset="0" stop-color="${li}"/><stop offset=".5" stop-color="${ba}"/><stop offset="1" stop-color="${da}"/></radialGradient></defs>
+      <path d="M${pts.join('L')}Z" fill="url(#${id})"/>
+      <circle cx="60" cy="60" r="39" fill="url(#${id}i)"/>
+      <circle cx="60" cy="60" r="39" fill="none" stroke="${da}" stroke-opacity=".55" stroke-width="2"/>
+      <circle cx="59.3" cy="59.3" r="39" fill="none" stroke="${li}" stroke-opacity=".7" stroke-width=".9"/>
+      <g fill="${da}" stroke="${da}" stroke-width="${t ? 0 : 1.6}" fill-opacity="${t ? 0.85 : 0}" opacity=".9">${mark}</g>
+      <g fill="${li}" stroke="${li}" stroke-width="${t ? 0 : 0.8}" fill-opacity="${t ? 0.5 : 0}" opacity=".7" transform="translate(-.8 -.8)">${mark}</g></svg>`;
+  }
+  /* Nœud de ruban noir satiné */
+  const BOW = `<svg viewBox="0 0 240 170" aria-hidden="true"><defs><linearGradient id="evbow" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a3a3a"/><stop offset=".35" stop-color="#050505"/><stop offset=".6" stop-color="#2a2a2a"/><stop offset="1" stop-color="#000"/></linearGradient></defs>
+    <g fill="none" stroke="url(#evbow)" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke-width="7" d="M120 62C95 20 48 8 44 34C40 58 86 66 120 62"/>
+      <path stroke-width="7" d="M120 62C146 22 194 12 197 38C200 62 154 68 120 62"/>
+      <path stroke-width="6.5" d="M116 66C104 92 86 118 62 160"/>
+      <path stroke-width="6.5" d="M124 66C140 96 158 120 190 152"/>
+    </g><ellipse cx="120" cy="63" rx="9" ry="8" fill="#0b0b0b"/><ellipse cx="117" cy="60" rx="3.5" ry="2.5" fill="#4a4a4a" opacity=".7"/></svg>`;
+  NFC.evEnvHTML = (style, b, lang) => {
+    const st = ENV_STYLES.includes(style) ? style : 'or';
+    const emb = st === 'sauge' || st === 'blanc' ? ` style="--emb:${emboss(st).replace(/"/g, '&quot;')}"` : '';
+    const fl = '<span class="ev-bk"></span>' + ['t', 'b', 'l', 'r'].map((k) => `<span class="ev-fl ev-fl-${k}"><i></i></span>`).join('');
+    const mid = st === 'ruban' ? `<span class="ev-band"></span><span class="ev-bow">${BOW}</span>` : `<span class="ev-seal">${waxSeal(st, b && b.seal)}</span>`;
+    return `<div class="ev-env st-${st}"${emb}><button type="button" class="ev-stage" aria-label="${lang ? 'Open the invitation' : 'Ouvrir l’invitation'}">${fl}${mid}
+      ${b && b.text ? `<p class="ev-env-t">${esc(b.text)}</p>` : ''}<p class="ev-env-h">${lang ? 'Tap to open' : 'Touchez pour ouvrir'}</p></button></div>`;
+  };
+
+  /* ---------- Page publique : enveloppe plein écran, puis invitation (et musique) ---------- */
   NFC.evMount = (app, m) => {
     const E = blockOf(m, 'envelope');
     if (!E || m.thumb) return;
-    const lang = m.lang === 'en';
-    const ov = document.createElement('div');
-    ov.className = 'ev-env';
-    ov.style.setProperty('--p', m.pal.p); ov.style.setProperty('--a', m.pal.a);
-    ov.innerHTML = `<div class="ev-env-in"><p class="ev-env-t">${esc(E.b.text || '')}</p>
-      <button type="button" class="ev-env-box" aria-label="${lang ? 'Open the invitation' : 'Ouvrir l’invitation'}">
-        <span class="ev-env-back"></span><span class="ev-env-card"><b>${esc((m.card.identity || {}).name || '')}</b></span><span class="ev-env-front"></span><span class="ev-env-flap"></span>
-        <span class="ev-env-seal">${esc(E.b.seal || '')}</span>
-      </button>
-      <p class="ev-env-h">${lang ? 'Tap to open' : 'Touchez pour ouvrir'}</p></div>`;
+    const wrap = document.createElement('div');
+    wrap.innerHTML = NFC.evEnvHTML(E.b.style || (NFC.EV_ENV_OF || {})[m.sec.id] || 'or', E.b, m.lang === 'en');
+    const ov = wrap.firstElementChild;
     document.body.appendChild(ov);
     document.body.style.overflow = 'hidden';
-    ov.querySelector('.ev-env-box').addEventListener('click', () => {
+    ov.querySelector('.ev-stage').addEventListener('click', () => {
+      if (ov.classList.contains('open')) return;
       ov.classList.add('open');
       /* La musique démarre au geste de l’invité (les navigateurs l’exigent) */
       const btn = app.querySelector('.ev-play'), au = btn && btn.parentElement.querySelector('audio');
       if (au) au.play().then(() => setPlaying(btn, true)).catch(() => {});
-      setTimeout(() => { ov.classList.add('gone'); document.body.style.overflow = ''; }, 1500);
-      setTimeout(() => ov.remove(), 2300);
+      setTimeout(() => { ov.classList.add('gone'); document.body.style.overflow = ''; }, 2100);
+      setTimeout(() => ov.remove(), 2800);
     });
   };
 })();

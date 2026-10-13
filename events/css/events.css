@@ -103,23 +103,57 @@
 .vc-e5 .qa-ic { border-radius: 16px; background: var(--p); color: #fff; border: 0; }
 .vc-e5 .sec-t { justify-content: center; font: 800 18px/1.2 Inter, sans-serif; text-transform: none; letter-spacing: -.01em; color: var(--p); }
 
-/* ---------- Enveloppe animée (page publique) ---------- */
-.ev-env { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--a) 35%, #fff), color-mix(in srgb, var(--p) 25%, #e9e4dc)); transition: opacity .7s ease; font-family: Inter, system-ui, sans-serif; }
+
+/* ---------- Enveloppe plein écran (page publique) : 4 modèles ---------- */
+.ev-env { position: fixed; inset: 0; z-index: 200; display: flex; justify-content: center; background: #e9e8e4; transition: opacity .6s ease; font-family: Inter, system-ui, sans-serif; }
 .ev-env.gone { opacity: 0; pointer-events: none; }
-.ev-env-in { text-align: center; padding: 20px; }
-.ev-env-t { font: 400 46px/1.05 "Allura", cursive; color: var(--p); margin: 0 0 26px; }
-.ev-env-h { margin-top: 26px; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: color-mix(in srgb, var(--p) 70%, #555); animation: evblink 1.6s ease-in-out infinite; }
-@keyframes evblink { 50% { opacity: .4; } }
-.ev-env-box { position: relative; display: block; width: 300px; height: 200px; margin: 0 auto; padding: 0; border: 0; background: none; cursor: pointer; perspective: 900px; }
-.ev-env-back, .ev-env-front { position: absolute; inset: 0; border-radius: 6px; }
-.ev-env-back { background: color-mix(in srgb, var(--a) 55%, #f3ead8); box-shadow: 0 24px 50px -24px rgba(0,0,0,.5); }
-.ev-env-front { background: linear-gradient(160deg, color-mix(in srgb, var(--a) 38%, #f7f0e2), color-mix(in srgb, var(--a) 52%, #efe4cc)); clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%); z-index: 3; }
-.ev-env-flap { position: absolute; left: 0; right: 0; top: 0; height: 120px; z-index: 4; transform-origin: top; background: linear-gradient(to bottom, color-mix(in srgb, var(--a) 70%, #efe3c8), color-mix(in srgb, var(--a) 50%, #f3ead8)); clip-path: polygon(0 0, 100% 0, 50% 100%); transition: transform .7s ease; }
-.ev-env-card { position: absolute; left: 16px; right: 16px; top: 16px; height: 168px; z-index: 2; display: grid; place-items: center; background: #fffdf9; border-radius: 4px; transition: transform .8s ease .5s; }
-.ev-env-card b { font: 400 30px/1.1 "Allura", cursive; color: var(--p); padding: 0 10px; }
-.ev-env-seal { position: absolute; left: 50%; top: 92px; z-index: 5; width: 62px; height: 62px; margin-left: -31px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 35%, color-mix(in srgb, var(--p) 60%, #fff), var(--p)); color: #fff; font: 600 17px/1 "Playfair Display", serif; box-shadow: inset 0 0 0 4px color-mix(in srgb, var(--p) 80%, #000), 0 6px 14px rgba(0,0,0,.3); transition: opacity .3s ease, transform .3s ease; }
-.ev-env.open .ev-env-seal { opacity: 0; transform: scale(.6); }
-.ev-env.open .ev-env-flap { transform: rotateX(180deg); z-index: 1; }
-.ev-env.open .ev-env-card { transform: translateY(-120px); z-index: 4; }
-.ev-env.open .ev-env-h { visibility: hidden; }
-.ev-env.open .ev-env-t { opacity: 0; transition: opacity .3s; }
+.ev-env.open { background: transparent; }
+.ev-stage { position: relative; width: 100%; max-width: 480px; height: 100%; overflow: hidden; container-type: inline-size; perspective: 1400px; cursor: pointer; border: 0; padding: 0; background: none; display: block; }
+.ev-env.open .ev-stage { overflow: visible; }
+/* Rabats : le wrapper porte l’ombre, l’enfant porte la forme et le papier */
+.ev-fl { position: absolute; inset: 0; filter: drop-shadow(0 1px 2px rgba(0,0,0,.16)) drop-shadow(0 6px 12px rgba(0,0,0,.08)); transition: transform 1.3s cubic-bezier(.45,.05,.25,1), opacity .5s ease; }
+.ev-fl i { position: absolute; inset: 0; background: var(--shade), var(--emb, none), var(--paper); background-size: 100% 100%, 210px 210px, 100% 100%; }
+.ev-fl-t { z-index: 4; transform-origin: 50% 0; } .ev-fl-t i { clip-path: polygon(0 0, 100% 0, 50% 53%); --shade: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0) 60%); }
+.ev-fl-b { z-index: 3; transform-origin: 50% 100%; } .ev-fl-b i { clip-path: polygon(0 100%, 100% 100%, 50% 47%); --shade: linear-gradient(0deg, rgba(0,0,0,.05), rgba(0,0,0,0) 60%); }
+.ev-fl-l { z-index: 2; transform-origin: 0 50%; } .ev-fl-l i { clip-path: polygon(0 0, 53% 50%, 0 100%); --shade: linear-gradient(90deg, rgba(0,0,0,.06), rgba(0,0,0,0)); }
+.ev-fl-r { z-index: 2; transform-origin: 100% 50%; } .ev-fl-r i { clip-path: polygon(100% 0, 47% 50%, 100% 100%); --shade: linear-gradient(270deg, rgba(0,0,0,.06), rgba(0,0,0,0)); }
+.ev-env.open .ev-fl-t { transform: rotateX(-170deg); opacity: 0; transition-delay: .45s, 1.35s; }
+.ev-env.open .ev-fl-b { transform: rotateX(170deg); opacity: 0; transition-delay: .6s, 1.5s; }
+.ev-env.open .ev-fl-l { transform: rotateY(170deg); opacity: 0; transition-delay: .75s, 1.65s; }
+.ev-env.open .ev-fl-r { transform: rotateY(-170deg); opacity: 0; transition-delay: .75s, 1.65s; }
+/* Fond de l’enveloppe (visible entre les rabats), s’efface à l’ouverture */
+.ev-bk { position: absolute; inset: 0; z-index: 1; background: linear-gradient(rgba(0,0,0,.07), rgba(0,0,0,.07)), var(--paper); transition: opacity .6s ease .7s; }
+.ev-env.open .ev-bk { opacity: 0; }
+/* Modèle ruban : deux grands rabats latéraux, ruban et nœud */
+.st-ruban .ev-fl-t, .st-ruban .ev-fl-b { display: none; }
+.st-ruban .ev-fl-l i { clip-path: polygon(0 0, 46% 0, 57% 16%, 57% 84%, 46% 100%, 0 100%); }
+.st-ruban .ev-fl-r { z-index: 3; } .st-ruban .ev-fl-r i { clip-path: polygon(100% 0, 60% 0, 45% 19%, 45% 81%, 60% 100%, 100% 100%); }
+.ev-band { position: absolute; left: 0; right: 0; top: 50%; z-index: 5; height: 3cqw; margin-top: -1.5cqw; background: linear-gradient(180deg, #2b2b2b, #050505 45%, #1d1d1d); box-shadow: 0 2px 4px rgba(0,0,0,.25); transition: opacity .3s ease, transform .5s ease; }
+.ev-bow { position: absolute; left: 50%; top: 50%; z-index: 6; width: 64cqw; transform: translate(-50%, -38%); transition: transform .45s ease, opacity .35s ease; filter: drop-shadow(0 4px 5px rgba(0,0,0,.25)); }
+.ev-bow svg { display: block; width: 100%; height: auto; }
+.ev-env.open .ev-bow { transform: translate(-50%, -38%) scale(1.25); opacity: 0; }
+.ev-env.open .ev-band { opacity: 0; transform: scaleX(1.1); }
+/* Sceau de cire */
+.ev-seal { position: absolute; left: 50%; top: 50%; z-index: 6; width: 33cqw; transform: translate(-50%, -50%); transition: transform .5s ease, opacity .45s ease; filter: drop-shadow(0 5px 6px rgba(0,0,0,.28)); }
+.ev-seal svg { display: block; width: 100%; height: auto; }
+.ev-env:not(.open) .ev-seal, .ev-env:not(.open) .ev-bow { animation: evpulse 2.4s ease-in-out infinite; }
+@keyframes evpulse { 50% { scale: 1.04; } }
+.ev-env.open .ev-seal { transform: translate(-50%, -50%) scale(1.3); opacity: 0; }
+/* Textes */
+.ev-env-t { position: absolute; left: 0; right: 0; top: 11%; z-index: 7; margin: 0; padding: 0 8%; text-align: center; font: 400 11cqw/1.05 "Allura", cursive; color: var(--ink); transition: opacity .3s; pointer-events: none; }
+.ev-env-h { position: absolute; left: 0; right: 0; bottom: 7%; z-index: 7; margin: 0; text-align: center; font-size: 12px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--ink); opacity: .8; animation: evblink 1.8s ease-in-out infinite; pointer-events: none; }
+@keyframes evblink { 50% { opacity: .35; } }
+.ev-env.open .ev-env-t, .ev-env.open .ev-env-h { opacity: 0; animation: none; }
+/* Papiers */
+.st-ruban { --paper: linear-gradient(160deg, #efe8dc, #e4dacb); --ink: #1d1b19; }
+.st-or { --paper: radial-gradient(120% 80% at 50% 40%, #fbfaf7, #ecebe6); --ink: #9a7531; }
+.st-sauge { --paper: linear-gradient(160deg, #a3ad90, #8c977a); --ink: #f6f1e4; }
+.st-blanc { --paper: radial-gradient(120% 80% at 50% 40%, #fbfaf8, #e9e7e1); --ink: #8a857b; }
+/* Miniatures dans l’éditeur */
+.ev-envs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 4px 0 10px; }
+.ev-envs button { padding: 0; border: 2px solid transparent; border-radius: 12px; background: none; cursor: pointer; text-align: center; font: 600 12px/1.2 Inter, sans-serif; color: var(--tx, #111); }
+.ev-envs button.on { border-color: #111114; }
+.ev-envs .ev-env { position: relative; inset: auto; z-index: 0; display: block; height: 0; padding-bottom: 170%; border-radius: 10px; overflow: hidden; background: none; }
+.ev-envs .ev-stage { position: absolute; inset: 0; cursor: inherit; }
+.ev-envs .ev-env-t, .ev-envs .ev-env-h { display: none; }
+.ev-envs span.n { display: block; padding: 6px 0 4px; }

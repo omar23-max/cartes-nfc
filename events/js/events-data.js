@@ -27,6 +27,9 @@
     B('contact', 'contact', 'Nous écrire'),
   ];
 
+  /* Modèle d’enveloppe proposé par événement (modifiable dans l’éditeur) */
+  const ENV_OF = { mariage: 'sauge', bapteme: 'sauge', cremaillere: 'sauge', fetemeres: 'sauge', demande: 'blanc', demoiselles: 'blanc', naissance: 'blanc', babyshower: 'blanc', hommage: 'blanc', anniversaire: 'ruban', halloween: 'ruban', valentin: 'ruban', fetesperes: 'ruban' };
+  NFC.EV_ENV_OF = ENV_OF;
   /* Construit l’exemple d’un événement dans une langue */
   function demo(e, L, en) {
     const t = (fr, enText) => (en ? enText : fr);
@@ -36,7 +39,7 @@
       contact: { phone: '+1 514 555-0142', whatsapp: '', email: L.mail || 'reponse@exemple.com', website: '' },
       socials: { linkedin: '', instagram: '', facebook: '', tiktok: '', youtube: '' },
       blocks: {
-        envelope: { on: true, text: L.env, seal: L.seal || '' },
+        envelope: { on: true, style: ENV_OF[e.id] || 'or', text: L.env, seal: L.seal || '' },
         details: { on: e.details !== false, date: e.date, time: e.time, end: e.end || '', place: L.place, address: L.address, dress: L.dress || '', note: L.note || '' },
         countdown: { on: e.countdown !== false, title: '' },
         intro: { on: true, title: L.introTitle || '', text: L.intro },
@@ -173,7 +176,7 @@
   /* Anglais : libellés de l’éditeur des sections Événements */
   Object.assign(en, { 'L’invité ouvre l’enveloppe, puis découvre l’invitation (et la musique démarre)': 'The guest opens the envelope, then discovers the invitation (and the music starts)',
     'Date, heure, lieu, code vestimentaire': 'Date, time, venue, dress code', '40 à 120 mots conseillés': '40 to 120 words recommended', 'Heure et étape (ex. 16 h · Cérémonie)': 'Time and step (e.g. 4 p.m. · Ceremony)', 'Liste de mariage, cagnotte, suggestions…': 'Wedding registry, cash fund, gift ideas…',
-    'Texte au-dessus de l’enveloppe': 'Text above the envelope', 'Vous êtes invités': 'You’re invited', 'Initiales sur le sceau': 'Initials on the seal', 'L’invité touche l’enveloppe : elle s’ouvre, l’invitation apparaît et la musique démarre.': 'The guest taps the envelope: it opens, the invitation appears and the music starts.',
+    'Texte au-dessus de l’enveloppe': 'Text above the envelope', 'Vous êtes invités': 'You’re invited', 'Initiales sur le sceau': 'Initials on the seal', 'Modèle d’enveloppe': 'Envelope style', 'L’invité touche l’enveloppe : elle s’ouvre, l’invitation apparaît et la musique démarre. Les initiales s’impriment dans le sceau de cire (laisser vide : brin de feuillage). ': 'The guest taps the envelope: it opens, the invitation appears and the music starts. Initials are pressed into the wax seal (leave empty for a leaf sprig). ', 'Voir l’enveloppe s’ouvrir': 'See the envelope open', 'L’invité touche l’enveloppe : elle s’ouvre, l’invitation apparaît et la musique démarre.': 'The guest taps the envelope: it opens, the invitation appears and the music starts.',
     'Date': 'Date', 'Heure': 'Time', 'Lieu': 'Venue', 'Domaine des Érables': 'Maple Estate', '1200, chemin du Lac, Mont-Tremblant': '1200 Lake Road, Mont-Tremblant', 'Code vestimentaire': 'Dress code', 'Tenue de cocktail': 'Cocktail attire', 'Remarque': 'Note', 'Stationnement gratuit sur place': 'Free parking on site',
     'Le compte à rebours utilise la date et l’heure de la section « L’événement ».': 'The countdown uses the date and time from the “The event” section.',
     'Répondre avant le': 'Reply by', '1er mai 2027': 'May 1, 2027', 'Personnes par réponse (maximum)': 'Guests per reply (maximum)', 'Choix de repas (séparés par des virgules)': 'Meal choices (comma-separated)', 'Bœuf, Saumon, Végétarien': 'Beef, Salmon, Vegetarian', 'Adresse qui reçoit les réponses': 'Email that receives replies',
