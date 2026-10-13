@@ -405,7 +405,7 @@
       const coP = co ? `<p class="co">${logo ? `<img class="lg" src="${logo}" alt="">` : ''}${co}</p>` : '';
       /* Polaroid : photo façon Polaroid légèrement inclinée, nom manuscrit */
       if (d === 'd16') {
-        return `<header class="hd"><div class="p16-pol"><img src="${pic}" alt=""><span class="p16-cap">${sec.establishment ? '' : esc(String(id.name || '').replace(/^(Dr|Me)\.?\s+/i, '').split(' ')[0] || '')}</span></div><h1>${name}</h1>${roleP}${specP}${coP}</header>`;
+        return `<header class="hd"><div class="p16-pol"><img src="${pic}" alt=""><span class="p16-cap">${sec.establishment ? '' : esc(((w) => (/^(en|in|le|la|les|l’|bienvenue|welcome|bravo|congrats|joyeux|happy|merci|thank|nos|our|soirée|réveillon)$/i.test(w) ? '' : w))(String(id.name || '').replace(/^(Dr|Me)\.?\s+/i, '').split(' ')[0] || ''))}</span></div><h1>${name}</h1>${roleP}${specP}${coP}</header>`;
       }
       /* Split : bloc de couleur avec le nom, portrait rond qui déborde */
       if (d === 'd17') {

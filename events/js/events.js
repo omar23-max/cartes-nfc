@@ -230,10 +230,21 @@
   /* Photo d’exemple par modèle : tant que l’invitation garde la photo de démonstration */
   const R0 = V.render;
   V.render = (m) => {
-    const F = m && m.sec && (NFC.EV_FACE || {})[m.sec.id], n = F && F[m.d || m.sec.rec];
+    const F = m && m.sec && (NFC.EV_FACE || {})[m.sec.id], f = F && F[m.d || m.sec.rec];
     const id = (m && m.card && m.card.identity) || {}, demo = 'media/' + (m && m.sec && m.sec.id) + '-1.jpg';
-    if (!n || (id.photo && id.photo !== demo)) return R0(m);
-    const src = 'media/' + m.sec.id + '-' + n + '.jpg';
-    return R0(Object.assign({}, m, { card: Object.assign({}, m.card, { identity: Object.assign({}, id, { photo: src, cover: !id.cover || id.cover === demo ? src : id.cover }) }) }));
+    if (!f || (id.photo && id.photo !== demo)) return R0(m);
+    const n = typeof f === 'object' ? f.n : f, src = 'media/' + m.sec.id + '-' + n + '.jpg';
+    const ni = Object.assign({}, id, { photo: src, cover: !id.cover || id.cover === demo ? src : id.cover });
+    let card = Object.assign({}, m.card, { identity: ni });
+    /* Démo : nom, dates et texte de la personne de la photo, seulement s’ils sont encore ceux de la démo */
+    const W = f.who && (NFC.EV_WHO || {})[f.who], d0 = m.sec.demo, d1 = m.sec.demoEn;
+    const L = W && (id.name === d0.identity.name ? 'fr' : d1 && id.name === d1.identity.name ? 'en' : '');
+    if (L) {
+      const [t, sub, intro] = W[L], dd = L === 'fr' ? d0 : d1;
+      ni.name = t; if (id.role === dd.identity.role) ni.role = sub;
+      const b = card.blocks || {};
+      if (b.intro && b.intro.text === dd.blocks.intro.text) card = Object.assign({}, card, { blocks: Object.assign({}, b, { intro: Object.assign({}, b.intro, { text: intro }) }) });
+    }
+    return R0(Object.assign({}, m, { card }));
   };
 })();

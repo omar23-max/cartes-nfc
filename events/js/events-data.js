@@ -31,7 +31,19 @@
   const ENV_OF = { mariage: 'sauge', bapteme: 'sauge', cremaillere: 'sauge', fetemeres: 'sauge', demande: 'blanc', demoiselles: 'blanc', naissance: 'blanc', babyshower: 'blanc', hommage: 'blanc', anniversaire: 'ruban', halloween: 'ruban', valentin: 'ruban', fetesperes: 'ruban' };
   NFC.EV_ENV_OF = ENV_OF;
   /* Photo d’exemple propre à chaque modèle (photos fournies par l’utilisateur pour le mariage : n° 3 à 6) */
-  NFC.EV_FACE = { mariage: { e1: 3, e2: 5, e3: 6, e4: 1, e5: 2, d16: 3, d19: 5, d20: 4 } };
+  NFC.EV_FACE = { mariage: { e1: 3, e2: 5, e3: 6, e4: 1, e5: 2, d16: 3, d19: 5, d20: 4 },
+    /* Hommage : 4 modèles avec portrait (photos fournies par l’utilisateur), les 4 autres gardent les bougies */
+    hommage: { e1: { n: 3, who: 'f1' }, e4: { n: 5, who: 'm1' }, d16: { n: 4, who: 'f2' }, d20: { n: 6, who: 'm2' } } };
+  /* Défunt de la démo selon la photo (le nom et le texte changent seulement s’ils sont encore ceux de la démo) */
+  NFC.EV_WHO = {
+    f1: { fr: ['En mémoire de Jeanne Tremblay', '1938 – 2027', 'Jeanne nous a quittées paisiblement, entourée des siens. Nous vous invitons à vous joindre à nous pour lui rendre un dernier hommage et partager vos souvenirs.'],
+      en: ['In memory of Jeanne Tremblay', '1938 – 2027', 'Jeanne passed away peacefully, surrounded by her loved ones. We invite you to join us to pay a final tribute and share your memories.'] },
+    f2: { fr: ['En mémoire de Simone Gagnon', '1935 – 2027', 'Simone nous a quittées paisiblement, entourée des siens. Nous vous invitons à vous joindre à nous pour lui rendre un dernier hommage et partager vos souvenirs.'],
+      en: ['In memory of Simone Gagnon', '1935 – 2027', 'Simone passed away peacefully, surrounded by her loved ones. We invite you to join us to pay a final tribute and share your memories.'] },
+    m1: null,
+    m2: { fr: ['En mémoire de Robert Côté', '1949 – 2027', 'Robert nous a quittés paisiblement, entouré des siens. Nous vous invitons à vous joindre à nous pour lui rendre un dernier hommage et partager vos souvenirs.'],
+      en: ['In memory of Robert Côté', '1949 – 2027', 'Robert passed away peacefully, surrounded by his loved ones. We invite you to join us to pay a final tribute and share your memories.'] },
+  };
   /* Construit l’exemple d’un événement dans une langue */
   function demo(e, L, en) {
     const t = (fr, enText) => (en ? enText : fr);
