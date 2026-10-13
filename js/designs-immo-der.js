@@ -12,11 +12,12 @@
   const demoOf = () => (NFC.MEDIA && NFC.MEDIA.immobilier) || {};
   function face(m) {
     const p = (m.card.identity || {}).photo;
-    return !p || p === demoOf().portrait ? MI + FACE[m.d] + '.jpg' : V.img(p, m);
+    /* Photo d’exemple du site (ancienne ou actuelle, chemin media/…) : on montre celle du modèle ; photo de la personne : on la garde */
+    return !p || /^media\//.test(p) ? MI + FACE[m.d] + '.jpg' : V.img(p, m);
   }
   function room(m) {
     const id = m.card.identity || {}, c = id.cover;
-    return (!c || c === demoOf().cover) && ROOM[m.d] ? MI + ROOM[m.d] + '.jpg' : V.img(c || id.photo || 'ph:cover|', m);
+    return (!c || /^media\//.test(c)) && ROOM[m.d] ? MI + ROOM[m.d] + '.jpg' : V.img(c || id.photo || 'ph:cover|', m);
   }
   const parts = (m) => {
     const id = m.card.identity || {}, ct = m.card.contact || {};

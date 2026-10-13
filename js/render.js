@@ -147,7 +147,9 @@
     const fs = cover ? 30 : 34;
     return svgUri(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g" x1="0" y1="0" x2="${h % 2}" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient><radialGradient id="r"><stop offset="0" stop-color="${c3}" stop-opacity=".55"/><stop offset="1" stop-color="${c3}" stop-opacity="0"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/><circle cx="${x1}%" cy="${y1}%" r="${W * 0.45}" fill="url(#r)"/><circle cx="${100 - x1}%" cy="${100 - y1}%" r="${W * 0.3}" fill="url(#r)" opacity=".6"/><g transform="translate(${W / 2 - 26} ${H / 2 - 44})" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="0" y="0" width="52" height="42" rx="7"/><circle cx="16" cy="14" r="5"/><path d="M52 30 38 18 8 42"/></g>${label ? `<text x="${W / 2}" y="${H / 2 + 36}" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="${fs}" font-weight="600" fill="#fff" fill-opacity=".85">${xml(label)}</text>` : ''}</svg>`);
   }
-  const img = (src, m) => (!src ? '' : String(src).startsWith('ph:') ? placeholder(src, m.pal, (m.card.identity || {}).name) : src);
+  /* Anciennes photos de démo retirées (encore dans d’anciens brouillons) : remplacées par les actuelles */
+  const GONE = { 'media/immobilier/13126.jpg': 'media/immobilier/px16846825.jpg', 'media/immobilier/13107.jpg': 'media/immobilier/px276746.jpg' };
+  const img = (src, m) => (!src ? '' : String(src).startsWith('ph:') ? placeholder(src, m.pal, (m.card.identity || {}).name) : GONE[src] || src);
 
   /* ---------- Actions ---------- */
   function contactActions(card) {
@@ -750,6 +752,7 @@
     },
     video(def, b, m) {
       if (!b.url && !b.src) return '';
+      if (/immobilier\/video\.mp4/.test(b.src || '')) return ''; /* ancienne vidéo de démo retirée (encore dans d’anciens brouillons) */
       const cover = img(b.cover || 'ph:photo|', m);
       const cap = b.cap ? `<p class="cap">${esc(b.cap)}</p>` : '';
       if (b.url) return `<a class="vid" href="${esc(url(b.url))}" target="_blank" rel="noopener"><img src="${cover}" alt=""><span class="play">${ic('play', 22)}</span></a>${cap}`;
