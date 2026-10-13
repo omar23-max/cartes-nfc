@@ -1427,13 +1427,16 @@
       if (id === 'services') return (d.type === 'list' && d.price) || d.type === 'menu';
       if (id === 'text') return false;
       if (id === 'google') return d.type === 'greviews' || s.blocks.some((b) => b.type === 'greviews');
-      if (id === 'gallery' || id === 'imgcar') return d.type === id || d.type === 'gallery';
+      if (id === 'imgcar') return d.type === 'imgcar'; /* le carrousel reste proposé même s’il y a une galerie */
+      if (id === 'gallery') return d.type === 'gallery';
       return d.type === id;
     });
   }
   const CAT_SUGGEST_BY = { boutiques: ['products'], producteurs: ['products'], restaurant: ['products'], influence: ['products'], coaching: ['products'] };
   const CAT_SUGGEST = ['google', 'reviews', 'faq', 'hours', 'stats', 'services', 'booking', 'location', 'tags', 'cards', 'links', 'gallery'];
-  const catOn = (x) => x && (x.id !== 'google' || svcOn('google:reviews')) && !cfg('catOff', []).includes(x.id);
+  const catOn = (x) => x && (x.id !== 'google' || svcOn('google:reviews')) && !cfg('catOff', []).includes(x.id) && !(((NFC.SEC_HIDE || {})[KIND] || []).includes(x.id));
+  /* Suggestions propres au secteur / métier / type de boutique / événement (js/section-suggest.js) */
+  const sugIds = () => { const T = (NFC.SEC_SUGGEST || {})[KIND] || {}, p = prof(); return (p && T[S.sectorId + '~' + p.id]) || T[S.sectorId] || T._ || (CAT_SUGGEST_BY[S.sectorId] || []).concat(CAT_SUGGEST); };
   /* Nombre de sections de ce type déjà sur la carte (pastille « Déjà sur votre carte ») */
   function catCount(id) {
     const s = sec(), c = card(), defs = s.blocks.filter((b) => (c.blocks[b.key] || {}).on)
@@ -1451,12 +1454,12 @@
   }
   function addSecHTML() {
     const en = ui() === 'en';
-    const sug = (CAT_SUGGEST_BY[S.sectorId] || []).concat(CAT_SUGGEST).filter((id) => !catPresent(id) && catOn(catOf(id))).slice(0, 3).map(catOf);
+    const sug = sugIds().filter((id) => !catPresent(id) && catOn(catOf(id))).slice(0, 4).map(catOf);
     return `<div class="add-sec">
       <span class="f-l">${ic('plus', 15)}${en ? 'Add a section' : 'Ajouter une section'}</span>
       ${sug.length ? `<div class="as-g as-sug"><span class="as-h">${en ? 'Suggested for you' : 'Suggérées pour vous'}</span><div class="as-grid">${sug.map((x) => catTile(x, en)).join('')}</div></div>` : ''}
       <div class="as-all">${catGroups(en)}</div>
-      <button type="button" class="b as-more" data-act="addcat">${ic('plus', 16)}${en ? `See all sections (${CAT.length})` : `Voir toutes les sections (${CAT.length})`}</button>
+      <button type="button" class="b as-more" data-act="addcat">${ic('plus', 16)}${en ? `See all sections (${CAT.filter(catOn).length})` : `Voir toutes les sections (${CAT.filter(catOn).length})`}</button>
     </div>`;
   }
   /* Éditer avec l’IA : maquette de l’assistant (activé plus tard côté serveur, la clé IA ne doit jamais être dans le navigateur) */
