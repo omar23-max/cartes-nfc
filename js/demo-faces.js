@@ -9,18 +9,6 @@
   const SECTORS = { conseil: 0, archi: 3, beaute: 6, prestige: 1 }; /* décalage : pas la même photo en tête partout */
   const FACES = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => 'media/immobilier/der' + n + '.jpg');
   const listOf = (s) => ((s.designs && s.designs.length ? s.designs : NFC.DESIGNS) || []).map((d) => d.id);
-  function faceFor(m) {
-    const s = m && m.sec, off = s && SECTORS[s.id];
-    if (off == null || m.sec.establishment) return '';
-    if (m.sec.profile && m.sec.profile.id === 'barbier') return ''; /* barbier : on garde la démo masculine */
-    const p = ((m.card || {}).identity || {}).photo;
-    if (p && !/^media\//.test(p)) return '';
-    const i = listOf(s).indexOf(m.d || s.rec);
-    if (i < 0 || i % 2) return ''; /* un modèle sur deux */
-    return FACES[(i / 2 + off) % FACES.length];
-  }
-  /* Démo au féminin quand la photo est celle d’une femme, au masculin sinon : nom, métier et textes de la démo.
-     Seulement si ce sont encore ceux de la démo (dans un sens comme dans l’autre). */
   const G = {
     conseil: { n: ['Michael Bennett', 'Michelle Bennett'], r: [['Attaché commercial', 'Conseillère financière']] },
     archi: { n: [['Daniel Brooks', 'Danielle Brooks'], ['Tom Barrett', 'Tess Barrett'], ['Victor Lane', 'Victoria Lane'], ['Mike Donovan', 'Mia Donovan'], ['Ryan Calloway', 'Rachel Calloway'], ['Graham Pierce', 'Grace Pierce']],
@@ -30,6 +18,22 @@
       t: [['Entrepreneur et investisseur depuis', 'Entrepreneure et investisseuse depuis'], ['Passionné d’art', 'Passionnée d’art']] },
   };
   const pairs = (x) => (Array.isArray(x[0]) ? x : [x]);
+  function faceFor(m) {
+    const s = m && m.sec, off = s && SECTORS[s.id];
+    if (off == null || m.sec.establishment) return '';
+    if (m.sec.profile && m.sec.profile.id === 'barbier') return ''; /* barbier : on garde la démo masculine */
+    const p = ((m.card || {}).identity || {}).photo;
+    if (p && !/^media\//.test(p)) return '';
+    /* Nom saisi par le client (ce n’est plus un nom de la démo) : pas de photo de femme d’exemple */
+    const nm = ((m.card || {}).identity || {}).name, g = G[s.id];
+    const known = [s.demo, s.demoEn].some((d) => d && d.identity && d.identity.name === nm) || (g && pairs(g.n).some((x) => x.includes(nm)));
+    if (!known) return '';
+    const i = listOf(s).indexOf(m.d || s.rec);
+    if (i < 0 || i % 2) return ''; /* un modèle sur deux */
+    return FACES[(i / 2 + off) % FACES.length];
+  }
+  /* Démo au féminin quand la photo est celle d’une femme, au masculin sinon : nom, métier et textes de la démo.
+     Seulement si ce sont encore ceux de la démo (dans un sens comme dans l’autre). */
   /* Renvoie une copie de la carte au féminin (fem = true) ou au masculin */
   function gender(card, sid, fem) {
     const g = G[sid];
