@@ -138,7 +138,8 @@ window.NFC = window.NFC || {};
 
   /* ---------- F10 Restaurant ---------- */
   const restaurant = {
-    id: 'restaurant', code: 'F10', name: 'Restaurant, café et bar', icon: 'utensils-crossed', active: true, rec: 'd3', establishment: true,
+    /* moved : retiré de la liste du studio Cartes (déplacé dans Stores) ; reste ici pour les cartes déjà publiées */
+    id: 'restaurant', code: 'F10', name: 'Restaurant, café et bar', icon: 'utensils-crossed', active: true, rec: 'd3', establishment: true, moved: 'stores',
     ex: 'Restaurant, café, bar, brasserie, food truck…',
     palettes: [
       pal('Bordeaux', '#7f1d1d', '#d4a373', '#faf6f1', '#ffffff', '#23140f', '#6d5c55', '#ecdfd4'),

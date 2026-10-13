@@ -376,4 +376,5 @@
       demo: build(resto.demo, p.M, p.fr), demoEn: build(resto.demoEn, p.M, p.en), media: mediaOf(p.M, p.fr) };
   });
   resto.ex = 'Bistro, sushis, pizzeria, café, bar, microbrasserie…';
+  NFC.RESTO_SECTOR = resto; /* repris par le studio Stores (stores/js/stores-resto.js) */
 })();

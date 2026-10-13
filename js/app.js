@@ -27,7 +27,7 @@
   const secList = () => {
     const ord = cfg('sectors.order', []), pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
     /* L’administrateur voit aussi les secteurs désactivés (grisés), jamais les supprimés */
-    return SECTORS.filter((s) => (ADM() ? !secDel(s) : !secOff(s))).map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
+    return SECTORS.filter((s) => !s.moved && (ADM() ? !secDel(s) : !secOff(s))).map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
   };
   const profDel = (s, p) => cfg('profDel', []).includes(s.id + '~' + p.id);
   const profOk = (s, p) => !cfg('profOff', []).includes(s.id + '~' + p.id) && !profDel(s, p);
