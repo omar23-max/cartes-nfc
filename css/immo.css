@@ -357,3 +357,150 @@
 .vc-l5 .hd > .co { padding: 4px 22px 20px; text-align: center; letter-spacing: .18em; text-transform: uppercase; font-size: 11px; }
 .vc-l5 .qa-ic { border-radius: 50%; background: transparent; border: 1px solid #c9a96e; color: #9c7a43; }
 .vc-l5 .btn { background: #1f1c17; }
+
+/* ---------- Immobilier : nouveaux modèles DER01 à DER10 ---------- */
+.vc-der1, .vc-der2, .vc-der3, .vc-der4, .vc-der5, .vc-der6, .vc-der7, .vc-der8, .vc-der9, .vc-der10 { --r: 10px; }
+.vc-der1 .sec-t, .vc-der3 .sec-t, .vc-der5 .sec-t, .vc-der6 .sec-t, .vc-der8 .sec-t, .vc-der9 .sec-t { font: 400 34px/1.05 var(--script); letter-spacing: 0; text-transform: none; color: var(--tx); }
+.vc-der2 .sec-t, .vc-der4 .sec-t, .vc-der7 .sec-t, .vc-der10 .sec-t { font: 600 15px/1.2 var(--pf); letter-spacing: .2em; text-transform: uppercase; color: var(--tx); }
+[class*="vc-der"] .dr-rows { display: flex; flex-direction: column; gap: 9px; margin: 16px auto 0; width: fit-content; max-width: calc(100% - 48px); text-align: left; }
+[class*="vc-der"] .dr-row { display: flex; align-items: center; gap: 12px; color: var(--tx); text-decoration: none; font-size: 14px; }
+[class*="vc-der"] .dr-row svg { flex: none; color: var(--p); }
+[class*="vc-der"] .dr-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* DER01 Voisin */
+.vc-der1 { --bg: #ffffff; --sf: #f6f5f2; }
+.vc-der1 .r1-top { position: relative; height: 250px; }
+.vc-der1 .r1-room { width: 100%; height: 190px; object-fit: cover; display: block; }
+.vc-der1 .r1-face { position: absolute; right: 18px; bottom: -34px; width: 128px; height: 168px; object-fit: cover; object-position: top; border: 5px solid #fff; box-shadow: 0 12px 26px -12px rgba(0,0,0,.45); }
+.vc-der1 .r1-txt { padding: 0 160px 0 22px; margin-top: -48px; position: relative; }
+.vc-der1 .r1-sc { font: 400 30px/1 var(--script); color: var(--tx); }
+.vc-der1 .r1-big { margin-top: 6px; font: 700 23px/1.08 var(--pf); text-transform: uppercase; letter-spacing: .02em; color: var(--tx); }
+.vc-der1 .r1-it { margin-top: 8px; font: italic 500 15px/1.3 var(--pf); color: var(--mu); }
+.vc-der1 .r1-id { margin: 22px 22px 0; padding: 12px; border: 2px solid var(--tx); text-align: center; }
+.vc-der1 .hd h1 { font: 700 20px/1.1 var(--pf); text-transform: uppercase; letter-spacing: .12em; }
+.vc-der1 .role { margin-top: 4px; font-size: 11.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--mu); }
+.vc-der1 .co { margin-top: 2px; font-size: 13px; font-weight: 600; color: var(--p); }
+.vc-der1 .hd > .spec { padding: 14px 22px 20px; text-align: center; }
+.vc-der1 .qa-ic { border-radius: 0; background: #111; color: #fff; border: 0; }
+
+/* DER02 Curieux */
+.vc-der2 { --bg: #ffffff; --sf: #f5f5f4; }
+.vc-der2 .hd { text-align: center; }
+.vc-der2 .r2-top { position: relative; height: 260px; overflow: hidden; }
+.vc-der2 .r2-top img { width: 100%; height: 100%; object-fit: cover; }
+.vc-der2 .r2-box { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 14px 30px 18px; background: rgba(20,20,20,.72); color: #fff; font: 400 54px/1 var(--script); white-space: nowrap; }
+.vc-der2 .r2-q { margin: 18px 24px 0; font: 600 17px/1.35 var(--pf); text-transform: uppercase; letter-spacing: .06em; color: var(--tx); }
+.vc-der2 .r2-q em { font: 400 30px/1 var(--script); text-transform: none; letter-spacing: 0; color: var(--p); }
+.vc-der2 .hd > .spec { margin: 12px 24px 0; padding: 12px; border: 1px solid var(--ln); font-size: 13.5px; }
+.vc-der2 .r2-ag { display: flex; align-items: flex-end; gap: 14px; margin: 18px 22px 18px; text-align: left; }
+.vc-der2 .r2-ag img { width: 112px; height: 140px; object-fit: cover; object-position: top; border-radius: 6px; flex: none; }
+.vc-der2 .r2-call { font: 400 24px/1.05 var(--script); color: var(--tx); margin-bottom: 8px; }
+.vc-der2 .hd h1 { font: 700 19px/1.1 var(--pf); }
+.vc-der2 .role { font-size: 12px; color: var(--mu); margin-top: 2px; }
+.vc-der2 .co { font-size: 12px; font-weight: 600; color: var(--tx); margin-top: 2px; }
+.vc-der2 .qa-ic { border-radius: 8px; background: #111; color: #fff; border: 0; }
+
+/* DER03 Bonjour */
+.vc-der3 { --bg: #ffffff; --sf: #f7f4ee; }
+.vc-der3 .hd { text-align: center; }
+.vc-der3 .r3-ph { height: 300px; overflow: hidden; }
+.vc-der3 .r3-ph img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.vc-der3 .r3-hi { margin-top: 18px; font: 400 40px/1 var(--script); color: var(--tx); }
+.vc-der3 .hd h1 { margin-top: 2px; font: 600 27px/1.1 var(--pf); text-transform: uppercase; letter-spacing: .14em; }
+.vc-der3 .r3-band { margin: 12px 34px 0; padding: 8px; background: #e9e1d4; font-size: 11.5px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--tx); }
+.vc-der3 .hd > .spec { margin: 14px 26px 0; }
+.vc-der3 .r3-sc { margin-top: 14px; font: 400 28px/1 var(--script); color: var(--p); }
+.vc-der3 .r3-co { margin: 16px 34px 18px; padding: 8px; border: 1px solid var(--tx); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+.vc-der3 .qa-ic { border-radius: 50%; background: #e9e1d4; color: var(--tx); border: 0; }
+
+/* DER04 Portrait */
+.vc-der4 { --bg: #ffffff; --sf: #f6f6f4; }
+.vc-der4 .hd { text-align: center; }
+.vc-der4 .r4-ph { position: relative; height: 470px; overflow: hidden; }
+.vc-der4 .r4-ph img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.vc-der4 .r4-fade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0) 55%, #fff 97%); }
+.vc-der4 .r4-id { position: relative; margin-top: -110px; padding: 0 24px; }
+.vc-der4 .hd h1 { font: 500 36px/1.02 var(--pf); text-transform: uppercase; letter-spacing: .12em; color: #1f1f1f; }
+.vc-der4 .role { margin-top: 8px; font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--mu); }
+.vc-der4 .r4-co { margin: 18px auto 0; width: fit-content; padding: 9px 22px; background: #e8e2d8; font-size: 11px; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; }
+.vc-der4 .hd > .spec { margin: 16px 24px 0; }
+.vc-der4 .qa-ic { border-radius: 50%; background: #fff; color: var(--tx); border: 1px solid var(--tx); }
+
+/* DER05 Médaillon */
+.vc-der5 { --bg: #ffffff; --sf: #f7f5f1; }
+.vc-der5 .hd { text-align: center; }
+.vc-der5 .r5-top { height: 180px; overflow: hidden; } .vc-der5 .r5-top img { width: 100%; height: 100%; object-fit: cover; }
+.vc-der5 .r5-av { width: 176px; height: 176px; margin: -96px auto 0; position: relative; border-radius: 50%; overflow: hidden; border: 6px solid #fff; box-shadow: 0 14px 30px -14px rgba(0,0,0,.4); }
+.vc-der5 .r5-av img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.vc-der5 .hd h1 { margin-top: 12px; font: 400 52px/1 var(--script); letter-spacing: 0; }
+.vc-der5 .role { margin-top: 4px; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; color: var(--mu); }
+.vc-der5 .hd > .spec { margin: 14px 24px 0; }
+.vc-der5 .r5-band { margin-top: 20px; padding: 12px; background: #e8e1d5; font-size: 12px; font-weight: 600; letter-spacing: .24em; text-transform: uppercase; }
+.vc-der5 .qa-ic { border-radius: 50%; background: var(--p); color: #fff; border: 0; }
+
+/* DER06 Signature */
+.vc-der6 { --bg: #ffffff; --sf: #f6f6f6; }
+.vc-der6 .hd { text-align: center; padding-top: 54px; }
+.vc-der6 .r6-av { width: 168px; height: 168px; margin: 0 auto; border-radius: 50%; padding: 6px; background: linear-gradient(135deg, #efe7da, #d9cdb8); }
+.vc-der6 .r6-av img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; object-position: top; border: 4px solid #fff; }
+.vc-der6 .hd h1 { margin-top: 14px; font: 400 54px/1 var(--script); letter-spacing: 0; }
+.vc-der6 .role { margin-top: 2px; font-size: 12px; letter-spacing: .28em; text-transform: uppercase; color: var(--mu); }
+.vc-der6 .hd > .spec { margin: 14px 24px 0; }
+.vc-der6 .r6-band { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 22px; padding: 13px; background: #d8d8d6; font-size: 12px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: #2a2a2a; }
+.vc-der6 .qa-ic { border-radius: 50%; background: #2a2a2a; color: #fff; border: 0; }
+
+/* DER07 Dôme */
+.vc-der7 { --bg: #ffffff; --sf: #f5f5f5; }
+.vc-der7 .hd { text-align: center; }
+.vc-der7 .r7-lg { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 54px 0 0; font-size: 11px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--tx); }
+.vc-der7 .r7-dome { position: relative; margin-top: 16px; height: 190px; display: flex; justify-content: center; align-items: flex-end; }
+.vc-der7 .r7-dome::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 140px; background: #e6e6e4; border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+.vc-der7 .r7-dome img { position: relative; width: 150px; height: 150px; border-radius: 50%; object-fit: cover; object-position: top; border: 6px solid #fff; box-shadow: 0 10px 24px -12px rgba(0,0,0,.4); }
+.vc-der7 .hd h1 { margin-top: 14px; font: 500 30px/1.1 var(--pf); }
+.vc-der7 .role { margin-top: 4px; font-size: 13px; color: var(--mu); }
+.vc-der7 .dr-rows { width: auto; margin: 20px 40px 0; }
+.vc-der7 .hd > .spec { margin: 16px 24px 0; }
+.vc-der7 .qa-ic { border-radius: 50%; background: #e6e6e4; color: var(--tx); border: 0; }
+
+/* DER08 Merci (suivi de visite libre) */
+.vc-der8 { --bg: #ffffff; --sf: #f5f5f4; }
+.vc-der8 .r8-top { position: relative; height: 230px; overflow: hidden; } .vc-der8 .r8-top img { width: 100%; height: 100%; object-fit: cover; }
+.vc-der8 .r8-addr { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 16px; background: #111; color: #fff; font-size: 12.5px; font-weight: 600; letter-spacing: .06em; text-align: center; }
+.vc-der8 .r8-t { margin-top: 18px; text-align: center; font: 700 46px/1 var(--pf); color: var(--tx); }
+.vc-der8 .r8-s { margin-top: 6px; text-align: center; font-size: 12.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--tx); }
+.vc-der8 .r8-ag { display: flex; align-items: flex-end; gap: 14px; margin: 18px 22px 18px; }
+.vc-der8 .r8-ag img { width: 120px; height: 160px; object-fit: cover; object-position: top; flex: none; }
+.vc-der8 .r8-sc { font: 400 30px/1 var(--script); color: var(--tx); margin-bottom: 10px; }
+.vc-der8 .hd h1 { font: 700 20px/1.1 var(--pf); }
+.vc-der8 .role { font-size: 12px; color: var(--mu); margin-top: 2px; }
+.vc-der8 .co { font-size: 12px; font-weight: 600; margin-top: 2px; }
+.vc-der8 .qa-ic { border-radius: 0; background: #111; color: #fff; border: 0; }
+
+/* DER09 Merci cursive */
+.vc-der9 { --bg: #ffffff; --sf: #f6f6f5; }
+.vc-der9 .r9-top { position: relative; height: 250px; overflow: hidden; } .vc-der9 .r9-top img { width: 100%; height: 100%; object-fit: cover; }
+.vc-der9 .r9-box { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%) rotate(-3deg); padding: 10px 34px 16px; background: #111; color: #fff; font: 400 56px/1 var(--script); white-space: nowrap; }
+.vc-der9 .r9-s { margin-top: 18px; text-align: center; font-size: 12.5px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.vc-der9 .r9-frame { margin: 14px 22px 0; padding: 14px; border: 1px solid var(--tx); outline: 1px solid var(--tx); outline-offset: 4px; font-size: 13.5px; line-height: 1.5; text-align: center; color: var(--tx); }
+.vc-der9 .r9-ag { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin: 20px 22px 18px; }
+.vc-der9 .r9-ag img { width: 118px; height: 150px; object-fit: cover; object-position: top; flex: none; }
+.vc-der9 .hd h1 { font: 400 40px/1 var(--script); }
+.vc-der9 .role { font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--mu); margin-top: 4px; }
+.vc-der9 .co { margin-top: 10px; display: inline-block; padding: 7px 14px; background: #111; color: #fff; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+.vc-der9 .qa-ic { border-radius: 50%; background: #111; color: #fff; border: 0; }
+
+/* DER10 Je peux aider */
+.vc-der10 { --bg: #3b3b3d; --sf: #47474a; --tx: #f4f2ee; --mu: #c9c6c0; --ln: #58585b; }
+.vc-der10 .hd { text-align: center; padding: 56px 22px 4px; }
+.vc-der10 .r10-q { font: italic 700 30px/1.15 var(--pf); color: #fff; }
+.vc-der10 .r10-n { margin-top: 10px; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--mu); }
+.vc-der10 .r10-sc { margin-top: 18px; font: 400 60px/1 var(--script); color: #fff; }
+.vc-der10 .r10-av { width: 170px; height: 170px; margin: 18px auto 0; border-radius: 50%; overflow: hidden; border: 5px solid #fff; }
+.vc-der10 .r10-av img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.vc-der10 .hd h1 { margin-top: 14px; font: 600 24px/1.1 var(--pf); color: #fff; }
+.vc-der10 .role { margin-top: 4px; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--mu); }
+.vc-der10 .co { margin-top: 2px; font-size: 13px; color: var(--mu); }
+.vc-der10 .hd > .spec { margin-top: 12px; color: var(--mu); }
+.vc-der10 .qa-ic { border-radius: 50%; background: #fff; color: #3b3b3d; border: 0; }
+.vc-der10 .lst-s { color: #fff; }
+.vc-der1 .r1-sc { font-size: 27px; }

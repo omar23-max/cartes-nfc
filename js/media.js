@@ -70,12 +70,7 @@
       { "src": "media/immobilier/px7166645.jpg", "cap": "Cuisine" },
       { "src": "media/immobilier/px6903157.jpg", "cap": "Chambre principale" },
       { "src": "media/immobilier/px4119832.jpg", "cap": "Salle à manger" }
-    ],
-    "video": {
-      "src": "media/immobilier/video.mp4",
-      "poster": "media/immobilier/13107.jpg",
-      "cap": "Visite d’un appartement"
-    }
+    ]
   },
   "archi": {
     "portrait": "media/archi/21219.jpg",
