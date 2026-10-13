@@ -533,7 +533,7 @@
   /* ---------- Rendu global ---------- */
   function render() {
     if (S.sectorId && !sec()) S.sectorId = null;
-    if (S.sectorId) ensureCard();
+    if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     if (S.step > maxStep()) S.step = maxStep();
     $('#steps').innerHTML = STEPS.map((t, i) => {
       const n = i + 1, m = maxStep();
