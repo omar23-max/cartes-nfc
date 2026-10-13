@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=209">
+  <link rel="stylesheet" href="css/app.css?v=210">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -106,31 +106,31 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=209"></script>
-  <script src="js/data.js?v=209"></script>
-  <script src="js/sectors.js?v=209"></script>
-  <script src="js/media.js?v=209"></script>
-  <script src="js/extras.js?v=209"></script>
-  <script src="js/locale-na.js?v=209"></script>
-  <script src="js/locale-na-en.js?v=209"></script>
-  <script src="js/google.js?v=209"></script>
-  <script src="js/profiles.js?v=209"></script>
-  <script src="js/profiles-sport.js?v=209"></script>
-  <script src="js/profiles-sante.js?v=209"></script>
-  <script src="js/profiles-archi.js?v=209"></script>
-  <script src="js/profiles-resto.js?v=209"></script>
-  <script src="js/profiles-auto.js?v=209"></script>
-  <script src="js/profiles-edu.js?v=209"></script>
-  <script src="js/designs-immo.js?v=209"></script>
-  <script src="js/sector-prestige.js?v=209"></script>
-  <script src="js/custom-catalog.js?v=209"></script>
-  <script src="js/jobs.js?v=209"></script>
-  <script src="js/render.js?v=209"></script>
-  <script src="js/designs-immo-der.js?v=209"></script>
-  <script src="js/demo-faces.js?v=209"></script>
-  <script src="js/section-suggest.js?v=209"></script>
+  <script src="js/services.js?v=210"></script>
+  <script src="js/data.js?v=210"></script>
+  <script src="js/sectors.js?v=210"></script>
+  <script src="js/media.js?v=210"></script>
+  <script src="js/extras.js?v=210"></script>
+  <script src="js/locale-na.js?v=210"></script>
+  <script src="js/locale-na-en.js?v=210"></script>
+  <script src="js/google.js?v=210"></script>
+  <script src="js/profiles.js?v=210"></script>
+  <script src="js/profiles-sport.js?v=210"></script>
+  <script src="js/profiles-sante.js?v=210"></script>
+  <script src="js/profiles-archi.js?v=210"></script>
+  <script src="js/profiles-resto.js?v=210"></script>
+  <script src="js/profiles-auto.js?v=210"></script>
+  <script src="js/profiles-edu.js?v=210"></script>
+  <script src="js/designs-immo.js?v=210"></script>
+  <script src="js/sector-prestige.js?v=210"></script>
+  <script src="js/custom-catalog.js?v=210"></script>
+  <script src="js/jobs.js?v=210"></script>
+  <script src="js/render.js?v=210"></script>
+  <script src="js/designs-immo-der.js?v=210"></script>
+  <script src="js/demo-faces.js?v=210"></script>
+  <script src="js/section-suggest.js?v=210"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=209"></script>
+  <script src="events/js/events-data.js?v=210"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -205,7 +205,7 @@
         .concat(pa.map(([sid, x]) => `<div class="adm-f"><div>Métier : <b>${esc(x.name)}</b><small>${esc(SECNAME(sid))}${x.ai ? ' · proposé par l’IA (simulation)' : ''}</small></div><div><button type="button" class="adm-t" data-profrm="${esc(sid)}|${esc(x.id)}">Retirer</button></div></div>`)).join('');
       return `<div class="sh"><h1>Catalogue</h1><p>Ce que vos clients voient : secteurs, métiers, modèles, sections et recherche.</p></div>
       ${box('Ajouter au catalogue', LIVE, 'Chaque ajout part d’un secteur, d’un métier, d’un type de boutique ou d’un événement existant (mêmes sections, modèles et couleurs) : vous remplacez le nom, les exemples, les photos et l’exemple. Remplissage manuel, ou proposition de l’IA.',
-        `<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="b pri" data-catadd="sector">+ Ajouter un secteur</button><button type="button" class="b" data-catadd="prof">+ Ajouter un métier</button><button type="button" class="b" data-catadd="store">+ Ajouter un type de boutique</button><button type="button" class="b" data-catadd="event">+ Ajouter un événement</button></div>${addedList ? `<p class="adm-d" style="margin:14px 0 4px"><b>Ajoutés par vous</b></p>${addedList}` : ''}`)}
+        `<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="b pri" data-catadd="sector">+ Ajouter un secteur</button><button type="button" class="b" data-catadd="prof">+ Ajouter un métier</button></div>${addedList ? `<p class="adm-d" style="margin:14px 0 4px"><b>Ajoutés par vous</b></p>${addedList}` : ''}`)}
       ${box('Mode administrateur dans les studios', LIVE, 'Affiche, directement dans les studios, les boutons Désactiver, Supprimer, Recommander et Ajouter une palette. Vos clients ne les voient pas (sur GoBiz : réservé à l’administrateur connecté).', fBool('adminMode', 'Activer le mode administrateur', 'Raccourci : ajoutez ?admin=1 à l’adresse d’un studio (?admin=0 pour quitter).') + '<p class="adm-d" style="margin-top:10px"><a class="adm-btn pri" style="text-decoration:none" href="index.html">Ouvrir le studio des cartes</a> <a class="adm-btn" style="text-decoration:none" href="stores/">Ouvrir le studio des boutiques</a></p>')}
       ${box('Éléments supprimés', LIVE, 'Supprimés depuis le studio en mode administrateur. Restaurez-les pour les proposer de nouveau.', del.length ? del.map(([l, path, v]) => `<div class="adm-f"><div>${esc(l)}</div><div><button type="button" class="adm-btn" data-restore="${esc(path)}" data-v="${esc(v)}">Restaurer</button></div></div>`).join('') : '<p class="adm-empty">Rien n’a été supprimé.</p>')}
       ${box('Palettes ajoutées', LIVE, 'Ajoutées depuis l’étape Couleurs du studio, en mode administrateur.', added.length ? added.map(([k, a]) => a.map((x) => `<div class="adm-f"><div><span style="display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px"><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.p)};display:inline-block"></i><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.a)};display:inline-block"></i></span>${esc(x.name)}<small>${esc(SECNAME(k.split('~')[0]))}${k.includes('~') ? ' – ' + esc(k.split('~')[1]) : ''}</small></div><div><span class="adm-d">Pour la retirer : « Supprimer » sur la palette, dans le studio.</span></div></div>`).join('')).join('') : '<p class="adm-empty">Aucune palette ajoutée.</p>')}
@@ -323,7 +323,7 @@
     let catKind = 'sector';
     function openCatAdd(k, sid) {
       catKind = k;
-      const T = { sector: 'Ajouter un secteur', prof: 'Ajouter un métier', store: 'Ajouter un type de boutique', event: 'Ajouter un événement' }[k];
+      const T = k === 'prof' ? 'Ajouter un métier' : 'Ajouter un secteur';
       const ev = k === 'event';
       const secOpts = CARDS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
       const baseSel = k === 'store' ? STORES.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('') : ev ? EVENTS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('') : secOpts;
@@ -331,8 +331,9 @@
       $('#modal').innerHTML = `<div class="mb" data-assistx="1"></div>
         <div class="md" role="dialog" aria-modal="true" aria-labelledby="ca-t" style="width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto">
           <h2 id="ca-t">${T}</h2>
-          <p>${k === 'prof' ? 'Le métier apparaîtra après le choix du secteur (« Quel est votre métier ? ») et dans la recherche.' : `Il apparaîtra dans la liste du studio${ev ? ' Événements' : ''} et dans la recherche, avec les mêmes boutons Désactiver, Bientôt et Supprimer que les autres.`}</p>
+          <p>${k === 'prof' ? 'Le métier apparaîtra après le choix du secteur (« Quel est votre métier ? ») et dans la recherche.' : `Il apparaîtra dans la liste du studio ${k === 'store' ? 'Stores' : ev ? 'Événements' : 'des cartes'} et dans la recherche, avec les mêmes boutons Désactiver, Bientôt et Supprimer que les autres.`}</p>
           <form data-catf onsubmit="return false">
+            ${k === 'prof' ? '' : `<div class="f"><span class="f-l">Domaine</span><div class="seg ca-dom" role="group" aria-label="Domaine" style="display:flex;gap:6px;flex-wrap:wrap">${[['sector', 'Carte de visite'], ['store', 'Boutique'], ['event', 'Événement']].map(([v, l]) => `<button type="button" class="b sm${k === v ? ' pri' : ''}" data-catdom="${v}" aria-pressed="${k === v}">${l}</button>`).join('')}</div></div>`}
             ${k === 'prof' ? `<label class="f"><span class="f-l">Secteur</span><select name="sec">${secOpts}</select></label><label class="f"><span class="f-l">Basé sur le métier</span><select name="base"></select></label>`
               : `<label class="f"><span class="f-l">Basé sur ${k === 'store' ? 'le type de boutique' : ev ? 'l’événement (sections, enveloppe, musique, modèles)' : 'le secteur'}</span><select name="base">${baseSel}</select></label>`}
             ${f2('name', 'Nom (français) *', 'nameEn', 'Nom (anglais)', k === 'prof' ? 'Ex. Vétérinaire' : ev ? 'Ex. Fiançailles' : 'Ex. Animaux et vétérinaires', k === 'prof' ? 'Ex. Veterinarian' : ev ? 'Ex. Engagement party' : 'Ex. Pets & vets')}
@@ -457,6 +458,7 @@
       if (d.tab) { e.preventDefault(); tab = d.tab; history.replaceState(null, '', '#' + tab); window.scrollTo(0, 0); draw(); return; }
       if (d.assist) { openAssist(d.assist, d.key, d.name); return; }
       if (d.catadd) { openCatAdd(d.catadd, d.sec); return; }
+      if (d.catdom) { const f0 = $('[data-catf]'), keep = ['name', 'nameEn', 'kw', 'photos'].map((n) => [n, f0[n] ? f0[n].value : '']); openCatAdd(d.catdom); const f1 = $('[data-catf]'); keep.forEach(([n, v]) => { if (f1[n]) f1[n].value = v; }); return; }
       if (d.catai) { aiFill(); return; }
       if (d.catsave) { catSave(); return; }
       if (d.secrm !== undefined) { const a = C.get('secAdd', []).slice(), x = a.splice(+d.secrm, 1)[0]; if (x && confirm(`Retirer « ${x.name} » du catalogue ?`)) { C.set('secAdd', a, `Catalogue : « ${x.name} » retiré`); draw(); } return; }
