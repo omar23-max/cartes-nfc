@@ -59,6 +59,8 @@
       d20: ['Black & White', 'Portrait noir et blanc plein cadre, nom en grand : intemporel et affirmé.']
     };
     immo.designs = immo.designs.map((x) => (NAMES[x.id] ? Object.assign({}, x, { name: NAMES[x.id][0], desc: NAMES[x.id][1] }) : x));
+    /* Modèles propres à l’immobilier (der*, i*) : même nom partout, y compris dans l’admin */
+    DER_DESIGNS.concat(IMMO_DESIGNS).forEach((x) => { if (NAMES[x.id]) { x.name = NAMES[x.id][0]; x.desc = NAMES[x.id][1]; } });
     immo.designsOnly = true; /* seuls ces modèles sont proposés pour l’immobilier */
     immo.rec = 'i1';
   }

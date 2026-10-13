@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=205">
+  <link rel="stylesheet" href="css/app.css?v=209">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -106,28 +106,32 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=205"></script>
-  <script src="js/data.js?v=205"></script>
-  <script src="js/sectors.js?v=205"></script>
-  <script src="js/media.js?v=205"></script>
-  <script src="js/extras.js?v=205"></script>
-  <script src="js/locale-na.js?v=205"></script>
-  <script src="js/locale-na-en.js?v=205"></script>
-  <script src="js/google.js?v=205"></script>
-  <script src="js/profiles.js?v=205"></script>
-  <script src="js/profiles-sport.js?v=205"></script>
-  <script src="js/profiles-sante.js?v=205"></script>
-  <script src="js/profiles-archi.js?v=205"></script>
-  <script src="js/profiles-resto.js?v=205"></script>
-  <script src="js/profiles-auto.js?v=205"></script>
-  <script src="js/profiles-edu.js?v=205"></script>
-  <script src="js/designs-immo.js?v=205"></script>
-  <script src="js/sector-prestige.js?v=205"></script>
-  <script src="js/custom-catalog.js?v=205"></script>
-  <script src="js/jobs.js?v=205"></script>
-  <script src="js/render.js?v=205"></script>
-  <script src="js/designs-immo-der.js?v=205"></script>
-  <script src="js/demo-faces.js?v=205"></script>
+  <script src="js/services.js?v=209"></script>
+  <script src="js/data.js?v=209"></script>
+  <script src="js/sectors.js?v=209"></script>
+  <script src="js/media.js?v=209"></script>
+  <script src="js/extras.js?v=209"></script>
+  <script src="js/locale-na.js?v=209"></script>
+  <script src="js/locale-na-en.js?v=209"></script>
+  <script src="js/google.js?v=209"></script>
+  <script src="js/profiles.js?v=209"></script>
+  <script src="js/profiles-sport.js?v=209"></script>
+  <script src="js/profiles-sante.js?v=209"></script>
+  <script src="js/profiles-archi.js?v=209"></script>
+  <script src="js/profiles-resto.js?v=209"></script>
+  <script src="js/profiles-auto.js?v=209"></script>
+  <script src="js/profiles-edu.js?v=209"></script>
+  <script src="js/designs-immo.js?v=209"></script>
+  <script src="js/sector-prestige.js?v=209"></script>
+  <script src="js/custom-catalog.js?v=209"></script>
+  <script src="js/jobs.js?v=209"></script>
+  <script src="js/render.js?v=209"></script>
+  <script src="js/designs-immo-der.js?v=209"></script>
+  <script src="js/demo-faces.js?v=209"></script>
+  <script src="js/section-suggest.js?v=209"></script>
+  <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
+  <script src="events/js/events-data.js?v=209"></script>
+  <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
     'use strict';
@@ -139,14 +143,17 @@
     const norm = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
     const LIVE = '<span class="adm-live">Actif dans la maquette</span>', GB = '<span class="adm-gb">Appliqué dans GoBiz</span>';
 
-    /* Données des deux studios */
-    const CARDS = NFC.SECTORS.slice();
-    const STORES0 = [['mode', 'Mode et vêtements'], ['friperie', 'Friperie et seconde main'], ['bijoux', 'Bijouterie'], ['fleuriste', 'Fleuriste'], ['deco', 'Décoration et mobilier'], ['librairie', 'Librairie et papeterie'], ['cadeaux', 'Cadeaux et souvenirs'], ['velos', 'Vélos'], ['cosmetiques', 'Cosmétiques naturels'], ['telephones', 'Réparation de téléphones'], ['epicerie', 'Supermarché et épicerie'], ['traiteur', 'Traiteur'], ['animalerie', 'Animalerie'], ['resto', 'Restaurant (pour emporter)'], ['coiffure', 'Coiffure (produits)'], ['esthetique', 'Esthétique (produits de soin)']].map(([id, name]) => ({ id, name, active: true }));
+    /* Données des trois studios (le secteur Restaurant, déplacé dans Stores, n’est plus dans les cartes) */
+    const CARDS = NFC.SECTORS.filter((s) => !s.moved);
+    const EVENTS = (NFC.EVENT_SECTORS || []).concat((NFC.cfg.get('secAdd', []) || []).filter((x) => x.kind === 'events').map((x) => ({ id: x.id, name: x.name, active: true, custom: true })));
+    const STORES0 = [['mode', 'Mode et vêtements'], ['friperie', 'Friperie et seconde main'], ['bijoux', 'Bijouterie'], ['fleuriste', 'Fleuriste'], ['deco', 'Décoration et mobilier'], ['librairie', 'Librairie et papeterie'], ['cadeaux', 'Cadeaux et souvenirs'], ['velos', 'Vélos'], ['cosmetiques', 'Cosmétiques naturels'], ['telephones', 'Réparation de téléphones'], ['epicerie', 'Supermarché et épicerie'], ['traiteur', 'Traiteur'], ['animalerie', 'Animalerie'], ['resto', 'Restaurant (pour emporter)'], ['coiffure', 'Coiffure (produits)'], ['esthetique', 'Esthétique (produits de soin)']].map(([id, name]) => ({ id, name, active: true }))
+      /* Les 10 restaurants, cafés et bars (stores/js/stores-resto.js), juste après « Restaurant (pour emporter) » */
+      .flatMap((x) => (x.id === 'resto' ? [x].concat(((NFC.RESTO_SECTOR || {}).profiles || []).map((p) => ({ id: 'r-' + p.id, name: p.n[0], active: true }))) : [x]));
     const DESIGNS = NFC.DESIGNS_ALL || NFC.DESIGNS;
     const CATSEC = [['text', 'Texte libre'], ['services', 'Services et tarifs'], ['faq', 'Questions fréquentes'], ['hours', 'Horaires'], ['location', 'Adresse et plan'], ['cards', 'Fiches avec photo'], ['reviews', 'Avis clients'], ['google', 'Avis Google'], ['stats', 'Chiffres clés'], ['tags', 'Engagements'], ['booking', 'Prise de rendez-vous'], ['form', 'Formulaire de demande'], ['products', 'Produits'], ['action', 'Bouton vers un lien'], ['links', 'Liens et documents'], ['gallery', 'Galerie photos'], ['imgcar', 'Carrousel de photos'], ['vidcar', 'Carrousel de vidéos']];
     const STORES = STORES0.concat((NFC.cfg.get('secAdd', []) || []).filter((x) => x.kind === 'stores').map((x) => ({ id: x.id, name: x.name, active: true, custom: true })));
     const PLANS = [['gratuit', 'Gratuit'], ['pro', 'Pro'], ['premium', 'Premium']];
-    const SECNAME = (id) => (CARDS.concat(STORES).find((s) => s.id === id) || {}).name || id;
+    const SECNAME = (id) => (CARDS.concat(STORES, EVENTS).find((s) => s.id === id) || {}).name || id;
 
     /* Listes de services : 9 interrupteurs visibles, le reste derrière « Voir plus » */
     const MAXV = 9, OPEN = new Set();
@@ -194,21 +201,22 @@
       Object.entries(C.get('palDel', {})).forEach(([k, arr]) => (arr || []).forEach((i) => del.push([`Palette n° ${i + 1} : ${SECNAME(k.split('~')[0])}${k.includes('~') ? ' – ' + k.split('~')[1] : ''}`, 'pal', k + '|' + i])));
       const added = Object.entries(C.get('palAdd', {})).filter(([, a]) => a && a.length);
       const sa = C.get('secAdd', []), pa = Object.entries(C.get('profAdd', {})).flatMap(([sid, l]) => (l || []).map((x) => [sid, x]));
-      const addedList = sa.map((x, i) => `<div class="adm-f"><div>${x.kind === 'stores' ? 'Type de boutique' : 'Secteur'} : <b>${esc(x.name)}</b><small>Basé sur ${esc(x.kind === 'stores' ? ((STORES.find((s) => s.id === x.base) || {}).name || x.base) : SECNAME(x.base))}${x.ai ? ' · proposé par l’IA (simulation)' : ''}</small></div><div><button type="button" class="adm-t" data-secrm="${i}">Retirer</button></div></div>`)
+      const addedList = sa.map((x, i) => `<div class="adm-f"><div>${x.kind === 'stores' ? 'Type de boutique' : x.kind === 'events' ? 'Événement' : 'Secteur'} : <b>${esc(x.name)}</b><small>Basé sur ${esc(x.kind === 'stores' ? ((STORES.find((s) => s.id === x.base) || {}).name || x.base) : SECNAME(x.base))}${x.ai ? ' · proposé par l’IA (simulation)' : ''}</small></div><div><button type="button" class="adm-t" data-secrm="${i}">Retirer</button></div></div>`)
         .concat(pa.map(([sid, x]) => `<div class="adm-f"><div>Métier : <b>${esc(x.name)}</b><small>${esc(SECNAME(sid))}${x.ai ? ' · proposé par l’IA (simulation)' : ''}</small></div><div><button type="button" class="adm-t" data-profrm="${esc(sid)}|${esc(x.id)}">Retirer</button></div></div>`)).join('');
       return `<div class="sh"><h1>Catalogue</h1><p>Ce que vos clients voient : secteurs, métiers, modèles, sections et recherche.</p></div>
-      ${box('Ajouter au catalogue', LIVE, 'Chaque ajout part d’un secteur ou d’un métier existant (mêmes sections, modèles et couleurs) : vous remplacez le nom, les exemples, les photos et la personne d’exemple. Remplissage manuel, ou proposition de l’IA.',
-        `<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="b pri" data-catadd="sector">+ Ajouter un secteur</button><button type="button" class="b" data-catadd="prof">+ Ajouter un métier</button><button type="button" class="b" data-catadd="store">+ Ajouter un type de boutique</button></div>${addedList ? `<p class="adm-d" style="margin:14px 0 4px"><b>Ajoutés par vous</b></p>${addedList}` : ''}`)}
+      ${box('Ajouter au catalogue', LIVE, 'Chaque ajout part d’un secteur, d’un métier, d’un type de boutique ou d’un événement existant (mêmes sections, modèles et couleurs) : vous remplacez le nom, les exemples, les photos et l’exemple. Remplissage manuel, ou proposition de l’IA.',
+        `<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="b pri" data-catadd="sector">+ Ajouter un secteur</button><button type="button" class="b" data-catadd="prof">+ Ajouter un métier</button><button type="button" class="b" data-catadd="store">+ Ajouter un type de boutique</button><button type="button" class="b" data-catadd="event">+ Ajouter un événement</button></div>${addedList ? `<p class="adm-d" style="margin:14px 0 4px"><b>Ajoutés par vous</b></p>${addedList}` : ''}`)}
       ${box('Mode administrateur dans les studios', LIVE, 'Affiche, directement dans les studios, les boutons Désactiver, Supprimer, Recommander et Ajouter une palette. Vos clients ne les voient pas (sur GoBiz : réservé à l’administrateur connecté).', fBool('adminMode', 'Activer le mode administrateur', 'Raccourci : ajoutez ?admin=1 à l’adresse d’un studio (?admin=0 pour quitter).') + '<p class="adm-d" style="margin-top:10px"><a class="adm-btn pri" style="text-decoration:none" href="index.html">Ouvrir le studio des cartes</a> <a class="adm-btn" style="text-decoration:none" href="stores/">Ouvrir le studio des boutiques</a></p>')}
       ${box('Éléments supprimés', LIVE, 'Supprimés depuis le studio en mode administrateur. Restaurez-les pour les proposer de nouveau.', del.length ? del.map(([l, path, v]) => `<div class="adm-f"><div>${esc(l)}</div><div><button type="button" class="adm-btn" data-restore="${esc(path)}" data-v="${esc(v)}">Restaurer</button></div></div>`).join('') : '<p class="adm-empty">Rien n’a été supprimé.</p>')}
       ${box('Palettes ajoutées', LIVE, 'Ajoutées depuis l’étape Couleurs du studio, en mode administrateur.', added.length ? added.map(([k, a]) => a.map((x) => `<div class="adm-f"><div><span style="display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px"><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.p)};display:inline-block"></i><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.a)};display:inline-block"></i></span>${esc(x.name)}<small>${esc(SECNAME(k.split('~')[0]))}${k.includes('~') ? ' – ' + esc(k.split('~')[1]) : ''}</small></div><div><span class="adm-d">Pour la retirer : « Supprimer » sur la palette, dans le studio.</span></div></div>`).join('')).join('') : '<p class="adm-empty">Aucune palette ajoutée.</p>')}
       ${box('Secteurs des cartes', LIVE, 'Visible, « Bientôt » (affiché mais pas encore ouvert) ou masqué. Les flèches changent l’ordre d’affichage.', secRows(CARDS, 'cards'))}
-      ${box('Types de boutique', LIVE, 'Même principe pour le studio des boutiques.', secRows(STORES, 'stores'))}
+      ${box('Types de boutique', LIVE, 'Même principe pour le studio des boutiques (dont les 10 restaurants, cafés et bars).', secRows(STORES, 'stores'))}
+      ${box('Événements', LIVE, 'Même principe pour le studio des invitations (mariage, naissance, anniversaire…).', secRows(EVENTS, 'events'))}
       ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<p class="adm-d" style="margin:10px 0 4px"><b>${esc(s.name)}</b></p><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div><button type="button" class="adm-t" style="margin-top:6px" data-catadd="prof" data-sec="${s.id}">+ Ajouter un métier à ce secteur</button>`).join('')
         + `<p class="adm-d" style="margin:16px 0 6px"><b>Secteurs sans métiers</b> : ajoutez-leur un premier métier (l’exemple actuel devient alors le métier « par défaut »).</p><div style="display:flex;flex-wrap:wrap;gap:6px">${CARDS.filter((s) => !s.profiles).map((s) => `<button type="button" class="adm-t" data-catadd="prof" data-sec="${s.id}">+ ${esc(s.name)}</button>`).join('')}</div>`)}
       ${box('Modèles (mises en page)', LIVE, 'Un modèle désactivé n’est plus proposé ; un client qui l’a déjà choisi le garde.', `<div class="adm-list">${DESIGNS.map((d) => { const on = !C.get('designsOff', []).includes(d.id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(d.name)} <small style="color:var(--mut)">${esc(d.id.toUpperCase())}</small></span>${sw(`data-des="${d.id}"`, on)}</label>`; }).join('')}</div>`)}
-      ${box('Modèle recommandé par secteur', LIVE, 'Le badge « Recommandé » à l’étape Modèle.', CARDS.filter((s) => s.active).map((s) => `<div class="adm-f"><div>${esc(s.name)}</div><div><select data-rec="${s.id}"><option value="">Par défaut (${esc(String(s.rec || '').toUpperCase())})</option>${DESIGNS.map((d) => `<option value="${d.id}" ${C.get('rec', {})[s.id] === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></div></div>`).join(''))}
-      ${box('Sections de « Ajouter une section »', LIVE, 'Types de sections que le client peut ajouter à sa carte.', `<div class="adm-list">${CATSEC.map(([id, n]) => { const on = !C.get('catOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(n)}</span>${sw(`data-catsec="${id}"`, on)}</label>`; }).join('')}</div>`)}
+      ${box('Modèle recommandé par secteur et par événement', LIVE, 'Le badge « Recommandé » à l’étape Modèle.', CARDS.filter((s) => s.active).concat(EVENTS).map((s) => `<div class="adm-f"><div>${esc(s.name)}</div><div><select data-rec="${s.id}"><option value="">Par défaut (${esc(String(s.rec || '').toUpperCase())})</option>${DESIGNS.map((d) => `<option value="${d.id}" ${C.get('rec', {})[s.id] === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></div></div>`).join(''))}
+      ${box('Sections de « Ajouter une section »', LIVE, 'Types de sections que le client peut ajouter à sa carte. Les « Suggérées pour vous » sont propres à chaque secteur, type de boutique et événement. Les invitations ne proposent jamais : Avis Google, Avis clients, Produits, Prise de rendez-vous.', `<div class="adm-list">${CATSEC.map(([id, n]) => { const on = !C.get('catOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(n)}</span>${sw(`data-catsec="${id}"`, on)}</label>`; }).join('')}</div>`)}
       ${box('Recherche : mots reconnus (sans carte)', LIVE, `${jobsN} métiers sont déjà reconnus par la recherche : taper l’un d’eux mène au bon secteur. Ajoutez-en d’autres ici (simple mot de recherche, sans carte d’exemple). Pour un vrai métier avec sa carte, utilisez « Ajouter au catalogue ».`, `${C.get('jobs', []).map((j, i) => `<div class="adm-row"><input type="text" data-job="${i}" data-f="0" value="${esc(j[0])}" placeholder="Nom du métier"><select data-job="${i}" data-f="1">${CARDS.map((s) => `<option value="${s.id}" ${j[1] === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select><button type="button" class="adm-btn" data-jobdel="${i}">Retirer</button></div>`).join('') || '<p class="adm-empty">Aucun métier ajouté pour l’instant.</p>'}`, '<button type="button" class="adm-btn pri" data-jobadd>Ajouter un mot de recherche</button>')}
       ${box('Palettes de couleurs', GB, 'Ajout de palettes personnalisées et couleur extraite du logo.', fBool('palettes.custom', 'Autoriser une couleur personnalisée', 'Le client choisit sa propre couleur principale.'))}`;
     };
@@ -226,8 +234,8 @@
 
     /* 4. Marque NexTap */
     P.brand = () => `<div class="sh"><h1>Marque NexTap</h1><p>Noms affichés dans les studios et mention en bas des cartes.</p></div>
-      ${box('Noms des studios', LIVE, '', fTxt('brand.studio', 'Nom du studio des cartes', 'Vide = NexTap Studio', 'NexTap Studio') + fTxt('brand.stores', 'Nom du studio des boutiques', 'Vide = NexTap Studio – Stores', 'NexTap Studio – Stores'))}
-      ${box('Mention en bas des cartes', LIVE, '', fTxt('brand.footCards', 'Cartes de visite', 'Vide = « Carte de visite NFC »', 'Créé avec NexTap') + fTxt('brand.footStores', 'Boutiques', 'Vide = « Boutique NFC »', 'Boutique NexTap') +
+      ${box('Noms des studios', LIVE, '', fTxt('brand.studio', 'Nom du studio des cartes', 'Vide = NexTap Studio', 'NexTap Studio') + fTxt('brand.stores', 'Nom du studio des boutiques', 'Vide = NexTap Studio – Stores', 'NexTap Studio – Stores') + fTxt('brand.events', 'Nom du studio des invitations', 'Vide = NexTap Studio – Événements', 'NexTap Studio – Événements'))}
+      ${box('Mention en bas des cartes', LIVE, '', fTxt('brand.footCards', 'Cartes de visite', 'Vide = « Carte de visite NFC »', 'Créé avec NexTap') + fTxt('brand.footStores', 'Boutiques', 'Vide = « Boutique NFC »', 'Boutique NexTap') + fTxt('brand.footEvents', 'Invitations', 'Vide = « Invitation créée avec NexTap »', 'Invitation NexTap') +
         `<div class="adm-f"><div>Masquer la mention pour les forfaits<small>Avantage des forfaits supérieurs.</small></div><div class="adm-act">${PLANS.map(([p, l]) => `<label class="adm-i" style="padding:4px 8px"><span>${l}</span>${sw(`data-hidefoot="${p}"`, C.get('brand.hideFoot', []).includes(p))}</label>`).join('')}</div></div>`)}
       ${box('Adresse des cartes', LIVE, 'Début du lien de chaque carte (le code de la carte est ajouté à la fin).', fTxt('brand.linkBase', 'Adresse de base', 'Vide = https://votre-site.com/c/', 'https://nextap.ca/'))}
       ${box('Logo et couleurs du studio', GB, '', fTxt('brand.logoUrl', 'Lien du logo', '', 'https://…/logo.svg', 'url') + fTxt('brand.color', 'Couleur principale', 'Code couleur, ex. #111111', '#111111'))}`;
@@ -266,7 +274,7 @@
     /* 10. Cartes et statistiques */
     P.cards = () => {
       const rows = [];
-      [['nfc-studio-v6', 'Cartes', 'view.html'], ['nfc-stores-v1', 'Boutiques', 'stores/view.html']].forEach(([key, studio, view]) => {
+      [['nfc-studio-v6', 'Cartes', 'view.html'], ['nfc-stores-v1', 'Boutiques', 'stores/view.html'], ['nfc-events-v1', 'Événements', 'events/view.html']].forEach(([key, studio, view]) => {
         try {
           const st = JSON.parse(localStorage.getItem(key) || 'null');
           if (!st || !st.id) return;
@@ -276,12 +284,13 @@
           rows.push({ id: st.id, studio, view, key, name: ((first.identity || {}).name) || '—', sec: SECNAME(st.sectorId) });
         } catch (e) { /* ignoré */ }
       });
-      let leads = [];
+      let leads = [], rsvp = [];
       try { leads = JSON.parse(localStorage.getItem('nfc-leads') || '[]'); } catch (e) { leads = []; }
+      try { rsvp = JSON.parse(localStorage.getItem('nfc-rsvp') || '[]'); } catch (e) { rsvp = []; }
       const stat = (n, l, b) => `<div class="adm-stat"><b>${n}</b><span>${l} ${b}</span></div>`;
       return `<div class="sh"><h1>Cartes et statistiques</h1><p>Sur GoBiz : toutes les cartes de tous les clients. Dans la maquette : les cartes créées dans ce navigateur.</p></div>
       ${box('Cartes publiées', LIVE, 'Une carte suspendue affiche « Carte momentanément indisponible » à ses visiteurs.', rows.length ? `<div class="adm-tbl-w"><table class="adm-tbl"><thead><tr><th>Carte</th><th>Studio</th><th>Secteur</th><th>Code</th><th>Voir</th><th>Assistance</th><th>Suspendue</th></tr></thead><tbody>${rows.map((r) => `<tr><td>${esc(r.name)}</td><td>${r.studio}</td><td>${esc(r.sec)}</td><td>${esc(r.id)}</td><td><a href="${r.view}" target="_blank" rel="noopener">Ouvrir</a></td><td><button type="button" class="adm-t" data-assist="${esc(r.id)}" data-key="${r.key}" data-name="${esc(r.name)}">Modifier à la demande du client</button></td><td>${sw(`data-susp="${esc(r.id)}"`, C.get('suspended', []).includes(r.id))}</td></tr>`).join('')}</tbody></table></div>` : '<p class="adm-empty">Aucune carte créée dans ce navigateur pour l’instant.</p>')}
-      ${box('Statistiques', '', '', `<div class="adm-stats">${stat(leads.length, 'contacts reçus (formulaires et échanges)', LIVE)}${stat('—', 'vues des cartes', GB)}${stat('—', 'clics sur « Appeler »', GB)}${stat('—', 'contacts enregistrés (.vcf)', GB)}${stat('—', 'commandes des boutiques', GB)}</div>`)}`;
+      ${box('Statistiques', '', '', `<div class="adm-stats">${stat(leads.length, 'contacts reçus (formulaires et échanges)', LIVE)}${stat(rsvp.length, 'réponses RSVP aux invitations', LIVE)}${stat('—', 'vues des cartes', GB)}${stat('—', 'clics sur « Appeler »', GB)}${stat('—', 'contacts enregistrés (.vcf)', GB)}${stat('—', 'commandes des boutiques', GB)}</div>`)}`;
     };
 
     /* 11. Journal */
@@ -314,28 +323,29 @@
     let catKind = 'sector';
     function openCatAdd(k, sid) {
       catKind = k;
-      const T = { sector: 'Ajouter un secteur', prof: 'Ajouter un métier', store: 'Ajouter un type de boutique' }[k];
+      const T = { sector: 'Ajouter un secteur', prof: 'Ajouter un métier', store: 'Ajouter un type de boutique', event: 'Ajouter un événement' }[k];
+      const ev = k === 'event';
       const secOpts = CARDS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
-      const baseSel = k === 'store' ? STORES.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('') : secOpts;
+      const baseSel = k === 'store' ? STORES.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('') : ev ? EVENTS.map((s) => `<option value="${s.id}">${esc(s.name)}</option>`).join('') : secOpts;
       const f2 = (n1, l1, n2, l2, ph1 = '', ph2 = '') => `<div class="row2" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0 10px"><label class="f"><span class="f-l">${l1}</span><input name="${n1}" placeholder="${ph1}"></label><label class="f"><span class="f-l">${l2}</span><input name="${n2}" placeholder="${ph2}"></label></div>`;
       $('#modal').innerHTML = `<div class="mb" data-assistx="1"></div>
         <div class="md" role="dialog" aria-modal="true" aria-labelledby="ca-t" style="width:min(640px,100%);max-height:calc(100vh - 32px);overflow:auto">
           <h2 id="ca-t">${T}</h2>
-          <p>${k === 'prof' ? 'Le métier apparaîtra après le choix du secteur (« Quel est votre métier ? ») et dans la recherche.' : 'Il apparaîtra dans la liste du studio et dans la recherche, avec les mêmes boutons Désactiver, Bientôt et Supprimer que les autres.'}</p>
+          <p>${k === 'prof' ? 'Le métier apparaîtra après le choix du secteur (« Quel est votre métier ? ») et dans la recherche.' : `Il apparaîtra dans la liste du studio${ev ? ' Événements' : ''} et dans la recherche, avec les mêmes boutons Désactiver, Bientôt et Supprimer que les autres.`}</p>
           <form data-catf onsubmit="return false">
             ${k === 'prof' ? `<label class="f"><span class="f-l">Secteur</span><select name="sec">${secOpts}</select></label><label class="f"><span class="f-l">Basé sur le métier</span><select name="base"></select></label>`
-              : `<label class="f"><span class="f-l">Basé sur ${k === 'store' ? 'le type de boutique' : 'le secteur'}</span><select name="base">${baseSel}</select></label>`}
-            ${f2('name', 'Nom (français) *', 'nameEn', 'Nom (anglais)', k === 'prof' ? 'Ex. Vétérinaire' : 'Ex. Animaux et vétérinaires', k === 'prof' ? 'Ex. Veterinarian' : 'Ex. Pets & vets')}
+              : `<label class="f"><span class="f-l">Basé sur ${k === 'store' ? 'le type de boutique' : ev ? 'l’événement (sections, enveloppe, musique, modèles)' : 'le secteur'}</span><select name="base">${baseSel}</select></label>`}
+            ${f2('name', 'Nom (français) *', 'nameEn', 'Nom (anglais)', k === 'prof' ? 'Ex. Vétérinaire' : ev ? 'Ex. Fiançailles' : 'Ex. Animaux et vétérinaires', k === 'prof' ? 'Ex. Veterinarian' : ev ? 'Ex. Engagement party' : 'Ex. Pets & vets')}
             <div style="display:flex;justify-content:flex-end;margin:-2px 0 6px"><button type="button" class="b sm" data-catai="1" style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;border:0">✨ Générer avec l’IA</button></div>
             <p class="ai-note" hidden style="margin:0 0 10px;padding:8px 10px;border-radius:9px;background:#f3e8ff;color:#5b21b6;font-size:12.5px">Simulation : sur le site test, la proposition suit un gabarit. Sur GoBiz, l’IA (clé côté serveur) rédigera des textes adaptés au métier, en français et en anglais. Relisez et corrigez avant d’ajouter.</p>
-            ${k !== 'prof' ? f2('ex', 'Exemples (français)', 'exEn', 'Exemples (anglais)', 'Vétérinaire, toiletteur, éleveur…', 'Vet, groomer, breeder…') : ''}
+            ${k !== 'prof' ? f2('ex', 'Exemples (français)', 'exEn', 'Exemples (anglais)', ev ? 'Soirée de fiançailles, bague, RSVP…' : 'Vétérinaire, toiletteur, éleveur…', ev ? 'Engagement party, ring, RSVP…' : 'Vet, groomer, breeder…') : ''}
             <label class="f"><span class="f-l">Mots-clés pour la recherche</span><input name="kw" placeholder="animaux chien chat clinique veterinaire pet"></label>
             <label class="f"><span class="f-l">Photos (une adresse https par ligne : photo de la personne, couverture, galerie)</span><textarea name="photos" rows="3" placeholder="https://images.unsplash.com/photo-…"></textarea></label>
-            <p class="adm-d" style="margin:12px 0 4px"><b>${k === 'store' ? 'Boutique d’exemple' : 'Personne d’exemple'}</b> (carte de démonstration)</p>
-            ${k === 'store' ? f2('pname', 'Nom de la boutique', 'role', 'Accroche (français)', 'Ex. Chocolaterie Laurier', 'Ex. Chocolats faits main') : f2('pname', 'Nom', 'role', 'Fonction (français)', 'Ex. Dre Sarah Collins', 'Ex. Médecin vétérinaire')}
-            ${f2('spec', k === 'store' ? 'Précision (français)' : 'Spécialité (français)', 'roleEn', k === 'store' ? 'Accroche (anglais)' : 'Fonction (anglais)', k === 'store' ? 'Ex. Artisan chocolatier depuis 2009' : 'Ex. Chiens, chats et NAC', k === 'store' ? 'Ex. Handmade chocolates' : 'Ex. Veterinarian')}
-            <label class="f"><span class="f-l">Présentation (français)</span><textarea name="about" rows="3"></textarea></label>
-            <label class="f"><span class="f-l">Présentation (anglais)</span><textarea name="aboutEn" rows="3"></textarea></label>
+            <p class="adm-d" style="margin:12px 0 4px"><b>${k === 'store' ? 'Boutique d’exemple' : ev ? 'Invitation d’exemple' : 'Personne d’exemple'}</b> (${ev ? 'invitation' : 'carte'} de démonstration)</p>
+            ${k === 'store' ? f2('pname', 'Nom de la boutique', 'role', 'Accroche (français)', 'Ex. Chocolaterie Laurier', 'Ex. Chocolats faits main') : ev ? f2('pname', 'Titre (noms des hôtes)', 'role', 'Sous-titre (français)', 'Ex. Emma & Noah', 'Ex. Se fiancent !') : f2('pname', 'Nom', 'role', 'Fonction (français)', 'Ex. Dre Sarah Collins', 'Ex. Médecin vétérinaire')}
+            ${ev ? f2('spec', 'Texte de l’enveloppe (français)', 'roleEn', 'Sous-titre (anglais)', 'Ex. Vous êtes invités', 'Ex. Are getting engaged!') : f2('spec', k === 'store' ? 'Précision (français)' : 'Spécialité (français)', 'roleEn', k === 'store' ? 'Accroche (anglais)' : 'Fonction (anglais)', k === 'store' ? 'Ex. Artisan chocolatier depuis 2009' : 'Ex. Chiens, chats et NAC', k === 'store' ? 'Ex. Handmade chocolates' : 'Ex. Veterinarian')}
+            <label class="f"><span class="f-l">${ev ? 'Le mot des hôtes' : 'Présentation'} (français)</span><textarea name="about" rows="3"></textarea></label>
+            <label class="f"><span class="f-l">${ev ? 'Le mot des hôtes' : 'Présentation'} (anglais)</span><textarea name="aboutEn" rows="3"></textarea></label>
             <p class="ca-err" hidden style="color:#b91c1c;font-size:13px;margin:8px 0 0">Indiquez au moins le nom en français.</p>
             <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b pri" data-catsave="1">Ajouter au catalogue</button><button type="button" class="b" data-assistx="1">Annuler</button></div>
           </form>
@@ -355,17 +365,20 @@
       const en = f.nameEn.value.trim() || n, low = n.toLowerCase();
       const set = (k, v) => { if (f[k] && !f[k].value.trim()) f[k].value = v; };
       set('nameEn', en);
-      if (catKind === 'store') { set('ex', `${n}, produits artisanaux, commande en ligne…`); set('exEn', `${en}, handmade products, online orders…`); }
+      if (catKind === 'event') { set('ex', `${n}, invitation, RSVP, photos…`); set('exEn', `${en}, invitation, RSVP, photos…`); set('pname', 'Emma & Noah'); set('role', n); set('roleEn', en); set('spec', 'Vous êtes invités');
+        set('about', `Nous avons la joie de vous inviter à célébrer avec nous : ${low}. Votre présence nous ferait très plaisir !`); set('aboutEn', `We are delighted to invite you to celebrate with us: ${en.toLowerCase()}. We would love to see you there!`); }
+      else if (catKind === 'store') { set('ex', `${n}, produits artisanaux, commande en ligne…`); set('exEn', `${en}, handmade products, online orders…`); }
       else { set('ex', `${n}, conseil, accompagnement…`); set('exEn', `${en}, advice, support…`); }
       set('kw', [...new Set((slug(n) + '-' + slug(en)).split('-').filter((t) => t.length > 2))].join(' '));
-      if (catKind === 'store') { set('pname', `${n} Laurier`); set('role', `${n} artisanale`); set('roleEn', `Handcrafted ${en.toLowerCase()}`); set('spec', 'Commande en ligne, ramassage ou livraison'); }
+      if (catKind === 'event') { /* déjà rempli plus haut */ }
+      else if (catKind === 'store') { set('pname', `${n} Laurier`); set('role', `${n} artisanale`); set('roleEn', `Handcrafted ${en.toLowerCase()}`); set('spec', 'Commande en ligne, ramassage ou livraison'); }
       else { set('pname', 'Alex Morgan'); set('role', n); set('roleEn', en); set('spec', 'Accompagnement personnalisé'); }
       if (catKind === 'store') {
         set('about', `Bienvenue chez ${n} Laurier ! Des produits choisis avec soin, préparés sur place et proposés au juste prix. Commandez en ligne et passez les chercher, ou faites-vous livrer.`);
         set('aboutEn', `Welcome to ${en} Laurier! Carefully selected products, made on site and fairly priced. Order online and pick up, or get them delivered.`);
       }
-      set('about', `Passionné par mon métier (${low}), j’accompagne mes clients avec écoute, rigueur et transparence. Chaque demande est unique : je prends le temps de comprendre vos besoins avant de vous proposer une solution claire. Écrivez-moi ou appelez-moi pour en discuter.`);
-      set('aboutEn', `Passionate about my work (${en.toLowerCase()}), I support my clients with care, rigor and transparency. Every request is unique: I take the time to understand your needs before suggesting a clear solution. Message or call me to talk it through.`);
+      if (catKind !== 'event') set('about', `Passionné par mon métier (${low}), j’accompagne mes clients avec écoute, rigueur et transparence. Chaque demande est unique : je prends le temps de comprendre vos besoins avant de vous proposer une solution claire. Écrivez-moi ou appelez-moi pour en discuter.`);
+      if (catKind !== 'event') set('aboutEn', `Passionate about my work (${en.toLowerCase()}), I support my clients with care, rigor and transparency. Every request is unique: I take the time to understand your needs before suggesting a clear solution. Message or call me to talk it through.`);
       f.dataset.ai = '1';
       $('.ai-note').hidden = false;
     }
@@ -374,7 +387,7 @@
       if (!name) { $('.ca-err').hidden = false; return; }
       const photos = v('photos').split(/\s+/).filter((u) => /^https:\/\//.test(u)).slice(0, 8);
       const x = { name, nameEn: v('nameEn'), kw: v('kw'), photos, base: v('base'), ai: f.dataset.ai === '1',
-        fr: { name: v('pname'), role: v('role'), specialty: v('spec'), about: v('about') },
+        fr: { name: v('pname'), role: v('role'), specialty: catKind === 'event' ? '' : v('spec'), env: catKind === 'event' ? v('spec') : '', about: v('about') },
         en: { name: v('pname'), role: v('roleEn') || v('role'), specialty: v('spec'), about: v('aboutEn') || v('about') } };
       if (catKind === 'prof') {
         const sid = v('sec'), o = Object.assign({}, C.get('profAdd', {})), list = (o[sid] || []).slice();
@@ -383,10 +396,10 @@
         list.push(Object.assign(x, { id })); o[sid] = list;
         C.set('profAdd', o, `Catalogue : métier « ${name} » ajouté (${SECNAME(sid)})${x.ai ? ' — proposé par l’IA' : ''}`);
       } else {
-        const kind = catKind === 'store' ? 'stores' : 'cards', a = C.get('secAdd', []).slice();
-        let id = 'x-' + slug(name); while (CARDS.some((s) => s.id === id) || STORES.some((s) => s.id === id) || a.some((z) => z.id === id)) id += '2';
+        const kind = catKind === 'store' ? 'stores' : catKind === 'event' ? 'events' : 'cards', a = C.get('secAdd', []).slice();
+        let id = 'x-' + slug(name); while (CARDS.some((s) => s.id === id) || STORES.some((s) => s.id === id) || EVENTS.some((s) => s.id === id) || a.some((z) => z.id === id)) id += '2';
         a.push(Object.assign(x, { id, kind, ex: v('ex'), exEn: v('exEn') }));
-        C.set('secAdd', a, `Catalogue : ${kind === 'stores' ? 'type de boutique' : 'secteur'} « ${name} » ajouté${x.ai ? ' — proposé par l’IA' : ''}`);
+        C.set('secAdd', a, `Catalogue : ${kind === 'stores' ? 'type de boutique' : kind === 'events' ? 'événement' : 'secteur'} « ${name} » ajouté${x.ai ? ' — proposé par l’IA' : ''}`);
       }
       $('#modal').classList.remove('on');
       toast(`« ${name} » ajouté : il est déjà visible dans le studio.`);
@@ -455,20 +468,20 @@
         try { localStorage.setItem('nextap-assist-backup', localStorage.getItem(f.key.value) || ''); } catch (err) { /* rien */ }
         C.set('assistNow', { id: f.id.value, key: f.key.value, name: f.nm.value, motif: f.motif.value.trim(), by: f.by.value, start: new Date().toISOString() },
           `Assistance commencée : carte ${f.id.value} (${f.nm.value}) — demande par ${f.by.value} — motif : ${f.motif.value.trim()}`);
-        location.href = (f.key.value === 'nfc-stores-v1' ? 'stores/' : 'index.html') + '?assist=1';
+        location.href = (f.key.value === 'nfc-stores-v1' ? 'stores/' : f.key.value === 'nfc-events-v1' ? 'events/' : 'index.html') + '?assist=1';
         return;
       }
       if (d.assistx) { $('#modal').classList.remove('on'); return; }
       if (d.morecat) { if (OPEN.has(d.morecat)) OPEN.delete(d.morecat); else OPEN.add(d.morecat); draw(); return; }
       if (d.svcall) { const c = S.all().find((x) => x.id === d.svcall); c.items.forEach(([id]) => S.set(c.id + ':' + id, d.v === '1')); C.set('log', C.get('log', []).concat([{ t: new Date().toISOString(), w: `${d.v === '1' ? 'Activé' : 'Désactivé'} : catégorie ${c.n[0]}` }]).slice(-200)); draw(); return saved(); }
       if (d.mv) {
-        const list = (d.g === 'cards' ? CARDS : STORES), ord = C.get('sectors.order', []);
+        const list = (d.g === 'cards' ? CARDS : d.g === 'events' ? EVENTS : STORES), ord = C.get('sectors.order', []);
         const pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
         const ids = list.map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0].id);
         const i = ids.indexOf(d.mv), j = i + +d.d;
         if (j < 0 || j >= ids.length) return;
         [ids[i], ids[j]] = [ids[j], ids[i]];
-        const other = (d.g === 'cards' ? STORES : CARDS).map((s) => s.id).filter((id) => ord.includes(id));
+        const other = CARDS.concat(STORES, EVENTS).filter((s) => !list.includes(s)).map((s) => s.id).filter((id) => ord.includes(id));
         C.set('sectors.order', ids.concat(other), `Ordre modifié : ${SECNAME(d.mv)}`);
         draw(); return saved();
       }

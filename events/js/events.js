@@ -82,7 +82,10 @@
     if (R) return { l: L2('Répondre à l’invitation', 'RSVP now'), i: 'send', attrs: `href="#" data-vc="scroll" data-to="${R.def.key}"`, second };
     return { l: L2('Partager', 'Share'), i: 'share', attrs: 'href="#" data-vc="share"', second };
   };
-  V.footerX = (m) => (m.sec.event ? `<footer class="ft ev-ft"><div class="ft-btns"><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>${L2('Partager', 'Share')}</span></a>${calUrl(m, (blockOf(m, 'event') || {}).b || {}) ? `<a class="btn ghost" href="${calUrl(m, blockOf(m, 'event').b)}" target="_blank" rel="noopener">${ic('cal', 18)}<span>${L2('Ajouter à l’agenda', 'Add to calendar')}</span></a>` : ''}</div><p class="ft-c">${L2('Invitation créée avec NexTap', 'Invitation made with NexTap')}</p></footer>` : null);
+  /* Mention en bas des invitations : réglable dans l’admin (Marque NexTap), masquée pour certains forfaits */
+  const cfg = (k, d) => (NFC.cfg ? NFC.cfg.get(k, d) : d);
+  const foot = () => (cfg('brand.hideFoot', []).includes(cfg('planSim', 'premium')) ? '' : `<p class="ft-c">${esc(cfg('brand.footEvents', '') || L2('Invitation créée avec NexTap', 'Invitation made with NexTap'))}</p>`);
+  V.footerX = (m) => (m.sec.event ? `<footer class="ft ev-ft"><div class="ft-btns"><a class="btn ghost" href="#" data-vc="share">${ic('share', 18)}<span>${L2('Partager', 'Share')}</span></a>${calUrl(m, (blockOf(m, 'event') || {}).b || {}) ? `<a class="btn ghost" href="${calUrl(m, blockOf(m, 'event').b)}" target="_blank" rel="noopener">${ic('cal', 18)}<span>${L2('Ajouter à l’agenda', 'Add to calendar')}</span></a>` : ''}</div>${foot()}</footer>` : null);
 
   /* ---------- Sections propres aux événements ---------- */
   V.S.envelope = () => '';

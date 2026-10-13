@@ -932,7 +932,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     LG = m.lang === 'en' ? 'en' : 'fr';
     const cid = String(m.link || '').split('/').pop();
     if (!m.thumb && cid && cfg('suspended', []).includes(cid) && !document.getElementById('main')) {
-      return `<div class="vc vc-susp"><div class="vc-susp-in">${ic('shield', 30)}<h1>${L2('Carte momentanément indisponible', 'Profile temporarily unavailable')}</h1><p>${L2('Cette carte a été suspendue. Revenez plus tard.', 'This profile has been suspended. Please check back later.')}</p></div></div>`;
+      return `<div class="vc vc-susp"><div class="vc-susp-in">${ic('shield', 30)}<h1>${m.sec && m.sec.event ? L2('Invitation momentanément indisponible', 'Invitation temporarily unavailable') : L2('Carte momentanément indisponible', 'Profile temporarily unavailable')}</h1><p>${m.sec && m.sec.event ? L2('Cette invitation a été suspendue. Revenez plus tard.', 'This invitation has been suspended. Please check back later.') : L2('Cette carte a été suspendue. Revenez plus tard.', 'This profile has been suspended. Please check back later.')}</p></div></div>`;
     }
     const { card, sec, d, pal } = m;
     const ctx = { n: 0 };

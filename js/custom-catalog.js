@@ -25,10 +25,12 @@
     if (photos[1] || photos[0]) id.cover = photos[1] || photos[0];
     Object.values(c.blocks || {}).forEach((b) => {
       if (!b || typeof b !== 'object') return;
-      if (x && x.about && 'text' in b && b === (c.blocks.about || null)) b.text = x.about;
+      if (x && x.about && 'text' in b && b === (c.blocks.about || c.blocks.intro || null)) b.text = x.about;
       if (Array.isArray(b.images) && photos.length) b.images = photos.slice(0, 6).map((src, i) => ({ src, cap: (b.images[i] || {}).cap || '' }));
     });
-    if (x && x.about && !c.blocks.about) {
+    /* Invitation : texte de l’enveloppe */
+    if (x && x.env && c.blocks.envelope) c.blocks.envelope.text = x.env;
+    if (x && x.about && !c.blocks.about && !c.blocks.intro) {
       const t = Object.values(c.blocks).find((b) => b && 'text' in b && !('items' in b));
       if (t) t.text = x.about;
     }
@@ -48,7 +50,7 @@
     const prof = base.profiles ? base.profiles[0] : null;
     const s = Object.assign({}, base, {
       id: x.id,
-      code: (kind === 'stores' ? 'B' : 'F') + String(60 + n),
+      code: (kind === 'stores' ? 'B' : kind === 'events' ? 'E' : 'F') + String(60 + n),
       name: x.name,
       ex: x.ex || base.ex,
       kw: x.kw || '',
