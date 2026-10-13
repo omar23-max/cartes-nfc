@@ -396,7 +396,8 @@
   function orderBox() {
     if (hasQR() || isEvents) return '';
     const paid = paidOf();
-    if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien. Votre lien et votre QR code vous ont été envoyés par courriel.</p><p class="test-only">${ic('reset', 13)}<span>Site test : <button type="button" class="lnk" data-act="order-unpay">annuler le paiement simulé</button> pour revoir le parcours avant paiement.</span></p></div>`;
+    if (paid) { const pl = (PLAN_L.find((p) => p[0] === paid) || [, paid])[1], plEn = { Gratuit: 'Free' }[pl] || pl;
+      return `<div class="box order-ok"><span class="box-l">${TT('Commande', 'Order')}</span><p>${ic('check', 15)} <b>${TT('Carte payée', 'Card paid')}</b> · ${TT(`forfait ${esc(pl)}. Votre carte NFC est en fabrication, programmée avec ce lien. Votre lien et votre QR code vous ont été envoyés par courriel.`, `${esc(plEn)} plan. Your NFC card is being made and programmed with this link. Your link and QR code were emailed to you.`)}</p><p class="test-only">${ic('reset', 13)}<span>${TT('Site test : ', 'Test site: ')}<button type="button" class="lnk" data-act="order-unpay">${TT('annuler le paiement simulé', 'cancel the simulated payment')}</button>${TT(' pour revoir le parcours avant paiement.', ' to see the pre-payment flow again.')}</span></p></div>`; }
     return `<div class="box order">
       <span class="box-l">Votre carte NFC</span>
       <p>Commandez la carte physique : elle sera programmée avec le lien de votre carte et livrée chez vous.</p>
@@ -566,6 +567,8 @@
       const pt = document.querySelector('.ptabs');
       if (pt) pt.after(el); else document.body.prepend(el);
     } else if (!A && bar) bar.remove();
+    /* Noms complets des onglets en anglais (sauf nom personnalisé dans l’admin) */
+    if (ui() === 'en') document.querySelectorAll('.ptabs .pt-l').forEach((x) => { x.textContent = x.textContent.replace(/–\s*Événements$/, '– Events'); });
     const ptl = document.querySelectorAll('.ptabs .pt-s');
     ptl.forEach((x) => { x.textContent = { cards: ui() === 'en' ? 'Cards' : 'Cartes', stores: ui() === 'en' ? 'Stores' : 'Boutiques', events: ui() === 'en' ? 'Events' : 'Événements', admin: 'Admin' }[x.parentNode.dataset.ptab]; });
   }
