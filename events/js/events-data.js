@@ -27,6 +27,9 @@
     B('contact', 'contact', 'Nous écrire'),
   ];
 
+  /* Événements pour un garçon ou une fille : toujours Rose, Saumon, Bleu et Lilas en plus des palettes de l’événement */
+  const KIDS = ['naissance', 'bapteme', 'babyshower', 'anniversaire'];
+  const KIDS_PAL = [['Rose', '#c2557a', '#f9d3e0'], ['Saumon', '#cf6f5c', '#fbd8cd'], ['Bleu', '#3f72b0', '#d3e4f7'], ['Lilas', '#8a6bb5', '#e7dcf5']];
   /* Modèle d’enveloppe proposé par événement (modifiable dans l’éditeur) */
   const ENV_OF = { mariage: 'sauge', bapteme: 'sauge', cremaillere: 'sauge', fetemeres: 'sauge', demande: 'blanc', demoiselles: 'blanc', naissance: 'blanc', babyshower: 'blanc', hommage: 'blanc', anniversaire: 'ruban', halloween: 'ruban', valentin: 'ruban', fetesperes: 'ruban' };
   NFC.EV_ENV_OF = ENV_OF;
@@ -171,7 +174,7 @@
 
   const SECTORS = EV.map((e, i) => ({
     id: e.id, code: 'E' + String(i + 1).padStart(2, '0'), name: e.n[0], icon: e.icon, ex: e.ex[0], active: true, rec: e.rec, event: true,
-    palettes: e.pal.map(([n, p, a]) => pal(n, p, a)),
+    palettes: (KIDS.includes(e.id) ? e.pal.concat(KIDS_PAL.filter(([n]) => !e.pal.some((x) => x[0] === n))) : e.pal).map(([n, p, a]) => pal(n, p, a)),
     blocks: BLOCKS.map((b) => Object.assign({}, b)),
     demo: demo(e, e.fr, false), demoEn: demo(e, e.en, true),
     designs: EV_DESIGNS.concat((NFC.DESIGNS || []).filter((d) => COMMON.includes(d.id))), designsOnly: true,
@@ -187,6 +190,7 @@
   EV.forEach((e) => { en[e.n[0]] = e.n[1]; en[e.ex[0]] = e.ex[1]; });
   EV_DESIGNS.forEach((d, i) => { en[d.desc] = ['Cream paper, fine frame, arched photo, script title: the classic invitation.', 'Big opening photo, script title on top: moving and modern.', 'White background, big date, fine type: understated and elegant.', 'Dark background, gold or colored accents, medallion photo: evenings and celebrations.', 'Confetti, tilted photo, bright colors: joyful and festive.'][i]; });
   Object.assign(en, { 'Enveloppe': 'Envelope', 'L’événement': 'The event', 'Compte à rebours': 'Countdown', 'Le mot des hôtes': 'A word from the hosts', 'Programme': 'Program', 'Photos': 'Photos', 'Vidéo': 'Video', 'Liste de cadeaux': 'Gift registry', 'Réponse (RSVP)': 'RSVP', 'Musique': 'Music', 'Nous écrire': 'Write to us', 'Répondre à l’invitation': 'RSVP now', 'Faire-part': 'Invitation', 'Fête': 'Party', 'Nuit': 'Night' });
+  Object.assign(en, { 'Rose': 'Pink', 'Saumon': 'Salmon', 'Bleu': 'Blue', 'Lilas': 'Lilac' });
   /* Anglais : accueil et étapes du studio Événements */
   Object.assign(en, { 'Quel événement célébrez-vous ?': 'What are you celebrating?', 'Mariage, naissance, anniversaire, fêtes… Choisissez votre événement : textes, photos, musique et sections restent entièrement personnalisables.': 'Wedding, new baby, birthday, holidays… Pick your event: texts, photos, music and sections stay fully customizable.',
     'Événement': 'Event', 'NexTap Studio – Événements': 'NexTap Studio – Events', 'Événements': 'Events', 'Changer d’événement': 'Change event', 'Cherchez votre événement (ex. mariage, naissance, Noël)': 'Search your event (e.g. wedding, baby, Christmas)' });
