@@ -161,6 +161,7 @@
   const extA = (a) => (a.ext ? ' target="_blank" rel="noopener"' : '');
 
   function primary(m) {
+    if (window.VC && window.VC.primaryX) { const p = window.VC.primaryX(m); if (p) return p; }
     const { card, sec } = m, c = card.contact || {}, k = card.primary || 'call';
     const def = sec.blocks.find((b) => b.key === k), b = def && card.blocks[k];
     const save = { l: 'Enregistrer le contact', i: 'userplus', attrs: 'href="#" data-vc="vcard"', save: 1 };
@@ -325,6 +326,8 @@
 
   /* ---------- En-têtes par design ---------- */
   function header(m) {
+    const HX = window.VC && window.VC.HEADERS;
+    if (HX && HX[m.d]) return HX[m.d](m);
     const { card, sec, d } = m, id = card.identity || {};
     const name = esc(id.name || 'Votre nom'), role = esc(id.role), spec = esc(id.specialty), co = esc(id.company);
     const av = img(id.photo || id.logo || 'ph:logo', m);
@@ -481,6 +484,7 @@
   }
 
   function quick(m) {
+    if (window.VC && window.VC.quickX) { const q = window.VC.quickX(m); if (q != null) return q; }
     const acts = contactActions(m.card);
     if (m.d === 'd2') {
       if (!acts.length) return socials(m, 'soc-top');
@@ -757,6 +761,7 @@
   /* Réglages de l’administrateur (js/services.js) */
   const cfg = (p, d) => (window.NFC && NFC.cfg ? NFC.cfg.get(p, d) : d);
   function footer(m) {
+    if (window.VC && window.VC.footerX) { const f = window.VC.footerX(m); if (f != null) return f; }
     const store = (m.sec.blocks || []).some((b) => b.type === 'shop');
     const own = cfg(store ? 'brand.footStores' : 'brand.footCards', '');
     const hide = cfg('brand.hideFoot', []).includes(cfg('planSim', 'premium'));
@@ -914,7 +919,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
 
   function sticky(m) {
     const p = primary(m), c = m.card.contact || {};
-    const second = p.save
+    const second = p.second != null ? p.second : p.save
       ? (c.phone ? `<a class="btn-ic" href="tel:${tel(c.phone)}" aria-label="Appeler">${ic('phone')}</a>` : '')
       : `<a class="btn-ic" href="#" data-vc="vcard" aria-label="Enregistrer le contact">${ic('userplus')}</a>`;
     return `<div class="sticky"><a class="btn" ${p.attrs}>${ic(p.i, 19)}<span>${esc(p.l)}</span></a>${second}</div>`;

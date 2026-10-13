@@ -6,7 +6,7 @@
   'use strict';
   const stores = /\/stores\//.test(location.pathname);
   const en = () => {
-    try { return (JSON.parse(localStorage.getItem(stores ? 'nfc-stores-v1' : 'nfc-studio-v6') || '{}').ui) === 'en'; } catch (e) { return false; }
+    try { return (JSON.parse(localStorage.getItem(/\/events\//.test(location.pathname) ? 'nfc-events-v1' : stores ? 'nfc-stores-v1' : 'nfc-studio-v6') || '{}').ui) === 'en'; } catch (e) { return false; }
   };
   const T = (fr, eng) => (en() ? eng : fr);
   const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

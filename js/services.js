@@ -135,7 +135,7 @@ window.NFC = window.NFC || {};
      Libellés courts sur téléphone : Cartes / Boutiques / Admin. */
   NFC.prodTabs = (cur, root) => {
     const g = (p, d) => NFC.cfg.get(p, '') || d;
-    const T = [['cards', root || './', g('brand.studio', 'NexTap Studio'), 'Cartes'], ['stores', (root || '') + 'stores/', g('brand.stores', 'NexTap Studio – Stores'), 'Boutiques']];
+    const T = [['cards', root || './', g('brand.studio', 'NexTap Studio'), 'Cartes'], ['stores', (root || '') + 'stores/', g('brand.stores', 'NexTap Studio – Stores'), 'Boutiques'], ['events', (root || '') + 'events/', g('brand.events', 'NexTap Studio – Événements'), 'Événements']];
     /* Visible pour l’administrateur : mode administrateur actif, ou admin déjà ouverte dans ce navigateur (sur GoBiz : administrateur connecté) */
     if (cur === 'admin' || NFC.isAdmin() || NFC.cfg.get('admTab', false)) T.push(['admin', (root || '') + 'admin.html', 'Admin NexTap Studio', 'Admin']);
     return `<nav class="ptabs" aria-label="Produits NexTap">${T.map(([k, h, l, s]) => `<a href="${h}" class="${k === cur ? 'on' : ''}${k === 'admin' ? ' adm' : ''}" ${k === cur ? 'aria-current="page"' : ''} data-ptab="${k}"><span class="pt-l">${l}</span><span class="pt-s">${s}</span></a>`).join('')}</nav>`;

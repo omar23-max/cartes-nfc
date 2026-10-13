@@ -13,7 +13,12 @@
   /* Réglages de l’administrateur (js/services.js, NFC.cfg) et forfait du client */
   const cfg = (p, d) => (NFC.cfg ? NFC.cfg.get(p, d) : d);
   const plan = () => Object.assign({ docs: 5, size: 10 }, NFC.cfg ? NFC.cfg.plan() : { sections: 99, photos: 99, products: 999, bili: true, video: true, shop: true, online: true, ai: true });
-  const isStores = !!X.key && X.key !== 'nfc-studio-v6';
+  /* Produit : cartes, boutiques ou événements (invitations) */
+  const isEvents = X.kind === 'events';
+  const isStores = X.kind ? X.kind === 'stores' : !!X.key && X.key !== 'nfc-studio-v6';
+  /* Événements : pas de versions ni de mode titulaire, pas de commande de carte NFC ; registre séparé */
+  const NOVER = isEvents;
+  const REG = X.regKey || 'nextap-pages';
   /* Secteurs (ou types de boutique) : masqués, « Bientôt », ordre */
   const ADM = () => !!(NFC.isAdmin && NFC.isAdmin());
   const secDel = (s) => cfg('sectors.del', []).includes(s.id);
@@ -34,7 +39,7 @@
   let S = load();
   /* Une seule carte pour les deux studios : même lien, même QR code, même paiement */
   try {
-    const R0 = JSON.parse(localStorage.getItem('nextap-pages') || 'null');
+    const R0 = JSON.parse(localStorage.getItem(REG) || 'null');
     if (R0 && R0.link) { S.id = R0.link; if (S.qr === undefined && R0.qr !== undefined) S.qr = R0.qr; S.paid = Object.assign({}, S.paid || {}, R0.paid || {}); }
   } catch (e) { /* rien */ }
   /* Mode assistance (admin) : la carte du client s’ouvre directement à l’étape Contenu */
@@ -365,7 +370,7 @@
 
   /* Boutons de téléchargement du QR code de la carte */
   /* Avant le paiement (carte commandée depuis le studio) : QR code en aperçu seulement, sans téléchargement ni copie */
-  const locked = () => !hasQR() && !paidOf();
+  const locked = () => !isEvents && !hasQR() && !paidOf();
   const qrDl = () => locked() ? `<span class="qr-lock-n">${ic('lock', 14)}PNG, SVG et affiche à imprimer disponibles après le paiement.</span>` : `<button type="button" class="b xs" data-act="qrdl" data-v="png">${ic('download', 14)}PNG</button><button type="button" class="b xs" data-act="qrdl" data-v="svg">${ic('download', 14)}SVG</button><button type="button" class="b xs" data-act="poster">${ic('qr', 14)}Affiche à imprimer</button>`;
 
   /* ---------- Commande de la carte NFC sur Shopify ----------
@@ -378,8 +383,18 @@
     const shop = String(cfg('shop.url', '') || '').replace(/\/+$/, ''), v = cfg('shop.var.' + orderPlan(), '') || 'VARIANTE-' + orderPlan().toUpperCase();
     return `${shop || 'https://votre-boutique.myshopify.com'}/cart/${encodeURIComponent(v)}:1?attributes[Code carte]=${encodeURIComponent(S.id)}&attributes[Lien]=${encodeURIComponent(link())}&attributes[Forfait]=${orderPlan()}`;
   }
+  /* Événements : réponses RSVP reçues (site test : enregistrées dans ce navigateur) */
+  function rsvpBox() {
+    let L = [];
+    try { L = JSON.parse(localStorage.getItem('nfc-rsvp') || '[]'); } catch (e) { L = []; }
+    const yes = L.filter((x) => x.yes), ppl = yes.reduce((a, x) => a + (x.n || 1), 0);
+    return `<div class="box no-rw rsvp-box"><span class="box-l">${TT('Réponses RSVP', 'RSVP replies')}</span>
+      <div class="rsvp-st"><div><b>${yes.length}</b><span>${TT('oui', 'yes')}</span></div><div><b>${L.length - yes.length}</b><span>${TT('non', 'no')}</span></div><div><b>${ppl}</b><span>${TT('personnes', 'guests')}</span></div></div>
+      ${L.length ? `<ul class="rsvp-l">${L.slice(0, 12).map((x) => `<li><b>${esc(x.nom)}</b><span>${x.yes ? TT(`Oui · ${x.n} pers.`, `Yes · ${x.n}`) : TT('Non', 'No')}${x.meal ? ' · ' + esc(x.meal) : ''}</span>${x.msg ? `<small>« ${esc(x.msg)} »</small>` : ''}</li>`).join('')}</ul>` : `<p class="muted small">${TT('Aucune réponse pour l’instant. Testez : ouvrez l’invitation en plein écran et répondez.', 'No replies yet. Try it: open the invitation full screen and reply.')}</p>`}
+      <p class="muted small">${TT('Site test : réponses enregistrées dans ce navigateur. Sur la vraie plateforme : par courriel et dans votre tableau de bord, avec export Excel.', 'Test site: replies are saved in this browser. On the real platform: by email and in your dashboard, with Excel export.')}</p></div>`;
+  }
   function orderBox() {
-    if (hasQR()) return '';
+    if (hasQR() || isEvents) return '';
     const paid = paidOf();
     if (paid) return `<div class="box order-ok"><span class="box-l">Commande</span><p>${ic('check', 15)} <b>Carte payée</b> · forfait ${esc((PLAN_L.find((p) => p[0] === paid) || [, paid])[1])}. Votre carte NFC est en fabrication, programmée avec ce lien. Votre lien et votre QR code vous ont été envoyés par courriel.</p><p class="test-only">${ic('reset', 13)}<span>Site test : <button type="button" class="lnk" data-act="order-unpay">annuler le paiement simulé</button> pour revoir le parcours avant paiement.</span></p></div>`;
     return `<div class="box order">
@@ -441,7 +456,7 @@
   /* ---------- Mode administrateur dans le studio ----------
      Boutons « Désactiver / Activer » et « Supprimer » sur les secteurs, métiers, modèles et palettes,
      et « Ajouter une palette ». Visibles seulement en mode administrateur (sur GoBiz : administrateur connecté). */
-  const admBar = () => (ADM() ? `<div class="adm-bar">${ic('shield', 16)}<span><b>Mode administrateur</b> · vos clients ne voient pas ces boutons. Désactivé = caché aux clients (grisé pour vous) ; supprimé = retiré, à restaurer depuis la page admin.</span><a class="linkish" href="${isStores ? '../' : ''}admin.html#cat">Page admin</a><button type="button" class="linkish" data-act="adm" data-op="quit">Quitter le mode admin</button></div>` : '');
+  const admBar = () => (ADM() ? `<div class="adm-bar">${ic('shield', 16)}<span><b>Mode administrateur</b> · vos clients ne voient pas ces boutons. Désactivé = caché aux clients (grisé pour vous) ; supprimé = retiré, à restaurer depuis la page admin.</span><a class="linkish" href="${isStores || isEvents ? '../' : ''}admin.html#cat">Page admin</a><button type="button" class="linkish" data-act="adm" data-op="quit">Quitter le mode admin</button></div>` : '');
   function admTools(kind, id, state, soon, rec) {
     const b = (op, label, cls = '') => `<button type="button" class="adm-t ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}">${label}</button>`;
     return `<div class="adm-tb">${state === 'on' || state === 'soon' ? b('off', 'Désactiver') : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? b('soon', 'Bientôt') : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on">Recommandé</span>' : b('rec', 'Recommander')) : ''}${b('del', 'Supprimer', 'danger')}</div>`;
@@ -535,11 +550,11 @@
     if (S.step === 5) drawQR();
     translateTree(document.body);
     reword(document.body);
-    const bn = $('.brand-n'), bt = cfg(isStores ? 'brand.stores' : 'brand.studio', '');
+    const bn = $('.brand-n'), bt = cfg(isEvents ? 'brand.events' : isStores ? 'brand.stores' : 'brand.studio', '');
     if (bn && bt) { bn.textContent = bt; document.title = bt; }
     fitPreview();
     if (!document.querySelector('.ptabs') && NFC.prodTabs) {
-      document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs(isStores ? 'stores' : 'cards', isStores ? '../' : ''));
+      document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs(isEvents ? 'events' : isStores ? 'stores' : 'cards', isStores || isEvents ? '../' : ''));
       document.querySelector('.ptabs').addEventListener('click', (e) => { const a = e.target.closest('a[data-ptab]'); if (a && a.dataset.ptab !== 'admin') a.href = a.getAttribute('href').split('?')[0] + '?ui=' + ui(); });
     }
     /* Bandeau du mode assistance, sous les onglets */
@@ -552,7 +567,7 @@
       if (pt) pt.after(el); else document.body.prepend(el);
     } else if (!A && bar) bar.remove();
     const ptl = document.querySelectorAll('.ptabs .pt-s');
-    ptl.forEach((x) => { x.textContent = { cards: ui() === 'en' ? 'Cards' : 'Cartes', stores: ui() === 'en' ? 'Stores' : 'Boutiques', admin: 'Admin' }[x.parentNode.dataset.ptab]; });
+    ptl.forEach((x) => { x.textContent = { cards: ui() === 'en' ? 'Cards' : 'Cartes', stores: ui() === 'en' ? 'Stores' : 'Boutiques', events: ui() === 'en' ? 'Events' : 'Événements', admin: 'Admin' }[x.parentNode.dataset.ptab]; });
   }
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
   function reword(root) {
@@ -654,7 +669,7 @@
     return `<section class="wrap">${admBar()}
       <button class="back" data-act="profback">${ic('arrowl', 16)}${en ? 'Change industry' : 'Changer de secteur'}</button>
       ${head(en ? 'What is your profession?' : 'Quel est votre métier ?', en ? `${b.profiles.length} profiles for <b>${b.name}</b>, each with its own example, colors and photos. Everything stays customizable.` : `${b.profiles.length} métiers pour <b>${b.name}</b>, chacun avec son exemple, ses couleurs et ses photos. Tout reste personnalisable.`)}
-      <div class="tiles">${tiles}${ADM() ? `<a class="tile adm-addt" href="${isStores ? '../' : ''}admin.html?addprof=${b.id}&back=${encodeURIComponent('index.html?profpick=' + b.id)}#cat"><span class="tile-ic"><i data-lucide="plus"></i></span><span class="tile-n">Ajouter un métier</span><span class="tile-ex">Visible seulement par vous · manuel ou IA</span></a>` : ''}</div>
+      <div class="tiles">${tiles}${ADM() ? `<a class="tile adm-addt" href="${isStores || isEvents ? '../' : ''}admin.html?addprof=${b.id}&back=${encodeURIComponent('index.html?profpick=' + b.id)}#cat"><span class="tile-ic"><i data-lucide="plus"></i></span><span class="tile-n">Ajouter un métier</span><span class="tile-ex">Visible seulement par vous · manuel ou IA</span></a>` : ''}</div>
     </section>`;
   }
   function pickProfile(pid) {
@@ -914,7 +929,7 @@
           ${back(2, 'Changer de modèle')}
           ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · ${nPal === 6 ? '6 palettes pensées pour votre secteur.' : ui() === 'en' ? `${nPal} palettes designed for your industry.` : `${nPal} palettes pensées pour votre secteur.`}`)}
           <div class="pals">${pals}</div>
-          <p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>
+          ${isEvents ? '' : '<p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>'}
           <button class="b pri lg" data-act="go" data-n="4">Remplir mes informations ${ic('arrow', 18)}</button>
         </div>
         <div class="pv-col">${phone()}</div>
@@ -927,7 +942,7 @@
      Une carte = un lien = plusieurs versions, de type carte de visite (studio des cartes) ou boutique (studio Stores).
      Dans chaque studio, la version en cours vit dans S et les autres dans S.pf.list[].data.
      Registre commun (localStorage « nextap-pages ») : lien, QR, paiement, liste de toutes les versions et version affichée. */
-  const KIND = isStores ? 'stores' : 'cards', OTHER_URL = isStores ? '../index.html' : 'stores/index.html';
+  const KIND = isEvents ? 'events' : isStores ? 'stores' : 'cards', OTHER_URL = isStores ? '../index.html' : 'stores/index.html';
   const TT = (fr, en) => (ui() === 'en' ? en : fr);
   const KIND_L = { get cards() { return TT('Carte de visite', 'Business card'); }, get stores() { return TT('Boutique', 'Store'); } };
   const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
@@ -936,8 +951,8 @@
   const pfMax = () => Math.max(1, +plan().profiles || 1);
   function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: KIND === 'stores' ? TT('Boutique principale', 'Main store') : TT('Carte principale', 'Main card'), data: null }] }; return S.pf; }
   const pfName = (id) => (pfInit().list.find((x) => x.id === id) || {}).name || '';
-  const regGet = () => { try { return JSON.parse(localStorage.getItem('nextap-pages') || 'null'); } catch (e) { return null; } };
-  const regSet = (r) => { try { localStorage.setItem('nextap-pages', JSON.stringify(r)); } catch (e) { /* rien */ } };
+  const regGet = () => { try { return JSON.parse(localStorage.getItem(REG) || 'null'); } catch (e) { return null; } };
+  const regSet = (r) => { try { localStorage.setItem(REG, JSON.stringify(r)); } catch (e) { /* rien */ } };
   /* Met le registre à jour à partir de ce studio (appelé à chaque enregistrement) */
   function regSync() {
     const r = regGet() || { list: [] }, used = !!(S.pf || S.sectorId);
@@ -1098,6 +1113,7 @@
   }
   let pfOpen = false;
   function pfBar() {
+    if (NOVER) return '';
     const all = regAll(), n = all.length, P = pfInit(), live = regLive(), same = live.k === KIND && live.id === P.cur;
     if (n < 2) return '';
     const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {}, curE = all.find((x) => x.k === KIND && x.id === P.cur) || {};
@@ -1200,9 +1216,9 @@
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
-          ${regAll().length > 1 ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
+          ${regAll().length > 1 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
-        ${regAll().length < 2 && !locked() ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span>${locked() ? '' : `<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span>`}</div>` : ''}
+        ${regAll().length < 2 && !locked() && !NOVER ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span>${locked() ? '' : `<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span>`}</div>` : ''}
         ${biliNote()}
       </div>
       <div class="mtabs">
@@ -1264,6 +1280,17 @@
   function editor() {
     const s = sec();
     const est = !!s.establishment;
+    /* Événements : titre, sous-titre et photos ; pas d’échange de contacts ni d’action principale (c’est le RSVP) */
+    if (isEvents) {
+      let h = grp('identity', 'Titre & photos', 'Noms, sous-titre, photos', `
+        ${inp('Titre (noms des hôtes)', 'identity.name', { ph: 'Sophie & Lucas' })}
+        ${inp('Sous-titre', 'identity.role', { ph: 'Se disent oui' })}
+        <div class="row2">${imgF('Photo principale', 'identity.photo')}${imgF('Image de couverture', 'identity.cover')}</div>
+        ${coverEd()}`);
+      h += grp('contact', 'Contact des hôtes', 'Pour les questions des invités', `
+        <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('Email', 'contact.email', { type: 'email' })}</div>`);
+      return h + sectionsEd();
+    }
     let h = grp('identity', 'Identité', est ? 'Nom, activité, logo' : 'Nom, fonction, photo', `
       ${inp(est ? 'Nom de l’établissement' : 'Nom et prénom', 'identity.name')}
       <div class="row2">${inp(est ? 'Activité' : 'Fonction', 'identity.role', { ph: est ? 'Ex. Bistrot' : 'Ex. Attaché commercial' })}${inp('Entreprise', 'identity.company', { ph: 'Facultatif' })}</div>
@@ -1543,6 +1570,24 @@
         return area('Texte', base + '.text', { rows: 6, hint: def.help });
       case 'list':
         return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.items.${i}.t`, 'Intitulé', 'strong')}${mini(`${base}.items.${i}.d`, 'Détail (facultatif)', def.price ? '' : 'full')}${def.price ? mini(`${base}.items.${i}.p`, 'Prix (ex. dès 89 €)', 'price') : ''}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'item', 'Ajouter une ligne')}`;
+      /* ---------- Événements ---------- */
+      case 'envelope':
+        return `<div class="row2">${inp('Texte au-dessus de l’enveloppe', base + '.text', { ph: 'Vous êtes invités' })}${inp('Initiales sur le sceau', base + '.seal', { ph: 'S&L' })}</div><p class="f-h">L’invité touche l’enveloppe : elle s’ouvre, l’invitation apparaît et la musique démarre.</p>`;
+      case 'event':
+        return `<div class="row2"><label class="f"><span class="f-l">Date</span><input type="date" data-path="${base}.date" value="${esc(b.date || '')}"></label><label class="f"><span class="f-l">Heure</span><input type="time" data-path="${base}.time" value="${esc(b.time || '')}"></label></div>
+          <div class="row2">${inp('Lieu', base + '.place', { ph: 'Domaine des Érables' })}${inp('Adresse', base + '.address', { ph: '1200, chemin du Lac, Mont-Tremblant' })}</div>
+          ${inp('Code vestimentaire', base + '.dress', { ph: 'Tenue de cocktail' })}${inp('Remarque', base + '.note', { ph: 'Stationnement gratuit sur place' })}`;
+      case 'countdown':
+        return '<p class="f-h">Le compte à rebours utilise la date et l’heure de la section « L’événement ».</p>';
+      case 'rsvp':
+        return `<div class="row2">${inp('Répondre avant le', base + '.deadline', { ph: '1er mai 2027' })}${inp('Personnes par réponse (maximum)', base + '.guests', { type: 'number', ph: '2' })}</div>
+          ${inp('Choix de repas (séparés par des virgules)', base + '.meals', { ph: 'Bœuf, Saumon, Végétarien' })}
+          ${inp('Adresse qui reçoit les réponses', base + '.email', { type: 'email' })}${area('Texte d’accompagnement', base + '.text', { rows: 2 })}
+          <p class="f-h">Site test : les réponses sont enregistrées dans ce navigateur et s’affichent à l’étape Publication. Sur la vraie plateforme, vous les recevrez par courriel et dans votre tableau de bord.</p>`;
+      case 'music': {
+        const list = NFC.EV_MUSIC || [];
+        return `<label class="f"><span class="f-l">Morceau</span><select data-path="${base}.src">${list.map((x) => `<option value="${esc(x.src)}" ${b.src === x.src ? 'selected' : ''}>${esc(ui() === 'en' ? x.en : x.fr)}</option>`).join('')}</select></label>${inp('Titre affiché', base + '.title', { ph: 'Piano romantique' })}<p class="f-h">Musiques libres de droits (Pixabay). La musique démarre quand l’invité ouvre l’enveloppe ; il peut la couper à tout moment.</p>`;
+      }
       /* Immobilier : bien vedette (juste inscrit, portes ouvertes, vendu) */
       case 'listing': {
         const kinds = [['just', 'Juste inscrit'], ['open', 'Portes ouvertes'], ['pending', 'Vente en cours'], ['sold', 'Vendu']];
@@ -1785,7 +1830,7 @@
       ${head('Votre carte est prête', hasQR()
         ? 'Elle est reliée au lien et au QR code déjà imprimés sur votre carte NFC : scannez-les, votre nouvelle carte s’affiche.'
         : 'Voici le lien permanent de votre carte. C’est lui qui est programmé dans votre carte NFC et encodé dans votre QR code.')}
-          ${locked() ? orderBox() : ''}
+          ${locked() ? orderBox() : ''}${isEvents ? rsvpBox() : ''}
           <div class="box lqbox qrbox${locked() ? ' locked' : ''}">
             <span class="box-l">${hasQR() ? 'Votre lien et votre QR code · déjà imprimés' : 'Votre lien et votre QR code'}</span>
             <div class="lq">
@@ -1798,7 +1843,7 @@
             ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
           ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => `<div class="pf-pr"><button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button><button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${esc(x.name)} »`, `Edit “${esc(x.name)}”`)}">${ic('pen', 16)}</button></div>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
-          ${locked() ? '' : `<div class="box no-rw ownbox">
+          ${locked() || NOVER ? '' : `<div class="box no-rw ownbox">
             <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
             <p class="muted small">${TT('Ouvrez-la en mode titulaire et mettez-la sur votre écran d’accueil.', 'Open it in owner mode and add it to your home screen.')}</p>
             <div class="own2"><button type="button" class="b sm" data-act="pfhome">${ic(locked() ? 'lock' : 'smartphone', 15)}${TT('Mettre sur mon écran d’accueil', 'Add to my home screen')}</button><button type="button" class="b sm" data-act="pfowner">${ic(locked() ? 'lock' : 'nfc', 15)}${TT('Ouvrir en mode titulaire', 'Open in owner mode')}</button></div>
@@ -1986,7 +2031,7 @@
         $('#modal').innerHTML = `<div class="mb"></div><div class="md" role="dialog" aria-modal="true"><h2>Intervention terminée</h2>
           <p>Les modifications de la carte de <b>${esc(A.name)}</b> sont enregistrées et notées au journal.</p>
           <p class="muted small">Sur GoBiz, le client reçoit un courriel « NexTap a modifié votre carte à votre demande », avec la liste des changements et un lien pour la voir. La version d’avant reste disponible pour revenir en arrière.</p>
-          <div class="btns"><a class="b pri" href="${isStores ? '../' : ''}admin.html#cards">Retour à l’admin</a></div></div>`;
+          <div class="btns"><a class="b pri" href="${isStores || isEvents ? '../' : ''}admin.html#cards">Retour à l’admin</a></div></div>`;
         $('#modal').classList.add('on');
         document.querySelector('.assist-bar')?.remove();
         break;

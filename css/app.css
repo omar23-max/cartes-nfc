@@ -1114,3 +1114,10 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .hb-fab { height: 42px; padding: 0 14px 0 12px; }
   .hb-p { height: min(520px, calc(100vh - var(--mbar-h, 66px) - 90px)); }
 }
+/* Événements : réponses RSVP à l’étape Publication */
+.rsvp-st { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 8px 0 10px; }
+.rsvp-st div { padding: 10px; border-radius: 10px; background: #f4f3ef; text-align: center; }
+.rsvp-st b { display: block; font-size: 22px; } .rsvp-st span { font-size: 12px; color: var(--mut); }
+.rsvp-l { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.rsvp-l li { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
+.rsvp-l b { display: block; } .rsvp-l span, .rsvp-l small { display: block; font-size: 13px; color: var(--mut); }
