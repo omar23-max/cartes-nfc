@@ -30,6 +30,35 @@
   const immo = (NFC.SECTORS || []).find((s) => s.id === 'immobilier');
   if (immo) {
     immo.designs = DER_DESIGNS.concat(IMMO_DESIGNS).concat((NFC.DESIGNS || []).filter((x) => /^d(1[6-9]|20)$/.test(x.id)));
+    /* Noms et descriptions propres à l’immobilier (les modèles communs gardent leur nom ailleurs) */
+    const NAMES = {
+      der1: ['Sold Next Door', 'Pour prospecter un quartier : « Nous venons de vendre la maison de votre voisin », photo de cuisine, portrait détouré et nom encadré.'],
+      der2: ['Home Value', 'Pour proposer une évaluation gratuite : « Curieux ? » en cursive dans un cadre sombre posé sur la photo.'],
+      der3: ['Hello, I Am', 'Pour vous présenter : grand portrait, « bonjour, je suis » en cursive, nom en capitales et bandeau sable.'],
+      der4: ['Spotlight', 'Vous en grand : portrait plein cadre qui se fond dans le blanc, nom en grandes capitales fines.'],
+      der5: ['Medallion', 'Portrait en médaillon sur une photo de salon, nom manuscrit, contacts et bandeau de l’agence.'],
+      der6: ['Classic Card', 'La carte de visite blanche : portrait cerclé, nom en signature manuscrite, bandeau gris de l’agence.'],
+      der7: ['Dome', 'Logo maison et agence en haut, dôme gris derrière le portrait, contacts bien alignés.'],
+      der8: ['Open House Thanks', 'Après une visite libre : bandeau noir avec l’adresse, « Merci » en grand, « Ravie de vous avoir rencontré ! » en cursive.'],
+      der9: ['Thank You Note', '« merci » manuscrit dans un cadre noir posé sur la photo, petit mot encadré et portrait.'],
+      der10: ['Ready to Sell', 'Fond anthracite, « Vous pensez vendre ? » puis « Je peux vous aider ! » en grande cursive.'],
+      i1: ['Hello Neighbor', 'Photo de cuisine en couverture, « Bonjour, voisin ! » en lettres manuscrites, portrait rond.'],
+      i2: ['Black Band', 'Fond blanc, portrait cerclé, nom manuscrit et bandeau noir de l’agence : sobre et efficace.'],
+      i3: ['Vertical', 'En-tête noir, grand portrait rectangulaire, nom de l’agence à la verticale : affirmé et moderne.'],
+      i4: ['Sand Arch', 'Tons sable, portrait en arche, nom manuscrit : doux et élégant.'],
+      i5: ['Featured Listing', 'Votre bien vedette en premier : grande photo, prix, adresse, chambres et superficie.'],
+      i6: ['Introduction', '« Bonjour, je suis… », grand nom en capitales, portrait rond : pour se présenter au quartier.'],
+      i7: ['Front Row', 'Grand portrait pleine largeur, nom en élégantes capitales juste dessous.'],
+      i8: ['By the Numbers', 'Vos chiffres clés dès l’ouverture (ventes, délai, prix obtenu) : l’agent qui rassure par les résultats.'],
+      i9: ['Black & Gold', 'Fond noir, filets dorés, portrait cerclé d’or : haut de gamme et prestige.'],
+      i10: ['Magazine', 'Nom en capitales espacées, grand portrait façon magazine, tons ivoire.'],
+      d16: ['Snapshot', 'Photo façon Polaroid légèrement inclinée, prénom manuscrit : chaleureux et proche.'],
+      d17: ['Color Block', 'Bloc de couleur avec votre nom en grand, portrait rond qui déborde : moderne et graphique.'],
+      d18: ['Social Profile', 'Comme un profil de réseau social : portrait, chiffres clés et grille de vos photos de biens.'],
+      d19: ['Postcard', 'Grande photo de couverture, carte blanche posée dessus, nom en signature manuscrite.'],
+      d20: ['Black & White', 'Portrait noir et blanc plein cadre, nom en grand : intemporel et affirmé.']
+    };
+    immo.designs = immo.designs.map((x) => (NAMES[x.id] ? Object.assign({}, x, { name: NAMES[x.id][0], desc: NAMES[x.id][1] }) : x));
     immo.designsOnly = true; /* seuls ces modèles sont proposés pour l’immobilier */
     immo.rec = 'i1';
   }
