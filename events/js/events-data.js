@@ -27,8 +27,8 @@
     B('contact', 'contact', 'Nous écrire'),
   ];
 
-  /* Événements pour un garçon ou une fille : toujours Rose, Saumon, Bleu et Lilas en plus des palettes de l’événement */
-  const KIDS = ['naissance', 'bapteme', 'babyshower', 'anniversaire'];
+  /* Événements garçon/fille, demoiselles d’honneur, Saint-Valentin, fête des Mères : toujours Rose, Saumon, Bleu et Lilas en plus des palettes de l’événement */
+  const KIDS = ['naissance', 'bapteme', 'babyshower', 'anniversaire', 'demoiselles', 'valentin', 'fetemeres'];
   const KIDS_PAL = [['Rose', '#c2557a', '#f9d3e0'], ['Saumon', '#cf6f5c', '#fbd8cd'], ['Bleu', '#3f72b0', '#d3e4f7'], ['Lilas', '#8a6bb5', '#e7dcf5']];
   /* Modèle d’enveloppe proposé par événement (modifiable dans l’éditeur) */
   const ENV_OF = { mariage: 'sauge', bapteme: 'sauge', cremaillere: 'sauge', fetemeres: 'sauge', demande: 'blanc', demoiselles: 'blanc', naissance: 'blanc', babyshower: 'blanc', hommage: 'blanc', anniversaire: 'ruban', halloween: 'ruban', valentin: 'ruban', fetesperes: 'ruban' };
