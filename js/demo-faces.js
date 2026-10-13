@@ -12,6 +12,7 @@
   function faceFor(m) {
     const s = m && m.sec, off = s && SECTORS[s.id];
     if (off == null || m.sec.establishment) return '';
+    if (m.sec.profile && m.sec.profile.id === 'barbier') return ''; /* barbier : on garde la démo masculine */
     const p = ((m.card || {}).identity || {}).photo;
     if (p && !/^media\//.test(p)) return '';
     const i = listOf(s).indexOf(m.d || s.rec);
@@ -21,15 +22,23 @@
   /* Démo au féminin quand la photo est celle d’une femme : seulement si le nom est encore celui de la démo */
   const FEM = {
     conseil: { 'Michael Bennett': ['Michelle Bennett', { 'Attaché commercial': 'Conseillère financière', 'Financial advisor': 'Financial advisor' }] },
-    archi: { 'Daniel Brooks': ['Danielle Brooks', { 'Architecte d’intérieur': 'Architecte d’intérieur', 'Interior designer': 'Interior designer' }] },
-    beaute: { 'Jason Reid': ['Jade Reid', { 'Barbier coiffeur': 'Coiffeuse', 'Barber': 'Hair stylist' }] },
+    archi: { 'Daniel Brooks': ['Danielle Brooks', {}], 'Tom Barrett': ['Tess Barrett', { 'Jardinier': 'Jardinière' }], 'Victor Lane': ['Victoria Lane', {}],
+      'Mike Donovan': ['Mia Donovan', { 'Entrepreneur général': 'Entrepreneure générale' }], 'Ryan Calloway': ['Rachel Calloway', { 'Concepteur de piscines': 'Conceptrice de piscines' }],
+      'Graham Pierce': ['Grace Pierce', { 'Ingénieur en structure': 'Ingénieure en structure' }] },
     prestige: { 'Alexandre Valmont': ['Alexandra Valmont', { 'Investisseur et mécène': 'Investisseuse et mécène', 'Investor & patron of the arts': 'Investor & patron of the arts' }] },
   };
   const R0 = V.render;
   V.render = (m) => {
     const f = faceFor(m);
     if (!f) return R0(m);
-    const id = Object.assign({}, m.card.identity, { photo: f });
+    let card = m.card;
+    /* Beauté sans métier choisi : la démo de base est un barbier → on prend la démo du salon de coiffure */
+    if (m.sec.id === 'beaute' && !m.sec.profile && (card.identity || {}).name === 'Jason Reid') {
+      const pc = (m.sec.profiles || []).find((x) => x.id === 'coiffure');
+      if (pc) card = (m.lang === 'en' || (card.blocks.about || {}).text === ((m.sec.demoEn || {}).blocks || {}).about.text ? pc.demoEn : pc.demo) || card;
+    }
+    m = Object.assign({}, m, { card });
+    const id = Object.assign({}, card.identity, { photo: f });
     const fm = (FEM[m.sec.id] || {})[id.name];
     if (fm) { id.name = fm[0]; if (fm[1][id.role]) id.role = fm[1][id.role]; }
     return R0(Object.assign({}, m, { card: Object.assign({}, m.card, { identity: id }) }));
