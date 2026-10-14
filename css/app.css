@@ -1157,3 +1157,18 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 }
 @media (min-width: 601px) { .lang-sw .seg .lbl-s { display: none; } }
 .grp-tg > svg, .grp-tg > i { flex: none; } /* la flèche garde sa taille même avec un long sous-titre */
+/* Téléphone, versions repliées : « Vous modifiez : Été · Inactive » puis « En ligne : Carte principale · Active » */
+@media (max-width: 560px) {
+  .pf-bar .pf-sum.pf-sum2 { align-items: center; min-height: 0; padding: 9px 12px; }
+  .pf-sum2 .pf-sum-t { gap: 6px; }
+  .pf-sum2 .pf-sum-r { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+  .pf-bar .pf-sum.pf-sum2 { position: relative; display: block; text-align: left; }
+  .pf-sum2 .pf-sum-r:first-child { padding-right: 118px; }
+  .pf-sum2 .pf-sum-l { display: inline-flex; align-items: center; gap: 4px; flex: none; white-space: nowrap; font-size: 12.5px; font-weight: 500; color: var(--mut); }
+  .pf-sum2 .pf-sum-r b { font-size: 14.5px; white-space: normal; overflow: visible; }
+  .pf-sum2 .pf-sum-live { font-weight: 600; }
+  .pf-sum2 .pf-sum-lv { color: #15803d; }
+  .pf-sum2 .pf-sum-ok { color: #15803d; font-size: 12.5px; }
+  .pf-sum2.warn { border-color: #fdba74; background: #fffbf5; }
+  .pf-sum2 .pf-sum-c { position: absolute; top: 9px; right: 10px; }
+}
