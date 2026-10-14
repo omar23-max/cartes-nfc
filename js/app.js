@@ -1209,9 +1209,10 @@
   }
   let pfOpen = false;
   function pfBar() {
-    if (NOVER) return '';
+    /* Invitations : pas de versions, mais on rappelle ce qu’on modifie (nom choisi au départ) */
+    if (NOVER) return `<div class="pf-bar pf-ev no-rw"><span class="pf-l">${ic('pen', 15)}${TT('Vous modifiez&nbsp;:', 'You are editing:')}</span><b class="pf-ev-n">${esc(S.vname || TT('Événement principal', 'Main event'))}</b></div>`;
     const all = regAll(), n = all.length, P = pfInit(), live = regLive(), same = live.k === KIND && live.id === P.cur;
-    if (n < 2) return '';
+    if (n < 1) return '';
     const liveE = all.find((x) => x.k === live.k && x.id === live.id) || {}, curE = all.find((x) => x.k === KIND && x.id === P.cur) || {};
     /* Sur téléphone : une seule ligne résumée, qu’on déplie pour changer de version */
     /* Dépliée : la ligne résumée laisse la place à un simple « Replier » (pas de doublon avec les listes) */
@@ -1308,7 +1309,7 @@
     const s = sec(), p = (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0];
     return `<section class="wrap wide">
       <div class="ed-bar">
-        <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${NOVER && S.vname ? `<b>${esc(S.vname)}</b> · ` : ''}${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
+        <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
       </div>
       <div class="ed-tools">
         ${pfBar()}
@@ -1317,7 +1318,7 @@
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i><span class="lbl-l">Éditer avec l’IA</span><span class="lbl-s">IA</span></button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
-          ${regAll().length > 1 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
+          ${regAll().length > 0 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
         ${regAll().length < 2 && !locked() && !NOVER ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span>${locked() ? '' : `<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span>`}</div>` : ''}
         ${biliNote()}
