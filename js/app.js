@@ -693,6 +693,7 @@
     S.palette = 0;
     ensureCard();
     go(2);
+    askName();
   }
 
   function step1() {
@@ -791,6 +792,35 @@
     ensureCard();
     if (fromOther) toast(`Nous vous proposons « ${s.name} ». Tout reste personnalisable.`);
     go(2);
+    askName();
+  }
+
+  /* Première création (et toute version jamais nommée) : « Comment voulez-vous appeler cette carte ? »
+     Le nom n’est visible que par la personne ; il sert à retrouver ses versions. Pas pour les invitations (pas de versions). */
+  function askName() {
+    if (NOVER) return;
+    const P = pfInit(), e = P.list.find((x) => x.id === P.cur);
+    if (!e || e.named) return;
+    const b = baseSec(), p = prof(), what = p ? p.n[ui() === 'en' ? 1 : 0] : (b && (ui() === 'en' ? (window.NFC_EN_APP || {})[b.name] || b.name : b.name)) || '';
+    const st = KIND === 'stores';
+    const sug = st ? TT(`Ma boutique ${what}`, `My ${what} store`) : TT(`Ma carte ${what}`, `My ${what} card`);
+    $('#modal').innerHTML = `<div class="mb" data-act="nameskip"></div>
+      <div class="md" role="dialog" aria-modal="true" aria-labelledby="nm-t">
+        <h2 id="nm-t">${st ? TT('Comment voulez-vous appeler cette boutique ?', 'What would you like to call this store?') : TT('Comment voulez-vous appeler cette carte ?', 'What would you like to call this card?')}</h2>
+        <p>${TT('Ce nom n’est visible que par vous. Il sert à retrouver vos versions (par exemple « Carte pro », « Été », « Salon »). Le nom affiché sur la carte se règle ensuite dans « Identité ».', 'Only you can see this name. It helps you find your versions (e.g. “Work card”, “Summer”, “Salon”). The name shown on the card is set later in “Identity”.')}</p>
+        <form data-nameform onsubmit="return false">
+          <label class="f"><span class="f-l">${TT('Nom de la version', 'Version name')}</span><input name="n" maxlength="30" value="${esc(sug)}" required></label>
+          <div class="btns"><button type="submit" class="b pri" data-act="namesave">${TT('Continuer', 'Continue')}</button><button type="button" class="b" data-act="nameskip">${TT('Passer', 'Skip')}</button></div>
+        </form>
+      </div>`;
+    $('#modal').classList.add('on');
+    const i = $('[data-nameform] input'); if (i) { i.focus(); i.select(); }
+  }
+  function nameDone(save1) {
+    const P = pfInit(), e = P.list.find((x) => x.id === P.cur), i = $('[data-nameform] input');
+    if (e) { if (save1 && i && i.value.trim()) e.name = i.value.trim().slice(0, 30); e.named = true; }
+    closeModal(); save(); render();
+    if (save1 && e) toast(TT(`Version « ${e.name} » créée. Remplissez maintenant votre ${KIND === 'stores' ? 'boutique' : 'carte'}.`, `Version “${e.name}” created. Now fill in your ${KIND === 'stores' ? 'store' : 'card'}.`));
   }
 
   function openOther() {
@@ -1114,11 +1144,11 @@
   /* Nouvelle version vide (type choisi dans l’autre studio, ou dans celui-ci) : on repart du choix du secteur / type */
   function pfNewFresh(name) {
     const used = !!(S.pf || S.sectorId), P = pfInit();
-    if (!used || (!S.sectorId && P.list.length === 1)) { P.list[0].name = name; }
+    if (!used || (!S.sectorId && P.list.length === 1)) { P.list[0].name = name; P.list[0].named = true; }
     else {
       P.list.find((x) => x.id === P.cur).data = pfSnap();
       const id = 'p' + rid();
-      P.list.push({ id, name, data: null }); P.cur = id;
+      P.list.push({ id, name, data: null, named: true }); P.cur = id;
       pfApply({ palette: 0, cards: {} });
     }
     S.step = 1;
@@ -1989,6 +2019,8 @@
       case 'qrreset': if (hasQR()) S.id = rid(); delete S.qr; go(1); break;
       case 'other-pick': closeModal(); pickSector(t.dataset.id, true); break;
       case 'modal-close': closeModal(); break;
+      case 'namesave': nameDone(true); break;
+      case 'nameskip': nameDone(false); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
       case 'poster': if (!locked()) openPoster(); break;
