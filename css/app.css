@@ -1174,7 +1174,9 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 }
 /* Versions sur téléphone : tableau à 3 cases, « Version active » (vert) | « Vous modifiez » (orange) | « Versions n/5 » */
 .pf-sel-live .pf-val b { color: #15803d; }
-.pf-sel-cur .pf-val b { color: #c2410c; }
+/* « Vous modifiez » : vert si cette version est l’active, rouge sinon */
+.pf-sel-cur.is-live .pf-val b { color: #15803d; }
+.pf-sel-cur.is-off .pf-val b { color: #dc2626; }
 @media (max-width: 560px) {
   .ed-tools .pf-bar, .pf-bar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; align-items: end; }
   .pf-bar .pf-sum, .pf-bar .pf-add, .pf-bar .pf-st { display: none !important; }

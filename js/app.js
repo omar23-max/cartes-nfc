@@ -1140,7 +1140,7 @@
     return `<div class="pf-bar no-rw${pfOpen ? ' open' : ''}">${sum}
       <label class="pf-sel pf-sel-live"><span class="pf-l pf-l-live">${ic('nfc', 15)}${TT('Version active&nbsp;:', 'Active version:')}</span>
         <span class="pf-sw">${pfVal(liveE)}<select data-pflivesel aria-label="${TT('Version active de la carte', 'Active version of the card')}">${all.filter((x) => !isPaused(x.k, x.id) || isLive(x.k, x.id)).map((x) => `<option value="${x.k}:${x.id}" ${isLive(x.k, x.id) ? 'selected' : ''}>${verLabel(x)}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
-      <label class="pf-sel pf-sel-cur"><span class="pf-l">${ic('pen', 15)}${TT('Vous modifiez&nbsp;:', 'You are editing:')}</span>
+      <label class="pf-sel pf-sel-cur ${same ? 'is-live' : 'is-off'}"><span class="pf-l">${ic('pen', 15)}${TT('Vous modifiez&nbsp;:', 'You are editing:')}</span>
         <span class="pf-sw">${pfVal(all.find((x) => x.k === KIND && x.id === P.cur))}<select data-pfsel aria-label="${TT('Version de la carte en cours de modification', 'Version being edited')}">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? TT(' — Active', ' — Active') : isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <button type="button" class="pf-vers" data-act="pfmanage" title="${TT('Voir, renommer ou supprimer vos versions', 'See, rename or delete your versions')}">${ic('copy', 15)}Versions <em>${n} / ${pfMax()}</em></button>
       <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}${TT('Nouvelle version', 'New version')}</button>
