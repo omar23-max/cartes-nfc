@@ -1121,3 +1121,12 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .rsvp-l { list-style: none; margin: 0 0 8px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .rsvp-l li { padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; }
 .rsvp-l b { display: block; } .rsvp-l span, .rsvp-l small { display: block; font-size: 13px; color: var(--mut); }
+/* Échange de coordonnées : déroulé en 3 étapes et numéros des parties */
+.ld-how { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: stretch; margin: 2px 0 10px; }
+.ld-how-i { display: flex; flex-direction: column; gap: 3px; padding: 10px; border-radius: 12px; background: #f4f3ef; font-size: 13px; }
+.ld-how-i small { color: var(--mut); font-size: 12px; }
+.ld-how-ic { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: #111114; color: #fff; margin-bottom: 4px; }
+.ld-how-ar { align-self: center; color: var(--mut); font-weight: 700; }
+.ld-try { align-items: center; gap: 10px; margin: 0 0 14px; }
+.ld-num { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: #2563eb; color: #fff; font-weight: 800; font-size: 15px; }
+@media (max-width: 560px) { .ld-how { grid-template-columns: 1fr; } .ld-how-ar { transform: rotate(90deg); justify-self: center; } }
