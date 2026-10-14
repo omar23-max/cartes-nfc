@@ -1172,3 +1172,20 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .pf-sum2.warn { border-color: #fdba74; background: #fffbf5; }
   .pf-sum2 .pf-sum-c { position: absolute; top: 9px; right: 10px; }
 }
+/* Versions sur téléphone : tableau à 3 cases, « Version active » (vert) | « Vous modifiez » (orange) | « Versions n/5 » */
+.pf-sel-live .pf-val b { color: #15803d; }
+.pf-sel-cur .pf-val b { color: #c2410c; }
+@media (max-width: 560px) {
+  .ed-tools .pf-bar, .pf-bar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; align-items: end; }
+  .pf-bar .pf-sum, .pf-bar .pf-add, .pf-bar .pf-st { display: none !important; }
+  .pf-bar:not(.open) > .pf-sel, .pf-bar:not(.open) > .pf-vers { display: flex; }
+  .ed-tools .pf-bar .pf-sel, .pf-bar .pf-sel { grid-column: auto; gap: 4px; }
+  .pf-bar .pf-l { font-size: 11.5px; white-space: nowrap; }
+  .pf-bar .pf-sw select { height: 40px; min-height: 40px; padding-right: 26px; }
+  .pf-bar .pf-sw svg { right: 7px; }
+  .pf-bar .pf-sw .pf-val { left: 9px; right: 24px; }
+  .pf-bar .pf-sw .pf-val small { display: none; }
+  .pf-bar .pf-sw .pf-val b { font-size: 13.5px; }
+  .pf-bar .pf-vers { flex-direction: column; justify-content: center; gap: 2px; height: 40px; padding: 0 8px; font-size: 11.5px; white-space: nowrap; }
+  .pf-bar .pf-vers svg { display: none; }
+}
