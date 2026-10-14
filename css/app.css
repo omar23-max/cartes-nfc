@@ -1130,3 +1130,30 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .ld-try { align-items: center; gap: 10px; margin: 0 0 14px; }
 .ld-num { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: #2563eb; color: #fff; font-weight: 800; font-size: 15px; }
 @media (max-width: 560px) { .ld-how { grid-template-columns: 1fr; } .ld-how-ar { transform: rotate(90deg); justify-self: center; } }
+/* Téléphone : haut d’écran compact pendant la création (étapes 2 à 5), le contenu commence plus haut */
+@media (max-width: 560px) {
+  body[data-step="2"] .ptabs, body[data-step="3"] .ptabs, body[data-step="4"] .ptabs, body[data-step="5"] .ptabs { display: none; }
+  header.top { padding-top: 6px; padding-bottom: 6px; row-gap: 4px; }
+  #steps .st { gap: 2px; padding: 2px 0; }
+  #steps .st-n { width: 24px; height: 24px; font-size: 12px; }
+  #steps .st-n svg { width: 13px; height: 13px; }
+  #steps .st:not(.cur) .st-t { display: none; }
+  #steps .st.cur .st-t { font-size: 12.5px; font-weight: 700; }
+  #steps { justify-content: space-between; }
+  .ed-bar { margin: 6px 0 8px; }
+  .ed-info { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: nowrap; font-size: 12.5px; }
+  .ed-info .code { flex: none; white-space: nowrap; font-size: 11px; padding: 3px 7px; }
+  .ed-info > span:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ed-tools { padding: 10px; }
+  /* Outils : langue sur une ligne, puis IA · Modèle · Couleurs · Versions côte à côte (icône au-dessus du nom) */
+  .ed-tools .ed-links { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .ed-tools .ed-links .lang-sw { display: flex; align-items: center; justify-content: space-between; }
+  .lang-sw .seg button { padding: 6px 14px; white-space: nowrap; }
+  .lang-sw .seg .lbl-l { display: none; } .lang-sw .seg .lbl-s { display: inline; }
+  .ed-tools .ed-links > .b.sm { position: relative; flex-direction: column; gap: 3px; min-height: 54px; padding: 6px 4px; font-size: 12px; line-height: 1.1; }
+  .ed-tools .ed-links > .b.sm svg { width: 18px; height: 18px; flex: none; }
+  .ed-tools .ed-links > .b.sm .lbl-l { display: none; } .ed-tools .ed-links > .b.sm .lbl-s { display: inline; }
+  .ed-tools .ed-links > .pf-tb em { position: absolute; top: 3px; right: 4px; padding: 0 5px; font-size: 10px; line-height: 16px; border-radius: 8px; }
+}
+@media (min-width: 601px) { .lang-sw .seg .lbl-s { display: none; } }
+.grp-tg > svg, .grp-tg > i { flex: none; } /* la flèche garde sa taille même avec un long sous-titre */

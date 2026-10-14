@@ -543,6 +543,7 @@
     if (S.sectorId && !sec()) S.sectorId = null;
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     if (S.step > maxStep()) S.step = maxStep();
+    document.body.dataset.step = S.step; /* téléphone : le haut de l’écran se compacte selon l’étape */
     $('#steps').innerHTML = STEPS.map((t, i) => {
       const n = i + 1, m = maxStep();
       const cls = n === S.step ? 'cur' : n < S.step ? 'done' : '';
@@ -624,7 +625,7 @@
     const off = en ? 'Tick “Bilingual” to add the French version' : 'Cochez « Bilingue » pour ajouter la version anglaise';
     const note = ''; /* message bilingue : voir biliNote(), en haut du cadre */
     return `<div class="lang-sw"><div class="seg" role="group" aria-label="${bi ? (en ? 'Version to edit' : 'Version à modifier') : (en ? 'Card language' : 'Langue de la carte')}">
-      <button type="button" class="${fr ? 'on' : ''}" data-act="lang" data-v="fr" ${!bi && !fr ? `disabled title="${off}"` : ''}>${lab[0]}</button><button type="button" class="${!fr ? 'on' : ''}" data-act="lang" data-v="en" ${!bi && fr ? `disabled title="${off}"` : ''}>${lab[1]}</button></div>
+      <button type="button" class="${fr ? 'on' : ''}" data-act="lang" data-v="fr" ${!bi && !fr ? `disabled title="${off}"` : ''}><span class="lbl-l">${lab[0]}</span><span class="lbl-s">${en ? 'French' : 'Français'}</span></button><button type="button" class="${!fr ? 'on' : ''}" data-act="lang" data-v="en" ${!bi && fr ? `disabled title="${off}"` : ''}><span class="lbl-l">${lab[1]}</span><span class="lbl-s">${en ? 'English' : 'Anglais'}</span></button></div>
       ${!cfg('lang.bili', true) || !plan().bili ? '' : `<label class="ck bili-ck" title="${en ? 'Adds an FR | EN button to the card: visitors choose their language' : 'Affiche un bouton FR | EN sur la carte : le visiteur choisit sa langue'}"><input type="checkbox" data-act="bili" ${bi ? 'checked' : ''}><span>${en ? 'Bilingual' : 'Bilingue'}</span></label>`}${note}</div>`;
   };
   const head = (t, p) => `<div class="sh"><h1>${t}</h1>${p ? `<p>${p}</p>` : ''}</div>`;
@@ -1224,7 +1225,7 @@
         ${pfBar()}
         <div class="ed-links">
           ${langSwitch()}
-          ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i>Éditer avec l’IA</button>' : ''}
+          ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i><span class="lbl-l">Éditer avec l’IA</span><span class="lbl-s">IA</span></button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 1 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
