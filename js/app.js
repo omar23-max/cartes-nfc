@@ -45,6 +45,16 @@
   /* Mode assistance (admin) : la carte du client s’ouvre directement à l’étape Contenu */
   const assistNow = () => { const a = cfg('assistNow', null); return a && a.key === KEY && a.id === S.id ? a : null; };
   try { if (new URLSearchParams(location.search).get('assist') === '1' && assistNow()) S.step = 4; } catch (e) { /* rien */ }
+  /* Venu de « Que voulez-vous créer ? » (autre studio) : réponse au QR code et nom déjà donnés */
+  try {
+    const q = new URLSearchParams(location.search);
+    if (q.get('start') === '1') {
+      S.kindChosen = true;
+      if (q.has('q')) { try { S.qr = JSON.parse(q.get('q')); } catch (e) { S.qr = null; } }
+      if (q.get('vname')) S.vname = q.get('vname').slice(0, 30);
+      S.step = 1;
+    }
+  } catch (e) { /* rien */ }
   /* Langue transmise par les onglets du haut (?ui=en) */
   try { const qu = new URLSearchParams(location.search).get('ui'); if (qu === 'en' || qu === 'fr') S.ui = qu; } catch (e) { /* rien */ }
   /* Tous les panneaux de l’étape Contenu arrivent fermés : le client ouvre celui qu’il veut modifier */
@@ -299,6 +309,7 @@
   const uiSwitch = () => `<div class="seg ui-sw" role="group" aria-label="${ui() === 'en' ? 'Site language' : 'Langue du site'}">${ic('globe', 15)}<button type="button" class="${ui() === 'fr' ? 'on' : ''}" data-act="ui" data-v="fr" lang="fr" title="Site en français">FR</button><button type="button" class="${ui() === 'en' ? 'on' : ''}" data-act="ui" data-v="en" lang="en" title="Site in English">EN</button></div>`;
   const mdl = (d = S.design, p = S.palette) => {
     const s = sec();
+    if (!s) return null; /* aucun secteur encore choisi (écrans d’accueil) */
     const ps = NFC.palsOf ? NFC.palsOf(s) : s.palettes;
     return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: ps[p] || ps[0], link: link(), locked: locked(), lang: lang(), bilingual: bili() };
   };
@@ -640,6 +651,47 @@
 
   /* ---------- Étape 1 : secteur ---------- */
   /* ---------- Avant l’étape 1 : avez-vous déjà un QR code ? ---------- */
+  /* NexTap encore vierge : rien créé dans aucun studio (cartes, boutiques, invitations) */
+  function nexFresh() {
+    if (S.sectorId) return false;
+    const n = (k) => { try { return ((JSON.parse(localStorage.getItem(k) || 'null') || {}).list || []).length; } catch (e) { return 0; } };
+    return n('nextap-pages') === 0 && n('nextap-events') === 0;
+  }
+  const KIND_DEF = { cards: ['Carte principale', 'Main card'], stores: ['Boutique principale', 'Main store'], events: ['Événement principal', 'Main event'] };
+  let kindPick = '';
+  function stepKind() {
+    const o = (k, icon, t, d, ex) => `<button class="qa-o${kindPick === k ? ' sel' : ''}" data-act="kindpick" data-v="${k}">
+        <span class="qa-ic${k === 'stores' ? ' alt' : ''}">${ic(icon, 26)}</span><span class="qa-t">${t}</span><span class="qa-d">${d}</span><span class="qa-ex">${ex}</span></button>`;
+    const def = kindPick ? TT(KIND_DEF[kindPick][0], KIND_DEF[kindPick][1]) : '';
+    return `<section class="wrap start no-rw">
+      ${head(TT('Que voulez-vous créer ?', 'What would you like to create?'), TT('Choisissez pour commencer. Vous pourrez créer les autres ensuite, avec votre même carte NFC et votre même QR code.', 'Pick one to start. You can create the others later, with the same NFC card and QR code.'))}
+      <div class="qa qa3">
+        ${o('cards', 'userplus', TT('Une carte de visite', 'A business card'), TT('Vos coordonnées, réseaux, services et prise de rendez-vous, en un toucher.', 'Your contact details, socials, services and booking, in one tap.'), TT('Pour les pros, indépendants, entreprises', 'For professionals, freelancers, companies'))}
+        ${o('stores', 'bag', TT('Une boutique', 'A store'), TT('Vos produits ou votre menu, avec commande sur place, à emporter ou livrée.', 'Your products or menu, with dine-in, pickup or delivery orders.'), TT('Pour les commerces, restaurants, cafés', 'For shops, restaurants, cafés'))}
+        ${o('events', 'cal', TT('Un événement ou une invitation', 'An event or invitation'), TT('Une invitation animée : enveloppe, musique, compte à rebours, réponses RSVP.', 'An animated invitation: envelope, music, countdown, RSVP replies.'), TT('Mariage, naissance, anniversaire, fêtes…', 'Wedding, baby, birthday, holidays…'))}
+      </div>
+      ${kindPick ? `<form class="kind-name" data-kindform onsubmit="return false">
+        <label class="f"><span class="f-l">${kindPick === 'events' ? TT('Comment voulez-vous appeler cet événement ?', 'What would you like to call this event?') : kindPick === 'stores' ? TT('Comment voulez-vous appeler cette boutique ?', 'What would you like to call this store?') : TT('Comment voulez-vous appeler cette carte ?', 'What would you like to call this card?')}</span>
+          <input name="n" maxlength="30" placeholder="${esc(def)}" autocomplete="off"></label>
+        <p class="f-h">${TT(`Ce nom n’est visible que par vous : il sert à vous y retrouver quand vous aurez plusieurs cartes, boutiques ou invitations. Laissé vide : « ${def} ». Le nom que verront vos visiteurs se remplit plus loin.`, `Only you can see this name: it helps you find your way once you have several cards, stores or invitations. Left empty: “${def}”. The name your visitors see is filled in later.`)}</p>
+        <div class="btns"><button type="submit" class="b pri" data-act="kindgo">${TT('Continuer', 'Continue')} ${ic('arrow', 16)}</button></div>
+      </form>` : ''}
+    </section>`;
+  }
+  /* Le type est choisi : on reste dans ce studio, ou on passe au bon studio en gardant la réponse QR et le nom */
+  function kindGo() {
+    const i = $('[data-kindform] input'), name = ((i && i.value.trim()) || TT(KIND_DEF[kindPick][0], KIND_DEF[kindPick][1])).slice(0, 30);
+    if (kindPick === KIND) {
+      S.kindChosen = true;
+      if (NOVER) S.vname = name; else { const P = pfInit(); P.list[0].name = name; P.list[0].named = true; }
+      save(); render(); window.scrollTo(0, 0);
+      return;
+    }
+    const root = isStores || isEvents ? '../' : '';
+    const url = { cards: root + 'index.html', stores: root + 'stores/index.html', events: root + 'events/index.html' }[kindPick];
+    location.href = `${url}?start=1&ui=${ui()}&q=${encodeURIComponent(JSON.stringify(S.qr === undefined ? null : S.qr))}&vname=${encodeURIComponent(name)}`;
+  }
+
   function step0() {
     return `<section class="wrap start">
       ${head('Avez-vous déjà un QR code ?', 'Si votre carte NFC vous a été livrée avec un QR code et un lien déjà imprimés, votre nouvelle carte de visite sera reliée à ce lien.')}
@@ -698,6 +750,7 @@
 
   function step1() {
     if (S.qr === undefined) return step0();
+    if (!S.kindChosen && nexFresh()) return stepKind();
     if (profPick && baseSec() && baseSec().profiles) return stepProf();
     const tiles = secList().map((s) => admWrap(`
       <button class="tile ${secSoon(s) ? 'soon' : ''} ${ADM() && secOff(s) ? 'adm-off' : ''} ${S.sectorId === s.id ? 'sel' : ''} ${bgOf(s) ? 'has-bg' : ''}" data-act="sector" data-id="${s.id}"${bgOf(s) ? ` style="background-image:url('${bgOf(s)}')"` : ''}>
@@ -800,6 +853,7 @@
   function askName() {
     if (NOVER) return;
     const P = pfInit(), e = P.list.find((x) => x.id === P.cur);
+    if (e && !e.named && S.vname && P.list.length === 1) { e.name = S.vname; e.named = true; delete S.vname; save(); return; }
     if (!e || e.named) return;
     const b = baseSec(), p = prof(), what = p ? p.n[ui() === 'en' ? 1 : 0] : (b && (ui() === 'en' ? (window.NFC_EN_APP || {})[b.name] || b.name : b.name)) || '';
     const st = KIND === 'stores';
@@ -1254,7 +1308,7 @@
     const s = sec(), p = (NFC.palsOf ? NFC.palsOf(s) : s.palettes)[S.palette] || s.palettes[0];
     return `<section class="wrap wide">
       <div class="ed-bar">
-        <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
+        <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${NOVER && S.vname ? `<b>${esc(S.vname)}</b> · ` : ''}${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
       </div>
       <div class="ed-tools">
         ${pfBar()}
@@ -2020,6 +2074,8 @@
       case 'other-pick': closeModal(); pickSector(t.dataset.id, true); break;
       case 'modal-close': closeModal(); break;
       case 'namesave': nameDone(true); break;
+      case 'kindpick': kindPick = t.dataset.v; render(); setTimeout(() => { const i = $('[data-kindform] input'); if (i) { i.focus(); i.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 50); break;
+      case 'kindgo': kindGo(); break;
       case 'nameskip': nameDone(false); break;
       case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
       case 'adm': admAct(t); break;
