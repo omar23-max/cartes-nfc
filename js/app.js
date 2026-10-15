@@ -1053,7 +1053,8 @@
     let name, pub, live, pz = false;
     if (NOVER) { name = S.vname || TT('Événement principal', 'Main event'); pub = !!S.pub; live = true; }
     else {
-      const P = pfInit(), e = P.list.find((x) => x.id === P.cur) || {};
+      if (!S.pf) return null; /* aucune création dans ce studio (ex. la seule vient d'être supprimée) : pas de repère, et pas de création fantôme */
+      const P = S.pf, e = P.list.find((x) => x.id === P.cur) || {};
       name = e.name || ''; live = isLive(KIND, P.cur);
       pub = !!e.pub || (live && !!(paidOf() || hasQR()));
       pz = isPaused(KIND, P.cur) || (live && cardPaused());
@@ -1165,9 +1166,9 @@
     r.link = S.id;
     if (S.qr !== undefined) r.qr = S.qr;
     r.paid = Object.assign({}, r.paid || {}, S.paid || {});
-    const own = used ? pfInit().list.map((x) => ({ k: KIND, id: x.id, name: x.name })) : [];
+    const own = used ? pfInit().list.map((x) => ({ k: KIND, id: x.id, name: x.name, pub: !!x.pub })) : [];
     const keep = (r.list || []).filter((x) => x.k !== KIND || own.some((o) => o.id === x.id));
-    keep.forEach((x) => { const o = own.find((z) => x.k === KIND && z.id === x.id); if (o) x.name = o.name; });
+    keep.forEach((x) => { const o = own.find((z) => x.k === KIND && z.id === x.id); if (o) { x.name = o.name; if (o.pub) x.pub = true; } });
     own.forEach((o) => { if (!keep.some((x) => x.k === KIND && x.id === o.id)) keep.push(o); });
     r.list = keep;
     if ((!r.live || !r.list.some((x) => x.k === r.live.k && x.id === r.live.id)) && r.list.length) {
@@ -1199,7 +1200,7 @@
   }
   /* Carte en pause : aucune création n'est visible, le lien et le QR code affichent « Carte temporairement indisponible » */
   const cardPaused = () => !NOVER && !!(regGet() || {}).cardPaused;
-  const regLive = () => (regGet() || {}).live || { k: KIND, id: pfInit().cur };
+  const regLive = () => (regGet() || {}).live || { k: KIND, id: S.pf ? S.pf.cur : '' };
   const isLive = (k, id) => { const l = regLive(); return l.k === k && l.id === id; };
   /* Valeur visible d’une liste : nom de la version en gras, type en petit et fin */
   const pfVal = (x) => (x && x.name ? `<span class="pf-val"><b>${esc(x.name)}</b><small>${KIND_L[x.k]}</small></span>` : '');
@@ -1239,6 +1240,20 @@
   function pfDelModal(k, id) {
     const x = regAll().find((z) => z.k === k && z.id === id);
     if (!x || isLive(k, id)) return;
+    /* Jamais publiée (et pas en pause) : personne n'a pu garder son lien → simple confirmation */
+    if (!x.pub && !isPaused(k, id)) {
+      const typ = k === 'stores' ? TT('La boutique', 'The store') : TT('La carte', 'The card');
+      $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+        <div class="md no-rw" role="dialog" aria-modal="true" aria-labelledby="md-t">
+          <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+          <h2 id="md-t">${TT(`Supprimer « ${esc(x.name)} » ?`, `Delete “${esc(x.name)}”?`)}</h2>
+          <p>${TT(`${typ} « <b>${esc(x.name)}</b> » n’est pas encore publiée. En la supprimant, vous perdez toutes ses informations.`, `${typ} “<b>${esc(x.name)}</b>” is not published yet. Deleting it erases all its information.`)}</p>
+          <p><b>${TT('Voulez-vous la supprimer ?', 'Do you want to delete it?')}</b></p>
+          <div class="btns"><button type="button" class="b pri" data-act="pfdelyes" data-k="${k}" data-v="${id}">${TT('Oui, supprimer', 'Yes, delete')}</button><button type="button" class="b" data-act="curtag">${TT('Non', 'No')}</button></div>
+        </div>`;
+      $('#modal').classList.add('on');
+      return;
+    }
     const same = regAll().filter((z) => z.k === k && z.id !== id && !isPaused(z.k, z.id));
     const typ = k === 'cards' ? TT('carte de visite', 'business card') : TT('boutique', 'store');
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
@@ -1268,7 +1283,7 @@
     if (!x || isLive(k, id)) return;
     /* Ce que verra un ancien lien de cette version */
     const r0 = regSync();
-    r0.gone = Object.assign({}, r0.gone, { [`${k}:${id}`]: { mode: gone.mode, to: gone.to || '', date: new Date().toISOString() } });
+    if (gone.mode !== 'none') r0.gone = Object.assign({}, r0.gone, { [`${k}:${id}`]: { mode: gone.mode, to: gone.to || '', date: new Date().toISOString() } });
     r0.paused = (r0.paused || []).filter((z) => z !== `${k}:${id}`);
     regSet(r0);
     if (k === KIND) {
@@ -1282,7 +1297,7 @@
       P.list = P.list.filter((z) => z.id !== id);
       save();
     } else pfDelOther(id);
-    pfModal('manage'); render();
+    render(); if (regAll().length) curModal(); else closeModal();
     toast(TT(`Version « ${x.name} » supprimée.`, `“${x.name}” version deleted.`));
   }
   /* « Connecter mon téléphone » : QR code qui ouvre la carte en mode titulaire sur le téléphone
@@ -1351,7 +1366,7 @@
     /* Nom proposé : « Carte 2 », « Boutique 2 »… (numéro suivant libre) */
     const DEF = { cards: TT('Carte', 'Card'), stores: TT('Boutique', 'Store'), events: TT('Événement', 'Event') };
     let def = '';
-    const curN = (all.find((x) => x.k === KIND && x.id === pfInit().cur) || {}).name || '';
+    const curN = S.pf ? (all.find((x) => x.k === KIND && x.id === S.pf.cur) || {}).name || '' : '';
     if (newPick === 'copy') { const b0 = TT(`Copie de ${curN}`, `Copy of ${curN}`).slice(0, 24); def = b0; for (let i = 2; pfTaken(def); i++) def = `${b0.slice(0, 21)} ${i}`; }
     if (DEF[newPick]) { for (let i = all.filter((x) => x.k === newPick).length + 1; ; i++) { def = `${DEF[newPick]} ${i}`; if (!pfTaken(def)) break; } }
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
@@ -2324,6 +2339,7 @@
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
       case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;
+      case 'pfdelyes': pfDoDelete(t.dataset.k || KIND, t.dataset.v, { mode: 'none' }); break;
       case 'pfdelno': toast(TT('La version active ne peut pas être supprimée. Activez d’abord une autre version.', 'The active version cannot be deleted. Activate another version first.')); break;
       case 'pfpause': {
         const k = t.dataset.k, id = t.dataset.v, r = regSync(), key = `${k}:${id}`;
@@ -2375,7 +2391,7 @@
         break;
       }
       case 'pflive': {
-        const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur, inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal');
+        const P = S.pf || {}, k = t.dataset.k || KIND, id = t.dataset.v || P.cur, inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal');
         if (isLive(k, id) && !cardPaused()) break; /* déjà la version active : rien à faire */
         if (!liveOk(k, id)) break;
         setLive(k, id); P.live = k === KIND ? id : null; save(); render();
