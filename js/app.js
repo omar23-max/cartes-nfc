@@ -2109,6 +2109,19 @@
     return `<div class="box no-rw pub-off"><p>${ic('check', 15)}<span>${TT(`<b>« ${esc(pfName(P.cur))} » est enregistrée</b>, mais elle n’est pas en ligne : vos visiteurs voient toujours « ${esc(lv.name || '')} ».`, `<b>“${esc(pfName(P.cur))}” is saved</b>, but it is not live: your visitors still see “${esc(lv.name || '')}”.`)}</span></p>
       <button type="button" class="b pri sm" data-act="pflive" data-k="${KIND}" data-v="${P.cur}">${ic('nfc', 15)}${TT(`Rendre « ${esc(pfName(P.cur))} » active`, `Make “${esc(pfName(P.cur))}” active`)}</button></div>`;
   }
+  /* Ligne de la liste « Version active » : nom (activer) · pause / reprendre · modifier · supprimer */
+  function pubRow(x) {
+    const lv = isLive(x.k, x.id), pz = isPaused(x.k, x.id), cp = lv && cardPaused();
+    const nm = esc(x.name);
+    const pauseBtn = lv
+      ? (cp ? `<button type="button" class="pf-ed pf-pz on" data-act="cardresume" title="${TT('Reprendre ma carte', 'Resume my card')}" aria-label="${TT('Reprendre ma carte', 'Resume my card')}">${ic('play', 15)}</button>`
+        : `<button type="button" class="pf-ed pf-pz" data-act="cardpause" title="${TT('Version active : mettre toute la carte en pause', 'Active version: pause the whole card')}" aria-label="${TT('Mettre ma carte en pause', 'Pause my card')}">${ic('pause', 16)}</button>`)
+      : (pz ? `<button type="button" class="pf-ed pf-pz on" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : reprendre cette création', 'Paused: resume this creation')}" aria-label="${TT(`Reprendre « ${nm} »`, `Resume “${nm}”`)}">${ic('play', 15)}</button>`
+        : `<button type="button" class="pf-ed pf-pz" data-act="pfpause" data-k="${x.k}" data-v="${x.id}" title="${TT('Mettre cette création en pause', 'Pause this creation')}" aria-label="${TT(`Mettre « ${nm} » en pause`, `Pause “${nm}”`)}">${ic('pause', 16)}</button>`);
+    const del = lv ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>`
+      : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${nm} »`, `Delete “${nm}”`)}">${ic('trash', 16)}</button>`;
+    return `<div class="pf-pr"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${lv ? ic('nfc', 13) : pz ? ic('pause', 13) : ''}<span class="pf-cn">${nm}</span>${pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''}<span class="pf-ck">${KIND_L[x.k]}</span></button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
+  }
   function step5() {
     return `<section class="wrap">
       <div class="split s5">
@@ -2130,7 +2143,7 @@
             </div>
             ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
-          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => `<div class="pf-pr"><button type="button" class="pf-c${isLive(x.k, x.id) ? (cardPaused() ? ' on paused' : ' on') : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}<span class="pf-cn">${esc(x.name)}</span><span class="pf-ck">${KIND_L[x.k]}</span></button><button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${esc(x.name)} »`, `Edit “${esc(x.name)}”`)}">${ic('pen', 16)}</button>${isLive(x.k, x.id) ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>` : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${esc(x.name)} »`, `Delete “${esc(x.name)}”`)}">${ic('trash', 16)}</button>`}</div>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
+          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x)).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p><p class="muted small pf-pnote">${ic('pause', 13)}${TT('Un visiteur qui a enregistré votre contact garde le lien de la création qu’il a vue ce jour-là. « Pause » sur une création : ce lien affiche « Temporairement indisponible ».', 'A visitor who saved your contact keeps the link of the creation they saw that day. “Pause” on a creation: that link shows “Temporarily unavailable”.')}</p></div>` : ''}
           ${pauseBox()}
           ${locked() || NOVER ? '' : `<div class="box no-rw ownbox">
             <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
@@ -2285,15 +2298,15 @@
       case 'pfpause': {
         const k = t.dataset.k, id = t.dataset.v, r = regSync(), key = `${k}:${id}`;
         r.paused = (r.paused || []).filter((z) => z !== key).concat([key]); regSet(r);
-        pfModal('manage'); render();
-        toast(TT('Version mise en pause : son lien affiche « Temporairement indisponible ».', 'Version paused: its link shows “Temporarily unavailable”.'));
+        if (t.closest('#modal')) pfModal('manage'); render();
+        toast(TT('Création mise en pause : les visiteurs qui ont gardé son lien voient « Temporairement indisponible ».', 'Creation paused: visitors who kept its link see “Temporarily unavailable”.'));
         break;
       }
       case 'pfresume': {
         const key = `${t.dataset.k}:${t.dataset.v}`, r = regSync();
         r.paused = (r.paused || []).filter((z) => z !== key); regSet(r);
-        pfModal('manage'); render();
-        toast(TT('Version reprise : son lien fonctionne de nouveau.', 'Version resumed: its link works again.'));
+        if (t.closest('#modal')) pfModal('manage'); render();
+        toast(TT('Création reprise : son lien fonctionne de nouveau.', 'Creation resumed: its link works again.'));
         break;
       }
       /* Crayon (Publication) : retour à l’éditeur sur cette version ; autre studio si c’est une version de l’autre type */
@@ -2332,7 +2345,7 @@
       }
       case 'pflive': {
         const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur;
-        const r = regSync(); r.live = { k, id }; delete r.cardPaused; regSet(r); P.live = k === KIND ? id : null; save(); render();
+        const r = regSync(); r.live = { k, id }; delete r.cardPaused; r.paused = (r.paused || []).filter((z) => z !== `${k}:${id}`); regSet(r); P.live = k === KIND ? id : null; save(); render();
         if (t.closest('#modal')) pfModal('manage');
         const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
         toast(TT(`Version active : « ${e2.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`, `Active version: “${e2.name || ''}”. Your card now shows it; same link, same QR code.`));
