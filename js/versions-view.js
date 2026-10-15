@@ -13,7 +13,7 @@
   const T = (fr, eng) => (en() ? eng : fr);
 
   function page(title, text, pause) {
-    return `<div class="vc vc-susp"><div class="vc-susp-in"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/>${pause ? '<path d="M10 15.5v-7M14 15.5v-7" stroke-width="2.6"/>' : '<path d="M12 8v4M12 16h.01"/>'}</svg><h1>${title}</h1><p>${text}</p></div></div>`;
+    return `<div class="vc vc-susp"><div class="vc-susp-in"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/>${pause ? '<rect x="8" y="7.5" width="3" height="9" rx=".8" fill="currentColor" stroke="none"/><rect x="13" y="7.5" width="3" height="9" rx=".8" fill="currentColor" stroke="none"/>' : '<path d="M12 8v4M12 16h.01"/>'}</svg><h1>${title}</h1><p>${text}</p></div></div>`;
   }
 
   /* kind : 'cards' ou 'stores' ; renvoie { redirect } | { page } | { id, key } */
