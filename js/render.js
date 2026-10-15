@@ -1089,6 +1089,12 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
   }
 
   function saveLead(lead) {
+    /* Création d'où vient le contact (carte de visite ou boutique) : posée par la page (VC.leadSrc), sinon la version active */
+    try {
+      const R = JSON.parse(localStorage.getItem('nextap-pages') || 'null');
+      const k = window.VC.leadSrc || (R && R.live && R.live.k ? `${R.live.k}:${R.live.id}` : '');
+      if (k && !lead.src) { const e = R && (R.list || []).find((x) => `${x.k}:${x.id}` === k); lead.src = k; lead.srcName = e ? e.name : ''; }
+    } catch (e) { /* registre indisponible */ }
     try {
       const a = JSON.parse(localStorage.getItem('nfc-leads') || '[]');
       a.unshift(lead);

@@ -555,6 +555,7 @@
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     if (S.step > maxStep()) S.step = maxStep();
     NFC.curDesign = S.design || ''; /* palettes propres à certains modèles (modèles noirs) */
+    VC.leadSrc = !NOVER && S.pf ? `${KIND}:${S.pf.cur}` : null; /* contact laissé depuis l'aperçu : vient de la création en cours */
     document.body.dataset.step = S.step; /* téléphone : le haut de l’écran se compacte selon l’étape */
     $('#steps').innerHTML = STEPS.map((t, i) => {
       const n = i + 1, m = maxStep();
@@ -2168,9 +2169,10 @@
   function leadsBox() {
     let leads = [];
     try { leads = JSON.parse(localStorage.getItem('nfc-leads') || '[]'); } catch (e) { /* stockage indisponible */ }
-    const rows = leads.slice(0, 5).map((l) => `<li><b>${esc([l.prenom, l.nom].filter(Boolean).join(' '))}</b>${l.entreprise ? ` · ${esc(l.entreprise)}` : ''}${l.rdv ? ` · RDV : ${esc(l.rdv)}` : ''}${l.fichiers && l.fichiers.length ? ` · ${l.fichiers.length} pièce${l.fichiers.length > 1 ? 's' : ''} jointe${l.fichiers.length > 1 ? 's' : ''}` : ''}<span>${esc([l.tel, l.email].filter(Boolean).join(' · '))}</span></li>`).join('');
+    const srcOf = (l) => { if (!l.src) return ''; const x = regAll().find((z) => `${z.k}:${z.id}` === l.src); const n = x ? x.name : l.srcName; return n ? `<small class="ld-src">${ic(l.src.startsWith('stores') ? 'bag' : 'userplus', 12)}${TT('via', 'via')} « ${esc(n)} »${x ? '' : TT(' (supprimée)', ' (deleted)')}</small>` : ''; };
+    const rows = leads.slice(0, 5).map((l, i) => `<li><button type="button" class="ld-del" data-act="leaddel" data-i="${i}" title="${TT('Supprimer ce contact', 'Delete this contact')}" aria-label="${TT('Supprimer ce contact', 'Delete this contact')}">${ic('trash', 14)}</button><b>${esc([l.prenom, l.nom].filter(Boolean).join(' '))}</b>${l.entreprise ? ` · ${esc(l.entreprise)}` : ''}${l.rdv ? ` · RDV : ${esc(l.rdv)}` : ''}${l.fichiers && l.fichiers.length ? ` · ${l.fichiers.length} pièce${l.fichiers.length > 1 ? 's' : ''} jointe${l.fichiers.length > 1 ? 's' : ''}` : ''}<span>${esc([l.tel, l.email].filter(Boolean).join(' · '))}</span>${srcOf(l)}</li>`).join('');
     return `<div class="box">
-      <span class="box-l">Contacts reçus${leads.length ? ` · ${leads.length}` : ''}</span>
+      <span class="box-l ld-head"><span>Contacts reçus${leads.length ? ` · ${leads.length}` : ''}</span>${leads.length ? `<button type="button" class="lnk ld-clr" data-act="leadclr">${TT('Tout effacer', 'Clear all')}</button>` : ''}</span>
       ${rows ? `<ul class="leads">${rows}</ul>` : '<p>Quand un visiteur enregistre votre contact, il peut vous laisser ses coordonnées. Testez-le : cliquez sur « Enregistrer » dans l’aperçu.</p>'}
     </div>`;
   }
@@ -2303,6 +2305,18 @@
         go(4);
         break;
       }
+      case 'leaddel': {
+        let L = []; try { L = JSON.parse(localStorage.getItem('nfc-leads') || '[]'); } catch (e) { L = []; }
+        L.splice(+t.dataset.i, 1);
+        try { localStorage.setItem('nfc-leads', JSON.stringify(L)); } catch (e) { /* rien */ }
+        render(); toast(TT('Contact supprimé.', 'Contact deleted.'));
+        break;
+      }
+      case 'leadclr':
+        if (!ask(TT('Effacer tous les contacts reçus ? Cette action est définitive.', 'Clear all received contacts? This cannot be undone.'))) break;
+        try { localStorage.removeItem('nfc-leads'); } catch (e) { /* rien */ }
+        render(); toast(TT('Contacts effacés.', 'Contacts cleared.'));
+        break;
       case 'cardpause':
         if (!ask(TT('Mettre votre carte en pause ?\n\nVos visiteurs verront « Carte temporairement indisponible » quand ils toucheront votre carte ou scanneront votre QR code. Toutes vos créations sont conservées et vous pourrez reprendre à tout moment.', 'Pause your card?\n\nVisitors will see “Card temporarily unavailable” when they tap your card or scan your QR code. All your creations are kept and you can resume anytime.'))) break;
         { const r = regSync(); r.cardPaused = true; regSet(r); }
