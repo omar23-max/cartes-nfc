@@ -568,7 +568,7 @@
     if (!nb) { nb = document.createElement('button'); nb.type = 'button'; nb.className = 'b sm newc'; nb.dataset.act = 'newc'; $('.reset').before(nb); }
     let mc = $('.mycre');
     if (!mc) { mc = document.createElement('button'); mc.type = 'button'; mc.className = 'b sm mycre'; mc.dataset.act = 'mycre'; nb.before(mc); }
-    mc.innerHTML = `${ic('copy', 16)}<span>${TT('Mes créations', 'My creations')}</span><em>${regAll().length}</em>`; mc.title = TT('Mes créations', 'My creations');
+    mc.innerHTML = `${ic('copy', 16)}<span>${TT('Mes créations', 'My creations')}</span><em>${regAll().length}/${pfMax()}</em>`; mc.title = TT('Mes créations', 'My creations');
     mc.hidden = NOVER || !regAll().length;
     /* Menu « Version active » : ce que voient les visiteurs quand ils touchent la carte */
     let hl = $('.hd-live');
