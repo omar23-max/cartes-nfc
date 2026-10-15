@@ -1293,7 +1293,7 @@
   /* Suppression : que verront les personnes qui ont gardé le lien de cette version ? */
   function pfDelModal(k, id) {
     const x = regAll().find((z) => z.k === k && z.id === id);
-    if (!x || isLive(k, id)) return;
+    if (!x || (isLive(k, id) && !cardPaused())) return;
     /* Jamais publiée (et pas en pause) : personne n'a pu garder son lien → simple confirmation */
     if (!x.pub && !isPaused(k, id)) {
       const typ = k === 'stores' ? TT('La boutique', 'The store') : TT('La carte', 'The card');
@@ -1334,7 +1334,7 @@
   }
   function pfDoDelete(k, id, gone) {
     const x = regAll().find((z) => z.k === k && z.id === id);
-    if (!x || isLive(k, id)) return;
+    if (!x || (isLive(k, id) && !cardPaused())) return;
     /* Ce que verra un ancien lien de cette version */
     const r0 = regSync();
     if (gone.mode !== 'none') r0.gone = Object.assign({}, r0.gone, { [`${k}:${id}`]: { mode: gone.mode, to: gone.to || '', date: new Date().toISOString() } });
@@ -1345,13 +1345,24 @@
       if (id === P.cur) {
         const other = P.list.find((z) => z.id !== id && z.data);
         /* Seule version de ce studio : le studio repart à zéro (choix du secteur / type) */
-        if (!other) { delete S.pf; pfApply({ palette: 0, cards: {} }); S.step = 1; save(); closeModal(); render(); toast(TT('Version supprimée.', 'Version deleted.')); return; }
+        if (!other) {
+          delete S.pf; pfApply({ palette: 0, cards: {} }); S.step = 1; save();
+          if (!regAll().length) { const r1 = regGet() || {}; delete r1.cardPaused; delete r1.live; r1.paused = []; regSet(r1); S.kindChosen = false; save(); closeModal(); render(); toast(TT('Toutes vos créations sont supprimées. Vous pouvez repartir de zéro.', 'All your creations are deleted. You can start from zero.')); return; }
+          render(); curModal(); toast(TT('Version supprimée.', 'Version deleted.')); return;
+        }
         pfApply(other.data); other.data = null; P.cur = other.id;
       }
       P.list = P.list.filter((z) => z.id !== id);
       save();
     } else pfDelOther(id);
-    render(); if (regAll().length) curModal(); else closeModal();
+    if (!regAll().length) {
+      const r1 = regGet() || {}; delete r1.cardPaused; delete r1.live; r1.paused = []; regSet(r1);
+      S.kindChosen = false; save();
+      render(); closeModal();
+      toast(TT('Toutes vos créations sont supprimées. Vous pouvez repartir de zéro.', 'All your creations are deleted. You can start from zero.'));
+      return;
+    }
+    render(); curModal();
     toast(TT(`Version « ${x.name} » supprimée.`, `“${x.name}” version deleted.`));
   }
   /* « Connecter mon téléphone » : QR code qui ouvre la carte en mode titulaire sur le téléphone
@@ -2193,7 +2204,7 @@
         : `<button type="button" class="pf-ed pf-pz" data-act="cardpause" title="${TT('Version active : mettre toute la carte en pause', 'Active version: pause the whole card')}" aria-label="${TT('Mettre ma carte en pause', 'Pause my card')}">${ic('pause', 21)}</button>`)
       : (pz ? `<button type="button" class="pf-ed pf-pz on" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : reprendre cette création', 'Paused: resume this creation')}" aria-label="${TT(`Reprendre « ${nm} »`, `Resume “${nm}”`)}">${ic('play', 19)}</button>`
         : `<button type="button" class="pf-ed pf-pz" data-act="pfpause" data-k="${x.k}" data-v="${x.id}" title="${TT('Mettre cette création en pause', 'Pause this creation')}" aria-label="${TT(`Mettre « ${nm} » en pause`, `Pause “${nm}”`)}">${ic('pause', 21)}</button>`);
-    const del = lv ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>`
+    const del = lv && !cp ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>`
       : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${nm} »`, `Delete “${nm}”`)}">${ic('trash', 16)}</button>`;
     const act = edit && !lv && !pz ? `<span class="pf-actv" role="button" tabindex="0" data-act="pflive" data-direct="1" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette création sur votre carte', 'Show this creation on your card')}">${ic('nfc', 12)}${TT('Activer', 'Activate')}</span>` : '';
     const cur = edit && me ? `<em class="pf-curt">${TT('En cours', 'Editing')}</em>` : '';
@@ -2402,7 +2413,19 @@
         break;
       }
       case 'pfdelyes': pfDoDelete(t.dataset.k || KIND, t.dataset.v, { mode: 'none' }); break;
-      case 'pfdelno': toast(TT('La version active ne peut pas être supprimée. Activez d’abord une autre version.', 'The active version cannot be deleted. Activate another version first.')); break;
+      case 'pfdelno': {
+        const lv = regAll().find((x) => isLive(x.k, x.id)) || {}, inCm = !!t.closest('.cm-md');
+        $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+          <div class="md no-rw" role="dialog" aria-modal="true" aria-labelledby="md-t">
+            <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+            <h2 id="md-t">${TT(`Supprimer « ${esc(lv.name || '')} » ?`, `Delete “${esc(lv.name || '')}”?`)}</h2>
+            <p>${TT(`« <b>${esc(lv.name || '')}</b> » est votre création <b>active</b> : c’est elle que voient vos visiteurs quand ils touchent votre carte. Pour la supprimer, rendez-la d’abord <b>inactive</b> en mettant votre carte en pause.`, `“<b>${esc(lv.name || '')}</b>” is your <b>active</b> creation: it’s what visitors see when they tap your card. To delete it, first make it <b>inactive</b> by pausing your card.`)}</p>
+            <p class="muted small">${TT('Ensuite, la corbeille de cette création fonctionnera. Vous pouvez supprimer toutes vos créations et revenir à zéro.', 'Then this creation’s trash button will work. You can delete all your creations and start from zero.')}</p>
+            <div class="btns"><button type="button" class="b pri" data-act="cardpause"${inCm ? ' data-cm="1"' : ''}>${ic('pause', 15)}${TT('La rendre inactive (mettre en pause)', 'Make it inactive (pause)')}</button><button type="button" class="b" data-act="${inCm ? 'cmback' : 'modal-close'}">${TT('Annuler', 'Cancel')}</button></div>
+          </div>`;
+        $('#modal').classList.add('on');
+        break;
+      }
       case 'pfpause': {
         const k = t.dataset.k, id = t.dataset.v, r = regSync(), key = `${k}:${id}`;
         r.paused = (r.paused || []).filter((z) => z !== key).concat([key]); regSet(r);
@@ -2443,7 +2466,7 @@
       case 'cardpause':
         if (!ask(TT('Mettre votre carte en pause ?\n\nVos visiteurs verront « Carte temporairement indisponible » quand ils toucheront votre carte ou scanneront votre QR code. Toutes vos créations sont conservées et vous pourrez reprendre à tout moment.', 'Pause your card?\n\nVisitors will see “Card temporarily unavailable” when they tap your card or scan your QR code. All your creations are kept and you can resume anytime.'))) break;
         { const r = regSync(); r.cardPaused = true; regSet(r); }
-        { const inCm = !!t.closest('.cm-md'); closeModal(); save(); render(); if (inCm) curModal(); }
+        { const inCm = !!t.closest('.cm-md') || t.dataset.cm === '1'; closeModal(); save(); render(); if (inCm) curModal(); }
         toast(TT('Carte en pause : vos visiteurs voient « Carte temporairement indisponible ».', 'Card paused: visitors see “Card temporarily unavailable”.'));
         break;
       case 'cardresume': {
