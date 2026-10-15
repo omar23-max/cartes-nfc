@@ -1191,6 +1191,31 @@
   }
   const regAll = () => (regGet() || {}).list || [];
   /* Activer une création : elle sort de pause ; si la carte était en pause, l'ancienne active reste en pause */
+  /* Création en pause qu'on touche (nom ou crayon) : la garder en pause pendant les modifications ? */
+  const pzOf = (k, id) => isPaused(k, id) || (isLive(k, id) && cardPaused());
+  function pzEditModal(k, id) {
+    const x = regAll().find((z) => z.k === k && z.id === id) || {}, une = k === 'stores' ? TT('une boutique', 'a store') : TT('une carte', 'a card');
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md no-rw pz-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+        <h2 id="md-t">${ic('pause', 20)}${TT(`« ${esc(x.name || '')} » est en pause`, `“${esc(x.name || '')}” is paused`)}</h2>
+        <p>${TT(`Vous allez modifier ${une} en pause.`, `You are about to edit ${une} that is paused.`)}</p>
+        <p><b>${TT('Voulez-vous la garder en pause pendant vos modifications ?', 'Do you want to keep it paused while you edit it?')}</b></p>
+        <div class="pz-ch">
+          <button type="button" class="nc-o" data-act="pzkeep" data-k="${k}" data-v="${id}"><span class="qa-ic">${ic('pause', 22)}</span><span><b>${TT('Oui, la garder en pause', 'Yes, keep it paused')}</b><small>${TT('Vous la modifiez ; vos visiteurs ne la voient toujours pas.', 'You edit it; your visitors still don’t see it.')}</small></span></button>
+          <button type="button" class="nc-o" data-act="pzout" data-k="${k}" data-v="${id}"><span class="qa-ic">${ic('play', 20)}</span><span><b>${TT('Non, la sortir de pause', 'No, take it out of pause')}</b><small>${isLive(k, id) ? TT('C’est votre version active : votre carte est remise en ligne et l’affiche. Puis vous la modifiez.', 'It is your active version: your card goes back online and shows it. Then you edit it.') : TT('Son lien fonctionne de nouveau (sans la rendre active). Puis vous la modifiez.', 'Its link works again (without making it active). Then you edit it.')}</small></span></button>
+        </div>
+        <div class="btns"><button type="button" class="b" data-act="curtag">${TT('Annuler', 'Cancel')}</button></div>
+      </div>`;
+    $('#modal').classList.add('on');
+  }
+  /* Ouvrir une création à l'étape Contenu (dans l'autre studio si c'est l'autre type) */
+  function editVer(k, id) {
+    closeModal();
+    if (k !== KIND) { goOther(id); return; }
+    if (S.pf && id !== S.pf.cur) pfSwitch(id);
+    go(4);
+  }
   /* Confirmation avant une remise en ligne (création en pause, ou carte en pause) */
   function liveOk(k, id) {
     const x = regAll().find((z) => z.k === k && z.id === id) || {}, n = x.name || '';
@@ -2346,6 +2371,15 @@
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
       case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;
+      case 'pzkeep': editVer(t.dataset.k, t.dataset.v); break;
+      case 'pzout': {
+        const k = t.dataset.k, id = t.dataset.v, r = regSync();
+        if (isLive(k, id)) delete r.cardPaused; else r.paused = (r.paused || []).filter((z) => z !== `${k}:${id}`);
+        regSet(r); save();
+        toast(isLive(k, id) ? TT('Carte de nouveau en ligne.', 'Card back online.') : TT('Création sortie de pause : son lien fonctionne de nouveau.', 'Creation out of pause: its link works again.'));
+        editVer(k, id);
+        break;
+      }
       case 'pfdelyes': pfDoDelete(t.dataset.k || KIND, t.dataset.v, { mode: 'none' }); break;
       case 'pfdelno': toast(TT('La version active ne peut pas être supprimée. Activez d’abord une autre version.', 'The active version cannot be deleted. Activate another version first.')); break;
       case 'pfpause': {
@@ -2366,6 +2400,7 @@
       case 'pffold': pfOpen = !pfOpen; render(); break;
       case 'pfedit': {
         const k = t.dataset.k || KIND, id = t.dataset.v;
+        if (pzOf(k, id)) { pzEditModal(k, id); break; }
         closeModal();
         if (k !== KIND) { goOther(id); break; }
         if (S.pf && id !== S.pf.cur) pfSwitch(id);
@@ -2400,6 +2435,7 @@
       case 'pflive': {
         const P = S.pf || {}, k = t.dataset.k || KIND, id = t.dataset.v || P.cur, inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal');
         if (isLive(k, id) && !cardPaused()) break; /* déjà la version active : rien à faire */
+        if (pzOf(k, id)) { pzEditModal(k, id); break; }
         if (!liveOk(k, id)) break;
         setLive(k, id); P.live = k === KIND ? id : null; save(); render();
         if (inCm) curModal(); else if (inM) pfModal('manage');

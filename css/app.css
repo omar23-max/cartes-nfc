@@ -1341,3 +1341,7 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 /* Repère dans un studio sans création : la création active (autre studio), en gris */
 .cur-tag.is-other { background: #f4f4f5; border-color: #d4d4d8; color: #3f3f46; }
 .cur-tag.is-other .ct-t { background: #e4e4e7; color: #52525b; }
+/* Fenêtre « création en pause » */
+.pz-md h2 { display: flex; align-items: center; gap: 8px; color: #9a3412; }
+.pz-md h2 svg { flex: none; color: #c2410c; }
+.pz-ch { display: grid; gap: 8px; margin: 12px 0 14px; }
