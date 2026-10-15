@@ -60,7 +60,8 @@
     if (bar.querySelector('select')) bar.querySelector('select').addEventListener('change', (e) => {
       const [k, ...rest] = e.target.value.split(':');
       const r = reg() || R;
-      r.live = { k, id: rest.join(':') }; delete r.cardPaused;
+      if (r.cardPaused && r.live && !(r.live.k === k && r.live.id === rest.join(':'))) { const old = `${r.live.k}:${r.live.id}`; if (!(r.paused || []).includes(old)) r.paused = (r.paused || []).concat([old]); }
+      r.live = { k, id: rest.join(':') }; delete r.cardPaused; r.paused = (r.paused || []).filter((z) => z !== `${k}:${rest.join(':')}`);
       try { localStorage.setItem('nextap-pages', JSON.stringify(r)); } catch (err) { /* rien */ }
       const other = kind === 'cards' ? 'stores/view.html' : '../view.html';
       location.replace((k === kind ? location.pathname : other) + '?owner=1');

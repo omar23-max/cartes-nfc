@@ -2345,7 +2345,10 @@
       }
       case 'pflive': {
         const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur;
-        const r = regSync(); r.live = { k, id }; delete r.cardPaused; r.paused = (r.paused || []).filter((z) => z !== `${k}:${id}`); regSet(r); P.live = k === KIND ? id : null; save(); render();
+        const r = regSync();
+        /* Carte en pause et on active une autre création : l'ancienne active reste en pause (son lien gardé par des visiteurs aussi) */
+        if (r.cardPaused && r.live && !(r.live.k === k && r.live.id === id)) { const old = `${r.live.k}:${r.live.id}`; if (!(r.paused || []).includes(old)) r.paused = (r.paused || []).concat([old]); }
+        r.live = { k, id }; delete r.cardPaused; r.paused = (r.paused || []).filter((z) => z !== `${k}:${id}`); regSet(r); P.live = k === KIND ? id : null; save(); render();
         if (t.closest('#modal')) pfModal('manage');
         const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
         toast(TT(`Version active : « ${e2.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`, `Active version: “${e2.name || ''}”. Your card now shows it; same link, same QR code.`));
