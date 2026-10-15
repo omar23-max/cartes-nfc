@@ -1310,3 +1310,6 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
   .pf-pub .pf-c .pf-cn { flex: 1 1 auto; }
   .pf-pub .pf-c .pf-ck { flex-basis: 100%; margin-left: 0; padding-left: 0; text-align: left; font-size: 11.5px; }
 }
+/* Explications pause */
+.cp-l { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 6px; color: #7c2d12; font-size: 13.5px; line-height: 1.45; }
+.card-pause.on .box-l { text-transform: none; letter-spacing: 0; font-size: 14px; }

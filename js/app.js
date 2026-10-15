@@ -2104,15 +2104,16 @@
   }
 
   /* ---------- Étape 5 : publication ---------- */
+  /* Explications sur la pause : seulement quand au moins une création (ou la carte) est en pause */
   function pauseBox() {
     if (NOVER || locked() || !regAll().length) return '';
-    if (cardPaused()) {
-      const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
-      return `<div class="box no-rw card-pause on"><span class="box-l">${ic('pause', 14)}${TT('Carte en pause', 'Card paused')}</span><p>${TT('Vos visiteurs voient « Carte temporairement indisponible » quand ils touchent votre carte ou scannent votre QR code. Toutes vos créations sont conservées.', 'Visitors see “Card temporarily unavailable” when they tap your card or scan your QR code. All your creations are kept.')}</p>
-        <button type="button" class="b pri sm" data-act="cardresume">${ic('nfc', 15)}${TT(`Reprendre avec « ${esc(lv.name || '')} »`, `Resume with “${esc(lv.name || '')}”`)}</button>${regAll().length > 1 ? `<p class="muted small">${TT('Ou choisissez une autre création ci-dessus : elle remet aussi votre carte en ligne.', 'Or choose another creation above: it also puts your card back online.')}</p>` : ''}</div>`;
-    }
-    return `<div class="box no-rw card-pause"><span class="box-l">${TT('Pause', 'Pause')}</span><p class="muted small">${TT('Vacances, fermeture, carte perdue… Mettez votre carte en pause : plus rien ne s’affiche, vos créations sont conservées.', 'Holidays, closure, lost card… Pause your card: nothing is shown, your creations are kept.')}</p>
-      <button type="button" class="b sm" data-act="cardpause">${ic('pause', 15)}${TT('Mettre ma carte en pause', 'Pause my card')}</button></div>`;
+    if (!cardPaused() && !((regGet() || {}).paused || []).length) return '';
+    return `<div class="box no-rw card-pause on"><span class="box-l">${ic('pause', 14)}${TT('Que se passe-t-il quand une création est en pause ?', 'What happens when a creation is paused?')}</span>
+      <ul class="cp-l">
+        <li>${TT('<b>Création en pause</b> : un visiteur qui a enregistré votre contact garde le lien de la création qu’il a vue ce jour-là. Ce lien affiche « Temporairement indisponible ».', '<b>Paused creation</b>: a visitor who saved your contact keeps the link of the creation they saw that day. That link shows “Temporarily unavailable”.')}</li>
+        <li>${TT('<b>Création active en pause</b> : c’est toute la carte qui est en pause. Quand on touche votre carte ou qu’on scanne votre QR code, on voit « Carte temporairement indisponible ».', '<b>Active creation paused</b>: the whole card is paused. Tapping your card or scanning your QR code shows “Card temporarily unavailable”.')}</li>
+        <li>${TT('Vos créations sont conservées. Touchez ▶ pour reprendre une création, ou touchez son nom pour la rendre active : elle sort de pause.', 'Your creations are kept. Tap ▶ to resume a creation, or tap its name to make it active: it leaves pause.')}</li>
+      </ul></div>`;
   }
   /* Création enregistrée mais pas en ligne : on le dit, et on propose de la rendre active */
   function pubOffBox() {
@@ -2134,7 +2135,7 @@
         : `<button type="button" class="pf-ed pf-pz" data-act="pfpause" data-k="${x.k}" data-v="${x.id}" title="${TT('Mettre cette création en pause', 'Pause this creation')}" aria-label="${TT(`Mettre « ${nm} » en pause`, `Pause “${nm}”`)}">${ic('pause', 21)}</button>`);
     const del = lv ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>`
       : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${nm} »`, `Delete “${nm}”`)}">${ic('trash', 16)}</button>`;
-    return `<div class="pf-pr"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${lv ? ic('nfc', 13) : pz ? ic('pause', 13) : ''}<span class="pf-cn">${nm}</span>${pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''}<span class="pf-ck">${KIND_L[x.k]}</span></button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
+    return `<div class="pf-pr"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}<span class="pf-cn">${nm}</span>${pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''}<span class="pf-ck">${KIND_L[x.k]}</span></button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
   }
   function step5() {
     return `<section class="wrap">
@@ -2157,7 +2158,7 @@
             </div>
             ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
-          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x)).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p><p class="muted small pf-pnote">${ic('pause', 13)}${TT('Un visiteur qui a enregistré votre contact garde le lien de la création qu’il a vue ce jour-là. « Pause » sur une création : ce lien affiche « Temporairement indisponible ».', 'A visitor who saved your contact keeps the link of the creation they saw that day. “Pause” on a creation: that link shows “Temporarily unavailable”.')}</p></div>` : ''}
+          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x)).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
           ${pauseBox()}
           ${locked() || NOVER ? '' : `<div class="box no-rw ownbox">
             <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
