@@ -331,7 +331,7 @@
   function go(n) {
     const pub = n === 5 && S.step !== 5;
     S.step = Math.max(1, Math.min(n, maxStep()));
-    if (pub && S.step === 5) { if (NOVER) S.pub = true; else { const P = pfInit(), e = P.list.find((x) => x.id === P.cur); if (e) e.pub = true; } pfPublishCur(); }
+    if (pub && S.step === 5) { if (NOVER) S.pub = true; else { const P = pfInit(), e = P.list.find((x) => x.id === P.cur); if (e) e.pub = true; } }
     save(); render(); window.scrollTo(0, 0);
   }
 
@@ -654,7 +654,8 @@
   const phone = () => `<div class="phone live"><div class="phone-screen" id="pv" data-vc-scroll>${VC.render(mdl())}</div></div>`;
   /* Publication : l’aperçu montre toujours la version active (celle que la carte ouvre), même si on en modifie une autre ou si c’est une boutique */
   const pubPhone = () => {
-    if (regAll().length < 2) return phone();
+    if (regAll().length < 2 || NOVER) return phone();
+    { const P = pfInit(); if (!isLive(KIND, P.cur)) return `${phone()}<p class="pv-hint no-rw">${TT('Aperçu de', 'Preview of')} <b>${esc(pfName(P.cur))}</b> · ${TT('pas en ligne', 'not live')}</p>`; }
     const l = regLive(), x = regAll().find((z) => z.k === l.k && z.id === l.id);
     return `<div class="phone live"><div class="phone-screen pv-frame"><iframe src="view.html?pv=${Date.now()}" onload="try{const d=this.contentDocument,st=d.createElement('style');st.textContent='html{scrollbar-width:none}html::-webkit-scrollbar{display:none}';d.head.appendChild(st)}catch(e){}" title="${TT('Aperçu de la version active', 'Active version preview')}"></iframe></div></div>${x ? `<p class="pv-hint no-rw">${TT('Aperçu de la version active', 'Active version preview')} : <b>${verLabel(x)}</b></p>` : ''}`;
   };
@@ -2083,6 +2084,15 @@
   }
 
   /* ---------- Étape 5 : publication ---------- */
+  /* Création enregistrée mais pas en ligne : on le dit, et on propose de la rendre active */
+  function pubOffBox() {
+    if (NOVER || regAll().length < 2) return '';
+    const P = pfInit();
+    if (isLive(KIND, P.cur)) return '';
+    const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
+    return `<div class="box no-rw pub-off"><p>${ic('check', 15)}<span>${TT(`<b>« ${esc(pfName(P.cur))} » est enregistrée</b>, mais elle n’est pas en ligne : vos visiteurs voient toujours « ${esc(lv.name || '')} ».`, `<b>“${esc(pfName(P.cur))}” is saved</b>, but it is not live: your visitors still see “${esc(lv.name || '')}”.`)}</span></p>
+      <button type="button" class="b pri sm" data-act="pflive" data-k="${KIND}" data-v="${P.cur}">${ic('nfc', 15)}${TT(`Rendre « ${esc(pfName(P.cur))} » active`, `Make “${esc(pfName(P.cur))}” active`)}</button></div>`;
+  }
   function step5() {
     return `<section class="wrap">
       <div class="split s5">
@@ -2091,6 +2101,7 @@
       ${head('Votre carte est prête', hasQR()
         ? 'Elle est reliée au lien et au QR code déjà imprimés sur votre carte NFC : scannez-les, votre nouvelle carte s’affiche.'
         : 'Voici le lien permanent de votre carte. C’est lui qui est programmé dans votre carte NFC et encodé dans votre QR code.')}
+          ${pubOffBox()}
           ${locked() ? orderBox() : ''}${isEvents ? rsvpBox() : ''}
           <div class="box lqbox qrbox${locked() ? ' locked' : ''}">
             <span class="box-l">${hasQR() ? 'Votre lien et votre QR code · déjà imprimés' : 'Votre lien et votre QR code'}</span>

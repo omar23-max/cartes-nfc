@@ -1275,3 +1275,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .sg-md .sg-sec { text-align: center; margin: 0 0 14px; color: var(--mut); font-size: 14px; }
 .sg-md .sg-sec b { color: var(--ink); }
 .sg-md .sg-q { margin: 0 0 10px; font-weight: 700; font-size: 15px; }
+/* Publication : création enregistrée mais pas en ligne */
+.pub-off { background: #fffbeb; border-color: #fcd9a1; }
+.pub-off p { display: flex; gap: 8px; align-items: flex-start; margin: 0 0 10px; color: #7a4a00; font-size: 14px; }
+.pub-off p svg { flex: none; margin-top: 2px; }
