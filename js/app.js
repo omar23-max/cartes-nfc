@@ -576,8 +576,13 @@
     { const all = regAll(), lv = regLive(), cp = cardPaused();
       hl.hidden = NOVER || !all.length;
       hl.classList.toggle('pz', cp);
-      if (all.length) hl.innerHTML = `<span class="hd-ll">${ic(cp ? 'pause' : 'nfc', 14)}<span class="hd-lg">${cp ? TT('Version active (carte en pause)', 'Active version (card paused)') : TT('Version active', 'Active version')}</span><span class="hd-sh">${cp ? TT('En pause', 'Paused') : TT('Active', 'Active')}</span>&nbsp;:</span>
-        <span class="hd-sw"><select data-pflivesel aria-label="${TT('Version active de la carte : ce que voient vos visiteurs', 'Card’s active version: what your visitors see')}">${all.map((x) => `<option value="${x.k}:${x.id}" ${x.k === lv.k && x.id === lv.id ? 'selected' : ''}>${esc(x.name)} · ${KIND_L[x.k]}${isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : ''}</option>`).join('')}</select>${ic('chevd', 14)}</span>`; }
+      const opts = (sel) => all.map((x) => `<option value="${x.k}:${x.id}" ${x.k === lv.k && x.id === lv.id ? 'selected' : ''}>${esc(x.name)} · ${KIND_L[x.k]}${isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : ''}</option>`).join('');
+      /* Carte en pause : aucune création n'est visible → « Aucune création activée » + menu + bouton « Activer » */
+      if (all.length && cp) hl.innerHTML = `<span class="hd-ll">${ic('pause', 14)}${TT('Aucune création activée', 'No creation active')}</span>
+        <span class="hd-sw"><select data-hdpick aria-label="${TT('Création à activer', 'Creation to activate')}">${opts()}</select>${ic('chevd', 14)}</span>
+        <button type="button" class="hd-act" data-act="hdact">${ic('nfc', 13)}${TT('Activer', 'Activate')}</button>`;
+      else if (all.length) hl.innerHTML = `<span class="hd-ll">${ic('nfc', 14)}<span class="hd-lg">${TT('Version active', 'Active version')}</span><span class="hd-sh">${TT('Active', 'Active')}</span>&nbsp;:</span>
+        <span class="hd-sw"><select data-pflivesel aria-label="${TT('Version active de la carte : ce que voient vos visiteurs', 'Card’s active version: what your visitors see')}">${opts()}</select>${ic('chevd', 14)}</span>`; }
     nb.classList.add('newc2');
     nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`;
     nb.hidden = !(S.sectorId || regAll().length);
@@ -2667,6 +2672,14 @@
       case 'newc': newPick = ''; newModal(); break;
       case 'curtag': curModal('edit'); break;
       case 'mycre': curModal('list'); break;
+      case 'hdact': {
+        const v = ($('[data-hdpick]') || {}).value || ''; const [k, ...rest] = v.split(':'), id = rest.join(':');
+        if (!k || !id || !liveOk(k, id)) break;
+        setLive(k, id); save(); render();
+        const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
+        toast(TT(`« ${e2.name || ''} » est maintenant active : votre carte est de nouveau en ligne.`, `“${e2.name || ''}” is now active: your card is back online.`));
+        break;
+      }
       case 'cmback': curModal(); break;
       case 'newpick': newPick = t.dataset.v; newModal(); break;
       case 'reset':

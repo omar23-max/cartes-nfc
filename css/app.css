@@ -1389,3 +1389,6 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .pf-bar-min .pf-owns { display: inline-flex; flex-wrap: wrap; gap: 6px 18px; }
 .pf-bar-min .pf-own { display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); cursor: pointer; }
 .pf-bar-min .pf-own:hover { text-decoration: underline; }
+/* En-tête pendant la pause : « Aucune création activée » + menu + Activer */
+.hd-live .hd-act { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border: 0; border-radius: 99px; background: #16a34a; color: #fff; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.hd-live .hd-act:hover { background: #15803d; }
