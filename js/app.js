@@ -331,7 +331,7 @@
   function go(n) {
     const pub = n === 5 && S.step !== 5;
     S.step = Math.max(1, Math.min(n, maxStep()));
-    if (pub && S.step === 5) pfPublishCur();
+    if (pub && S.step === 5) { if (NOVER) S.pub = true; else { const P = pfInit(), e = P.list.find((x) => x.id === P.cur); if (e) e.pub = true; } pfPublishCur(); }
     save(); render(); window.scrollTo(0, 0);
   }
 
@@ -567,6 +567,10 @@
     if (!nb) { nb = document.createElement('button'); nb.type = 'button'; nb.className = 'b sm newc'; nb.dataset.act = 'newc'; $('.reset').before(nb); }
     nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`;
     nb.hidden = !(S.sectorId || regAll().length);
+    let ct = $('.cur-tag');
+    if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; $('.top .brand').after(ct); }
+    const tg = curTag();
+    ct.hidden = !tg; if (tg) { ct.className = `cur-tag no-rw ${tg.cls}`; ct.innerHTML = tg.html; ct.title = tg.title; }
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
     document.documentElement.lang = ui();
     document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : 'NexTap Studio';
@@ -1033,9 +1037,42 @@
   }
 
   /* ---------- Étape 2 : modèle ---------- */
-  /* Étapes Modèle et Couleurs : quelle création on modifie, active ou non (seulement à partir de 2 créations) */
+  /* Repère de l'en-tête (tous les studios, toutes les étapes) :
+     « Nouvelle carte : <nom> » tant que la création n'a jamais été publiée, puis « Vous modifiez : <nom> · Active / Inactive » */
+  function curTag() {
+    if (!S.kindChosen && !S.sectorId && !S.pf && !S.vname) return null; /* tout début : rien encore à nommer */
+    const NEW = { cards: TT('Nouvelle carte', 'New card'), stores: TT('Nouvelle boutique', 'New store'), events: TT('Nouvel événement', 'New event') }[KIND];
+    let name, pub, live;
+    if (NOVER) { name = S.vname || TT('Événement principal', 'Main event'); pub = !!S.pub; live = true; }
+    else {
+      const P = pfInit(), e = P.list.find((x) => x.id === P.cur) || {};
+      name = e.name || ''; live = isLive(KIND, P.cur);
+      pub = !!e.pub || (live && !!(paidOf() || hasQR()));
+    }
+    if (!name) return null;
+    if (!pub) return { cls: 'is-new', title: TT('Création pas encore publiée. Touchez pour voir vos créations.', 'Not published yet. Tap to see your creations.'), html: `${ic('plus', 14)}<span class="ct-l">${NEW}&nbsp;:</span><b>${esc(name)}</b>` };
+    if (NOVER) return { cls: 'is-live', title: '', html: `${ic('pen', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b>` };
+    return { cls: live ? 'is-live' : 'is-off', title: live ? TT('Version active : vos visiteurs voient ces changements. Touchez pour voir vos créations.', 'Active version: your visitors see these changes. Tap to see your creations.') : TT('Pas en ligne : vos visiteurs ne voient pas ces changements. Touchez pour voir vos créations.', 'Not live: your visitors do not see these changes. Tap to see your creations.'),
+      html: `${ic('pen', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b><em class="ct-t">${live ? TT('Active', 'Active') : TT('Inactive', 'Inactive')}</em>` };
+  }
+  /* Clic sur le repère : mes créations, pour passer à une autre ou en créer une */
+  function curModal() {
+    if (NOVER) return;
+    const P = pfInit(), all = regAll();
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md no-rw sg-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+        <h2 id="md-t">${TT('Mes créations', 'My creations')}</h2>
+        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). Touchez une création pour la modifier.`, `All on the same NFC card (${all.length} of ${pfMax()}). Tap a creation to edit it.`)}</p>
+        <div class="sg-ol">${all.map((x) => { const me = x.k === KIND && x.id === P.cur, lv = isLive(x.k, x.id);
+          return `<button type="button" class="sg-o${me ? ' me' : ''}" ${me ? 'data-act="modal-close"' : `data-act="${x.k === KIND ? 'sgsw' : 'pfother'}" data-v="${x.id}"`}><span><b>${esc(x.name)}</b><small>${KIND_L[x.k]}${lv ? TT(' · Active', ' · Active') : isPaused(x.k, x.id) ? TT(' · en pause', ' · paused') : ''}${me ? TT(' · en cours de modification', ' · being edited') : ''}</small></span>${me ? ic('check', 15) : ic(x.k === KIND ? 'pen' : 'arrowur', 15)}</button>`; }).join('')}</div>
+        <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="pfmanage">${TT('Gérer les versions', 'Manage versions')}</button></div>
+      </div>`;
+    $('#modal').classList.add('on');
+  }
+  /* (remplacé par le repère de l'en-tête) */
   function editLine() {
-    if (NOVER || regAll().length < 2) return '';
+    if (true) return '';
     const P = pfInit(), x = regAll().find((z) => z.k === KIND && z.id === P.cur);
     if (!x) return '';
     const on = isLive(KIND, P.cur);
@@ -1275,9 +1312,12 @@
     const all = KIND === 'events' ? [] : regAll(), full = KIND !== 'events' && all.length >= pfMax();
     const root = isStores || isEvents ? '../' : '';
     const o = (k, icon, t, d) => `<button type="button" class="nc-o${newPick === k ? ' sel' : ''}" data-act="newpick" data-v="${k}"><span class="qa-ic">${ic(icon, 22)}</span><span><b>${t}</b><small>${d}</small></span></button>`;
-    const DEF = { cards: TT('Nouvelle carte', 'New card'), stores: TT('Nouvelle boutique', 'New store'), events: TT('Nouvel événement', 'New event') };
-    let def = DEF[newPick] || '';
-    for (let i = 2; def && pfTaken(def); i++) def = `${DEF[newPick]} ${i}`;
+    /* Nom proposé : « Carte 2 », « Boutique 2 »… (numéro suivant libre) */
+    const DEF = { cards: TT('Carte', 'Card'), stores: TT('Boutique', 'Store'), events: TT('Événement', 'Event') };
+    let def = '';
+    const curN = (all.find((x) => x.k === KIND && x.id === pfInit().cur) || {}).name || '';
+    if (newPick === 'copy') { const b0 = TT(`Copie de ${curN}`, `Copy of ${curN}`).slice(0, 24); def = b0; for (let i = 2; pfTaken(def); i++) def = `${b0.slice(0, 21)} ${i}`; }
+    if (DEF[newPick]) { for (let i = all.filter((x) => x.k === newPick).length + 1; ; i++) { def = `${DEF[newPick]} ${i}`; if (!pfTaken(def)) break; } }
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
       <div class="md no-rw nc-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
@@ -1288,6 +1328,7 @@
           ${o('cards', 'userplus', TT('Une carte de visite', 'A business card'), TT('Coordonnées, réseaux, services, rendez-vous', 'Contact details, socials, services, booking'))}
           ${o('stores', 'bag', TT('Une boutique', 'A store'), TT('Produits ou menu, commandes', 'Products or menu, orders'))}
           ${o('events', 'cal', TT('Un événement ou une invitation', 'An event or invitation'), TT('Enveloppe animée, compte à rebours, RSVP', 'Animated envelope, countdown, RSVP'))}
+          ${KIND !== 'events' && S.sectorId && curN ? o('copy', 'copy', TT(`Une copie de « ${esc(curN)} »`, `A copy of “${esc(curN)}”`), TT('Même contenu, même modèle et mêmes couleurs, à modifier librement', 'Same content, template and colors, to edit freely')) : ''}
         </div>
         ${newPick ? `<form data-ncf>
           ${full && newPick !== 'events' ? `<p class="pf-err" role="alert">${TT(`Vous utilisez déjà vos ${pfMax()} créations. Supprimez-en une dans « Versions » pour en ajouter une autre.`, `You already use your ${pfMax()} creations. Delete one in “Versions” to add another.`)}</p>` : `<label class="f"><span class="f-l">${TT('Nom (pour vous seulement)', 'Name (only for you)')}</span><input name="n" maxlength="24" placeholder="${esc(def)}" autocomplete="off"></label>`}
@@ -1303,6 +1344,15 @@
       const name = ((inp && inp.value.trim()) || def).slice(0, 24);
       if (newPick === 'events') { save(); location.href = `${isEvents ? '' : root + 'events/'}index.html?start=1&ui=${ui()}&vname=${encodeURIComponent(name)}`; return; }
       if (pfTaken(name)) { pfErr(f, TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`)); if (inp) inp.focus(); return; }
+      if (newPick === 'copy') {
+        const P = pfInit(), curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
+        curE.data = pfSnap();
+        P.list.push({ id, name, data: null, named: true }); P.cur = id;
+        newPick = ''; closeModal(); save(); render();
+        const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
+        toast(TT(`« ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${lv.name || ''} ».`, `“${name}” created (copy). Edit it freely: your card still shows “${lv.name || ''}”.`));
+        return;
+      }
       if (newPick !== KIND) { save(); location.href = `${{ cards: root + 'index.html', stores: root + 'stores/index.html' }[newPick]}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
       pfNewFresh(name); newPick = ''; closeModal(); save(); render(); window.scrollTo(0, 0);
       toast(TT(`« ${name} » créée, sur la même carte NFC : rien à repayer. Choisissez maintenant ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `“${name}” created on the same NFC card: nothing to pay again. Now choose ${isStores ? 'the store type' : 'your industry'}.`));
@@ -1312,6 +1362,7 @@
   let pfOpen = false;
   function pfBar() {
     /* Invitations : pas de versions, mais on rappelle ce qu’on modifie (nom choisi au départ) */
+    if (NOVER) return ''; /* invitations : le repère de l'en-tête suffit */
     if (NOVER) return `<div class="pf-bar pf-ev no-rw"><span class="pf-l">${ic('pen', 15)}${TT('Vous modifiez&nbsp;:', 'You are editing:')}</span><b class="pf-ev-n">${esc(S.vname || TT('Événement principal', 'Main event'))}</b></div>`;
     const all = regAll(), n = all.length, P = pfInit(), live = regLive(), same = live.k === KIND && live.id === P.cur;
     if (n < 1) return '';
@@ -1321,7 +1372,6 @@
     const sum = pfOpen ? `<button type="button" class="pf-sum pf-sum-x" data-act="pffold" aria-expanded="true"><span class="pf-sum-t"><b>${TT('Versions', 'Versions')}</b></span><span class="pf-sum-c">${TT('Replier', 'Collapse')} ${ic('chevd', 15)}</span></button>`
       /* Replié (téléphone) : deux lignes explicites — la version modifiée, puis la version en ligne */
       : `<button type="button" class="pf-sum pf-sum2${same ? '' : ' warn'}" data-act="pffold" aria-expanded="false"><span class="pf-sum-t">
-        <span class="pf-sum-r"><span class="pf-sum-l">${ic('pen', 13)}${TT('Vous modifiez', 'Editing')}</span><b>${esc(curE.name || '')}</b>${same ? `<em class="pf-tag on">${TT('Active', 'Active')}</em>` : `<em class="pf-tag off">${TT('Inactive', 'Inactive')}</em>`}</span>
         <span class="pf-sum-r">${same ? `<small class="pf-sum-ok">${ic('nfc', 13)}${TT('C’est elle que voient vos visiteurs', 'This is what your visitors see')}</small>` : `<span class="pf-sum-l pf-sum-lv">${ic('nfc', 13)}${TT('En ligne', 'Live')}</span><b class="pf-sum-live">${esc(liveE.name || '')}</b><em class="pf-tag on">${TT('Active', 'Active')}</em>`}</span>
       </span><span class="pf-sum-c">${TT('Versions', 'Versions')} <em>${n}/${pfMax()}</em>${ic('chevd', 15)}</span></button>`;
     return `<div class="pf-bar no-rw${pfOpen ? ' open' : ''}">${sum}
@@ -1330,7 +1380,7 @@
       <label class="pf-sel pf-sel-cur ${same ? 'is-live' : 'is-off'}"><span class="pf-l">${ic('pen', 15)}${TT('Vous modifiez&nbsp;:', 'You are editing:')}</span>
         <span class="pf-sw">${pfVal(all.find((x) => x.k === KIND && x.id === P.cur))}<select data-pfsel aria-label="${TT('Version de la carte en cours de modification', 'Version being edited')}">${all.map((x) => `<option value="${x.k === KIND ? '' : 'x:'}${x.id}" ${x.k === KIND && x.id === P.cur ? 'selected' : ''}>${verLabel(x)}${isLive(x.k, x.id) ? TT(' — Active', ' — Active') : isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : ''}</option>`).join('')}</select>${ic('chevd', 15)}</span></label>
       <button type="button" class="pf-vers" data-act="pfmanage" title="${TT('Voir, renommer ou supprimer vos versions', 'See, rename or delete your versions')}">${ic('copy', 15)}Versions <em>${n} / ${pfMax()}</em></button>
-      <button type="button" class="pf-add" data-act="pfadd">${ic('plus', 14)}${TT('Nouvelle version', 'New version')}</button>
+      <button type="button" class="pf-add" data-act="newc">${ic('plus', 14)}${TT('Nouvelle création', 'New creation')}</button>
       <div class="pf-st${same ? '' : ' warn'}">${ic('nfc', 14)}${same
         ? `<span>${TT('Vous modifiez la version active de votre carte.', 'You are editing your card’s active version.')}</span>`
         : `<span>${TT(`La version active de votre carte est « <b>${esc(liveE.name || '')}</b> »${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, pas celle que vous modifiez.`, `Your card’s active version is “<b>${esc(liveE.name || '')}</b>”${liveE.k && liveE.k !== KIND ? ` (${KIND_L[liveE.k].toLowerCase()})` : ''}, not the one you are editing.`)}</span>`}${locked() ? '' : `<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span>`}</div>
@@ -1350,7 +1400,7 @@
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
       <div class="md no-rw" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="Fermer">${ic('x')}</button>
-        ${mode === 'add' ? `<h2 id="md-t">${all.length < 2 ? TT('Versions de ma carte', 'My card’s versions') : TT('Nouvelle version', 'New version')}</h2>
+        ${mode === 'add' ? `<h2 id="md-t">${all.length < 2 ? TT('Versions de ma carte', 'My card’s versions') : TT('Nouvelle création', 'New creation')}</h2>
           <p>${TT('Une <b>version</b> est une autre présentation de <b>la même carte</b> : une pour un salon, une pour l’été, une boutique pour les fêtes… Votre carte garde le même lien et le même QR code ; vous choisissez la version qu’elle affiche, quand vous voulez.', 'A <b>version</b> is another presentation of <b>the same card</b>: one for a trade show, one for summer, a store for the holidays… Your card keeps the same link and QR code; you choose which version it shows, whenever you like.')}</p>
           <form data-pff>
             <div class="f"><span class="f-l">${TT('Type de version', 'Version type')}</span><div class="pf-kind">
@@ -1365,7 +1415,7 @@
           <form data-pfm>${all.map((x) => x.k === KIND
             ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('Active', 'Active')}</span>` : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`
             : `<div class="pf-row"><button type="button" class="pf-o" data-act="pfother" data-v="${x.id}" title="${TT('Ouvrir cette version dans l’autre studio', 'Open this version in the other studio')}"><span>${esc(x.name)}</span>${ic('arrowur', 14)}</button><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('Active', 'Active')}</span>` : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`).join('')}
-          <div class="btns pf-mbtns"><button type="submit" class="b pri">${TT('Enregistrer', 'Save')}</button><button type="button" class="b" data-act="pfadd">${ic('plus', 14)}${TT('Nouvelle version', 'New version')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div></form>`}
+          <div class="btns pf-mbtns"><button type="submit" class="b pri">${TT('Enregistrer', 'Save')}</button><button type="button" class="b" data-act="newc">${ic('plus', 14)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div></form>`}
       </div>`;
     $('#modal').classList.add('on');
     const f = $('[data-pff]') || $('[data-pfm]');
@@ -1403,7 +1453,7 @@
       }
       if (ver && S.sectorId && S.design) S.step = 4;
       if (nv && (S.sectorId || S.pf) && regAll().length >= pfMax()) toast(TT(`Votre forfait permet ${pfMax()} créations par carte NFC. Supprimez-en une pour en ajouter.`, `Your plan allows ${pfMax()} creations per NFC card. Delete one to add more.`));
-      else if (nv) { pfNewFresh(nv.slice(0, 24)); toast(TT(`Nouvelle version « ${nv.slice(0, 24)} » : choisissez ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `New version “${nv.slice(0, 24)}”: choose ${isStores ? 'the store type' : 'your industry'}.`)); }
+      else if (nv) { pfNewFresh(nv.slice(0, 24)); toast(TT(`Nouvelle création « ${nv.slice(0, 24)} » : choisissez ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `New version “${nv.slice(0, 24)}”: choose ${isStores ? 'the store type' : 'your industry'}.`)); }
       if (ver || nv) { save(); history.replaceState(null, '', location.pathname); }
     } catch (e) { /* rien */ }
   }
@@ -2051,7 +2101,7 @@
             </div>
             ${locked() ? '' : `<div class="qr-dl"><button class="b xs" data-act="copy">${ic('copy', 14)}Copier</button>${qrDl()}</div>`}
           </div>
-          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => `<div class="pf-pr"><button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}${verLabel(x)}</button><button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${esc(x.name)} »`, `Edit “${esc(x.name)}”`)}">${ic('pen', 16)}</button></div>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
+          ${regAll().length > 1 ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().filter((x) => !isPaused(x.k, x.id)).sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => `<div class="pf-pr"><button type="button" class="pf-c${isLive(x.k, x.id) ? ' on' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${isLive(x.k, x.id) ? ic('nfc', 13) : ''}<span class="pf-cn">${esc(x.name)}</span><span class="pf-ck">${KIND_L[x.k]}</span></button><button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${esc(x.name)} »`, `Edit “${esc(x.name)}”`)}">${ic('pen', 16)}</button>${isLive(x.k, x.id) ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>` : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${esc(x.name)} »`, `Delete “${esc(x.name)}”`)}">${ic('trash', 16)}</button>`}</div>`).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
           ${locked() || NOVER ? '' : `<div class="box no-rw ownbox">
             <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
             <p class="muted small">${TT('Ouvrez-la en mode titulaire et mettez-la sur votre écran d’accueil.', 'Open it in owner mode and add it to your home screen.')}</p>
@@ -2200,6 +2250,7 @@
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
       case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;
+      case 'pfdelno': toast(TT('La version active ne peut pas être supprimée. Activez d’abord une autre version.', 'The active version cannot be deleted. Activate another version first.')); break;
       case 'pfpause': {
         const k = t.dataset.k, id = t.dataset.v, r = regSync(), key = `${k}:${id}`;
         r.paused = (r.paused || []).filter((z) => z !== key).concat([key]); regSet(r);
@@ -2440,6 +2491,7 @@
       case 'json': exportJSON(); break;
       case 'full': openFull(); break;
       case 'newc': newPick = ''; newModal(); break;
+      case 'curtag': curModal(); break;
       case 'newpick': newPick = t.dataset.v; newModal(); break;
       case 'reset':
         if (ask(TT('Tout recommencer dans ce studio ? Les créations de ce studio seront effacées. Votre lien, votre QR code et votre paiement sont conservés.', 'Start over in this studio? This studio’s creations will be erased. Your link, QR code and payment are kept.'))) {

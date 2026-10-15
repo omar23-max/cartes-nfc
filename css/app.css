@@ -1013,7 +1013,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 @media (max-width: 420px) { .ownbox .own2 { grid-template-columns: 1fr; } }
 .pf-own.lk { opacity: .6; }
 /* Publication : crayon à droite de chaque version (modifier) */
-.pf-pub .pf-pr { display: grid; grid-template-columns: minmax(0, 1fr) 44px; gap: 6px; }
+.pf-pub .pf-pr { display: grid; grid-template-columns: minmax(0, 1fr) 44px 44px; gap: 6px; }
 .pf-pub .pf-pr .pf-c { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; }
 .pf-pub .pf-ed { display: inline-flex; align-items: center; justify-content: center; height: 100%; min-height: 40px; border: 1px solid var(--line2); border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; }
 .pf-pub .pf-ed:hover { border-color: var(--ink); }
@@ -1234,3 +1234,39 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .ed-line .pf-tag { padding: 2px 8px; border-radius: 99px; font-size: 11.5px; font-weight: 700; font-style: normal; }
 .ed-line .pf-tag.on { background: #dcfce7; color: #166534; }
 .ed-line .pf-tag.off { background: #fee2e2; color: #b91c1c; }
+/* Corbeille dans « Version active de votre carte » */
+.pf-pub .pf-tr:hover { border-color: #b91c1c; color: #b91c1c; }
+.pf-pub .pf-tr.is-off { opacity: .35; cursor: not-allowed; }
+.pf-pub .pf-tr.is-off:hover { border-color: var(--line2); color: var(--ink); }
+/* Repère de l'en-tête : nouvelle création (bleu) / vous modifiez · active (vert) / inactive (rouge) */
+.cur-tag { display: inline-flex; align-items: center; gap: 6px; min-width: 0; max-width: 340px; padding: 6px 12px; border-radius: 99px; border: 1px solid; font: inherit; font-size: 13px; cursor: pointer; white-space: nowrap; }
+.cur-tag[hidden] { display: none; }
+.cur-tag svg { flex: none; }
+.cur-tag b { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 700; }
+.cur-tag .ct-t { flex: none; padding: 1px 7px; border-radius: 99px; font-size: 11px; font-weight: 700; font-style: normal; }
+.cur-tag.is-new { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+.cur-tag.is-live { background: #ecfdf3; border-color: #a6e9c1; color: #065f46; }
+.cur-tag.is-live .ct-t { background: #dcfce7; color: #166534; }
+.cur-tag.is-off { background: #fef3f2; border-color: #f7c1bb; color: #912018; }
+.cur-tag.is-off .ct-t { background: #fee2e2; color: #b91c1c; }
+.cur-tag:hover { filter: brightness(.97); }
+.sg-o.me { border-color: #111114; box-shadow: 0 0 0 1px #111114 inset; }
+.pf-bar .pf-sel-cur { display: none; }
+/* Ordinateur moyen et tablette : le repère passe sur une deuxième ligne, sous les étapes */
+@media (min-width: 561px) {
+  .top { flex-wrap: wrap; row-gap: 8px; }
+  .top::after { content: ""; order: 19; flex-basis: 100%; height: 0; }
+  .cur-tag { order: 20; max-width: 100%; flex: none; padding: 4px 12px; }
+}
+/* Ordinateur moyen : seule l'étape en cours garde son nom, pour que la première ligne tienne */
+@media (max-width: 1180px) and (min-width: 561px) { #steps .st:not(.cur) .st-t { display: none; } #steps .st { padding-right: 6px; } .top .reset span { display: none; } }
+/* Téléphone : le repère prend la place du nom NexTap, sur la première ligne */
+@media (max-width: 560px) {
+  .top .badge { display: none; }
+  .cur-tag { order: 20; flex: 0 1 auto; max-width: 100%; margin: 0 auto; padding: 4px 10px; font-size: 12.5px; }
+}
+/* « Version active de votre carte » : type (Carte de visite / Boutique) aligné tout à droite */
+.pf-pub .pf-c { align-items: center; gap: 6px; }
+.pf-pub .pf-c .pf-cn { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-pub .pf-c .pf-ck { flex: none; margin-left: auto; padding-left: 10px; text-align: right; font-weight: 500; opacity: .7; }
+@media (max-width: 560px) { .pf-pub .pf-c .pf-ck { width: auto; font-size: 12px; } }
