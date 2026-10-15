@@ -1082,11 +1082,11 @@
       <div class="md no-rw cm-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
         <h2 id="md-t">${TT('Mes créations', 'My creations')}</h2>
-        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). Touchez un nom pour le rendre actif ; ⏸ pour mettre en pause ; ✏️ pour modifier.`, `All on the same NFC card (${all.length} of ${pfMax()}). Tap a name to make it active; ⏸ to pause; ✏️ to edit.`)}</p>
+        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). Touchez un nom pour le rendre actif ; ✎ à côté du nom pour le renommer ; ⏸ pour mettre en pause ; ✏️ pour modifier.`, `All on the same NFC card (${all.length} of ${pfMax()}). Tap a name to make it active; ✎ next to the name to rename it; ⏸ to pause; ✏️ to edit.`)}</p>
         <span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span>
         <div class="pf-pub">${all.slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x)).join('')}</div>
         ${pauseBox()}
-        <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="pfmanage">${TT('Renommer', 'Rename')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div>
+        <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div>
       </div>`;
     $('#modal').classList.add('on');
   }
@@ -2197,7 +2197,26 @@
         : `<button type="button" class="pf-ed pf-pz" data-act="pfpause" data-k="${x.k}" data-v="${x.id}" title="${TT('Mettre cette création en pause', 'Pause this creation')}" aria-label="${TT(`Mettre « ${nm} » en pause`, `Pause “${nm}”`)}">${ic('pause', 21)}</button>`);
     const del = lv ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>`
       : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${nm} »`, `Delete “${nm}”`)}">${ic('trash', 16)}</button>`;
-    return `<div class="pf-pr"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}<span class="pf-cn">${nm}</span>${pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''}<span class="pf-ck">${KIND_L[x.k]}</span></button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
+    return `<div class="pf-pr"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}<span class="pf-cn">${nm}</span><span class="pf-ren" role="button" tabindex="0" data-act="pfren" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier le nom', 'Rename')}" aria-label="${TT(`Modifier le nom de « ${nm} »`, `Rename “${nm}”`)}">${ic('pen', 13)}</span>${pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''}<span class="pf-ck">${KIND_L[x.k]}</span></button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
+  }
+  /* Renommer une création sans ouvrir l'éditeur */
+  function renameForm(row, k, id) {
+    const x = regAll().find((z) => z.k === k && z.id === id); if (!x || !row) return;
+    row.classList.add('pf-renaming');
+    row.innerHTML = `<form class="pf-renf" data-renf data-k="${k}" data-v="${id}"><label><span>${TT('Nom', 'Name')}</span><input name="n" maxlength="24" value="${esc(x.name)}" required></label>
+      <div class="pf-renb"><button type="button" class="b" data-act="pfrenx">${TT('Annuler', 'Cancel')}</button><button type="submit" class="b pri">${TT('Enregistrer', 'Save')}</button></div></form>`;
+    const i = row.querySelector('input'); i.focus(); i.select();
+  }
+  function renameVer(k, id, name) {
+    const taken = regAll().some((z) => !(z.k === k && z.id === id) && pfNorm(z.name) === pfNorm(name));
+    if (taken) return TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`);
+    if (k === KIND) { const e = (pfInit().list || []).find((z) => z.id === id); if (e) { e.name = name; e.named = true; } save(); }
+    else {
+      const key = KIND === 'stores' ? 'nfc-studio-v6' : 'nfc-stores-v1';
+      try { const O = JSON.parse(localStorage.getItem(key) || 'null'); const e = O && O.pf && O.pf.list.find((z) => z.id === id); if (e) { e.name = name; e.named = true; localStorage.setItem(key, JSON.stringify(O)); } } catch (er) { /* rien */ }
+      const r = regGet() || { list: [] }; const e2 = (r.list || []).find((z) => z.k === k && z.id === id); if (e2) e2.name = name; regSet(r);
+    }
+    return '';
   }
   function step5() {
     return `<section class="wrap">
@@ -2371,6 +2390,8 @@
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
       case 'pfother': closeModal(); goOther(t.dataset.v); break;
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;
+      case 'pfren': e.preventDefault(); renameForm(t.closest('.pf-pr'), t.dataset.k, t.dataset.v); break;
+      case 'pfrenx': if (t.closest('.cm-md')) curModal(); else render(); break;
       case 'pzkeep': editVer(t.dataset.k, t.dataset.v); break;
       case 'pzout': {
         const k = t.dataset.k, id = t.dataset.v, r = regSync();
@@ -2960,6 +2981,15 @@
   /* Saisie du lien imprimé, envoi du lien et du QR code par email */
   document.addEventListener('submit', (e) => {
     const f = e.target;
+    if (f.matches('[data-renf]')) {
+      e.preventDefault();
+      const n = f.n.value.trim().slice(0, 24); if (!n) return;
+      const inCm = !!f.closest('.cm-md'), err = renameVer(f.dataset.k, f.dataset.v, n);
+      if (err) { let p0 = f.querySelector('.pf-err'); if (!p0) { p0 = document.createElement('p'); p0.className = 'pf-err'; f.appendChild(p0); } p0.textContent = err; f.n.focus(); return; }
+      render(); if (inCm) curModal();
+      toast(TT(`Nom enregistré : « ${n} ».`, `Name saved: “${n}”.`));
+      return;
+    }
     if (f.matches('[data-qrform]')) {
       e.preventDefault();
       const v = $('#qrman').value;

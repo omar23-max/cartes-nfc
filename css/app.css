@@ -1345,3 +1345,14 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .pz-md h2 { display: flex; align-items: center; gap: 8px; color: #9a3412; }
 .pz-md h2 svg { flex: none; color: #c2410c; }
 .pz-ch { display: grid; gap: 8px; margin: 12px 0 14px; }
+/* Renommer une création sans ouvrir l'éditeur */
+.pf-pub .pf-ren { flex: none; display: inline-grid; place-items: center; width: 24px; height: 24px; margin-left: -2px; border-radius: 6px; opacity: .45; cursor: pointer; }
+.pf-pub .pf-ren:hover, .pf-pub .pf-ren:focus-visible { opacity: 1; background: rgba(0,0,0,.08); outline: none; }
+.pf-pub .pf-c.on .pf-ren:hover { background: rgba(255,255,255,.18); }
+.pf-pub .pf-pr.pf-renaming { display: block; }
+.pf-renf { padding: 12px; border: 1px solid var(--line2, #e4e4e7); border-radius: 12px; background: #fff; box-shadow: 0 8px 24px -12px rgba(0,0,0,.25); }
+.pf-renf label { display: flex; align-items: center; gap: 10px; }
+.pf-renf label span { font-weight: 700; font-size: 13.5px; }
+.pf-renf input { flex: 1; min-width: 0; padding: 9px 12px; border: 1px solid #93c5fd; border-radius: 10px; font: inherit; font-size: 15px; }
+.pf-renb { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.pf-renf .pf-err { margin: 8px 0 0; }
