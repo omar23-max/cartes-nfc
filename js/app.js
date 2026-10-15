@@ -561,7 +561,12 @@
       const cls = n === S.step ? 'cur' : n < S.step ? 'done' : '';
       return `<button class="st ${cls}" data-act="go" data-n="${n}" ${n > m ? 'disabled' : ''}><span class="st-n">${n < S.step ? ic('check', 13) : n}</span><span class="st-t"><span class="st-tl">${t}</span><span class="st-ts">${t.split(' ')[0]}</span></span></button>`;
     }).join('');
-    $('.reset').innerHTML = `${ic('reset', 16)}<span>Recommencer</span>`;
+    $('.reset').innerHTML = `${ic('reset', 16)}<span>${TT('Recommencer', 'Start over')}</span>`;
+    /* Déjà une création : « Nouvelle création » ajoute une carte, une boutique ou une invitation sans rien effacer */
+    let nb = $('.newc');
+    if (!nb) { nb = document.createElement('button'); nb.type = 'button'; nb.className = 'b sm newc'; nb.dataset.act = 'newc'; $('.reset').before(nb); }
+    nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`;
+    nb.hidden = !(S.sectorId || regAll().length);
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
     document.documentElement.lang = ui();
     document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : 'NexTap Studio';
@@ -1196,6 +1201,7 @@
   function goOther(id) { save(); location.href = `${OTHER_URL}?ver=${encodeURIComponent(id)}&ui=${ui()}`; }
   /* Nouvelle version vide (type choisi dans l’autre studio, ou dans celui-ci) : on repart du choix du secteur / type */
   function pfNewFresh(name) {
+    S.kindChosen = true;
     const used = !!(S.pf || S.sectorId), P = pfInit();
     if (!used || (!S.sectorId && P.list.length === 1)) { P.list[0].name = name; P.list[0].named = true; }
     else {
@@ -1206,6 +1212,47 @@
     }
     S.step = 1;
   }
+  /* « Nouvelle création » : une autre carte de visite, boutique ou invitation, sur la même carte NFC.
+     Même lien, même QR code, même paiement : rien à repayer. Compte dans les versions du forfait (5 par défaut). */
+  let newPick = '';
+  function newModal() {
+    const all = KIND === 'events' ? [] : regAll(), full = KIND !== 'events' && all.length >= pfMax();
+    const root = isStores || isEvents ? '../' : '';
+    const o = (k, icon, t, d) => `<button type="button" class="nc-o${newPick === k ? ' sel' : ''}" data-act="newpick" data-v="${k}"><span class="qa-ic">${ic(icon, 22)}</span><span><b>${t}</b><small>${d}</small></span></button>`;
+    const DEF = { cards: TT('Nouvelle carte', 'New card'), stores: TT('Nouvelle boutique', 'New store'), events: TT('Nouvel événement', 'New event') };
+    let def = DEF[newPick] || '';
+    for (let i = 2; def && pfTaken(def); i++) def = `${DEF[newPick]} ${i}`;
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md no-rw nc-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+        <h2 id="md-t">${TT('Que voulez-vous créer ?', 'What would you like to create?')}</h2>
+        <p>${TT('Votre nouvelle création utilise <b>la même carte NFC, le même lien et le même QR code</b>. Elle est comprise dans votre forfait : <b>rien à payer de plus</b>. Vos créations actuelles ne sont pas modifiées.', 'Your new creation uses <b>the same NFC card, link and QR code</b>. It is included in your plan: <b>nothing more to pay</b>. Your current creations are not changed.')}</p>
+        ${KIND !== 'events' ? `<p class="nc-count">${ic('copy', 14)}${TT(`${all.length} sur ${pfMax()} créations utilisées`, `${all.length} of ${pfMax()} creations used`)}</p>` : ''}
+        <div class="nc-l">
+          ${o('cards', 'userplus', TT('Une carte de visite', 'A business card'), TT('Coordonnées, réseaux, services, rendez-vous', 'Contact details, socials, services, booking'))}
+          ${o('stores', 'bag', TT('Une boutique', 'A store'), TT('Produits ou menu, commandes', 'Products or menu, orders'))}
+          ${o('events', 'cal', TT('Un événement ou une invitation', 'An event or invitation'), TT('Enveloppe animée, compte à rebours, RSVP', 'Animated envelope, countdown, RSVP'))}
+        </div>
+        ${newPick ? `<form data-ncf>
+          ${full && newPick !== 'events' ? `<p class="pf-err" role="alert">${TT(`Vous utilisez déjà vos ${pfMax()} créations. Supprimez-en une dans « Versions » pour en ajouter une autre.`, `You already use your ${pfMax()} creations. Delete one in “Versions” to add another.`)}</p>` : `<label class="f"><span class="f-l">${TT('Nom (pour vous seulement)', 'Name (only for you)')}</span><input name="n" maxlength="24" placeholder="${esc(def)}" autocomplete="off"></label>`}
+          <div class="btns">${full && newPick !== 'events' ? `<button type="button" class="b pri" data-act="pfmanage">${TT('Voir mes versions', 'See my versions')}</button>` : `<button type="submit" class="b pri">${TT('Créer', 'Create')} ${ic('arrow', 16)}</button>`}<button type="button" class="b" data-act="modal-close">${TT('Annuler', 'Cancel')}</button></div>
+        </form>` : ''}
+      </div>`;
+    $('#modal').classList.add('on');
+    const f = $('[data-ncf]');
+    if (!f) return;
+    const inp = f.n; if (inp) inp.focus();
+    f.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = ((inp && inp.value.trim()) || def).slice(0, 24);
+      if (newPick === 'events') { save(); location.href = `${isEvents ? '' : root + 'events/'}index.html?start=1&ui=${ui()}&vname=${encodeURIComponent(name)}`; return; }
+      if (pfTaken(name)) { pfErr(f, TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`)); if (inp) inp.focus(); return; }
+      if (newPick !== KIND) { save(); location.href = `${{ cards: root + 'index.html', stores: root + 'stores/index.html' }[newPick]}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
+      pfNewFresh(name); newPick = ''; closeModal(); save(); render(); window.scrollTo(0, 0);
+      toast(TT(`« ${name} » créée, sur la même carte NFC : rien à repayer. Choisissez maintenant ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `“${name}” created on the same NFC card: nothing to pay again. Now choose ${isStores ? 'the store type' : 'your industry'}.`));
+    });
+  }
+
   let pfOpen = false;
   function pfBar() {
     /* Invitations : pas de versions, mais on rappelle ce qu’on modifie (nom choisi au départ) */
@@ -1299,7 +1346,8 @@
         if (nx && nx.data) { cur.data = pfSnap(); pfApply(nx.data); nx.data = null; P.cur = ver; }
       }
       if (ver && S.sectorId && S.design) S.step = 4;
-      if (nv) { pfNewFresh(nv.slice(0, 24)); toast(TT(`Nouvelle version « ${nv.slice(0, 24)} » : choisissez ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `New version “${nv.slice(0, 24)}”: choose ${isStores ? 'the store type' : 'your industry'}.`)); }
+      if (nv && (S.sectorId || S.pf) && regAll().length >= pfMax()) toast(TT(`Votre forfait permet ${pfMax()} créations par carte NFC. Supprimez-en une pour en ajouter.`, `Your plan allows ${pfMax()} creations per NFC card. Delete one to add more.`));
+      else if (nv) { pfNewFresh(nv.slice(0, 24)); toast(TT(`Nouvelle version « ${nv.slice(0, 24)} » : choisissez ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `New version “${nv.slice(0, 24)}”: choose ${isStores ? 'the store type' : 'your industry'}.`)); }
       if (ver || nv) { save(); history.replaceState(null, '', location.pathname); }
     } catch (e) { /* rien */ }
   }
@@ -2331,8 +2379,12 @@
       case 'vcf': VC.downloadVCard(card(), locked() ? '' : link(), lang()); break; /* avant le paiement : fiche sans le lien de la carte */
       case 'json': exportJSON(); break;
       case 'full': openFull(); break;
+      case 'newc': newPick = ''; newModal(); break;
+      case 'newpick': newPick = t.dataset.v; newModal(); break;
       case 'reset':
-        if (ask('Tout recommencer ? Vos cartes en cours seront effacées.')) { const u = S.ui; S = fresh(); S.ui = u; save(); go(1); }
+        if (ask(TT('Tout recommencer dans ce studio ? Les créations de ce studio seront effacées. Votre lien, votre QR code et votre paiement sont conservés.', 'Start over in this studio? This studio’s creations will be erased. Your link, QR code and payment are kept.'))) {
+          const keep = { ui: S.ui, id: S.id, paid: S.paid, qr: S.qr }; S = fresh(); Object.assign(S, keep); save(); go(1);
+        }
         break;
     }
   });

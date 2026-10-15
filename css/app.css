@@ -1202,3 +1202,16 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-bar.pf-ev { display: flex !important; align-items: center; gap: 8px; flex-wrap: wrap; }
 .pf-ev .pf-l { font-size: 13px; }
 .pf-ev-n { font-size: 15px; color: #15803d; }
+/* « Nouvelle création » (en-tête + fenêtre) */
+.newc { background: #111114; color: #fff; border-color: #111114; }
+.newc:hover { background: #2a2a30; }
+.newc[hidden] { display: none; }
+.nc-count { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--mut); margin: 0 0 10px; }
+.nc-l { display: grid; gap: 8px; margin-bottom: 14px; }
+.nc-o { display: flex; align-items: center; gap: 12px; text-align: left; padding: 12px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); cursor: pointer; font: inherit; color: inherit; }
+.nc-o b { display: block; font-size: 15px; }
+.nc-o small { display: block; color: var(--mut); font-size: 12.5px; margin-top: 2px; }
+.nc-o .qa-ic { flex: none; }
+.nc-o:hover { border-color: #b9b9c0; }
+.nc-o.sel { border-color: #111114; box-shadow: 0 0 0 2px #111114 inset; }
+@media (max-width: 640px) { .newc span { display: none; } }
