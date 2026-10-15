@@ -1366,3 +1366,26 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .cm-md .pf-pub .pf-c .pf-ck { flex-basis: 100%; margin-left: 0; padding-left: 0; text-align: left; font-size: 11.5px; }
 .cm-md .pf-pub .pf-c:not(.on):not(.is-pz) .pf-ck { padding-left: 19px; }
 .cm-md .pf-pub .pf-c.on .pf-ck, .cm-md .pf-pub .pf-c.is-pz .pf-ck { padding-left: 19px; }
+/* En-tête, 2e ligne : Version active (menu) · Mes créations · Nouvelle création */
+.hd-live { order: 20; display: inline-flex; align-items: center; gap: 8px; padding: 4px 6px 4px 12px; border: 1px solid #a6e9c1; border-radius: 99px; background: #ecfdf3; font-size: 13px; }
+.hd-live[hidden] { display: none; }
+.hd-live .hd-ll { display: inline-flex; align-items: center; gap: 6px; color: #166534; font-weight: 600; white-space: nowrap; }
+.hd-live .hd-sw { position: relative; display: inline-flex; align-items: center; }
+.hd-live select { appearance: none; -webkit-appearance: none; max-width: 260px; padding: 4px 26px 4px 10px; border: 1px solid #bbf7d0; border-radius: 99px; background: #fff; font: inherit; font-weight: 700; color: #14532d; cursor: pointer; text-overflow: ellipsis; }
+.hd-live .hd-sw svg { position: absolute; right: 8px; pointer-events: none; color: #166534; }
+.hd-live.pz { border-color: #fdba74; background: #fff7ed; }
+.hd-live.pz .hd-ll { color: #c2410c; }
+.hd-live.pz select { border-color: #fed7aa; color: #9a3412; }
+.hd-live.pz .hd-sw svg { color: #c2410c; }
+@media (min-width: 1321px) { .top .newc.newc2 { order: 21; } }
+.pf-bar.pf-bar-min { display: flex; justify-content: flex-end; padding: 0; margin: 0 0 10px; border: 0; background: none; }
+@media (max-width: 560px) {
+  .hd-live { order: 21; flex: 1 1 100%; justify-content: space-between; padding: 4px 4px 4px 10px; font-size: 12px; }
+  .hd-live select { max-width: 190px; }
+  .pf-bar.pf-bar-min { justify-content: flex-start; }
+}
+.hd-live .hd-sh { display: none; }
+@media (max-width: 1320px) { .hd-live .hd-lg { display: none; } .hd-live .hd-sh { display: inline; } .hd-live select { max-width: 200px; } }
+.pf-bar-min .pf-owns { display: inline-flex; flex-wrap: wrap; gap: 6px 18px; }
+.pf-bar-min .pf-own { display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: none; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.pf-bar-min .pf-own:hover { text-decoration: underline; }
