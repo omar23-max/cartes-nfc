@@ -1053,7 +1053,14 @@
     let name, pub, live, pz = false;
     if (NOVER) { name = S.vname || TT('Événement principal', 'Main event'); pub = !!S.pub; live = true; }
     else {
-      if (!S.pf) return null; /* aucune création dans ce studio (ex. la seule vient d'être supprimée) : pas de repère, et pas de création fantôme */
+      /* Aucune création dans ce studio : on montre la création active (de l'autre studio), sans en créer une fantôme */
+      if (!S.pf) {
+        const lv = regAll().find((x) => isLive(x.k, x.id));
+        if (!lv || S.sectorId) return null;
+        const pzl = cardPaused();
+        return { cls: pzl ? 'is-pause' : 'is-other', title: TT('Touchez pour voir vos créations et modifier celle-ci.', 'Tap to see your creations and edit this one.'),
+          html: `${ic(pzl ? 'pause' : 'nfc', 14)}<span class="ct-l">${TT('Votre création active&nbsp;:', 'Your active creation:')}</span><b>${esc(lv.name)}</b><em class="ct-t">${pzl ? TT('En pause', 'Paused') : KIND_L[lv.k]}</em>` };
+      }
       const P = S.pf, e = P.list.find((x) => x.id === P.cur) || {};
       name = e.name || ''; live = isLive(KIND, P.cur);
       pub = !!e.pub || (live && !!(paidOf() || hasQR()));

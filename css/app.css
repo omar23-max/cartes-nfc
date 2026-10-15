@@ -1338,3 +1338,6 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .pf-sum-pz { display: inline-flex; align-items: center; gap: 5px; color: #c2410c; font-weight: 600; }
 .pf-sum2.pz { border-color: #fdba74; background: #fff7ed; }
 @media (max-width: 560px) { .pf-l-pz { display: none; } }
+/* Repère dans un studio sans création : la création active (autre studio), en gris */
+.cur-tag.is-other { background: #f4f4f5; border-color: #d4d4d8; color: #3f3f46; }
+.cur-tag.is-other .ct-t { background: #e4e4e7; color: #52525b; }
