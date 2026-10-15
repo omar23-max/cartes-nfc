@@ -12,8 +12,8 @@
   const en = () => (document.documentElement.lang || '').startsWith('en') || /[?&]lang=en/.test(location.search);
   const T = (fr, eng) => (en() ? eng : fr);
 
-  function page(title, text) {
-    return `<div class="vc vc-susp"><div class="vc-susp-in"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg><h1>${title}</h1><p>${text}</p></div></div>`;
+  function page(title, text, pause) {
+    return `<div class="vc vc-susp"><div class="vc-susp-in"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/>${pause ? '<path d="M10 15.5v-7M14 15.5v-7" stroke-width="2.6"/>' : '<path d="M12 8v4M12 16h.01"/>'}</svg><h1>${title}</h1><p>${text}</p></div></div>`;
   }
 
   /* kind : 'cards' ou 'stores' ; renvoie { redirect } | { page } | { id, key } */
@@ -22,7 +22,7 @@
     if (!R) return {};
     const other = kind === 'cards' ? 'stores/view.html' : '../view.html';
     /* Carte en pause (titulaire) : tous ses liens affichent « Carte temporairement indisponible » ; le titulaire (?owner=1) voit sa carte */
-    if (R.cardPaused && q.get('owner') !== '1') return { page: page(T('Carte temporairement indisponible', 'Card temporarily unavailable'), T('Cette carte reviendra bientôt.', 'This card will be back soon.')) };
+    if (R.cardPaused && q.get('owner') !== '1') return { page: page(T('Carte temporairement indisponible', 'Card temporarily unavailable'), T('Cette carte reviendra bientôt.', 'This card will be back soon.'), true) };
     let key = q.get('ver');
     const seen = new Set();
     while (key && R.gone && R.gone[key] && !seen.has(key)) {
@@ -32,7 +32,7 @@
       else if (g.mode === 'active') key = null;
       else return { page: page(T('Cette page n’est plus disponible', 'This page is no longer available'), T('Ce contenu a été retiré par son propriétaire.', 'This content has been removed by its owner.')) };
     }
-    if (key && (R.paused || []).includes(key)) return { page: page(T('Temporairement indisponible', 'Temporarily unavailable'), T('Cette page reviendra bientôt.', 'This page will be back soon.')) };
+    if (key && (R.paused || []).includes(key)) return { page: page(T('Temporairement indisponible', 'Temporarily unavailable'), T('Cette page reviendra bientôt.', 'This page will be back soon.'), true) };
     if (key && !(R.list || []).some((x) => `${x.k}:${x.id}` === key)) key = null;
     const t = key ? { k: key.split(':')[0], id: key.split(':').slice(1).join(':') } : R.live;
     if (!t || !t.k) return {};

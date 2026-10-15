@@ -1055,7 +1055,7 @@
     }
     if (!name) return null;
     if (cardPaused()) return { cls: 'is-pause', title: TT('Votre carte est en pause : vos visiteurs voient « Carte temporairement indisponible ». Touchez pour voir vos créations.', 'Your card is paused: visitors see “Card temporarily unavailable”. Tap to see your creations.'),
-      html: `${ic('pen', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b><em class="ct-t">${TT('Carte en pause', 'Card paused')}</em>` };
+      html: `${ic('pause', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b><em class="ct-t">${TT('Carte en pause', 'Card paused')}</em>` };
     if (!pub) return { cls: 'is-new', title: TT('Création pas encore publiée. Touchez pour voir vos créations.', 'Not published yet. Tap to see your creations.'), html: `${ic('plus', 14)}<span class="ct-l">${NEW}&nbsp;:</span><b>${esc(name)}</b>` };
     if (NOVER) return { cls: 'is-live', title: '', html: `${ic('pen', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b>` };
     return { cls: live ? 'is-live' : 'is-off', title: live ? TT('Version active : vos visiteurs voient ces changements. Touchez pour voir vos créations.', 'Active version: your visitors see these changes. Tap to see your creations.') : TT('Pas en ligne : vos visiteurs ne voient pas ces changements. Touchez pour voir vos créations.', 'Not live: your visitors do not see these changes. Tap to see your creations.'),
@@ -1072,8 +1072,8 @@
         <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). Touchez une création pour la modifier.`, `All on the same NFC card (${all.length} of ${pfMax()}). Tap a creation to edit it.`)}</p>
         <div class="sg-ol">${all.map((x) => { const me = x.k === KIND && x.id === P.cur, lv = isLive(x.k, x.id);
           return `<button type="button" class="sg-o${me ? ' me' : ''}" ${me ? 'data-act="modal-close"' : `data-act="${x.k === KIND ? 'sgsw' : 'pfother'}" data-v="${x.id}"`}><span><b>${esc(x.name)}</b><small>${KIND_L[x.k]}${lv ? TT(' · Active', ' · Active') : isPaused(x.k, x.id) ? TT(' · en pause', ' · paused') : ''}${me ? TT(' · en cours de modification', ' · being edited') : ''}</small></span>${me ? ic('check', 15) : ic(x.k === KIND ? 'pen' : 'arrowur', 15)}</button>`; }).join('')}</div>
-        <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="pfmanage">${TT('Gérer les versions', 'Manage versions')}</button>${locked() ? '' : cardPaused() ? `<button type="button" class="b" data-act="cardresume">${ic('nfc', 15)}${TT('Reprendre ma carte', 'Resume my card')}</button>` : `<button type="button" class="b" data-act="cardpause">${ic('clock', 15)}${TT('Mettre ma carte en pause', 'Pause my card')}</button>`}</div>
-        ${cardPaused() ? `<p class="cp-note">${ic('clock', 14)}${TT('Carte en pause : vos visiteurs voient « Carte temporairement indisponible ».', 'Card paused: visitors see “Card temporarily unavailable”.')}</p>` : ''}
+        <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="pfmanage">${TT('Gérer les versions', 'Manage versions')}</button>${locked() ? '' : cardPaused() ? `<button type="button" class="b" data-act="cardresume">${ic('nfc', 15)}${TT('Reprendre ma carte', 'Resume my card')}</button>` : `<button type="button" class="b" data-act="cardpause">${ic('pause', 15)}${TT('Mettre ma carte en pause', 'Pause my card')}</button>`}</div>
+        ${cardPaused() ? `<p class="cp-note">${ic('pause', 14)}${TT('Carte en pause : vos visiteurs voient « Carte temporairement indisponible ».', 'Card paused: visitors see “Card temporarily unavailable”.')}</p>` : ''}
       </div>`;
     $('#modal').classList.add('on');
   }
@@ -1223,7 +1223,7 @@
           <label class="pf-opt"><input type="radio" name="m" value="gone" checked><span><b>${TT('Une page « plus disponible »', 'A “no longer available” page')}</b><small>${TT('Page neutre, sans lien vers vos autres versions. Recommandé.', 'Neutral page, with no link to your other versions. Recommended.')}</small></span></label>
           <label class="pf-opt${same.length ? '' : ' off'}"><input type="radio" name="m" value="redirect" ${same.length ? '' : 'disabled'}><span><b>${TT(`Une autre ${typ}`, `Another ${typ}`)}</b><small>${same.length ? TT(`Seulement une version du même type.`, 'Only a version of the same type.') : TT(`Aucune autre ${typ} disponible.`, `No other ${typ} available.`)}</small>${same.length ? `<select name="to">${same.map((z) => `<option value="${z.k}:${z.id}">${esc(z.name)}</option>`).join('')}</select>` : ''}</span></label>
           <label class="pf-opt"><input type="radio" name="m" value="active"><span><b>${TT('Ma version active', 'My active version')}</b><small>${TT('Attention : ce sera la version affichée par votre carte au moment de la visite, quel que soit son type.', 'Careful: this will be whatever version your card shows at the time of the visit, of any type.')}</small></span></label>
-          <div class="btns"><button type="submit" class="b pri">${TT('Supprimer', 'Delete')}</button><button type="button" class="b" data-act="pfpause" data-k="${k}" data-v="${id}">${ic('clock', 14)}${TT('Mettre en pause plutôt', 'Pause instead')}</button><button type="button" class="b" data-act="pfmanage">${TT('Annuler', 'Cancel')}</button></div>
+          <div class="btns"><button type="submit" class="b pri">${TT('Supprimer', 'Delete')}</button><button type="button" class="b" data-act="pfpause" data-k="${k}" data-v="${id}">${ic('pause', 14)}${TT('Mettre en pause plutôt', 'Pause instead')}</button><button type="button" class="b" data-act="pfmanage">${TT('Annuler', 'Cancel')}</button></div>
           <p class="muted small">${TT('« En pause » : le lien affiche « Temporairement indisponible » et vous pouvez reprendre la version plus tard (ex. une boutique saisonnière).', '“Paused”: the link shows “Temporarily unavailable” and you can resume the version later (e.g. a seasonal store).')}</p>
         </form>
       </div>`;
@@ -2094,11 +2094,11 @@
     if (NOVER || locked() || !regAll().length) return '';
     if (cardPaused()) {
       const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
-      return `<div class="box no-rw card-pause on"><span class="box-l">${ic('clock', 14)}${TT('Carte en pause', 'Card paused')}</span><p>${TT('Vos visiteurs voient « Carte temporairement indisponible » quand ils touchent votre carte ou scannent votre QR code. Toutes vos créations sont conservées.', 'Visitors see “Card temporarily unavailable” when they tap your card or scan your QR code. All your creations are kept.')}</p>
+      return `<div class="box no-rw card-pause on"><span class="box-l">${ic('pause', 14)}${TT('Carte en pause', 'Card paused')}</span><p>${TT('Vos visiteurs voient « Carte temporairement indisponible » quand ils touchent votre carte ou scannent votre QR code. Toutes vos créations sont conservées.', 'Visitors see “Card temporarily unavailable” when they tap your card or scan your QR code. All your creations are kept.')}</p>
         <button type="button" class="b pri sm" data-act="cardresume">${ic('nfc', 15)}${TT(`Reprendre avec « ${esc(lv.name || '')} »`, `Resume with “${esc(lv.name || '')}”`)}</button>${regAll().length > 1 ? `<p class="muted small">${TT('Ou choisissez une autre création ci-dessus : elle remet aussi votre carte en ligne.', 'Or choose another creation above: it also puts your card back online.')}</p>` : ''}</div>`;
     }
     return `<div class="box no-rw card-pause"><span class="box-l">${TT('Pause', 'Pause')}</span><p class="muted small">${TT('Vacances, fermeture, carte perdue… Mettez votre carte en pause : plus rien ne s’affiche, vos créations sont conservées.', 'Holidays, closure, lost card… Pause your card: nothing is shown, your creations are kept.')}</p>
-      <button type="button" class="b sm" data-act="cardpause">${ic('clock', 15)}${TT('Mettre ma carte en pause', 'Pause my card')}</button></div>`;
+      <button type="button" class="b sm" data-act="cardpause">${ic('pause', 15)}${TT('Mettre ma carte en pause', 'Pause my card')}</button></div>`;
   }
   /* Création enregistrée mais pas en ligne : on le dit, et on propose de la rendre active */
   function pubOffBox() {
