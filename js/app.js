@@ -554,6 +554,7 @@
     if (S.sectorId && !sec()) S.sectorId = null;
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     if (S.step > maxStep()) S.step = maxStep();
+    NFC.curDesign = S.design || ''; /* palettes propres à certains modèles (modèles noirs) */
     document.body.dataset.step = S.step; /* téléphone : le haut de l’écran se compacte selon l’étape */
     $('#steps').innerHTML = STEPS.map((t, i) => {
       const n = i + 1, m = maxStep();
@@ -2078,7 +2079,7 @@
       case 'kindpick': kindPick = t.dataset.v; render(); setTimeout(() => { const i = $('[data-kindform] input'); if (i) { i.focus(); i.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 50); break;
       case 'kindgo': kindGo(); break;
       case 'nameskip': nameDone(false); break;
-      case 'design': closeModal(); S.design = t.dataset.id; go(3); break;
+      case 'design': closeModal(); if (/^n[1-3]$/.test(t.dataset.id) !== /^n[1-3]$/.test(S.design || '')) S.palette = 0; S.design = t.dataset.id; NFC.curDesign = S.design; go(3); break;
       case 'adm': admAct(t); break;
       case 'poster': if (!locked()) openPoster(); break;
       case 'pfsw': pfSwitch(t.dataset.v); break;

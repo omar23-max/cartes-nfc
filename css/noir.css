@@ -1,0 +1,152 @@
+/* Modèles « Noir » : n1 Obsidian, n2 Graphite, n3 Onyx */
+.vc-n1, .vc-n2, .vc-n3 { --bg: #050506; --sf: #141418; --tx: #f4f4f5; --mu: #a1a1aa; --ln: rgba(255,255,255,.08); --r: 18px; background: #050506; color: #f4f4f5; font-family: Inter, system-ui, sans-serif; }
+/* Carte en relief : reflet en haut, bord fin, ombre douce */
+.vc-n1 .nx-card, .vc-n2 .nx-card, .vc-n3 .nx-card,
+.vc-n1 .vc-body > .sec, .vc-n2 .vc-body > .sec, .vc-n3 .vc-body > .sec,
+.vc-n1 .qa, .vc-n2 .qa, .vc-n3 .qa {
+  margin: 12px 14px; border-radius: 28px; background: linear-gradient(180deg, #1a1a1f 0%, #0f0f12 100%);
+  border: 1px solid rgba(255,255,255,.07);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.09), inset 0 -1px 0 rgba(0,0,0,.7), 0 22px 44px -24px rgba(0,0,0,.95), 0 3px 10px rgba(0,0,0,.55);
+}
+.vc-n1 .vc-body > .sec, .vc-n2 .vc-body > .sec, .vc-n3 .vc-body > .sec { padding: 22px 18px; border-top: 1px solid rgba(255,255,255,.07); }
+.vc-n1 .vc-body, .vc-n2 .vc-body, .vc-n3 .vc-body { background: transparent; padding-top: 0; }
+.vc-n1 .qa, .vc-n2 .qa, .vc-n3 .qa { padding: 16px 10px; }
+.vc-n1 .qa-ic, .vc-n2 .qa-ic, .vc-n3 .qa-ic { border-radius: 16px; background: #1d1d22; color: #fff; border: 1px solid rgba(255,255,255,.09); box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
+.vc-n1 .qa-l, .vc-n2 .qa-l, .vc-n3 .qa-l { color: var(--mu); }
+/* Titres de section : petite étiquette centrée */
+.vc-n1 .sec-t, .vc-n2 .sec-t, .vc-n3 .sec-t { justify-content: center; margin-bottom: 14px; font: 600 13px/1.2 Inter, sans-serif; letter-spacing: .02em; text-transform: none; color: #e4e4e7; }
+.vc-n1 .sec-n, .vc-n2 .sec-n, .vc-n3 .sec-n { display: none; }
+.vc-n1 .txt, .vc-n2 .txt, .vc-n3 .txt { color: #d4d4d8; }
+/* Services : pastilles en relief */
+.vc-n1 .list, .vc-n2 .list, .vc-n3 .list { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.vc-n1 .li, .vc-n2 .li, .vc-n3 .li { display: flex; align-items: center; gap: 12px; width: auto; max-width: 100%; padding: 11px 16px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; background: #17171b; box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 6px 14px -8px rgba(0,0,0,.9); }
+.vc-n1 .li-t, .vc-n2 .li-t, .vc-n3 .li-t { font-size: 15px; color: #fafafa; }
+.vc-n1 .li-d, .vc-n2 .li-d, .vc-n3 .li-d { font-size: 12px; color: var(--mu); }
+.vc-n1 .li-p, .vc-n2 .li-p, .vc-n3 .li-p { margin-left: 6px; font-weight: 700; color: #fff; }
+/* Avis : grande citation */
+.vc-n1 .rev blockquote, .vc-n2 .rev blockquote, .vc-n3 .rev blockquote { font-size: 20px; line-height: 1.3; font-weight: 600; color: #fafafa; }
+.vc-n1 .rev, .vc-n2 .rev, .vc-n3 .rev { background: transparent; border: 0; box-shadow: none; }
+/* Boutons */
+.vc-n1 .btn, .vc-n2 .btn, .vc-n3 .btn { border-radius: 999px; }
+.vc-n1 .btn.ghost, .vc-n2 .btn.ghost, .vc-n3 .btn.ghost { background: #16161a; color: #fff; border: 1px solid rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.08); }
+.vc-n1 .sticky .btn, .vc-n2 .sticky .btn, .vc-n3 .sticky .btn { background: #f4f4f5; color: #0a0a0b; }
+.vc-n1 .ft, .vc-n2 .ft, .vc-n3 .ft { background: transparent; color: var(--mu); }
+.nx-btn { display: inline-block; margin-top: 18px; padding: 9px 20px; border-radius: 999px; background: #16161a; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; border: 1px solid rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.1), 0 6px 14px -8px #000; }
+
+/* ---------- n1 Obsidian : photo floutée derrière, portrait carré + grand nom ---------- */
+.vc-n1 .hd { position: relative; padding-top: 70px; text-align: center; }
+.vc-n1 .nx-bg { position: absolute; left: 0; right: 0; top: 0; bottom: 0; overflow: hidden; }
+.vc-n1 .nx-bg img { width: 100%; height: 100%; object-fit: cover; filter: blur(14px) brightness(.55) saturate(.8); transform: scale(1.15); }
+.vc-n1 .nx-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5,5,6,.1) 30%, #050506 96%); }
+.vc-n1 .nx-hero { position: relative; padding: 24px 22px 26px; background: linear-gradient(180deg, rgba(40,40,46,.55), rgba(16,16,19,.75)); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+.nx-k { margin: 0 0 18px; font-size: 13px; font-weight: 500; color: #e4e4e7; }
+.vc-n1 .nx-id { display: flex; align-items: center; justify-content: center; gap: 16px; text-align: left; }
+.vc-n1 .nx-av { width: 112px; height: 112px; border-radius: 26px; object-fit: cover; flex: none; box-shadow: 0 10px 24px -10px #000, 0 0 0 1px rgba(255,255,255,.12); }
+.vc-n1 h1 { margin: 0; font: 600 36px/1.02 Inter, sans-serif; letter-spacing: -.02em; color: #fff; }
+.nx-loc { margin: 6px 0 0; font-size: 12.5px; color: var(--mu); }
+
+/* ---------- n2 Graphite : portrait rond centré, nom métallisé ---------- */
+.vc-n2 .hd { padding-top: 64px; text-align: center; }
+.vc-n2 .nx-hero { padding: 30px 22px 28px; }
+.vc-n2 .nx-ring { width: 136px; height: 136px; margin: 0 auto 18px; padding: 4px; border-radius: 50%; background: conic-gradient(from 210deg, #6b6b73, #f4f4f5, #52525b, #d4d4d8, #6b6b73); box-shadow: 0 16px 34px -16px #000; }
+.vc-n2 .nx-av { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #0d0d10; box-sizing: border-box; }
+.nx-metal { margin: 0; font: 700 32px/1.08 Inter, sans-serif; letter-spacing: -.02em; background: linear-gradient(180deg, #ffffff 20%, #a1a1aa 70%, #e4e4e7); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.vc-n2 .nx-k { margin: 10px 0 0; }
+
+/* ---------- n3 Onyx : grande photo dans une carte, nom en surimpression ---------- */
+.vc-n3 .hd { padding-top: 58px; }
+.vc-n3 .nx-photo { position: relative; height: 470px; overflow: hidden; padding: 0; }
+.vc-n3 .nx-photo img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.vc-n3 .nx-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 45%, rgba(5,5,6,.92)); }
+.vc-n3 .nx-over { position: absolute; left: 22px; right: 22px; bottom: 22px; }
+.vc-n3 .nx-over .nx-k { margin: 0 0 6px; color: #d4d4d8; }
+.vc-n3 h1 { margin: 0; font: 700 40px/1 Inter, sans-serif; letter-spacing: -.03em; color: #fff; }
+
+/* ---------- Bandeau défilant ---------- */
+.nx-mq { overflow: hidden; padding: 14px 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); }
+.nx-mq-in { display: flex; gap: 18px; width: max-content; animation: nxmq 22s linear infinite; font-size: 14px; color: #f4f4f5; white-space: nowrap; }
+.nx-mq-in i { color: #71717a; font-style: normal; }
+@keyframes nxmq { to { transform: translateX(-50%); } }
+
+/* ---------- Carrousel tournant d’images inclinées ---------- */
+.nx-fan { position: relative; height: 250px; margin: 6px 0 4px; perspective: 900px; }
+.nx-fi { position: absolute; left: 50%; top: 10px; width: 62%; height: 220px; margin-left: -31%; padding: 0; border: 0; border-radius: 22px; overflow: hidden; background: #111; cursor: pointer; box-shadow: 0 18px 30px -14px #000, 0 0 0 1px rgba(255,255,255,.1); animation: nxfan 15s cubic-bezier(.6,.05,.3,1) infinite; }
+.nx-fi img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes nxfan {
+  0%, 14% { transform: translateX(0) rotate(0) scale(1); z-index: 5; opacity: 1; filter: none; }
+  20%, 34% { transform: translateX(-46%) rotate(-9deg) scale(.84); z-index: 4; opacity: .85; filter: brightness(.7); }
+  40%, 54% { transform: translateX(-70%) rotate(-15deg) scale(.7); z-index: 2; opacity: .5; filter: brightness(.5); }
+  60%, 74% { transform: translateX(70%) rotate(15deg) scale(.7); z-index: 1; opacity: .5; filter: brightness(.5); }
+  80%, 94% { transform: translateX(46%) rotate(9deg) scale(.84); z-index: 3; opacity: .85; filter: brightness(.7); }
+  100% { transform: translateX(0) rotate(0) scale(1); z-index: 5; opacity: 1; filter: none; }
+}
+@media (prefers-reduced-motion: reduce) { .nx-fi, .nx-mq-in { animation-play-state: paused; } }
+
+/* ---------- Relief « bouton 3D » (épaisseur, reflet brillant, liseré, ombre) ---------- */
+.vc-n1 .nx-card, .vc-n2 .nx-card, .vc-n3 .nx-card,
+.vc-n1 .vc-body > .sec, .vc-n2 .vc-body > .sec, .vc-n3 .vc-body > .sec,
+.vc-n1 .qa, .vc-n2 .qa, .vc-n3 .qa {
+  position: relative; isolation: isolate; margin: 14px 14px 22px; border-radius: 30px;
+  background: linear-gradient(180deg, #2a2a31 0%, #18181d 38%, #0e0e11 100%);
+  border: 1px solid rgba(255,255,255,.06);
+  box-shadow:
+    inset 0 2px 1px rgba(255,255,255,.16),   /* liseré clair du haut */
+    inset 0 -7px 10px rgba(0,0,0,.55),       /* ombre interne du bas */
+    0 7px 0 #050506,                          /* épaisseur (tranche) */
+    0 8px 0 rgba(255,255,255,.04),
+    0 26px 34px -12px rgba(0,0,0,.95);        /* ombre portée */
+}
+.vc-n1 .nx-card::before, .vc-n2 .nx-card::before, .vc-n3 .nx-card::before,
+.vc-n1 .vc-body > .sec::before, .vc-n2 .vc-body > .sec::before, .vc-n3 .vc-body > .sec::before,
+.vc-n1 .qa::before, .vc-n2 .qa::before, .vc-n3 .qa::before {
+  content: ""; position: absolute; left: 6px; right: 6px; top: 4px; height: min(46%, 120px); z-index: -1; pointer-events: none;
+  border-radius: 26px 26px 50% 50% / 26px 26px 26px 26px;
+  background: linear-gradient(180deg, rgba(255,255,255,.13), rgba(255,255,255,.03) 70%, rgba(255,255,255,0));
+}
+.vc-n3 .nx-photo::before { z-index: 2; background: linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,0) 60%); }
+.vc-n3 .nx-photo .nx-over { z-index: 3; }
+/* Pastilles des services : même relief, en petit */
+.vc-n1 .li, .vc-n2 .li, .vc-n3 .li {
+  border-radius: 18px; background: linear-gradient(180deg, #303038 0%, #1c1c22 45%, #131317 100%); border: 1px solid rgba(255,255,255,.07);
+  box-shadow: inset 0 1.5px 1px rgba(255,255,255,.18), inset 0 -4px 6px rgba(0,0,0,.5), 0 4px 0 #050506, 0 12px 16px -8px rgba(0,0,0,.9);
+}
+.vc-n1 .qa-ic, .vc-n2 .qa-ic, .vc-n3 .qa-ic, .nx-btn {
+  background: linear-gradient(180deg, #33333b, #1a1a1f 55%, #121216); border: 1px solid rgba(255,255,255,.08);
+  box-shadow: inset 0 1.5px 1px rgba(255,255,255,.2), inset 0 -3px 5px rgba(0,0,0,.5), 0 3px 0 #050506, 0 10px 14px -8px rgba(0,0,0,.9);
+}
+
+/* Sans liserés : pas de bord clair ni de ligne claire, on garde l'épaisseur, le reflet et l'ombre */
+.vc-n1 .nx-card, .vc-n2 .nx-card, .vc-n3 .nx-card,
+.vc-n1 .vc-body > .sec, .vc-n2 .vc-body > .sec, .vc-n3 .vc-body > .sec,
+.vc-n1 .qa, .vc-n2 .qa, .vc-n3 .qa {
+  border: 0;
+  box-shadow: inset 0 -7px 10px rgba(0,0,0,.55), 0 7px 0 #050506, 0 26px 34px -12px rgba(0,0,0,.95);
+}
+.vc-n1 .li, .vc-n2 .li, .vc-n3 .li { border: 0; box-shadow: inset 0 -4px 6px rgba(0,0,0,.5), 0 4px 0 #050506, 0 12px 16px -8px rgba(0,0,0,.9); }
+.vc-n1 .qa-ic, .vc-n2 .qa-ic, .vc-n3 .qa-ic, .nx-btn { border: 0; box-shadow: inset 0 -3px 5px rgba(0,0,0,.5), 0 3px 0 #050506, 0 10px 14px -8px rgba(0,0,0,.9); }
+.vc-n1 .nx-av { box-shadow: 0 10px 24px -10px #000; }
+.vc-n1 .nx-fi, .vc-n2 .nx-fi, .vc-n3 .nx-fi { box-shadow: 0 18px 30px -14px #000; }
+
+/* Un peu plus brillant : reflet plus fort, haut de carte plus clair */
+.vc-n1 .nx-card, .vc-n2 .nx-card, .vc-n3 .nx-card,
+.vc-n1 .vc-body > .sec, .vc-n2 .vc-body > .sec, .vc-n3 .vc-body > .sec,
+.vc-n1 .qa, .vc-n2 .qa, .vc-n3 .qa { background: linear-gradient(180deg, #35353d 0%, #1d1d23 40%, #0f0f12 100%); }
+.vc-n1 .nx-card::before, .vc-n2 .nx-card::before, .vc-n3 .nx-card::before,
+.vc-n1 .vc-body > .sec::before, .vc-n2 .vc-body > .sec::before, .vc-n3 .vc-body > .sec::before,
+.vc-n1 .qa::before, .vc-n2 .qa::before, .vc-n3 .qa::before { background: linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.07) 65%, rgba(255,255,255,0)); }
+.vc-n1 .li, .vc-n2 .li, .vc-n3 .li { background: linear-gradient(180deg, #3d3d46 0%, #212128 45%, #141418 100%); }
+.vc-n1 .qa-ic, .vc-n2 .qa-ic, .vc-n3 .qa-ic, .nx-btn { background: linear-gradient(180deg, #44444d, #1e1e24 55%, #131317); }
+
+/* ---------- Couleur d’accent de la palette (Argent, Or, Champagne, Émeraude, Bleu électrique, Rubis, Améthyste) ---------- */
+.vc-n1 .qa-ic, .vc-n2 .qa-ic, .vc-n3 .qa-ic { color: var(--p); }
+.vc-n1 .li-p, .vc-n2 .li-p, .vc-n3 .li-p { color: var(--p); }
+.nx-mq-in i { color: var(--p); }
+.vc-n2 .nx-ring { background: conic-gradient(from 210deg, var(--a), #ffffff, var(--p), var(--a), #ffffff, var(--a)); }
+.nx-metal { background-image: linear-gradient(180deg, #ffffff 15%, var(--p) 75%, #ffffff); }
+.vc-n1 .nx-k, .vc-n2 .nx-k, .vc-n3 .nx-k { color: var(--p); }
+.vc-n1 .sticky .btn, .vc-n2 .sticky .btn, .vc-n3 .sticky .btn {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--p) 70%, #ffffff) 0%, var(--p) 55%, var(--a) 100%); color: #0a0a0b; border: 0;
+  box-shadow: inset 0 -4px 6px rgba(0,0,0,.25), 0 4px 0 color-mix(in srgb, var(--a) 60%, #000), 0 14px 22px -10px rgba(0,0,0,.9);
+}
+.vc-n1 .sticky .btn svg, .vc-n2 .sticky .btn svg, .vc-n3 .sticky .btn svg { color: #0a0a0b; }
+.vc-n1 .stars, .vc-n2 .stars, .vc-n3 .stars { color: var(--p); }

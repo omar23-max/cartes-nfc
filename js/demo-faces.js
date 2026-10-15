@@ -8,7 +8,7 @@
   if (!V || !V.render) return;
   const SECTORS = { conseil: 0, archi: 3, beaute: 6, prestige: 1 }; /* décalage : pas la même photo en tête partout */
   const FACES = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => 'media/immobilier/der' + n + '.jpg');
-  const listOf = (s) => ((s.designs && s.designs.length ? s.designs : NFC.DESIGNS) || []).map((d) => d.id);
+  const listOf = (s) => ((s.designs && s.designs.length ? s.designs : NFC.DESIGNS) || []).map((d) => d.id).filter((id) => !/^n[1-3]$/.test(id)); /* modèles noirs exclus de l’alternance */
   const G = {
     conseil: { n: ['Michael Bennett', 'Michelle Bennett'], r: [['Attaché commercial', 'Conseillère financière']] },
     archi: { n: [['Daniel Brooks', 'Danielle Brooks'], ['Tom Barrett', 'Tess Barrett'], ['Victor Lane', 'Victoria Lane'], ['Mike Donovan', 'Mia Donovan'], ['Ryan Calloway', 'Rachel Calloway'], ['Graham Pierce', 'Grace Pierce']],
