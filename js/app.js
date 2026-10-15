@@ -567,7 +567,7 @@
     let nb = $('.newc');
     if (!nb) { nb = document.createElement('button'); nb.type = 'button'; nb.className = 'b sm newc'; nb.dataset.act = 'newc'; $('.reset').before(nb); }
     let mc = $('.mycre');
-    if (!mc) { mc = document.createElement('button'); mc.type = 'button'; mc.className = 'b sm mycre'; mc.dataset.act = 'curtag'; nb.before(mc); }
+    if (!mc) { mc = document.createElement('button'); mc.type = 'button'; mc.className = 'b sm mycre'; mc.dataset.act = 'mycre'; nb.before(mc); }
     mc.innerHTML = `${ic('copy', 16)}<span>${TT('Mes créations', 'My creations')}</span><em>${regAll().length}</em>`;
     mc.hidden = NOVER || !regAll().length;
     /* Menu « Version active » : ce que voient les visiteurs quand ils touchent la carte */
@@ -1084,13 +1084,16 @@
       html: `${ic('pen', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b><em class="ct-t">${live ? TT('Active', 'Active') : TT('Inactive', 'Inactive')}</em>` };
   }
   /* Clic sur le repère : mes créations, pour passer à une autre ou en créer une */
-  function curModal() {
+  /* Titre selon le bouton : repère « Vous modifiez » → « Modifier mes créations » ; bouton « Mes créations » → « Mes créations » */
+  let cmMode = 'edit';
+  function curModal(mode) {
     if (NOVER) return;
+    if (mode) cmMode = mode;
     const all = regAll();
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
       <div class="md no-rw cm-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
-        <h2 id="md-t">${TT('Modifier mes créations', 'Edit my creations')}</h2>
+        <h2 id="md-t">${cmMode === 'list' ? TT('Mes créations', 'My creations') : TT('Modifier mes créations', 'Edit my creations')}</h2>
         <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). <b>Touchez un nom pour modifier cette création.</b> « Activer » : elle s’affiche sur votre carte. ✎ renommer ; ⏸ pause.`, `All on the same NFC card (${all.length} of ${pfMax()}). <b>Tap a name to edit that creation.</b> “Activate”: it shows on your card. ✎ rename; ⏸ pause.`)}</p>
         <span class="box-l">${TT('Vos créations', 'Your creations')}</span>
         <div class="pf-pub">${all.slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x, true)).join('')}</div>
@@ -1214,7 +1217,7 @@
           <button type="button" class="nc-o" data-act="pzkeep" data-k="${k}" data-v="${id}"><span class="qa-ic">${ic('pause', 22)}</span><span><b>${TT('Oui, la garder en pause', 'Yes, keep it paused')}</b><small>${TT('Vous la modifiez ; vos visiteurs ne la voient toujours pas.', 'You edit it; your visitors still don’t see it.')}</small></span></button>
           <button type="button" class="nc-o" data-act="pzout" data-k="${k}" data-v="${id}"><span class="qa-ic">${ic('play', 20)}</span><span><b>${TT('Non, la sortir de pause', 'No, take it out of pause')}</b><small>${isLive(k, id) ? TT('C’est votre version active : votre carte est remise en ligne et l’affiche. Puis vous la modifiez.', 'It is your active version: your card goes back online and shows it. Then you edit it.') : TT('Son lien fonctionne de nouveau (sans la rendre active). Puis vous la modifiez.', 'Its link works again (without making it active). Then you edit it.')}</small></span></button>
         </div>
-        <div class="btns"><button type="button" class="b" data-act="curtag">${TT('Annuler', 'Cancel')}</button></div>
+        <div class="btns"><button type="button" class="b" data-act="cmback">${TT('Annuler', 'Cancel')}</button></div>
       </div>`;
     $('#modal').classList.add('on');
   }
@@ -1290,7 +1293,7 @@
           <h2 id="md-t">${TT(`Supprimer « ${esc(x.name)} » ?`, `Delete “${esc(x.name)}”?`)}</h2>
           <p>${TT(`${typ} « <b>${esc(x.name)}</b> » n’est pas encore publiée. En la supprimant, vous perdez toutes ses informations.`, `${typ} “<b>${esc(x.name)}</b>” is not published yet. Deleting it erases all its information.`)}</p>
           <p><b>${TT('Voulez-vous la supprimer ?', 'Do you want to delete it?')}</b></p>
-          <div class="btns"><button type="button" class="b pri" data-act="pfdelyes" data-k="${k}" data-v="${id}">${TT('Oui, supprimer', 'Yes, delete')}</button><button type="button" class="b" data-act="curtag">${TT('Non', 'No')}</button></div>
+          <div class="btns"><button type="button" class="b pri" data-act="pfdelyes" data-k="${k}" data-v="${id}">${TT('Oui, supprimer', 'Yes, delete')}</button><button type="button" class="b" data-act="cmback">${TT('Non', 'No')}</button></div>
         </div>`;
       $('#modal').classList.add('on');
       return;
@@ -2662,7 +2665,9 @@
       case 'json': exportJSON(); break;
       case 'full': openFull(); break;
       case 'newc': newPick = ''; newModal(); break;
-      case 'curtag': curModal(); break;
+      case 'curtag': curModal('edit'); break;
+      case 'mycre': curModal('list'); break;
+      case 'cmback': curModal(); break;
       case 'newpick': newPick = t.dataset.v; newModal(); break;
       case 'reset':
         if (ask(TT('Tout recommencer dans ce studio ? Les créations de ce studio seront effacées. Votre lien, votre QR code et votre paiement sont conservés.', 'Start over in this studio? This studio’s creations will be erased. Your link, QR code and payment are kept.'))) {
