@@ -566,6 +566,10 @@
     /* Déjà une création : « Nouvelle création » ajoute une carte, une boutique ou une invitation sans rien effacer */
     let nb = $('.newc');
     if (!nb) { nb = document.createElement('button'); nb.type = 'button'; nb.className = 'b sm newc'; nb.dataset.act = 'newc'; $('.reset').before(nb); }
+    let mc = $('.mycre');
+    if (!mc) { mc = document.createElement('button'); mc.type = 'button'; mc.className = 'b sm mycre'; mc.dataset.act = 'curtag'; nb.before(mc); }
+    mc.innerHTML = `${ic('copy', 16)}<span>${TT('Mes créations', 'My creations')}</span><em>${regAll().length}</em>`;
+    mc.hidden = NOVER || !regAll().length;
     nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`;
     nb.hidden = !(S.sectorId || regAll().length);
     let ct = $('.cur-tag');
@@ -1064,19 +1068,20 @@
   /* Clic sur le repère : mes créations, pour passer à une autre ou en créer une */
   function curModal() {
     if (NOVER) return;
-    const P = pfInit(), all = regAll();
+    const all = regAll();
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
-      <div class="md no-rw sg-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+      <div class="md no-rw cm-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
         <h2 id="md-t">${TT('Mes créations', 'My creations')}</h2>
-        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). Touchez une création pour la modifier.`, `All on the same NFC card (${all.length} of ${pfMax()}). Tap a creation to edit it.`)}</p>
-        <div class="sg-ol">${all.map((x) => { const me = x.k === KIND && x.id === P.cur, lv = isLive(x.k, x.id);
-          return `<button type="button" class="sg-o${me ? ' me' : ''}" ${me ? 'data-act="modal-close"' : `data-act="${x.k === KIND ? 'sgsw' : 'pfother'}" data-v="${x.id}"`}><span><b>${esc(x.name)}</b><small>${KIND_L[x.k]}${lv ? TT(' · Active', ' · Active') : isPaused(x.k, x.id) ? TT(' · en pause', ' · paused') : ''}${me ? TT(' · en cours de modification', ' · being edited') : ''}</small></span>${me ? ic('check', 15) : ic(x.k === KIND ? 'pen' : 'arrowur', 15)}</button>`; }).join('')}</div>
-        <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="pfmanage">${TT('Gérer les versions', 'Manage versions')}</button>${locked() ? '' : cardPaused() ? `<button type="button" class="b" data-act="cardresume">${ic('nfc', 15)}${TT('Reprendre ma carte', 'Resume my card')}</button>` : `<button type="button" class="b" data-act="cardpause">${ic('pause', 15)}${TT('Mettre ma carte en pause', 'Pause my card')}</button>`}</div>
-        ${cardPaused() ? `<p class="cp-note">${ic('pause', 14)}${TT('Carte en pause : vos visiteurs voient « Carte temporairement indisponible ».', 'Card paused: visitors see “Card temporarily unavailable”.')}</p>` : ''}
+        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). Touchez un nom pour le rendre actif ; ⏸ pour mettre en pause ; ✏️ pour modifier.`, `All on the same NFC card (${all.length} of ${pfMax()}). Tap a name to make it active; ⏸ to pause; ✏️ to edit.`)}</p>
+        <span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span>
+        <div class="pf-pub">${all.slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x)).join('')}</div>
+        ${pauseBox()}
+        <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="pfmanage">${TT('Renommer', 'Rename')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div>
       </div>`;
     $('#modal').classList.add('on');
   }
+
   /* (remplacé par le repère de l'en-tête) */
   function editLine() {
     if (true) return '';
@@ -2313,14 +2318,14 @@
       case 'pfpause': {
         const k = t.dataset.k, id = t.dataset.v, r = regSync(), key = `${k}:${id}`;
         r.paused = (r.paused || []).filter((z) => z !== key).concat([key]); regSet(r);
-        if (t.closest('#modal')) pfModal('manage'); render();
+        { const inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal'); render(); if (inCm) curModal(); else if (inM) pfModal('manage'); }
         toast(TT('Création mise en pause : les visiteurs qui ont gardé son lien voient « Temporairement indisponible ».', 'Creation paused: visitors who kept its link see “Temporarily unavailable”.'));
         break;
       }
       case 'pfresume': {
         const key = `${t.dataset.k}:${t.dataset.v}`, r = regSync();
         r.paused = (r.paused || []).filter((z) => z !== key); regSet(r);
-        if (t.closest('#modal')) pfModal('manage'); render();
+        { const inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal'); render(); if (inCm) curModal(); else if (inM) pfModal('manage'); }
         toast(TT('Création reprise : son lien fonctionne de nouveau.', 'Creation resumed: its link works again.'));
         break;
       }
@@ -2328,6 +2333,7 @@
       case 'pffold': pfOpen = !pfOpen; render(); break;
       case 'pfedit': {
         const k = t.dataset.k || KIND, id = t.dataset.v;
+        closeModal();
         if (k !== KIND) { goOther(id); break; }
         if (S.pf && id !== S.pf.cur) pfSwitch(id);
         go(4);
@@ -2348,20 +2354,20 @@
       case 'cardpause':
         if (!ask(TT('Mettre votre carte en pause ?\n\nVos visiteurs verront « Carte temporairement indisponible » quand ils toucheront votre carte ou scanneront votre QR code. Toutes vos créations sont conservées et vous pourrez reprendre à tout moment.', 'Pause your card?\n\nVisitors will see “Card temporarily unavailable” when they tap your card or scan your QR code. All your creations are kept and you can resume anytime.'))) break;
         { const r = regSync(); r.cardPaused = true; regSet(r); }
-        closeModal(); save(); render();
+        { const inCm = !!t.closest('.cm-md'); closeModal(); save(); render(); if (inCm) curModal(); }
         toast(TT('Carte en pause : vos visiteurs voient « Carte temporairement indisponible ».', 'Card paused: visitors see “Card temporarily unavailable”.'));
         break;
       case 'cardresume': {
         const r = regSync(); delete r.cardPaused; regSet(r);
-        closeModal(); save(); render();
+        { const inCm = !!t.closest('.cm-md'); closeModal(); save(); render(); if (inCm) curModal(); }
         const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
         toast(TT(`Carte de nouveau en ligne : elle affiche « ${lv.name || ''} ».`, `Card back online: it shows “${lv.name || ''}”.`));
         break;
       }
       case 'pflive': {
-        const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur;
+        const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur, inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal');
         setLive(k, id); P.live = k === KIND ? id : null; save(); render();
-        if (t.closest('#modal')) pfModal('manage');
+        if (inCm) curModal(); else if (inM) pfModal('manage');
         const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
         toast(TT(`Version active : « ${e2.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`, `Active version: “${e2.name || ''}”. Your card now shows it; same link, same QR code.`));
         break;
