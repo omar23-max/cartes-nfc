@@ -852,6 +852,51 @@
     askName();
   }
 
+  /* Autre secteur (ou type de boutique) choisi alors qu'une carte existe déjà (payée, ou plusieurs créations) :
+     nouvelle création, transformation de la carte en cours, ou modification d'une autre carte ? */
+  let secPend = null;
+  function secGuard(pend) {
+    if (NOVER || !S.sectorId || S.sectorId === pend.id) return false;
+    if (!(paidOf() || hasQR() || regAll().length > 1)) return false; /* toute première carte, pas encore payée : on change simplement de secteur */
+    const s = SECTORS.find((x) => x.id === pend.id);
+    if (!s || secSoon(s) || secOff(s)) return false;
+    secPend = pend;
+    const P = pfInit(), all = regAll(), full = all.length >= pfMax(), live = isLive(KIND, P.cur);
+    const cur = all.find((x) => x.k === KIND && x.id === P.cur) || {}, cs = baseSec();
+    const sn = ui() === 'en' ? (window.NFC_EN_APP || {})[s.name] || s.name : s.name;
+    const csn = cs ? (ui() === 'en' ? (window.NFC_EN_APP || {})[cs.name] || cs.name : cs.name) : '';
+    const st = KIND === 'stores', others = all.filter((x) => !(x.k === KIND && x.id === P.cur));
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md no-rw sg-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+        <h2 id="md-t">${TT(`Vous modifiez « ${esc(cur.name || '')} »${csn ? ` (${esc(csn)})` : ''}. Que voulez-vous faire ?`, `You are editing “${esc(cur.name || '')}”${csn ? ` (${esc(csn)})` : ''}. What would you like to do?`)}</h2>
+        <div class="nc-l">
+          <button type="button" class="nc-o${full ? ' off' : ''}" data-act="sgnew" ${full ? 'disabled' : ''}><span class="qa-ic">${ic('plus', 22)}</span><span><b>${st ? TT(`Créer une nouvelle boutique « ${esc(sn)} »`, `Create a new “${esc(sn)}” store`) : TT(`Créer une nouvelle carte « ${esc(sn)} »`, `Create a new “${esc(sn)}” card`)}</b><small>${full ? TT(`Vous utilisez déjà vos ${pfMax()} créations : supprimez-en une dans « Versions ».`, `You already use your ${pfMax()} creations: delete one in “Versions”.`) : TT(`Vos autres créations ne changent pas. Même carte NFC : rien à payer (${all.length + 1} sur ${pfMax()}).`, `Your other creations stay as they are. Same NFC card: nothing to pay (${all.length + 1} of ${pfMax()}).`)}</small></span></button>
+          <button type="button" class="nc-o" data-act="sgmod"><span class="qa-ic">${ic('reset', 22)}</span><span><b>${TT(`Transformer « ${esc(cur.name || '')} » en ${st ? 'boutique' : 'carte'} « ${esc(sn)} »`, `Turn “${esc(cur.name || '')}” into a “${esc(sn)}” ${st ? 'store' : 'card'}`)}</b><small>${live ? `<span class="sg-warn">${TT('Attention : c’est la version active, celle que voient vos visiteurs.', 'Careful: this is the active version, the one your visitors see.')}</span>` : TT('Cette création change de secteur ; elle n’est pas en ligne.', 'This creation changes industry; it is not live.')}</small></span></button>
+        </div>
+        ${others.length ? `<p class="sg-l">${TT('Ou modifier une autre de mes créations :', 'Or edit another of my creations:')}</p><div class="sg-ol">${others.map((x) => `<button type="button" class="sg-o" data-act="${x.k === KIND ? 'sgsw' : 'pfother'}" data-v="${x.id}"><span><b>${esc(x.name)}</b><small>${KIND_L[x.k]}${isLive(x.k, x.id) ? TT(' · Active', ' · Active') : ''}</small></span>${ic(x.k === KIND ? 'pen' : 'arrowur', 15)}</button>`).join('')}</div>` : ''}
+        <div class="btns"><button type="button" class="b" data-act="modal-close">${TT('Annuler', 'Cancel')}</button></div>
+      </div>`;
+    $('#modal').classList.add('on');
+    return true;
+  }
+  function secGo(isNew) {
+    const pd = secPend; secPend = null;
+    if (!pd) return;
+    closeModal();
+    if (isNew) {
+      if (regAll().length >= pfMax()) return;
+      const s = SECTORS.find((x) => x.id === pd.id), sn = (ui() === 'en' ? (window.NFC_EN_APP || {})[s.name] || s.name : s.name).split(/ et | and | & |, /)[0]; /* « Beauté et bien-être » → « Beauté » */
+      const base = KIND === 'stores' ? TT(`Ma boutique ${sn}`, `My ${sn} store`) : TT(`Ma carte ${sn}`, `My ${sn} card`);
+      let name = base.slice(0, 24);
+      for (let i = 2; pfTaken(name); i++) name = `${base.slice(0, 21)} ${i}`;
+      pfNewFresh(name);
+      toast(TT(`« ${name} » créée, sur la même carte NFC : rien à repayer. Vos autres créations ne changent pas.`, `“${name}” created on the same NFC card: nothing to pay again. Your other creations are unchanged.`));
+    }
+    if (pd.p) { if (S.sectorId !== pd.id) { S.sectorId = pd.id; S.design = null; } pickProfile(pd.p); }
+    else pickSector(pd.id, !!pd.other);
+  }
+
   /* Première création (et toute version jamais nommée) : « Comment voulez-vous appeler cette carte ? »
      Le nom n’est visible que par la personne ; il sert à retrouver ses versions. Pas pour les invitations (pas de versions). */
   function askName() {
@@ -2095,12 +2140,16 @@
     const a = t.dataset.act;
     switch (a) {
       case 'go': go(+t.dataset.n); break;
-      case 'sector': pickSector(t.dataset.id); break;
+      case 'sector': if (!secGuard({ id: t.dataset.id })) pickSector(t.dataset.id); break;
+      case 'sgnew': secGo(true); break;
+      case 'sgmod': secGo(false); break;
+      case 'sgsw': closeModal(); secPend = null; pfSwitch(t.dataset.v); window.scrollTo(0, 0); break;
       case 'profile': pickProfile(t.dataset.id); break;
       case 'profgo': {
         /* Résultat de recherche : secteur + métier en un clic */
         const s = SECTORS.find((x) => x.id === t.dataset.s);
         if (!s) break;
+        if (secGuard({ id: s.id, p: t.dataset.p })) break;
         if (S.sectorId !== s.id) { S.sectorId = s.id; S.design = null; }
         pickProfile(t.dataset.p);
         break;
@@ -2119,7 +2168,7 @@
         toast('Carte reliée à votre QR code. Créez maintenant votre carte : elle s’affichera à ce lien.');
         break;
       case 'qrreset': if (hasQR()) S.id = rid(); delete S.qr; go(1); break;
-      case 'other-pick': closeModal(); pickSector(t.dataset.id, true); break;
+      case 'other-pick': closeModal(); if (!secGuard({ id: t.dataset.id, other: true })) pickSector(t.dataset.id, true); break;
       case 'modal-close': closeModal(); break;
       case 'namesave': nameDone(true); break;
       case 'kindpick': kindPick = t.dataset.v; render(); setTimeout(() => { const i = $('[data-kindform] input'); if (i) { i.focus(); i.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 50); break;

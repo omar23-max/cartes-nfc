@@ -1215,3 +1215,13 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .nc-o:hover { border-color: #b9b9c0; }
 .nc-o.sel { border-color: #111114; box-shadow: 0 0 0 2px #111114 inset; }
 @media (max-width: 640px) { .newc span { display: none; } }
+/* Autre secteur alors qu'une carte existe : nouvelle création ou transformation ? */
+.sg-md h2 { font-size: 19px; line-height: 1.3; }
+.nc-o.off, .nc-o:disabled { opacity: .55; cursor: not-allowed; }
+.sg-warn { color: #b42318; font-weight: 600; }
+.sg-l { font-size: 13px; color: var(--mut); margin: 4px 0 6px; }
+.sg-ol { display: grid; gap: 6px; margin-bottom: 12px; }
+.sg-o { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-align: left; padding: 9px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); cursor: pointer; font: inherit; color: inherit; }
+.sg-o b { display: block; font-size: 14px; }
+.sg-o small { color: var(--mut); font-size: 12px; }
+.sg-o:hover { border-color: #b9b9c0; }
