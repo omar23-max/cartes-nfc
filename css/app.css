@@ -1405,3 +1405,14 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 @media (max-width: 1500px) and (min-width: 561px) { .top .reset span { display: none; } }
 /* Écrans moyens : « Mes créations » et « Nouvelle création » en icône seule */
 @media (max-width: 1180px) and (min-width: 561px) { .top .mycre span, .top .newc.newc2 span { display: none; } .top .mycre, .top .newc.newc2 { padding: 0 12px; } }
+/* Étape Contenu (v=273) : info dans l'en-tête, langue au-dessus de la boîte, outils à gauche */
+.hd-info { display: inline-flex; align-items: center; gap: 8px; min-width: 0; margin-left: 4px; font-size: 13px; font-weight: 500; color: var(--mut); }
+.hd-info[hidden] { display: none; }
+.hd-info .code { flex: none; font-size: 11.5px; }
+.hd-info .hd-info-t { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 30vw; }
+.ed-lang { display: flex; align-items: center; margin: 0 0 12px; }
+.ed-lang .lang-sw { display: inline-flex; align-items: center; gap: 12px; }
+.ed-tools .ed-links { justify-content: flex-start; }
+@media (min-width: 561px) { .wrap.wide > .ed-bar { display: none; } }
+@media (max-width: 1320px) and (min-width: 561px) { .hd-info .hd-info-t { display: none; } }
+@media (max-width: 560px) { .hd-info { display: none !important; } .ed-lang { margin-bottom: 8px; } .ed-lang .lang-sw { flex: 1 1 100%; justify-content: space-between; gap: 6px; } }

@@ -586,6 +586,11 @@
     nb.classList.add('newc2');
     nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`; nb.title = TT('Nouvelle création', 'New creation');
     nb.hidden = !(S.sectorId || regAll().length);
+    let hi = $('.hd-info');
+    if (!hi) { hi = document.createElement('span'); hi.className = 'hd-info no-rw'; $('.top .brand').appendChild(hi); }
+    { const s0 = S.step === 4 && S.sectorId ? sec() : null, p0 = s0 ? ((NFC.palsOf ? NFC.palsOf(s0) : s0.palettes)[S.palette] || s0.palettes[0]) : null;
+      hi.hidden = !s0;
+      if (s0) { hi.innerHTML = `<span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span class="hd-info-t">${s0.profile ? profName(s0.profile) : s0.name} · ${designOf(S.design).name} · ${p0.name}</span>`; hi.title = hi.textContent; } }
     let ct = $('.cur-tag');
     if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; $('.top .brand').after(ct); }
     const tg = curTag();
@@ -1543,17 +1548,15 @@
       <div class="ed-bar">
         <div class="ed-info"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span>${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></div>
       </div>
+      <div class="ed-lang">${langSwitch()}</div>
+      ${biliNote()}
       <div class="ed-tools">
-        ${pfBar()}
         <div class="ed-links">
-          ${langSwitch()}
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i><span class="lbl-l">Éditer avec l’IA</span><span class="lbl-s">IA</span></button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 0 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
-        ${regAll().length < 2 && !locked() && !NOVER ? `<div class="pf-st pf-solo">${ic('nfc', 14)}<span>${TT('Votre carte sur votre téléphone, pour la présenter à tout moment.', 'Your card on your phone, to show it anytime.')}</span>${locked() ? '' : `<span class="pf-owns"><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfphone">${ic(locked() ? 'lock' : 'qr', 13)}${TT('Connecter mon téléphone', 'Connect my phone')}</button><button type="button" class="pf-own${locked() ? ' lk' : ''}" data-act="pfowner">${locked() ? ic('lock', 13) : ''}${TT('Ma carte en mode titulaire', 'My card in owner mode')}${locked() ? '' : ic('arrowur', 13)}</button></span>`}</div>` : ''}
-        ${biliNote()}
       </div>
       <div class="mtabs">
         <button class="${mobileTab === 'edit' ? 'on' : ''}" data-act="mtab" data-t="edit">Modifier</button>
