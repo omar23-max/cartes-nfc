@@ -1001,7 +1001,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 /* Publication, « Version active » : une version par ligne, même largeur, icône NFC à gauche */
 .pf-pub { display: grid; grid-template-columns: 1fr; gap: 6px; }
 .pf-pub .pf-c { width: 100%; box-sizing: border-box; justify-content: flex-start; min-height: 40px; padding: 8px 12px; text-align: left; }
-.pf-pub .pf-c:not(.on)::before { content: ""; flex: none; width: 13px; }
+.pf-pub .pf-c:not(.on):not(.is-pz)::before { content: ""; flex: none; width: 13px; } /* place de l’icône quand la ligne n’en a pas */
 /* Publication : aperçu de la version active (page réelle de la carte) */
 .pv-frame { overflow: hidden; }
 .pv-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
