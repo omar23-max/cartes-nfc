@@ -652,11 +652,9 @@
 
   /* ---------- Étape 1 : secteur ---------- */
   /* ---------- Avant l’étape 1 : avez-vous déjà un QR code ? ---------- */
-  /* NexTap encore vierge : rien créé dans aucun studio (cartes, boutiques, invitations) */
+  /* Nouvelle création (aucun secteur choisi, y compris après « Recommencer ») : on demande ce qu’on veut créer */
   function nexFresh() {
-    if (S.sectorId) return false;
-    const n = (k) => { try { return ((JSON.parse(localStorage.getItem(k) || 'null') || {}).list || []).length; } catch (e) { return 0; } };
-    return n('nextap-pages') === 0 && n('nextap-events') === 0;
+    return !S.sectorId;
   }
   const KIND_DEF = { cards: ['Carte principale', 'Main card'], stores: ['Boutique principale', 'Main store'], events: ['Événement principal', 'Main event'] };
   let kindPick = '';
