@@ -1164,12 +1164,26 @@
     keep.forEach((x) => { const o = own.find((z) => x.k === KIND && z.id === x.id); if (o) x.name = o.name; });
     own.forEach((o) => { if (!keep.some((x) => x.k === KIND && x.id === o.id)) keep.push(o); });
     r.list = keep;
-    if ((!r.live || !r.list.some((x) => x.k === r.live.k && x.id === r.live.id)) && r.list.length) r.live = { k: r.list[0].k, id: r.list[0].id };
+    if ((!r.live || !r.list.some((x) => x.k === r.live.k && x.id === r.live.id)) && r.list.length) {
+      const free = r.list.find((x) => !(r.paused || []).includes(`${x.k}:${x.id}`));
+      const pick = free || r.list[0];
+      r.live = { k: pick.k, id: pick.id };
+      if (!free) r.cardPaused = true; /* toutes en pause : la carte est en pause */
+    }
+    if (r.live && (r.paused || []).includes(`${r.live.k}:${r.live.id}`)) { r.paused = r.paused.filter((z) => z !== `${r.live.k}:${r.live.id}`); r.cardPaused = true; }
     if (S.pf) S.pf.live = r.live && r.live.k === KIND ? r.live.id : null;
     regSet(r);
     return r;
   }
   const regAll = () => (regGet() || {}).list || [];
+  /* Activer une création : elle sort de pause ; si la carte était en pause, l'ancienne active reste en pause */
+  function setLive(k, id) {
+    const r = regSync();
+    if (r.cardPaused && r.live && !(r.live.k === k && r.live.id === id)) { const old = `${r.live.k}:${r.live.id}`; if (!(r.paused || []).includes(old)) r.paused = (r.paused || []).concat([old]); }
+    r.live = { k, id }; delete r.cardPaused; r.paused = (r.paused || []).filter((z) => z !== `${k}:${id}`);
+    regSet(r);
+    if (S.pf) S.pf.live = k === KIND ? id : null;
+  }
   /* Carte en pause : aucune création n'est visible, le lien et le QR code affichent « Carte temporairement indisponible » */
   const cardPaused = () => !NOVER && !!(regGet() || {}).cardPaused;
   const regLive = () => (regGet() || {}).live || { k: KIND, id: pfInit().cur };
@@ -1422,8 +1436,8 @@
         : `<h2 id="md-t">${TT('Versions de ma carte', 'My card’s versions')}</h2>
           <p>${TT('Toutes les versions de votre carte, cartes de visite et boutiques. Touchez le nom d’une version de l’autre studio (↗) pour l’ouvrir. La version active ne peut pas être supprimée.', 'All your card’s versions, business cards and stores. Tap the name of a version from the other studio (↗) to open it. The active version cannot be deleted.')}</p>
           <form data-pfm>${all.map((x) => x.k === KIND
-            ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('Active', 'Active')}</span>` : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`
-            : `<div class="pf-row"><button type="button" class="pf-o" data-act="pfother" data-v="${x.id}" title="${TT('Ouvrir cette version dans l’autre studio', 'Open this version in the other studio')}"><span>${esc(x.name)}</span>${ic('arrowur', 14)}</button><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? `<span class="pf-live">${TT('Active', 'Active')}</span>` : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`).join('')}
+            ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? (cardPaused() ? `<button type="button" class="pf-act pf-resume" data-act="cardresume" title="${TT('Carte en pause : touchez pour reprendre', 'Card paused: tap to resume')}">${ic('play', 13)}${TT('Reprendre', 'Resume')}</button>` : `<span class="pf-live">${TT('Active', 'Active')}</span>`) : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`
+            : `<div class="pf-row"><button type="button" class="pf-o" data-act="pfother" data-v="${x.id}" title="${TT('Ouvrir cette version dans l’autre studio', 'Open this version in the other studio')}"><span>${esc(x.name)}</span>${ic('arrowur', 14)}</button><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? (cardPaused() ? `<button type="button" class="pf-act pf-resume" data-act="cardresume" title="${TT('Carte en pause : touchez pour reprendre', 'Card paused: tap to resume')}">${ic('play', 13)}${TT('Reprendre', 'Resume')}</button>` : `<span class="pf-live">${TT('Active', 'Active')}</span>`) : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`).join('')}
           <div class="btns pf-mbtns"><button type="submit" class="b pri">${TT('Enregistrer', 'Save')}</button><button type="button" class="b" data-act="newc">${ic('plus', 14)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div></form>`}
       </div>`;
     $('#modal').classList.add('on');
@@ -2345,10 +2359,7 @@
       }
       case 'pflive': {
         const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur;
-        const r = regSync();
-        /* Carte en pause et on active une autre création : l'ancienne active reste en pause (son lien gardé par des visiteurs aussi) */
-        if (r.cardPaused && r.live && !(r.live.k === k && r.live.id === id)) { const old = `${r.live.k}:${r.live.id}`; if (!(r.paused || []).includes(old)) r.paused = (r.paused || []).concat([old]); }
-        r.live = { k, id }; delete r.cardPaused; r.paused = (r.paused || []).filter((z) => z !== `${k}:${id}`); regSet(r); P.live = k === KIND ? id : null; save(); render();
+        setLive(k, id); P.live = k === KIND ? id : null; save(); render();
         if (t.closest('#modal')) pfModal('manage');
         const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
         toast(TT(`Version active : « ${e2.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`, `Active version: “${e2.name || ''}”. Your card now shows it; same link, same QR code.`));
@@ -2760,8 +2771,8 @@
   /* Version affichée par la carte : choix direct dans la liste */
   document.addEventListener('change', (e) => {
     if (!e.target.matches || !e.target.matches('[data-pflivesel]')) return;
-    const [k, id] = e.target.value.split(':'), r = regSync();
-    r.live = { k, id }; regSet(r); if (S.pf) S.pf.live = k === KIND ? id : null; save(); render();
+    const [k, id] = e.target.value.split(':');
+    setLive(k, id); save(); render();
     const x = regAll().find((z) => z.k === k && z.id === id) || {};
     toast(TT(`Version active : « ${x.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`, `Active version: “${x.name || ''}”. Your card now shows it; same link, same QR code.`));
   });

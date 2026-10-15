@@ -22,7 +22,8 @@
     if (!R) return {};
     const other = kind === 'cards' ? 'stores/view.html' : '../view.html';
     /* Carte en pause (titulaire) : tous ses liens affichent « Carte temporairement indisponible » ; le titulaire (?owner=1) voit sa carte */
-    if (R.cardPaused && q.get('owner') !== '1') return { page: page(T('Carte temporairement indisponible', 'Card temporarily unavailable'), T('Cette carte reviendra bientôt.', 'This card will be back soon.'), true) };
+    const livePaused = R.live && (R.paused || []).includes(`${R.live.k}:${R.live.id}`); /* version active « en pause » = carte en pause */
+    if ((R.cardPaused || livePaused) && q.get('owner') !== '1') return { page: page(T('Carte temporairement indisponible', 'Card temporarily unavailable'), T('Cette carte reviendra bientôt.', 'This card will be back soon.'), true) };
     let key = q.get('ver');
     const seen = new Set();
     while (key && R.gone && R.gone[key] && !seen.has(key)) {
