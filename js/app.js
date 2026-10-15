@@ -1041,7 +1041,7 @@
      « Nouvelle carte : <nom> » tant que la création n'a jamais été publiée, puis « Vous modifiez : <nom> · Active / Inactive » */
   function curTag() {
     if (!S.kindChosen && !S.sectorId && !S.pf && !S.vname) return null; /* tout début : rien encore à nommer */
-    const NEW = { cards: TT('Nouvelle carte', 'New card'), stores: TT('Nouvelle boutique', 'New store'), events: TT('Nouvel événement', 'New event') }[KIND];
+    const NEW = { cards: TT('Création d’une nouvelle carte', 'Creating a new card'), stores: TT('Création d’une nouvelle boutique', 'Creating a new store'), events: TT('Création d’un nouvel événement', 'Creating a new event') }[KIND];
     let name, pub, live;
     if (NOVER) { name = S.vname || TT('Événement principal', 'Main event'); pub = !!S.pub; live = true; }
     else {
