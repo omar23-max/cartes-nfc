@@ -1050,16 +1050,17 @@
   function curTag() {
     if (!S.kindChosen && !S.sectorId && !S.pf && !S.vname) return null; /* tout début : rien encore à nommer */
     const NEW = { cards: TT('Création d’une nouvelle carte', 'Creating a new card'), stores: TT('Création d’une nouvelle boutique', 'Creating a new store'), events: TT('Création d’un nouvel événement', 'Creating a new event') }[KIND];
-    let name, pub, live;
+    let name, pub, live, pz = false;
     if (NOVER) { name = S.vname || TT('Événement principal', 'Main event'); pub = !!S.pub; live = true; }
     else {
       const P = pfInit(), e = P.list.find((x) => x.id === P.cur) || {};
       name = e.name || ''; live = isLive(KIND, P.cur);
       pub = !!e.pub || (live && !!(paidOf() || hasQR()));
+      pz = isPaused(KIND, P.cur) || (live && cardPaused());
     }
     if (!name) return null;
-    if (cardPaused()) return { cls: 'is-pause', title: TT('Votre carte est en pause : vos visiteurs voient « Carte temporairement indisponible ». Touchez pour voir vos créations.', 'Your card is paused: visitors see “Card temporarily unavailable”. Tap to see your creations.'),
-      html: `${ic('pause', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b><em class="ct-t">${TT('Carte en pause', 'Card paused')}</em>` };
+    if (pz) return { cls: 'is-pause', title: live ? TT('Cette création est la version active et elle est en pause : toute la carte affiche « Carte temporairement indisponible ». Touchez pour voir vos créations.', 'This creation is the active version and it is paused: the whole card shows “Card temporarily unavailable”. Tap to see your creations.') : TT('Cette création est en pause : son lien affiche « Temporairement indisponible ». Touchez pour voir vos créations.', 'This creation is paused: its link shows “Temporarily unavailable”. Tap to see your creations.'),
+      html: `${ic('pause', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b><em class="ct-t">${TT('En pause', 'Paused')}</em>` };
     if (!pub) return { cls: 'is-new', title: TT('Création pas encore publiée. Touchez pour voir vos créations.', 'Not published yet. Tap to see your creations.'), html: `${ic('plus', 14)}<span class="ct-l">${NEW}&nbsp;:</span><b>${esc(name)}</b>` };
     if (NOVER) return { cls: 'is-live', title: '', html: `${ic('pen', 14)}<span class="ct-l">${TT('Vous modifiez&nbsp;:', 'Editing:')}</span><b>${esc(name)}</b>` };
     return { cls: live ? 'is-live' : 'is-off', title: live ? TT('Version active : vos visiteurs voient ces changements. Touchez pour voir vos créations.', 'Active version: your visitors see these changes. Tap to see your creations.') : TT('Pas en ligne : vos visiteurs ne voient pas ces changements. Touchez pour voir vos créations.', 'Not live: your visitors do not see these changes. Tap to see your creations.'),
@@ -1182,6 +1183,13 @@
   }
   const regAll = () => (regGet() || {}).list || [];
   /* Activer une création : elle sort de pause ; si la carte était en pause, l'ancienne active reste en pause */
+  /* Confirmation avant une remise en ligne (création en pause, ou carte en pause) */
+  function liveOk(k, id) {
+    const x = regAll().find((z) => z.k === k && z.id === id) || {}, n = x.name || '';
+    if (isPaused(k, id) || (isLive(k, id) && cardPaused())) return ask(TT(`Rendre « ${n} » active ?\n\nElle sortira de pause et vos visiteurs la verront quand ils toucheront votre carte ou scanneront votre QR code.`, `Make “${n}” active?\n\nIt will leave pause and your visitors will see it when they tap your card or scan your QR code.`));
+    if (cardPaused()) return ask(TT(`Rendre « ${n} » active ?\n\nVotre carte est en pause : elle sera remise en ligne et affichera « ${n} ».`, `Make “${n}” active?\n\nYour card is paused: it will be back online and show “${n}”.`));
+    return true;
+  }
   function setLive(k, id) {
     const r = regSync();
     if (r.cardPaused && r.live && !(r.live.k === k && r.live.id === id)) { const old = `${r.live.k}:${r.live.id}`; if (!(r.paused || []).includes(old)) r.paused = (r.paused || []).concat([old]); }
@@ -2366,6 +2374,8 @@
       }
       case 'pflive': {
         const P = pfInit(), k = t.dataset.k || KIND, id = t.dataset.v || P.cur, inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal');
+        if (isLive(k, id) && !cardPaused()) break; /* déjà la version active : rien à faire */
+        if (!liveOk(k, id)) break;
         setLive(k, id); P.live = k === KIND ? id : null; save(); render();
         if (inCm) curModal(); else if (inM) pfModal('manage');
         const e2 = regAll().find((x) => x.k === k && x.id === id) || {};
@@ -2779,6 +2789,7 @@
   document.addEventListener('change', (e) => {
     if (!e.target.matches || !e.target.matches('[data-pflivesel]')) return;
     const [k, id] = e.target.value.split(':');
+    if (!liveOk(k, id)) { render(); return; }
     setLive(k, id); save(); render();
     const x = regAll().find((z) => z.k === k && z.id === id) || {};
     toast(TT(`Version active : « ${x.name || ''} ». Votre carte l’affiche maintenant ; même lien, même QR code.`, `Active version: “${x.name || ''}”. Your card now shows it; same link, same QR code.`));
