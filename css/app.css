@@ -1279,3 +1279,13 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pub-off { background: #fffbeb; border-color: #fcd9a1; }
 .pub-off p { display: flex; gap: 8px; align-items: flex-start; margin: 0 0 10px; color: #7a4a00; font-size: 14px; }
 .pub-off p svg { flex: none; margin-top: 2px; }
+/* Carte en pause (orange) */
+.cur-tag.is-pause { background: #fff7ed; border-color: #fdba74; color: #9a3412; }
+.cur-tag.is-pause .ct-t { background: #ffedd5; color: #c2410c; }
+.card-pause .box-l { display: inline-flex; align-items: center; gap: 6px; }
+.card-pause.on { background: #fff7ed; border-color: #fdba74; }
+.card-pause.on .box-l { color: #c2410c; }
+.card-pause.on > p:first-of-type { color: #7c2d12; font-size: 14px; margin: 6px 0 10px; }
+.card-pause .muted.small { margin: 6px 0 10px; }
+.pf-pub .pf-c.on.paused { background: #fff7ed; color: #9a3412; border-color: #fdba74; }
+.cp-note { display: flex; align-items: center; gap: 6px; margin: 10px 0 0; color: #c2410c; font-size: 13px; }
