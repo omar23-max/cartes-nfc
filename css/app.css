@@ -1225,3 +1225,12 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .sg-o b { display: block; font-size: 14px; }
 .sg-o small { color: var(--mut); font-size: 12px; }
 .sg-o:hover { border-color: #b9b9c0; }
+/* « Vous modifiez » aux étapes Modèle et Couleurs */
+.ed-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 10px 0 4px; padding: 9px 12px; border-radius: 12px; font-size: 14px; border: 1px solid; }
+.ed-line.is-live { background: #ecfdf3; border-color: #a6e9c1; color: #065f46; }
+.ed-line.is-off { background: #fef3f2; border-color: #f7c1bb; color: #912018; }
+.ed-line b { font-weight: 700; }
+.ed-line small { flex-basis: 100%; font-size: 12.5px; opacity: .85; }
+.ed-line .pf-tag { padding: 2px 8px; border-radius: 99px; font-size: 11.5px; font-weight: 700; font-style: normal; }
+.ed-line .pf-tag.on { background: #dcfce7; color: #166534; }
+.ed-line .pf-tag.off { background: #fee2e2; color: #b91c1c; }

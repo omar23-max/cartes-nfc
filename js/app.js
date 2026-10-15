@@ -1032,6 +1032,14 @@
   }
 
   /* ---------- Étape 2 : modèle ---------- */
+  /* Étapes Modèle et Couleurs : quelle création on modifie, active ou non (seulement à partir de 2 créations) */
+  function editLine() {
+    if (NOVER || regAll().length < 2) return '';
+    const P = pfInit(), x = regAll().find((z) => z.k === KIND && z.id === P.cur);
+    if (!x) return '';
+    const on = isLive(KIND, P.cur);
+    return `<div class="ed-line no-rw ${on ? 'is-live' : 'is-off'}">${ic('pen', 14)}<span>${TT('Vous modifiez&nbsp;:', 'You are editing:')}</span><b>${esc(x.name)}</b><em class="pf-tag ${on ? 'on' : 'off'}">${on ? TT('Active', 'Active') : TT('Inactive', 'Inactive')}</em><small>${on ? TT('Vos visiteurs voient ces changements.', 'Your visitors see these changes.') : TT('Pas en ligne : vos visiteurs ne voient pas ces changements.', 'Not live: your visitors do not see these changes.')}</small></div>`;
+  }
   function step2() {
     const s = sec();
     const dOff = (d) => cfg('designsOff', []).includes(d.id);
@@ -1048,6 +1056,7 @@
       </div>`).join('');
     return `<section class="wrap">${admBar()}
       ${back(1, X.backTo || 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
+      ${editLine()}
       ${langSwitch()}
       ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Cliquez pour choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.`)}
       <div class="tpls">${cards}</div>
@@ -1072,6 +1081,7 @@
       <div class="split s3">
         <div class="side">
           ${back(2, 'Changer de modèle')}
+          ${editLine()}
           ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · ${nPal === 6 ? '6 palettes pensées pour votre secteur.' : ui() === 'en' ? `${nPal} palettes designed for your industry.` : `${nPal} palettes pensées pour votre secteur.`}`)}
           <div class="pals">${pals}</div>
           ${isEvents ? '' : '<p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>'}
