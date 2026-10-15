@@ -1416,3 +1416,25 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 @media (min-width: 561px) { .wrap.wide > .ed-bar { display: none; } }
 @media (max-width: 1320px) and (min-width: 561px) { .hd-info .hd-info-t { display: none; } }
 @media (max-width: 560px) { .hd-info { display: none !important; } .ed-lang { margin-bottom: 8px; } .ed-lang .lang-sw { flex: 1 1 100%; justify-content: space-between; gap: 6px; } }
+/* Téléphone — en-tête et outils (v=275) : logo · FR/EN · ↻ / étapes / Vous modifiez / Active / Mes créations + Nouvelle création / IA · Modèle · Couleurs */
+@media (max-width: 560px) {
+  .top #uisw { margin-left: auto; }
+  .top .cur-tag { order: 20; flex: 1 1 100%; max-width: 100%; margin: 0; justify-content: flex-start; }
+  .top .cur-tag .ct-l { display: inline; }
+  .top .hd-live { order: 21; flex: 1 1 100%; }
+  .top .mycre { order: 22; flex: 1 1 0; justify-content: center; min-height: 38px; border-radius: 99px; padding: 0 10px; }
+  .top .mycre span { display: inline; }
+  .top .newc { order: 23; flex: 1 1 0; justify-content: center; min-height: 38px; border-radius: 99px; padding: 0 10px; }
+  .top .newc span { display: inline; }
+  .ed-tools .ed-links { display: flex; flex-wrap: nowrap; gap: 6px; }
+  .ed-tools .ed-links > .b.sm { flex: 1 1 0; flex-direction: row; justify-content: center; align-items: center; gap: 5px; min-height: 40px; padding: 0 6px; font-size: 12.5px; }
+  .ed-tools .ed-links > .b.sm .lbl-l { display: none; }
+  .ed-tools .ed-links > .b.sm .lbl-s { display: inline; }
+}
+@media (max-width: 560px) {
+  .top .hd-live { flex-wrap: nowrap; gap: 6px; min-width: 0; }
+  .top .hd-live .hd-ll { flex: none; }
+  .top .hd-live .hd-sw { flex: 1 1 auto; min-width: 0; }
+  .top .hd-live select { width: 100%; max-width: none; min-width: 0; }
+  .top .hd-live .hd-act { flex: none; padding: 5px 10px; }
+}
