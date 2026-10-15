@@ -1270,3 +1270,8 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 .pf-pub .pf-c .pf-cn { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .pf-pub .pf-c .pf-ck { flex: none; margin-left: auto; padding-left: 10px; text-align: right; font-weight: 500; opacity: .7; }
 @media (max-width: 560px) { .pf-pub .pf-c .pf-ck { width: auto; font-size: 12px; } }
+/* Fenêtre « Vous modifiez … » : titre centré, secteur, puis la question */
+.sg-md .sg-t { text-align: center; padding: 0 36px; margin-bottom: 4px; }
+.sg-md .sg-sec { text-align: center; margin: 0 0 14px; color: var(--mut); font-size: 14px; }
+.sg-md .sg-sec b { color: var(--ink); }
+.sg-md .sg-q { margin: 0 0 10px; font-weight: 700; font-size: 15px; }
