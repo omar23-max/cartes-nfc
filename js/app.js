@@ -582,7 +582,7 @@
         <span class="hd-sw"><select data-hdpick aria-label="${TT('Création à activer', 'Creation to activate')}">${opts()}</select>${ic('chevd', 14)}</span>
         <button type="button" class="hd-act" data-act="hdact">${ic('nfc', 13)}${TT('Activer', 'Activate')}</button>`;
       else if (all.length) hl.innerHTML = `<span class="hd-ll">${ic('nfc', 14)}<span class="hd-lg">${TT('Version active', 'Active version')}</span><span class="hd-sh">${TT('Active', 'Active')}</span>&nbsp;:</span>
-        <span class="hd-sw"><select data-pflivesel aria-label="${TT('Version active de la carte : ce que voient vos visiteurs', 'Card’s active version: what your visitors see')}">${opts()}</select>${ic('chevd', 14)}</span>`; }
+        <span class="hd-sw"><select data-pflivesel aria-label="${TT('Version active de la carte : ce que voient vos visiteurs', 'Card’s active version: what your visitors see')}">${opts()}<option value="__none">${TT('Aucune (carte en pause)', 'None (card paused)')}</option></select>${ic('chevd', 14)}</span>`; }
     nb.classList.add('newc2');
     nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`; nb.title = TT('Nouvelle création', 'New creation');
     nb.hidden = !(S.sectorId || regAll().length);
@@ -2903,6 +2903,12 @@
   /* Version affichée par la carte : choix direct dans la liste */
   document.addEventListener('change', (e) => {
     if (!e.target.matches || !e.target.matches('[data-pflivesel]')) return;
+    if (e.target.value === '__none') {
+      if (!ask(TT('Aucune création active ?\n\nVotre carte sera en pause : vos visiteurs verront « Carte temporairement indisponible » quand ils toucheront votre carte ou scanneront votre QR code. Toutes vos créations sont conservées.', 'No active creation?\n\nYour card will be paused: visitors will see “Card temporarily unavailable” when they tap your card or scan your QR code. All your creations are kept.'))) { render(); return; }
+      const r = regSync(); r.cardPaused = true; regSet(r); save(); render();
+      toast(TT('Aucune création active : votre carte est en pause.', 'No active creation: your card is paused.'));
+      return;
+    }
     const [k, id] = e.target.value.split(':');
     if (!liveOk(k, id)) { render(); return; }
     setLive(k, id); save(); render();
