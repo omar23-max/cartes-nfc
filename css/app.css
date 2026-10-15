@@ -1356,3 +1356,13 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .pf-renf input { flex: 1; min-width: 0; padding: 9px 12px; border: 1px solid #93c5fd; border-radius: 10px; font: inherit; font-size: 15px; }
 .pf-renb { display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; }
 .pf-renf .pf-err { margin: 8px 0 0; }
+/* « Mes créations » : le nom ouvre la création ; « Activer » à part ; création en cours repérée */
+.pf-pub .pf-actv { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 2px 9px; border: 1px solid #a6e9c1; border-radius: 99px; background: #ecfdf3; color: #166534; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+.pf-pub .pf-actv:hover { background: #dcfce7; border-color: #22c55e; }
+.pf-pub .pf-curt { flex: none; padding: 1px 7px; border-radius: 99px; background: #dbeafe; color: #1e40af; font-size: 11px; font-weight: 700; font-style: normal; }
+.cm-md .pf-pr.is-me .pf-c:not(.on) { box-shadow: 0 0 0 2px #93c5fd inset; }
+/* « Mes créations » : le type passe sous le nom, pour que le nom reste lisible */
+.cm-md .pf-pub .pf-c { flex-wrap: wrap; row-gap: 0; padding-top: 6px; padding-bottom: 6px; }
+.cm-md .pf-pub .pf-c .pf-ck { flex-basis: 100%; margin-left: 0; padding-left: 0; text-align: left; font-size: 11.5px; }
+.cm-md .pf-pub .pf-c:not(.on):not(.is-pz) .pf-ck { padding-left: 19px; }
+.cm-md .pf-pub .pf-c.on .pf-ck, .cm-md .pf-pub .pf-c.is-pz .pf-ck { padding-left: 19px; }

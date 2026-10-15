@@ -1082,9 +1082,9 @@
       <div class="md no-rw cm-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
         <h2 id="md-t">${TT('Mes créations', 'My creations')}</h2>
-        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). Touchez un nom pour le rendre actif ; ✎ à côté du nom pour le renommer ; ⏸ pour mettre en pause ; ✏️ pour modifier.`, `All on the same NFC card (${all.length} of ${pfMax()}). Tap a name to make it active; ✎ next to the name to rename it; ⏸ to pause; ✏️ to edit.`)}</p>
-        <span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span>
-        <div class="pf-pub">${all.slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x)).join('')}</div>
+        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). <b>Touchez un nom pour modifier cette création.</b> « Activer » : elle s’affiche sur votre carte. ✎ renommer ; ⏸ pause.`, `All on the same NFC card (${all.length} of ${pfMax()}). <b>Tap a name to edit that creation.</b> “Activate”: it shows on your card. ✎ rename; ⏸ pause.`)}</p>
+        <span class="box-l">${TT('Vos créations', 'Your creations')}</span>
+        <div class="pf-pub">${all.slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x, true)).join('')}</div>
         ${pauseBox()}
         <div class="btns"><button type="button" class="b pri" data-act="newc">${ic('plus', 15)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div>
       </div>`;
@@ -2187,8 +2187,9 @@
       <button type="button" class="b pri sm" data-act="pflive" data-k="${KIND}" data-v="${P.cur}">${ic('nfc', 15)}${TT(`Rendre « ${esc(pfName(P.cur))} » active`, `Make “${esc(pfName(P.cur))}” active`)}</button></div>`;
   }
   /* Ligne de la liste « Version active » : nom (activer) · pause / reprendre · modifier · supprimer */
-  function pubRow(x) {
+  function pubRow(x, edit) {
     const lv = isLive(x.k, x.id), pz = isPaused(x.k, x.id), cp = lv && cardPaused();
+    const me = x.k === KIND && S.pf && S.pf.cur === x.id;
     const nm = esc(x.name);
     const pauseBtn = lv
       ? (cp ? `<button type="button" class="pf-ed pf-pz on" data-act="cardresume" title="${TT('Reprendre ma carte', 'Resume my card')}" aria-label="${TT('Reprendre ma carte', 'Resume my card')}">${ic('play', 19)}</button>`
@@ -2197,7 +2198,9 @@
         : `<button type="button" class="pf-ed pf-pz" data-act="pfpause" data-k="${x.k}" data-v="${x.id}" title="${TT('Mettre cette création en pause', 'Pause this creation')}" aria-label="${TT(`Mettre « ${nm} » en pause`, `Pause “${nm}”`)}">${ic('pause', 21)}</button>`);
     const del = lv ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>`
       : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${nm} »`, `Delete “${nm}”`)}">${ic('trash', 16)}</button>`;
-    return `<div class="pf-pr"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="pflive" data-k="${x.k}" data-v="${x.id}">${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}<span class="pf-cn">${nm}</span><span class="pf-ren" role="button" tabindex="0" data-act="pfren" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier le nom', 'Rename')}" aria-label="${TT(`Modifier le nom de « ${nm} »`, `Rename “${nm}”`)}">${ic('pen', 13)}</span>${pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''}<span class="pf-ck">${KIND_L[x.k]}</span></button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
+    const act = edit && !lv ? `<span class="pf-actv" role="button" tabindex="0" data-act="pflive" data-direct="1" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette création sur votre carte', 'Show this creation on your card')}">${ic('nfc', 12)}${TT('Activer', 'Activate')}</span>` : '';
+    const cur = edit && me ? `<em class="pf-curt">${TT('En cours', 'Editing')}</em>` : '';
+    return `<div class="pf-pr${edit && me ? ' is-me' : ''}"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="${edit ? (me ? 'modal-close' : 'pfedit') : 'pflive'}" data-k="${x.k}" data-v="${x.id}"${edit ? ` title="${TT('Modifier cette création', 'Edit this creation')}"` : ''}>${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}<span class="pf-cn">${nm}</span><span class="pf-ren" role="button" tabindex="0" data-act="pfren" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier le nom', 'Rename')}" aria-label="${TT(`Modifier le nom de « ${nm} »`, `Rename “${nm}”`)}">${ic('pen', 13)}</span>${pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''}${cur}${act}<span class="pf-ck">${KIND_L[x.k]}</span></button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
   }
   /* Renommer une création sans ouvrir l'éditeur */
   function renameForm(row, k, id) {
@@ -2456,7 +2459,7 @@
       case 'pflive': {
         const P = S.pf || {}, k = t.dataset.k || KIND, id = t.dataset.v || P.cur, inCm = !!t.closest('.cm-md'), inM = !!t.closest('#modal');
         if (isLive(k, id) && !cardPaused()) break; /* déjà la version active : rien à faire */
-        if (pzOf(k, id)) { pzEditModal(k, id); break; }
+        if (pzOf(k, id) && !t.dataset.direct) { pzEditModal(k, id); break; }
         if (!liveOk(k, id)) break;
         setLive(k, id); P.live = k === KIND ? id : null; save(); render();
         if (inCm) curModal(); else if (inM) pfModal('manage');
