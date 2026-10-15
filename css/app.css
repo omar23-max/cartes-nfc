@@ -1377,7 +1377,7 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .hd-live.pz .hd-ll { color: #c2410c; }
 .hd-live.pz select { border-color: #fed7aa; color: #9a3412; }
 .hd-live.pz .hd-sw svg { color: #c2410c; }
-@media (min-width: 1321px) { .top .newc.newc2 { order: 21; } }
+@media (min-width: 561px) { .top .newc.newc2 { order: 21; } }
 .pf-bar.pf-bar-min { display: flex; justify-content: flex-end; padding: 0; margin: 0 0 10px; border: 0; background: none; }
 @media (max-width: 560px) {
   .hd-live { order: 21; flex: 1 1 100%; justify-content: space-between; padding: 4px 4px 4px 10px; font-size: 12px; }
@@ -1392,3 +1392,16 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 /* En-tête pendant la pause : « Aucune création activée » + menu + Activer */
 .hd-live .hd-act { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border: 0; border-radius: 99px; background: #16a34a; color: #fff; font: inherit; font-weight: 700; cursor: pointer; white-space: nowrap; }
 .hd-live .hd-act:hover { background: #15803d; }
+/* En-tête — mise en page (v=271) :
+   ligne 1 = logo · étapes · langue · Recommencer ; ligne 2 = Vous modifiez · Version active … | Mes créations · Nouvelle création (à droite) */
+@media (min-width: 561px) {
+  .top .cur-tag, .top .hd-live, .top .mycre, .top .newc.newc2 { box-sizing: border-box; min-height: 38px; border-radius: 99px; }
+  .top .cur-tag { padding: 0 14px; }
+  .top .hd-live { padding: 3px 4px 3px 14px; }
+  .top .mycre { margin-left: auto; padding: 0 14px; }
+  .top .newc.newc2 { padding: 0 16px; }
+}
+/* Écrans moyens (ou zoom du navigateur) : « Recommencer » en icône seule pour que la ligne 1 tienne */
+@media (max-width: 1500px) and (min-width: 561px) { .top .reset span { display: none; } }
+/* Écrans moyens : « Mes créations » et « Nouvelle création » en icône seule */
+@media (max-width: 1180px) and (min-width: 561px) { .top .mycre span, .top .newc.newc2 span { display: none; } .top .mycre, .top .newc.newc2 { padding: 0 12px; } }

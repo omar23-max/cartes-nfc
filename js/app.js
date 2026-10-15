@@ -568,7 +568,7 @@
     if (!nb) { nb = document.createElement('button'); nb.type = 'button'; nb.className = 'b sm newc'; nb.dataset.act = 'newc'; $('.reset').before(nb); }
     let mc = $('.mycre');
     if (!mc) { mc = document.createElement('button'); mc.type = 'button'; mc.className = 'b sm mycre'; mc.dataset.act = 'mycre'; nb.before(mc); }
-    mc.innerHTML = `${ic('copy', 16)}<span>${TT('Mes créations', 'My creations')}</span><em>${regAll().length}</em>`;
+    mc.innerHTML = `${ic('copy', 16)}<span>${TT('Mes créations', 'My creations')}</span><em>${regAll().length}</em>`; mc.title = TT('Mes créations', 'My creations');
     mc.hidden = NOVER || !regAll().length;
     /* Menu « Version active » : ce que voient les visiteurs quand ils touchent la carte */
     let hl = $('.hd-live');
@@ -578,13 +578,13 @@
       hl.classList.toggle('pz', cp);
       const opts = (sel) => all.map((x) => `<option value="${x.k}:${x.id}" ${x.k === lv.k && x.id === lv.id ? 'selected' : ''}>${esc(x.name)} · ${KIND_L[x.k]}${isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : ''}</option>`).join('');
       /* Carte en pause : aucune création n'est visible → « Aucune création activée » + menu + bouton « Activer » */
-      if (all.length && cp) hl.innerHTML = `<span class="hd-ll">${ic('pause', 14)}${TT('Aucune création activée', 'No creation active')}</span>
+      if (all.length && cp) hl.innerHTML = `<span class="hd-ll">${ic('pause', 14)}<span class="hd-lg">${TT('Aucune création activée', 'No creation active')}</span><span class="hd-sh">${TT('Aucune active', 'None active')}</span></span>
         <span class="hd-sw"><select data-hdpick aria-label="${TT('Création à activer', 'Creation to activate')}">${opts()}</select>${ic('chevd', 14)}</span>
         <button type="button" class="hd-act" data-act="hdact">${ic('nfc', 13)}${TT('Activer', 'Activate')}</button>`;
       else if (all.length) hl.innerHTML = `<span class="hd-ll">${ic('nfc', 14)}<span class="hd-lg">${TT('Version active', 'Active version')}</span><span class="hd-sh">${TT('Active', 'Active')}</span>&nbsp;:</span>
         <span class="hd-sw"><select data-pflivesel aria-label="${TT('Version active de la carte : ce que voient vos visiteurs', 'Card’s active version: what your visitors see')}">${opts()}</select>${ic('chevd', 14)}</span>`; }
     nb.classList.add('newc2');
-    nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`;
+    nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`; nb.title = TT('Nouvelle création', 'New creation');
     nb.hidden = !(S.sectorId || regAll().length);
     let ct = $('.cur-tag');
     if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; $('.top .brand').after(ct); }
