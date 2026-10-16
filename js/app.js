@@ -1724,7 +1724,7 @@
     const kind = id.coverVideoFile ? 'Vidéo téléversée' : id.coverVideoUrl ? 'Lien vidéo' : id.coverVideo ? 'Vidéo d’exemple' : '';
     const cur = VC.vsrc(id.coverVideoFile) || id.coverVideoUrl || id.coverVideo;
     const opt = (v, on, icn, lab) => `<button type="button" class="cv-opt${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="setcover" data-v="${v}"><span class="cv-ck">${on ? ic('check', 13) : ''}</span>${ic(icn, 15)}${lab}</button>`;
-    return `<div class="f cv-f"><span class="f-l">${TT('Couverture : une image OU une vidéo', 'Cover: an image OR a video')}</span>
+    return `<div class="f cv-f"><span class="f-l">${caps.vid ? TT('Couverture : une image OU une vidéo', 'Cover: an image OR a video') : TT('Couverture', 'Cover')}</span>
         <div class="cv-opts" role="radiogroup" aria-label="${TT('Type de couverture', 'Cover type')}">${opt('image', !video, 'image', TT('Image de couverture', 'Cover image'))}${(plan().video || video) && caps.vid ? opt('video', video, 'play', TT('Vidéo de couverture', 'Cover video')) : ''}</div>${caps.vid ? '' : `<p class="f-h cv-novid">${ic('play', 13)}${TT('Ce modèle affiche une image de couverture, pas de vidéo. Pour une vidéo, choisissez par exemple Showcase, Wave ou Immersive.', 'This template shows a cover image, not a video. For a video, choose e.g. Showcase, Wave or Immersive.')}</p>`}</div>
       ${video ? '' : `<div class="cv-img">${imgF('Image de couverture', 'identity.cover')}</div>`}
       ${video ? `<div class="cover-vid">
