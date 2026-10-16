@@ -1532,3 +1532,10 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .pf-pub .pf-pr .pf-c .pf-tx .pf-ck { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cm-md .pf-pub .pf-c .pf-curt { display: none; } /* le cadre bleu indique déjà la création en cours */
 }
+/* v=306 : création active en vert clair (comme « Version active »), au lieu du noir */
+.pf-pub .pf-c.on:not(.paused) { background: #ecfdf3; color: #14532d; border-color: #86efac; box-shadow: 0 0 0 1px #86efac inset; }
+.pf-pub .pf-c.on:not(.paused) .pf-ic { color: #16a34a; }
+.pf-pub .pf-c.on:not(.paused) .pf-ck { color: #166534; opacity: .8; }
+.pf-pub .pf-c.on:not(.paused) .pf-ren { color: #166534; }
+.pf-pub .pf-c.on:not(.paused) .pf-ren:hover { background: #dcfce7; }
+.pf-pub .pf-c.on:not(.paused):hover { background: #dcfce7; }
