@@ -1703,25 +1703,28 @@
 
   /* Le modèle choisi affiche-t-il une couverture ? (on le vérifie en le dessinant avec une image témoin) */
   const cvCache = {};
-  function designHasCover() {
+  /* Renvoie { img, vid } : le modèle affiche-t-il une image de couverture ? une vidéo de couverture ? */
+  function coverCaps() {
     const key = [KIND, S.sectorId, JSON.stringify(S.prof || {}), S.design].join('|');
     if (key in cvCache) return cvCache[key];
-    let has = true;
+    let caps = { img: true, vid: true };
     try {
-      const m = mdl(); if (!m) return true;
-      const c = Object.assign({}, m.card, { identity: Object.assign({}, m.card.identity, { cover: 'media/__cvprobe__.jpg', coverType: 'image' }) });
-      has = VC.render(Object.assign({}, m, { card: c, thumb: true })).includes('__cvprobe__');
-    } catch (e) { has = true; }
-    return (cvCache[key] = has);
+      const m = mdl(); if (!m) return caps;
+      const c = Object.assign({}, m.card, { identity: Object.assign({}, m.card.identity, { cover: 'media/__cvprobe__.jpg', coverType: 'video', coverVideo: 'media/__cvvid__.mp4', coverVideoFile: '', coverVideoUrl: '' }) });
+      const h = VC.render(Object.assign({}, m, { card: c }));
+      caps = { img: h.includes('__cvprobe__'), vid: h.includes('__cvvid__') };
+    } catch (e) { /* par défaut : tout est proposé */ }
+    return (cvCache[key] = caps);
   }
+  const designHasCover = () => { const c = coverCaps(); return c.img || c.vid; };
   function coverEd() {
     if (!designHasCover()) return `<p class="f-h cv-none">${ic('image', 14)}${TT('Ce modèle n’a pas de couverture. Changez de modèle pour ajouter une image ou une vidéo de couverture.', 'This template has no cover. Change template to add a cover image or video.')}</p>`;
-    const id = card().identity, video = id.coverType === 'video';
+    const caps = coverCaps(), id = card().identity, video = id.coverType === 'video' && caps.vid;
     const kind = id.coverVideoFile ? 'Vidéo téléversée' : id.coverVideoUrl ? 'Lien vidéo' : id.coverVideo ? 'Vidéo d’exemple' : '';
     const cur = VC.vsrc(id.coverVideoFile) || id.coverVideoUrl || id.coverVideo;
     const opt = (v, on, icn, lab) => `<button type="button" class="cv-opt${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="setcover" data-v="${v}"><span class="cv-ck">${on ? ic('check', 13) : ''}</span>${ic(icn, 15)}${lab}</button>`;
     return `<div class="f cv-f"><span class="f-l">${TT('Couverture : une image OU une vidéo', 'Cover: an image OR a video')}</span>
-        <div class="cv-opts" role="radiogroup" aria-label="${TT('Type de couverture', 'Cover type')}">${opt('image', !video, 'image', TT('Image de couverture', 'Cover image'))}${plan().video || video ? opt('video', video, 'play', TT('Vidéo de couverture', 'Cover video')) : ''}</div></div>
+        <div class="cv-opts" role="radiogroup" aria-label="${TT('Type de couverture', 'Cover type')}">${opt('image', !video, 'image', TT('Image de couverture', 'Cover image'))}${(plan().video || video) && caps.vid ? opt('video', video, 'play', TT('Vidéo de couverture', 'Cover video')) : ''}</div>${caps.vid ? '' : `<p class="f-h cv-novid">${ic('play', 13)}${TT('Ce modèle affiche une image de couverture, pas de vidéo. Pour une vidéo, choisissez par exemple Showcase, Wave ou Immersive.', 'This template shows a cover image, not a video. For a video, choose e.g. Showcase, Wave or Immersive.')}</p>`}</div>
       ${video ? '' : `<div class="cv-img">${imgF('Image de couverture', 'identity.cover')}</div>`}
       ${video ? `<div class="cover-vid">
           ${cur ? `<div class="demo-vid"><video src="${esc(cur)}" muted playsinline preload="metadata"></video><div><b>${kind}</b><span>Démarre sans le son et tourne en boucle.</span>${id.coverVideoFile || id.coverVideoUrl ? `<button class="b xs ghost" data-act="coverclear">Retirer ma vidéo</button>` : ''}</div></div>` : ''}
