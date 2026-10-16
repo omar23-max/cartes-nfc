@@ -1578,3 +1578,5 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 /* v=321 : bouton revenu sous les palettes (position d'origine), toujours actif seulement après le choix d'une palette */
 .pal-next { order: 0 !important; flex-direction: column !important; align-items: flex-start !important; justify-content: flex-start !important; gap: 6px; }
 @media (max-width: 900px) { .pal-next { align-items: stretch !important; } }
+/* v=322 : sans « Suivant » : bouton simple sur une ligne, comme à l'origine */
+.pal-go { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; padding-top: 0; padding-bottom: 0; }

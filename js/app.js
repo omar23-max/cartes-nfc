@@ -1106,7 +1106,7 @@
 
   /* Étape 3 : « Suivant » s'active une fois la palette choisie (création déjà publiée : déjà choisie) */
   const palDone = () => !!S.palPick || !!(S.pf && (S.pf.list.find((x) => x.id === S.pf.cur) || {}).pub);
-  const palNextBtn = () => `<button class="b pri lg pal-go" data-act="go" data-n="4" ${palDone() ? '' : 'disabled aria-disabled="true"'}><span class="pal-go-k">${TT('Suivant', 'Next')}</span>${TT('Remplir mes informations', 'Fill in my details')} ${ic('arrow', 18)}</button>
+  const palNextBtn = () => `<button class="b pri lg pal-go" data-act="go" data-n="4" ${palDone() ? '' : 'disabled aria-disabled="true"'}>${TT('Remplir mes informations', 'Fill in my details')} ${ic('arrow', 18)}</button>
       <small class="pal-go-h"${palDone() ? ' hidden' : ''}>${TT('Choisissez d’abord une palette.', 'Choose a palette first.')}</small>`;
   /* ---------- Étape 2 : modèle ---------- */
   /* Repère de l'en-tête (tous les studios, toutes les étapes) :
