@@ -1185,7 +1185,7 @@
   const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
   const pfApply = (d) => PF_KEYS.forEach((k) => { if (!d || d[k] === undefined) delete S[k]; else S[k] = clone(d[k]); });
   const pfMax = () => Math.max(1, +plan().profiles || 1);
-  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: KIND === 'stores' ? TT('Boutique principale', 'Main store') : TT('Carte principale', 'Main card'), data: null }] }; return S.pf; }
+  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: KIND === 'stores' ? TT('Boutique principale', 'Main store') : TT('Carte principale', 'Main card'), data: null, draft: true }] }; return S.pf; }
   const pfName = (id) => (pfInit().list.find((x) => x.id === id) || {}).name || '';
   const regGet = () => { try { return JSON.parse(localStorage.getItem(REG) || 'null'); } catch (e) { return null; } };
   const regSet = (r) => { try { localStorage.setItem(REG, JSON.stringify(r)); } catch (e) { /* rien */ } };
@@ -1407,16 +1407,56 @@
     regSet(r);
   }
   /* Version de l’autre studio : on y va (la version s’y ouvre) */
-  function goOther(id) { save(); location.href = `${OTHER_URL}?ver=${encodeURIComponent(id)}&ui=${ui()}`; }
+  function goOther(id) { leaveGuard(() => { leaving = true; save(); location.href = `${OTHER_URL}?ver=${encodeURIComponent(id)}&ui=${ui()}`; }); }
+  /* Brouillon = création jamais publiée (créée depuis v=280). Si on la quitte : avertissement, puis suppression. */
+  let leaving = false, pendingLeave = null;
+  const curDraft = () => { if (NOVER || !S.pf) return null; const e = S.pf.list.find((x) => x.id === S.pf.cur); return e && e.draft && !e.pub ? e : null; };
+  function dropDraft() {
+    const P = S.pf; if (!P) return;
+    const id = P.cur, other = P.list.find((z) => z.id !== id && z.data);
+    if (other) { pfApply(other.data); other.data = null; P.cur = other.id; P.list = P.list.filter((z) => z.id !== id); }
+    else { delete S.pf; pfApply({ palette: 0, cards: {} }); S.step = 1; }
+    save();
+    const r = regGet();
+    if (r) { r.paused = (r.paused || []).filter((z) => z !== `${KIND}:${id}`); if (!(r.list || []).length) { delete r.cardPaused; delete r.live; r.paused = []; S.kindChosen = false; } regSet(r); }
+    save();
+  }
+  function leaveGuard(go) {
+    const e = curDraft();
+    if (!e) return go();
+    if (!S.sectorId) { dropDraft(); return go(); } /* brouillon vide (pas encore de secteur) : rien à perdre */
+    pendingLeave = go;
+    const typ = KIND === 'stores' ? TT('boutique', 'store') : TT('carte', 'card');
+    $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
+      <div class="md no-rw lv-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
+        <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
+        <h2 id="md-t">⚠️ ${TT('Attention', 'Warning')}</h2>
+        <p>${TT(`Vous quittez la ${typ} « <b>${esc(e.name)}</b> », qui n’a pas encore été publiée.`, `You are leaving the ${typ} “<b>${esc(e.name)}</b>”, which has not been published yet.`)}</p>
+        <p><b>${TT('Si vous quittez, toutes ses informations seront perdues.', 'If you leave, all its information will be lost.')}</b></p>
+        <p class="muted small">${TT('Pour la garder, allez jusqu’à l’étape Publication.', 'To keep it, go to the Publish step.')}</p>
+        <div class="btns"><button type="button" class="b pri" data-act="modal-close">${TT('Continuer à la modifier', 'Keep editing')}</button><button type="button" class="b lv-quit" data-act="leaveok">${TT('Quitter et la supprimer', 'Leave and delete it')}</button></div>
+      </div>`;
+    $('#modal').classList.add('on');
+  }
+  window.addEventListener('beforeunload', (e) => { if (!leaving && curDraft() && S.sectorId) { e.preventDefault(); e.returnValue = ''; } });
+  /* Liens vers les autres studios / l'administration : même avertissement */
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || a.hasAttribute('download') || /^(#|mailto:|tel:|javascript:)/.test(a.getAttribute('href') || '')) return;
+    if (!curDraft() || !S.sectorId) return;
+    e.preventDefault();
+    const href = a.href;
+    leaveGuard(() => { leaving = true; location.href = href; });
+  }, true);
   /* Nouvelle version vide (type choisi dans l’autre studio, ou dans celui-ci) : on repart du choix du secteur / type */
   function pfNewFresh(name) {
     S.kindChosen = true;
     const used = !!(S.pf || S.sectorId), P = pfInit();
-    if (!used || (!S.sectorId && P.list.length === 1)) { P.list[0].name = name; P.list[0].named = true; }
+    if (!used || (!S.sectorId && P.list.length === 1)) { P.list[0].name = name; P.list[0].named = true; if (!P.list[0].pub) P.list[0].draft = true; }
     else {
       P.list.find((x) => x.id === P.cur).data = pfSnap();
       const id = 'p' + rid();
-      P.list.push({ id, name, data: null, named: true }); P.cur = id;
+      P.list.push({ id, name, data: null, named: true, draft: true }); P.cur = id;
       pfApply({ palette: 0, cards: {} });
     }
     S.step = 1;
@@ -1463,7 +1503,7 @@
       if (newPick === 'copy') {
         const P = pfInit(), curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
         curE.data = pfSnap();
-        P.list.push({ id, name, data: null, named: true }); P.cur = id;
+        P.list.push({ id, name, data: null, named: true, draft: true }); P.cur = id;
         newPick = ''; closeModal(); save(); render();
         const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
         toast(TT(`« ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${lv.name || ''} ».`, `“${name}” created (copy). Edit it freely: your card still shows “${lv.name || ''}”.`));
@@ -1525,7 +1565,7 @@
         if (!S.sectorId) { pfNewFresh(name); closeModal(); save(); render(); return; }
         const curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
         curE.data = pfSnap();
-        P.list.push({ id, name, data: null }); P.cur = id;
+        P.list.push({ id, name, data: null, draft: true }); P.cur = id;
         closeModal(); save(); render();
         const lv = regAll().find((x) => isLive(x.k, x.id)) || {};
         toast(TT(`Version « ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${lv.name || ''} ».`, `“${name}” version created (copy). Edit it freely: your card still shows “${lv.name || ''}”.`));
@@ -2353,9 +2393,9 @@
     switch (a) {
       case 'go': go(+t.dataset.n); break;
       case 'sector': if (!secGuard({ id: t.dataset.id })) pickSector(t.dataset.id); break;
-      case 'sgnew': secGo(true); break;
+      case 'sgnew': leaveGuard(() => secGo(true)); break;
       case 'sgmod': secGo(false); break;
-      case 'sgsw': closeModal(); secPend = null; pfSwitch(t.dataset.v); window.scrollTo(0, 0); break;
+      case 'sgsw': { const v = t.dataset.v; leaveGuard(() => { closeModal(); secPend = null; pfSwitch(v); window.scrollTo(0, 0); }); break; }
       case 'profile': pickProfile(t.dataset.id); break;
       case 'profgo': {
         /* Résultat de recherche : secteur + métier en un clic */
@@ -2389,7 +2429,7 @@
       case 'design': closeModal(); if (/^n[1-3]$/.test(t.dataset.id) !== /^n[1-3]$/.test(S.design || '')) S.palette = 0; S.design = t.dataset.id; NFC.curDesign = S.design; go(3); break;
       case 'adm': admAct(t); break;
       case 'poster': if (!locked()) openPoster(); break;
-      case 'pfsw': pfSwitch(t.dataset.v); break;
+      case 'pfsw': { const v = t.dataset.v; leaveGuard(() => pfSwitch(v)); break; }
       case 'pfadd':
         if (regAll().length >= pfMax()) { toast(`Votre forfait permet ${pfMax()} version${pfMax() > 1 ? 's' : ''} par carte. Passez au forfait supérieur pour en ajouter.`); break; }
         closeModal(); pfModal('add'); break;
@@ -2403,7 +2443,7 @@
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;
       case 'pfren': e.preventDefault(); renameForm(t.closest('.pf-pr'), t.dataset.k, t.dataset.v); break;
       case 'pfrenx': if (t.closest('.cm-md')) curModal(); else render(); break;
-      case 'pzkeep': editVer(t.dataset.k, t.dataset.v); break;
+      case 'pzkeep': { const k = t.dataset.k, v = t.dataset.v; leaveGuard(() => editVer(k, v)); break; }
       case 'pzout': {
         const k = t.dataset.k, id = t.dataset.v, r = regSync();
         if (isLive(k, id)) delete r.cardPaused; else r.paused = (r.paused || []).filter((z) => z !== `${k}:${id}`);
@@ -2445,6 +2485,9 @@
       case 'pfedit': {
         const k = t.dataset.k || KIND, id = t.dataset.v;
         if (pzOf(k, id)) { pzEditModal(k, id); break; }
+        if (k === KIND && S.pf && id === S.pf.cur) { closeModal(); go(4); break; }
+        leaveGuard(() => editVer(k, id));
+        break;
         closeModal();
         if (k !== KIND) { goOther(id); break; }
         if (S.pf && id !== S.pf.cur) pfSwitch(id);
@@ -2695,7 +2738,8 @@
       case 'vcf': VC.downloadVCard(card(), locked() ? '' : link(), lang()); break; /* avant le paiement : fiche sans le lien de la carte */
       case 'json': exportJSON(); break;
       case 'full': openFull(); break;
-      case 'newc': newPick = ''; newModal(); break;
+      case 'newc': leaveGuard(() => { newPick = ''; newModal(); }); break;
+      case 'leaveok': { const g = pendingLeave; pendingLeave = null; closeModal(); dropDraft(); render(); toast(TT('Brouillon supprimé.', 'Draft deleted.')); if (g) g(); break; }
       case 'curtag': curModal('edit'); break;
       case 'mycre': curModal('list'); break;
       case 'hdact': {

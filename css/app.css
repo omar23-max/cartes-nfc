@@ -1438,3 +1438,7 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .top .hd-live select { width: 100%; max-width: none; min-width: 0; }
   .top .hd-live .hd-act { flex: none; padding: 5px 10px; }
 }
+/* Avertissement : quitter un brouillon */
+.lv-md h2 { color: #9a3412; }
+.lv-md .lv-quit { color: #b91c1c; border-color: #fca5a5; }
+.lv-md .lv-quit:hover { background: #fef2f2; }
