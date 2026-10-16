@@ -1637,12 +1637,12 @@
     const v = g(path);
     return `<label class="thf" title="${v ? 'Changer la photo' : 'Ajouter une photo'}">${v ? `<img src="${VC.img(v, mdl())}" alt="">` : ic('image', 18)}<input type="file" accept="image/*" hidden data-img="${path}"></label>`;
   };
-  function imgF(label, path) {
+  function imgF(label, path, hint) {
     const v = g(path);
     return `<div class="f"><span class="f-l">${label}</span><div class="imgf">
       ${v ? `<img src="${VC.img(v, mdl())}" alt="">` : `<span class="imgf-e">${ic('image', 20)}</span>`}
       <div class="imgf-a"><label class="b xs">${v ? 'Changer' : 'Ajouter'}<input type="file" accept="image/*" hidden data-img="${path}"></label>${v ? `<button class="b xs ghost" data-act="imgdel" data-path="${path}">Retirer</button>` : ''}</div>
-    </div></div>`;
+    </div>${hint ? `<span class="f-h">${hint}</span>` : ''}</div>`;
   }
 
   function grp(id, title, sub, body, togglePath, ctl = '', key = '', cls = '') {
@@ -1683,7 +1683,7 @@
       ${inp(est ? 'Nom de l’établissement' : 'Nom et prénom', 'identity.name')}
       <div class="row2">${inp(est ? 'Activité' : 'Fonction', 'identity.role', { ph: est ? 'Ex. Bistrot' : 'Ex. Attaché commercial' })}${inp('Entreprise', 'identity.company', { ph: 'Facultatif' })}</div>
       ${inp('Spécialité ou accroche', 'identity.specialty', { ph: 'Ex. Gestion de patrimoine', hint: 'S’affiche sous votre fonction. Facultatif.' })}
-      <div class="row2">${imgF(est ? 'Photo / logo principal' : 'Photo de profil', 'identity.photo')}${imgF('Logo', 'identity.logo')}</div>
+      <div class="row2">${imgF(TT('Image principale (photo de profil)', 'Main image (profile photo)'), 'identity.photo', est ? TT('La photo ronde ou carrée à côté du nom : votre logo ou une photo de l’établissement.', 'The round or square picture next to the name: your logo or a photo of the place.') : TT('La photo ronde ou carrée à côté de votre nom.', 'The round or square photo next to your name.'))}${imgF(TT('Petit logo (facultatif)', 'Small logo (optional)'), 'identity.logo', TT('Affiché en petit à côté du nom de l’entreprise, dans certains modèles.', 'Shown small next to the company name, in some templates.'))}</div>
       ${coverEd()}`);
     h += grp('contact', 'Coordonnées & action principale', 'Téléphone, email, site', `
       <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('WhatsApp', 'contact.whatsapp', { type: 'tel', hint: 'Format international : +33 6…' })}</div>
