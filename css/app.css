@@ -1516,3 +1516,19 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .ed-top .ed-links .lang-sw .lbl-l { display: none; } .ed-top .ed-links .lang-sw .lbl-s { display: inline; }
 }
 @media (max-width: 560px) { .ed-top .ed-links .lang-sw { display: none !important; } }
+/* v=304 : lignes « Mes créations » homogènes : nom + type dessous à gauche, « Activer » à droite, centré en hauteur */
+.pf-pub .pf-pr .pf-c { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; min-height: 56px; padding: 8px 12px; white-space: normal; }
+.pf-pub .pf-c::before { content: none !important; }
+.pf-pub .pf-c .pf-ic { flex: none; display: inline-flex; width: 14px; justify-content: center; }
+.pf-pub .pf-c .pf-tx { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.pf-pub .pf-c .pf-l1 { display: flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; white-space: nowrap; }
+.pf-pub .pf-c .pf-l1 .pf-cn { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.pf-pub .pf-pr .pf-c .pf-tx .pf-ck { flex: none; margin: 0; padding: 0 !important; text-align: left; font-size: 11.5px; }
+.pf-pub .pf-c .pf-actv { margin-left: auto; padding: 5px 11px; font-size: 12px; }
+.pf-pub .pf-pr > .pf-ed { height: auto; min-height: 56px; }
+@media (max-width: 560px) { .pf-pub .pf-pr .pf-c { min-height: 52px; gap: 6px; padding: 6px 8px; } .pf-pub .pf-pr > .pf-ed { min-height: 52px; } .pf-pub .pf-c .pf-actv { padding: 4px 8px; font-size: 11px; } }
+@media (max-width: 560px) {
+  .pf-pub .pf-c .pf-l1 .pf-cn { flex: 0 1 auto; min-width: 3.5em; }
+  .pf-pub .pf-pr .pf-c .pf-tx .pf-ck { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cm-md .pf-pub .pf-c .pf-curt { display: none; } /* le cadre bleu indique déjà la création en cours */
+}
