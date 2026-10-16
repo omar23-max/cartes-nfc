@@ -1129,7 +1129,7 @@
         <div class="tpl-view"><div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(d.id), { thumb: true }))}</div></div></div>
           <button type="button" class="tpl-zoom" data-act="fullpreview" data-id="${d.id}" aria-label="Aperçu plein écran du modèle ${d.name}">${ic('eye', 15)}Aperçu</button></div>
         <div class="tpl-meta">
-          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}</div>
+          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}${isEvents ? '' : (() => { const c = coverCaps(d.id); return c.vid ? `<span class="cv-tag vid" title="${TT('Couverture : image ou vidéo', 'Cover: image or video')}">${ic('play', 11)}${TT('Couverture vidéo', 'Video cover')}</span>` : c.img ? `<span class="cv-tag img" title="${TT('Couverture : image seulement (pas de vidéo)', 'Cover: image only (no video)')}">${ic('image', 11)}${TT('Couverture image', 'Image cover')}</span>` : ''; })()}</div>
           <p>${d.desc}</p>
           <div class="tpl-foot"><span class="tpl-code">${s.code}-${d.id.toUpperCase()}</span><span class="tpl-go">Choisir ${ic('arrow', 14)}</span></div>
           ${ADM() ? admTools('des', d.id, dOff(d) ? 'off' : 'on', false, recOf(s) === d.id) : ''}
@@ -1704,12 +1704,13 @@
   /* Le modèle choisi affiche-t-il une couverture ? (on le vérifie en le dessinant avec une image témoin) */
   const cvCache = {};
   /* Renvoie { img, vid } : le modèle affiche-t-il une image de couverture ? une vidéo de couverture ? */
-  function coverCaps() {
-    const key = [KIND, S.sectorId, JSON.stringify(S.prof || {}), S.design].join('|');
+  function coverCaps(dId) {
+    const d = dId || S.design;
+    const key = [KIND, S.sectorId, JSON.stringify(S.prof || {}), d].join('|');
     if (key in cvCache) return cvCache[key];
     let caps = { img: true, vid: true };
     try {
-      const m = mdl(); if (!m) return caps;
+      const m = dId ? mdl(dId) : mdl(); if (!m) return caps;
       const c = Object.assign({}, m.card, { identity: Object.assign({}, m.card.identity, { cover: 'media/__cvprobe__.jpg', coverType: 'video', coverVideo: 'media/__cvvid__.mp4', coverVideoFile: '', coverVideoUrl: '' }) });
       const h = VC.render(Object.assign({}, m, { card: c }));
       caps = { img: h.includes('__cvprobe__'), vid: h.includes('__cvvid__') };
