@@ -7,11 +7,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=Allura&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../css/card.css?v=312">
-  <link rel="stylesheet" href="../css/card-plus.css?v=312">
-  <link rel="stylesheet" href="../css/noir.css?v=312">
-  <link rel="stylesheet" href="../css/immo.css?v=312">
-  <link rel="stylesheet" href="css/events.css?v=312">
+  <link rel="stylesheet" href="../css/card.css?v=316">
+  <link rel="stylesheet" href="../css/card-plus.css?v=316">
+  <link rel="stylesheet" href="../css/noir.css?v=316">
+  <link rel="stylesheet" href="../css/immo.css?v=316">
+  <link rel="stylesheet" href="css/events.css?v=316">
   <style>
     html, body { margin: 0; min-height: 100%; }
     body { background: #e9e8e4; }
@@ -23,22 +23,22 @@
 <body>
   <div id="app"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <script src="../js/services.js?v=312"></script>
-  <script src="../js/data.js?v=312"></script>
-  <script src="../js/sectors.js?v=312"></script>
-  <script src="../js/media.js?v=312"></script>
-  <script src="../js/extras.js?v=312"></script>
-  <script src="../js/locale-na.js?v=312"></script>
-  <script src="../js/locale-na-en.js?v=312"></script>
-  <script src="../js/profiles.js?v=312"></script>
-  <script src="../js/i18n-en.js?v=312"></script>
-  <script src="../js/i18n-app-en.js?v=312"></script>
-  <script src="../js/versions-view.js?v=312"></script>
-  <script src="../js/render.js?v=312"></script>
-  <script src="js/events-data.js?v=312"></script>
-  <script src="../js/custom-catalog.js?v=312" data-kind="events"></script>
-  <script src="js/events.js?v=312"></script>
-  <script src="../js/designs-noir.js?v=312"></script>
+  <script src="../js/services.js?v=316"></script>
+  <script src="../js/data.js?v=316"></script>
+  <script src="../js/sectors.js?v=316"></script>
+  <script src="../js/media.js?v=316"></script>
+  <script src="../js/extras.js?v=316"></script>
+  <script src="../js/locale-na.js?v=316"></script>
+  <script src="../js/locale-na-en.js?v=316"></script>
+  <script src="../js/profiles.js?v=316"></script>
+  <script src="../js/i18n-en.js?v=316"></script>
+  <script src="../js/i18n-app-en.js?v=316"></script>
+  <script src="../js/versions-view.js?v=316"></script>
+  <script src="../js/render.js?v=316"></script>
+  <script src="js/events-data.js?v=316"></script>
+  <script src="../js/custom-catalog.js?v=316" data-kind="events"></script>
+  <script src="js/events.js?v=316"></script>
+  <script src="../js/designs-noir.js?v=316"></script>
   <script>
     /* Invitation enregistrée dans le studio Événements, ou une démo : view.html?s=mariage&d=e1&c=0 */
     (function () {
@@ -53,6 +53,7 @@
           const S = JSON.parse(localStorage.getItem('nfc-events-v1'));
           /* Invitation à afficher : lien fixe (?ver=) ou invitation active ; supprimée ou en pause */
           const PFR = NFC.pfResolve ? NFC.pfResolve('events', q) : {};
+          if (PFR.redirect) { location.replace(PFR.redirect); return; }
           if (PFR.page) { document.getElementById('app').innerHTML = PFR.page; return; }
           if (PFR.key) VC.leadSrc = PFR.key;
           if (S && S.pf && PFR.id && PFR.id !== S.pf.cur) { const L = (S.pf.list || []).find((x) => x.id === PFR.id); if (L && L.data) Object.assign(S, L.data); }
@@ -63,6 +64,7 @@
             const cardOf = (l) => S.cards[l === 'en' ? s.id + ':en' : s.id] || (l === 'en' && s.demoEn) || s.demo;
             const en = want === 'en';
             m = { card: cardOf(en ? 'en' : 'fr'), sec: s, d: S.design || s.rec, pal: ((NFC.curDesign = S.design || s.rec), (NFC.palsOf ? NFC.palsOf(s) : s.palettes))[S.palette] || s.palettes[0], link: S.qr && S.qr.url ? S.qr.url : ((NFC.cfg && NFC.cfg.get('brand.linkBase', '')) || (en ? 'https://your-site.com/c/' : 'https://votre-site.com/c/')) + S.id, lang: en ? 'en' : 'fr', bilingual: bi };
+            if (PFR.key) m.link = String(m.link).replace(/[/]+$/, '') + '/v/' + PFR.key.replace(':', '-');
             VC.onLangSwitch = (l) => { if (l === m.lang) return; m.card = cardOf(l); m.lang = l; draw(); };
           }
         } catch (e) { /* pas de brouillon : démo par défaut */ }

@@ -1547,3 +1547,5 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .pf-pub .pf-c .pf-rt .pf-pzt { padding: 4px 9px; font-size: 11.5px; }
 /* v=309 : Événements (sans « Mes créations ») : « Nouvelle création » reste à droite comme dans les autres studios */
 @media (min-width: 561px) { .top:has(.mycre[hidden]) .newc.newc2, .top:not(:has(.mycre)) .newc.newc2 { margin-left: auto; } }
+/* v=315 : création jamais publiée */
+.pf-pub .pf-curt.is-new { background: #e0e7ff; color: #3730a3; }

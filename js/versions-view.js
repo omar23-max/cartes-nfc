@@ -8,7 +8,9 @@
 (function () {
   'use strict';
   const NFC = (window.NFC = window.NFC || {});
-  const reg = (kind) => { try { return JSON.parse(localStorage.getItem(kind === 'events' ? 'nextap-events' : 'nextap-pages') || 'null'); } catch (e) { return null; } };
+  const reg = () => { try { return JSON.parse(localStorage.getItem('nextap-pages') || 'null'); } catch (e) { return null; } };
+  /* Page publique de chaque type de création (cartes, boutiques, invitations : même carte NFC) */
+  const viewOf = (k) => (/\/(stores|events)\//.test(location.pathname) ? '../' : '') + ({ cards: 'view.html', stores: 'stores/view.html', events: 'events/view.html' }[k] || 'view.html');
   const en = () => (document.documentElement.lang || '').startsWith('en') || /[?&]lang=en/.test(location.search);
   const T = (fr, eng) => (en() ? eng : fr);
 
@@ -18,9 +20,8 @@
 
   /* kind : 'cards' ou 'stores' ; renvoie { redirect } | { page } | { id, key } */
   NFC.pfResolve = (kind, q) => {
-    const R = reg(kind);
+    const R = reg();
     if (!R) return {};
-    const other = kind === 'cards' ? 'stores/view.html' : '../view.html';
     /* Carte en pause (titulaire) : tous ses liens affichent « Carte temporairement indisponible » ; le titulaire (?owner=1) voit sa carte */
     const livePaused = R.live && (R.paused || []).includes(`${R.live.k}:${R.live.id}`); /* version active « en pause » = carte en pause */
     if ((R.cardPaused || livePaused) && q.get('owner') !== '1') return { page: page((kind === 'events' ? T('Invitation temporairement indisponible', 'Invitation temporarily unavailable') : T('Carte temporairement indisponible', 'Card temporarily unavailable')), (kind === 'events' ? T('Cette invitation reviendra bientôt.', 'This invitation will be back soon.') : T('Cette carte reviendra bientôt.', 'This card will be back soon.')), true) };
@@ -40,7 +41,7 @@
     if (t.k !== kind) {
       const p = new URLSearchParams(q);
       if (key) p.set('ver', key);
-      return { redirect: other + (p.toString() ? '?' + p : '') };
+      return { redirect: viewOf(t.k) + (p.toString() ? '?' + p : '') };
     }
     return { id: t.id, key: `${t.k}:${t.id}` };
   };
@@ -48,12 +49,12 @@
   /* Barre du titulaire : choisir la version active juste avant de taper la carte */
   NFC.pfOwnerBar = (kind, q) => {
     if (q.get('owner') !== '1') return;
-    const R = reg(kind);
+    const R = reg();
     if (!R || !(R.list || []).length) return;
     const paused = R.paused || [], live = R.live || {};
     const list = R.list.filter((x) => !paused.includes(`${x.k}:${x.id}`));
     if (!list.length) return;
-    const lab = (x) => `${x.name} · ${x.k === 'cards' ? T('Carte de visite', 'Business card') : T('Boutique', 'Store')}`;
+    const lab = (x) => `${x.name} · ${x.k === 'cards' ? T('Carte de visite', 'Business card') : x.k === 'events' ? T('Invitation', 'Invitation') : T('Boutique', 'Store')}`;
     const bar = document.createElement('div');
     bar.className = 'own-bar';
     const SVG = (d) => `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
@@ -64,8 +65,7 @@
       if (r.cardPaused && r.live && !(r.live.k === k && r.live.id === rest.join(':'))) { const old = `${r.live.k}:${r.live.id}`; if (!(r.paused || []).includes(old)) r.paused = (r.paused || []).concat([old]); }
       r.live = { k, id: rest.join(':') }; delete r.cardPaused; r.paused = (r.paused || []).filter((z) => z !== `${k}:${rest.join(':')}`);
       try { localStorage.setItem('nextap-pages', JSON.stringify(r)); } catch (err) { /* rien */ }
-      const other = kind === 'cards' ? 'stores/view.html' : '../view.html';
-      location.replace((k === kind ? location.pathname : other) + '?owner=1');
+      location.replace((k === kind ? location.pathname : viewOf(k)) + '?owner=1');
     });
     document.body.prepend(bar);
     /* Le raccourci garde « ?owner=1 » : le titulaire retrouve sa barre à chaque ouverture */

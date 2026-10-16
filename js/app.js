@@ -16,8 +16,7 @@
   /* Produit : cartes, boutiques ou événements (invitations) */
   const isEvents = X.kind === 'events';
   const isStores = X.kind ? X.kind === 'stores' : !!X.key && X.key !== 'nfc-studio-v6';
-  /* Événements : plusieurs invitations possibles (comme les cartes et boutiques, v=310), mais pas de mode titulaire
-     ni de commande de carte NFC ; registre séparé (nextap-events) */
+  /* Événements : invitations sur la même carte NFC que les cartes et boutiques (v=313) ; pas de mode titulaire */
   const NOVER = false;
   const REG = X.regKey || 'nextap-pages';
   /* Secteurs (ou types de boutique) : masqués, « Bientôt », ordre */
@@ -580,7 +579,8 @@
     { const all = regAll(), lv = regLive(), cp = cardPaused();
       hl.hidden = NOVER || !all.length;
       hl.classList.toggle('pz', cp);
-      const opts = (sel) => all.map((x) => `<option value="${x.k}:${x.id}" ${x.k === lv.k && x.id === lv.id ? 'selected' : ''}>${esc(x.name)} · ${KIND_L[x.k]}${isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : ''}</option>`).join('');
+      /* Création jamais publiée : visible dans le menu mais pas activable (on l'active à l'étape Publication) */
+      const opts = (sel) => all.map((x) => { const on = x.k === lv.k && x.id === lv.id; return `<option value="${x.k}:${x.id}" ${on ? 'selected' : ''}${!x.pub && !on ? ' disabled' : ''}>${esc(x.name)} · ${KIND_L[x.k]}${isPaused(x.k, x.id) ? TT(' — en pause', ' — paused') : !x.pub ? TT(' — pas encore publiée', ' — not published yet') : ''}</option>`; }).join('');
       /* Carte en pause : aucune création n'est visible → « Aucune création activée » + menu + bouton « Activer » */
       if (all.length && cp) hl.innerHTML = `<span class="hd-ll">${ic('pause', 14)}<span class="hd-lg">${TT('Aucune création activée', 'No creation active')}</span><span class="hd-sh">${TT('Aucune active', 'None active')}</span></span>
         <span class="hd-sw"><select data-hdpick aria-label="${TT('Création à activer', 'Creation to activate')}">${opts()}</select>${ic('chevd', 14)}</span>
@@ -1145,7 +1145,7 @@
       <div class="md no-rw cm-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
         <h2 id="md-t">${cmMode === 'list' ? TT('Mes créations', 'My creations') : TT('Modifier mes créations', 'Edit my creations')}</h2>
-        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). <b>Touchez un nom pour modifier cette création.</b> « Activer » : elle s’affiche sur votre carte. ✎ renommer ; ⏸ pause.`, `All on the same NFC card (${all.length} of ${pfMax()}). <b>Tap a name to edit that creation.</b> “Activate”: it shows on your card. ✎ rename; ⏸ pause.`)}</p>
+        <p class="muted small">${TT(`Toutes sur la même carte NFC (${all.length} sur ${pfMax()}). <b>Touchez un nom pour modifier cette création.</b> « Activer » (créations publiées) : elle s’affiche sur votre carte. ✎ renommer ; ⏸ pause.`, `All on the same NFC card (${all.length} of ${pfMax()}). <b>Tap a name to edit that creation.</b> “Activate” (published creations): it shows on your card. ✎ rename; ⏸ pause.`)}</p>
         <span class="box-l">${TT('Vos créations', 'Your creations')}</span>
         <div class="pf-pub">${all.slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x, true)).join('')}</div>
         ${pauseBox()}
@@ -1219,9 +1219,12 @@
      Une carte = un lien = plusieurs versions, de type carte de visite (studio des cartes) ou boutique (studio Stores).
      Dans chaque studio, la version en cours vit dans S et les autres dans S.pf.list[].data.
      Registre commun (localStorage « nextap-pages ») : lien, QR, paiement, liste de toutes les versions et version affichée. */
-  const KIND = isEvents ? 'events' : isStores ? 'stores' : 'cards', OTHER_URL = isStores ? '../index.html' : 'stores/index.html';
+  const KIND = isEvents ? 'events' : isStores ? 'stores' : 'cards';
+  /* Les trois studios partagent la même carte NFC : où vit chaque type de création */
+  const STU = { cards: { key: 'nfc-studio-v6', path: 'index.html' }, stores: { key: 'nfc-stores-v1', path: 'stores/index.html' }, events: { key: 'nfc-events-v1', path: 'events/index.html' } };
+  const urlOf = (k) => (isStores || isEvents ? '../' : '') + (STU[k] || STU.cards).path;
   const TT = (fr, en) => (ui() === 'en' ? en : fr);
-  const KIND_L = { get cards() { return TT('Carte de visite', 'Business card'); }, get stores() { return TT('Boutique', 'Store'); }, get events() { return TT('Événement', 'Event'); } };
+  const KIND_L = { get cards() { return TT('Carte de visite', 'Business card'); }, get stores() { return TT('Boutique', 'Store'); }, get events() { return TT('Invitation', 'Invitation'); } };
   const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
   const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
   const pfApply = (d) => PF_KEYS.forEach((k) => { if (!d || d[k] === undefined) delete S[k]; else S[k] = clone(d[k]); });
@@ -1275,7 +1278,7 @@
   /* Ouvrir une création à l'étape Contenu (dans l'autre studio si c'est l'autre type) */
   function editVer(k, id) {
     closeModal();
-    if (k !== KIND) { goOther(id); return; }
+    if (k !== KIND) { goOther(id, k); return; }
     if (S.pf && id !== S.pf.cur) pfSwitch(id);
     go(4);
   }
@@ -1395,7 +1398,7 @@
       }
       P.list = P.list.filter((z) => z.id !== id);
       save();
-    } else pfDelOther(id);
+    } else pfDelOther(id, k);
     if (!regAll().length) {
       const r1 = regGet() || {}; delete r1.cardPaused; delete r1.live; r1.paused = []; regSet(r1);
       S.kindChosen = false; save();
@@ -1425,8 +1428,8 @@
     $('#modal').classList.add('on');
   }
   /* Supprime une version de l’autre studio (ses données sont dans son propre enregistrement) */
-  function pfDelOther(id) {
-    const key = KIND === 'stores' ? 'nfc-studio-v6' : 'nfc-stores-v1';
+  function pfDelOther(id, k) {
+    const key = (STU[k] || STU.cards).key;
     let O = null;
     try { O = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { O = null; }
     if (O) {
@@ -1444,11 +1447,14 @@
       try { localStorage.setItem(key, JSON.stringify(O)); } catch (e) { /* rien */ }
     }
     const r = regGet() || { list: [] };
-    r.list = (r.list || []).filter((z) => !(z.k !== KIND && z.id === id));
+    r.list = (r.list || []).filter((z) => !(z.k === k && z.id === id));
     regSet(r);
   }
   /* Version de l’autre studio : on y va (la version s’y ouvre) */
-  function goOther(id) { leaveGuard(() => { leaving = true; save(); location.href = `${OTHER_URL}?ver=${encodeURIComponent(id)}&ui=${ui()}`; }); }
+  function goOther(id, k) {
+    k = k || ((regAll().find((z) => z.k !== KIND && z.id === id) || {}).k) || (isStores ? 'cards' : 'stores');
+    leaveGuard(() => { leaving = true; save(); location.href = `${urlOf(k)}?ver=${encodeURIComponent(id)}&ui=${ui()}`; });
+  }
   /* Brouillon = création jamais publiée (créée depuis v=280). Si on la quitte : avertissement, puis suppression. */
   let leaving = false, pendingLeave = null;
   const curDraft = () => { if (NOVER || !S.pf) return null; const e = S.pf.list.find((x) => x.id === S.pf.cur); return e && e.draft && !e.pub ? e : null; };
@@ -1528,8 +1534,8 @@
           ${KIND !== 'events' && S.sectorId && curN ? o('copy', 'copy', TT(`Une copie de « ${esc(curN)} »`, `A copy of “${esc(curN)}”`), TT('Même contenu, même modèle et mêmes couleurs, à modifier librement', 'Same content, template and colors, to edit freely')) : ''}
         </div>
         ${newPick ? `<form data-ncf>
-          ${full && (newPick !== 'events' || isEvents) ? `<p class="pf-err" role="alert">${TT(`Vous utilisez déjà vos ${pfMax()} créations. Supprimez-en une dans « Versions » pour en ajouter une autre.`, `You already use your ${pfMax()} creations. Delete one in “Versions” to add another.`)}</p>` : `<label class="f"><span class="f-l">${TT('Nom (pour vous seulement)', 'Name (only for you)')}</span><input name="n" maxlength="24" placeholder="${esc(def)}" autocomplete="off"></label>`}
-          <div class="btns">${full && (newPick !== 'events' || isEvents) ? `<button type="button" class="b pri" data-act="pfmanage">${TT('Voir mes versions', 'See my versions')}</button>` : `<button type="submit" class="b pri">${TT('Créer', 'Create')} ${ic('arrow', 16)}</button>`}<button type="button" class="b" data-act="modal-close">${TT('Annuler', 'Cancel')}</button></div>
+          ${full ? `<p class="pf-err" role="alert">${TT(`Vous utilisez déjà vos ${pfMax()} créations. Supprimez-en une dans « Versions » pour en ajouter une autre.`, `You already use your ${pfMax()} creations. Delete one in “Versions” to add another.`)}</p>` : `<label class="f"><span class="f-l">${TT('Nom (pour vous seulement)', 'Name (only for you)')}</span><input name="n" maxlength="24" placeholder="${esc(def)}" autocomplete="off"></label>`}
+          <div class="btns">${full ? `<button type="button" class="b pri" data-act="pfmanage">${TT('Voir mes versions', 'See my versions')}</button>` : `<button type="submit" class="b pri">${TT('Créer', 'Create')} ${ic('arrow', 16)}</button>`}<button type="button" class="b" data-act="modal-close">${TT('Annuler', 'Cancel')}</button></div>
         </form>` : ''}
       </div>`;
     $('#modal').classList.add('on');
@@ -1539,12 +1545,6 @@
     f.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = ((inp && inp.value.trim()) || def).slice(0, 24);
-      if (newPick === 'events' && !isEvents) {
-        save();
-        /* Le studio Événements a déjà des invitations : on y ajoute une nouvelle création ; sinon, premier départ */
-        let evN = 0; try { evN = ((JSON.parse(localStorage.getItem('nextap-events') || 'null') || {}).list || []).length; } catch (er) { /* rien */ }
-        location.href = `${root}events/index.html?${evN ? `newver=${encodeURIComponent(name)}` : `start=1&vname=${encodeURIComponent(name)}`}&ui=${ui()}`; return;
-      }
       if (pfTaken(name)) { pfErr(f, TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`)); if (inp) inp.focus(); return; }
       if (newPick === 'copy') {
         const P = pfInit(), curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
@@ -1555,7 +1555,7 @@
         toast(TT(`« ${name} » créée (copie). Modifiez-la librement : votre carte affiche toujours « ${lv.name || ''} ».`, `“${name}” created (copy). Edit it freely: your card still shows “${lv.name || ''}”.`));
         return;
       }
-      if (newPick !== KIND) { save(); location.href = `${{ cards: root + 'index.html', stores: root + 'stores/index.html' }[newPick]}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
+      if (newPick !== KIND) { save(); location.href = `${urlOf(newPick)}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
       pfNewFresh(name); newPick = ''; closeModal(); save(); render(); window.scrollTo(0, 0);
       toast(TT(`« ${name} » créée, sur la même carte NFC : rien à repayer. Choisissez maintenant ${isStores ? 'le type de boutique' : isEvents ? 'votre événement' : 'votre secteur'}.`, `“${name}” created on the same NFC card: nothing to pay again. Now choose ${isStores ? 'the store type' : isEvents ? 'your event' : 'your industry'}.`));
     });
@@ -1595,7 +1595,7 @@
           <p>${TT('Toutes les versions de votre carte, cartes de visite et boutiques. Touchez le nom d’une version de l’autre studio (↗) pour l’ouvrir. La version active ne peut pas être supprimée.', 'All your card’s versions, business cards and stores. Tap the name of a version from the other studio (↗) to open it. The active version cannot be deleted.')}</p>
           <form data-pfm>${all.map((x) => x.k === KIND
             ? `<div class="pf-row"><input name="${x.id}" value="${esc(x.name)}" maxlength="24"><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? (cardPaused() ? `<button type="button" class="pf-act pf-resume" data-act="cardresume" title="${TT('Carte en pause : touchez pour reprendre', 'Card paused: tap to resume')}">${ic('play', 13)}${TT('Reprendre', 'Resume')}</button>` : `<span class="pf-live">${TT('Active', 'Active')}</span>`) : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`
-            : `<div class="pf-row"><button type="button" class="pf-o" data-act="pfother" data-v="${x.id}" title="${TT('Ouvrir cette version dans l’autre studio', 'Open this version in the other studio')}"><span>${esc(x.name)}</span>${ic('arrowur', 14)}</button><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? (cardPaused() ? `<button type="button" class="pf-act pf-resume" data-act="cardresume" title="${TT('Carte en pause : touchez pour reprendre', 'Card paused: tap to resume')}">${ic('play', 13)}${TT('Reprendre', 'Resume')}</button>` : `<span class="pf-live">${TT('Active', 'Active')}</span>`) : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`).join('')}
+            : `<div class="pf-row"><button type="button" class="pf-o" data-act="pfother" data-k="${x.k}" data-v="${x.id}" title="${TT('Ouvrir cette version dans l’autre studio', 'Open this version in the other studio')}"><span>${esc(x.name)}</span>${ic('arrowur', 14)}</button><span class="pf-k"><span class="pf-kl">${KIND_L[x.k]}</span><span class="pf-ks">${x.k === 'cards' ? TT('Carte', 'Card') : TT('Boutique', 'Store')}</span></span>${isLive(x.k, x.id) ? (cardPaused() ? `<button type="button" class="pf-act pf-resume" data-act="cardresume" title="${TT('Carte en pause : touchez pour reprendre', 'Card paused: tap to resume')}">${ic('play', 13)}${TT('Reprendre', 'Resume')}</button>` : `<span class="pf-live">${TT('Active', 'Active')}</span>`) : isPaused(x.k, x.id) ? `<button type="button" class="pf-act pf-resume" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : touchez pour reprendre', 'Paused: tap to resume')}">${TT('Reprendre', 'Resume')}</button>` : `<button type="button" class="pf-act" data-act="pflive" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette version sur ma carte', 'Show this version on my card')}">${TT('Activer', 'Activate')}</button>`}${isLive(x.k, x.id) ? '<span class="pf-nil"></span>' : `<button type="button" class="b sm" data-act="pfdel" data-k="${x.k}" data-v="${x.id}">${TT('Supprimer', 'Delete')}</button>`}</div>`).join('')}
           <div class="btns pf-mbtns"><button type="submit" class="b pri">${TT('Enregistrer', 'Save')}</button><button type="button" class="b" data-act="newc">${ic('plus', 14)}${TT('Nouvelle création', 'New creation')}</button><button type="button" class="b" data-act="modal-close">${TT('Fermer', 'Close')}</button></div></form>`}
       </div>`;
     $('#modal').classList.add('on');
@@ -1607,7 +1607,7 @@
         if (!name) return;
         /* Deux versions ne peuvent pas porter le même nom (cartes de visite et boutiques confondues) */
         if (pfTaken(name)) { pfErr(f, TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`)); f.n.focus(); return; }
-        if (k !== KIND) { save(); location.href = `${OTHER_URL}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
+        if (k !== KIND) { save(); location.href = `${urlOf(k)}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
         if (!S.sectorId) { pfNewFresh(name); closeModal(); save(); render(); return; }
         const curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
         curE.data = pfSnap();
@@ -2330,8 +2330,10 @@
         : `<button type="button" class="pf-ed pf-pz" data-act="pfpause" data-k="${x.k}" data-v="${x.id}" title="${TT('Mettre cette création en pause', 'Pause this creation')}" aria-label="${TT(`Mettre « ${nm} » en pause`, `Pause “${nm}”`)}">${ic('pause', 21)}</button>`);
     const del = lv && !cp ? `<button type="button" class="pf-ed pf-tr is-off" data-act="pfdelno" title="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}" aria-label="${TT('La version active ne peut pas être supprimée', 'The active version cannot be deleted')}">${ic('trash', 16)}</button>`
       : `<button type="button" class="pf-ed pf-tr" data-act="pfdel" data-k="${x.k}" data-v="${x.id}" title="${TT('Supprimer cette version', 'Delete this version')}" aria-label="${TT(`Supprimer « ${nm} »`, `Delete “${nm}”`)}">${ic('trash', 16)}</button>`;
-    const act = edit && !lv && !pz ? `<span class="pf-actv" role="button" tabindex="0" data-act="pflive" data-direct="1" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette création sur votre carte', 'Show this creation on your card')}">${ic('nfc', 12)}${TT('Activer', 'Activate')}</span>` : '';
-    const cur = edit && me ? `<em class="pf-curt">${TT('En cours', 'Editing')}</em>` : '';
+    /* « Activer » seulement pour une création déjà publiée (sinon : l'activer à l'étape Publication) */
+    const act = edit && !lv && !pz && x.pub ? `<span class="pf-actv" role="button" tabindex="0" data-act="pflive" data-direct="1" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette création sur votre carte', 'Show this creation on your card')}">${ic('nfc', 12)}${TT('Activer', 'Activate')}</span>` : '';
+    /* Création jamais publiée : « En création » ; déjà publiée : « En cours » (comme le repère de l'en-tête) */
+    const cur = edit && me ? (x.pub ? `<em class="pf-curt">${TT('En cours', 'Editing')}</em>` : `<em class="pf-curt is-new">${TT('En création', 'Creating')}</em>`) : '';
     return `<div class="pf-pr${edit && me ? ' is-me' : ''}"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="${edit ? (me ? 'modal-close' : 'pfedit') : 'pflive'}" data-k="${x.k}" data-v="${x.id}"${edit ? ` title="${TT('Modifier cette création', 'Edit this creation')}"` : ''}><span class="pf-ic">${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}</span><span class="pf-tx"><span class="pf-l1"><span class="pf-cn">${nm}</span><span class="pf-ren" role="button" tabindex="0" data-act="pfren" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier le nom', 'Rename')}" aria-label="${TT(`Modifier le nom de « ${nm} »`, `Rename “${nm}”`)}">${ic('pen', 13)}</span></span><span class="pf-ck">${KIND_L[x.k]}</span></span>${(() => { const pzt = pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''; return cur || pzt || act ? `<span class="pf-rt">${cur}${pzt}${act}</span>` : ''; })()}</button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
   }
   /* Renommer une création sans ouvrir l'éditeur */
@@ -2347,7 +2349,7 @@
     if (taken) return TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`);
     if (k === KIND) { const e = (pfInit().list || []).find((z) => z.id === id); if (e) { e.name = name; e.named = true; } save(); }
     else {
-      const key = KIND === 'stores' ? 'nfc-studio-v6' : 'nfc-stores-v1';
+      const key = (STU[k] || STU.cards).key;
       try { const O = JSON.parse(localStorage.getItem(key) || 'null'); const e = O && O.pf && O.pf.list.find((z) => z.id === id); if (e) { e.name = name; e.named = true; localStorage.setItem(key, JSON.stringify(O)); } } catch (er) { /* rien */ }
       const r = regGet() || { list: [] }; const e2 = (r.list || []).find((z) => z.k === k && z.id === id); if (e2) e2.name = name; regSet(r);
     }
@@ -2523,7 +2525,7 @@
       /* Sur téléphone : la carte s’ouvre en mode titulaire avec les étapes « écran d’accueil » ; sur ordinateur : QR code de connexion */
       case 'pfhome': if (locked()) ownLocked(); else if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) location.href = 'view.html?owner=1&home=1'; else pfPhone(); break;
       case 'pfopen': pfModal(regAll().length < 2 ? 'add' : 'manage'); break;
-      case 'pfother': closeModal(); goOther(t.dataset.v); break;
+      case 'pfother': closeModal(); goOther(t.dataset.v, t.dataset.k); break;
       case 'pfdel': pfDelModal(t.dataset.k || KIND, t.dataset.v); break;
       case 'pfren': e.preventDefault(); renameForm(t.closest('.pf-pr'), t.dataset.k, t.dataset.v); break;
       case 'pfrenx': if (t.closest('.cm-md')) curModal(); else render(); break;
@@ -2573,7 +2575,7 @@
         leaveGuard(() => editVer(k, id));
         break;
         closeModal();
-        if (k !== KIND) { goOther(id); break; }
+        if (k !== KIND) { goOther(id, k); break; }
         if (S.pf && id !== S.pf.cur) pfSwitch(id);
         go(4);
         break;
@@ -3227,7 +3229,7 @@
   if (/[?&]pfmanage=1/.test(location.search)) {
     history.replaceState(null, '', location.pathname);
     const l = regLive();
-    if (l && l.k && l.k !== KIND) goOther(l.id);
+    if (l && l.k && l.k !== KIND) goOther(l.id, l.k);
     else {
       if (l && S.pf && l.id !== S.pf.cur) pfSwitch(l.id);
       if (S.sectorId && S.design && S.step !== 4) { S.step = 4; save(); render(); }

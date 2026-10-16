@@ -74,7 +74,7 @@ window.NFC_EN_UI = {
   'Les créneaux libres s’affichent ici sur votre carte en ligne.': 'Open time slots appear here on your live card.',
 
   /* Partage */
-  'Partager cette carte': 'Share this card', 'Copier le lien': 'Copy link', 'Lien copié': 'Link copied', 'Plus…': 'More…', 'Retour': 'Back',
+  'Partager cette carte': 'Share this card', 'Partager cette invitation': 'Share this invitation', 'Copier le lien': 'Copy link', 'Lien copié': 'Link copied', 'Plus…': 'More…', 'Retour': 'Back',
   'Faites scanner ce code avec l’appareil photo d’un téléphone.': 'Scan this code with a phone camera.', 'QR code indisponible hors ligne': 'QR code unavailable offline',
 
   /* Échange de coordonnées */

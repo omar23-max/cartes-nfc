@@ -1037,8 +1037,11 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
 
   function openShare(from, m) {
     const u = m.link || location.href, name = ownerName(m.card);
-    const msg = L2(`Voici la carte de visite de ${name} : ${u}`, `Here is ${name}’s business card: ${u}`);
-    const subj = L2('Carte de visite de ' + name, name + ' — business card');
+    /* Invitation (studio Événements) ou boutique : le message le dit */
+    const ev = /\/events\//.test(location.pathname), st = /\/stores\//.test(location.pathname);
+    const msg = ev ? L2(`Vous êtes invité·e ! ${name} : ${u}`, `You’re invited! ${name}: ${u}`) : st ? L2(`Découvrez ${name} : ${u}`, `Check out ${name}: ${u}`) : L2(`Voici la carte de visite de ${name} : ${u}`, `Here is ${name}’s business card: ${u}`);
+    const subj = ev ? L2('Invitation : ' + name, 'Invitation: ' + name) : st ? name : L2('Carte de visite de ' + name, name + ' — business card');
+    const shT = ev ? 'Partager cette invitation' : 'Partager cette carte';
     const E = encodeURIComponent;
     const opts = [
       { l: 'WhatsApp', i: 'wa', c: '#25D366', href: `https://wa.me/?text=${E(msg)}` },
@@ -1057,8 +1060,8 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
     /* Avant le paiement : tous les choix restent visibles mais grisés ; un toucher affiche un message */
     if (m.locked) opts.forEach((o) => { delete o.href; o.act = 'locked'; });
     const { ov, close } = overlay(from, 'ov-share');
-    ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="shr" role="menu" aria-label="Partager cette carte">
-      <div class="shr-h"><span>Partager cette carte</span><button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button></div>
+    ov.innerHTML = toEn(`<div class="vc-ov-in"><div class="shr" role="menu" aria-label="${shT}">
+      <div class="shr-h"><span>${shT}</span><button type="button" class="ov-x" aria-label="Fermer">${ic('x', 18)}</button></div>
       <div class="shr-l${m.locked ? ' locked' : ''}">${opts.map((o) => o.href
         ? `<a class="shr-i" role="menuitem" href="${esc(o.href)}" target="_blank" rel="noopener"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></a>`
         : `<button type="button" class="shr-i" role="menuitem" data-sh="${o.act}"><span class="shr-ic" style="--c:${o.c}">${ic(o.i, 20)}</span><span>${o.l}</span></button>`).join('')}${m.locked ? `<p class="shr-lock" hidden>${ic('lock', 15)}<span>${L2('Le partage sera disponible dès le paiement de votre carte NFC. Votre lien et votre QR code vous seront alors envoyés par courriel.', 'Sharing will be available as soon as your NFC card is paid. Your link and QR code will then be emailed to you.')}</span></p>` : ''}</div>

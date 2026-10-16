@@ -130,6 +130,21 @@ window.NFC = window.NFC || {};
     const q = new URLSearchParams(location.search).get('admin');
     if (q === '1' || q === '0') NFC.cfg.set('adminMode', q === '1', q === '1' ? 'Mode administrateur activé' : 'Mode administrateur désactivé');
   } catch (e) { /* rien */ }
+  /* v=313 : les invitations rejoignent la carte NFC commune (registre nextap-pages) ; fusion de l'ancien registre séparé */
+  try {
+    const oldE = JSON.parse(localStorage.getItem('nextap-events') || 'null');
+    if (oldE) {
+      const P = JSON.parse(localStorage.getItem('nextap-pages') || 'null') || { list: [], paused: [] };
+      P.list = P.list || []; P.paused = P.paused || [];
+      (oldE.list || []).forEach((x) => { if (!P.list.some((z) => z.k === x.k && z.id === x.id)) P.list.push(x); });
+      (oldE.paused || []).forEach((x) => { if (!P.paused.includes(x)) P.paused.push(x); });
+      if (oldE.gone) P.gone = Object.assign({}, oldE.gone, P.gone || {});
+      if (!P.live && oldE.live) P.live = oldE.live;
+      if (!P.link && oldE.link) P.link = oldE.link;
+      localStorage.setItem('nextap-pages', JSON.stringify(P));
+      localStorage.removeItem('nextap-events');
+    }
+  } catch (e) { /* rien */ }
   NFC.isAdmin = () => !!(NFC.cfg && NFC.cfg.get('adminMode', false));
   /* Onglets des produits NexTap en haut de page : cartes | boutiques (| admin, pour l’administrateur seulement).
      Libellés courts sur téléphone : Cartes / Boutiques / Admin. */
