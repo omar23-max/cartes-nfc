@@ -1461,3 +1461,16 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .cv-mosaic > svg { flex: none; margin-top: 2px; }
 .cv-mosaic b { display: block; font-size: 14px; }
 .cv-mosaic span { display: block; margin: 2px 0 8px; font-size: 13px; color: #1e40af; }
+/* Ordinateur : la marque dans la barre des onglets (à gauche), l'info du modèle en tête de l'en-tête */
+@media (min-width: 561px) {
+  .ptabs { position: relative; padding-left: 250px; padding-right: 12px; }
+  .ptabs > .pt-brand { position: absolute; left: 18px; top: 50%; transform: translateY(-42%); display: flex; align-items: center; gap: 8px; }
+  .ptabs > .pt-brand .brand-mk { width: 22px; height: 22px; border-radius: 7px; }
+  .ptabs > .pt-brand .brand-mk::after { inset: 6px 7px; }
+  .ptabs > .pt-brand .brand-n { font-size: 14px; }
+  .top .hd-info { margin-left: 0; }
+}
+@media (max-width: 900px) and (min-width: 561px) { .ptabs { padding-left: 60px; } .ptabs > .pt-brand .brand-n, .ptabs > .pt-brand .badge { display: none; } }
+/* v=292 : la marque est montée dans les onglets, l'info du modèle a de nouveau la place */
+@media (min-width: 1000px) { .top .hd-info .hd-info-t { display: inline; max-width: 22vw; } }
+@media (min-width: 1400px) { .top .hd-info .hd-info-t { max-width: 30vw; } }

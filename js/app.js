@@ -587,12 +587,12 @@
     nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`; nb.title = TT('Nouvelle création', 'New creation');
     nb.hidden = !(S.sectorId || regAll().length);
     let hi = $('.hd-info');
-    if (!hi) { hi = document.createElement('span'); hi.className = 'hd-info no-rw'; $('.top .brand').appendChild(hi); }
+    if (!hi) { hi = document.createElement('span'); hi.className = 'hd-info no-rw'; $('#steps').before(hi); }
     { const s0 = S.step === 4 && S.sectorId ? sec() : null, p0 = s0 ? ((NFC.palsOf ? NFC.palsOf(s0) : s0.palettes)[S.palette] || s0.palettes[0]) : null;
       hi.hidden = !s0;
       if (s0) { hi.innerHTML = `<span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span class="hd-info-t">${s0.profile ? profName(s0.profile) : s0.name} · ${designOf(S.design).name} · ${p0.name}</span>`; hi.title = hi.textContent; } }
     let ct = $('.cur-tag');
-    if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; $('.top .brand').after(ct); }
+    if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; ($('.top .brand') || $('#steps')).after(ct); }
     const tg = curTag();
     ct.hidden = !tg; if (tg) { ct.className = `cur-tag no-rw ${tg.cls}`; ct.innerHTML = tg.html; ct.title = tg.title; }
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
@@ -612,6 +612,9 @@
       document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs(isEvents ? 'events' : isStores ? 'stores' : 'cards', isStores || isEvents ? '../' : ''));
       document.querySelector('.ptabs').addEventListener('click', (e) => { const a = e.target.closest('a[data-ptab]'); if (a && a.dataset.ptab !== 'admin') a.href = a.getAttribute('href').split('?')[0] + '?ui=' + ui(); });
     }
+    /* Ordinateur : « NexTap Studio · Site test » monte dans la barre des onglets, à gauche ; l'info du modèle prend sa place */
+    { const pt = document.querySelector('.ptabs'), br = document.querySelector('.top .brand');
+      if (pt && br && window.matchMedia('(min-width: 561px)').matches) { br.classList.add('pt-brand'); pt.prepend(br); } }
     /* Bandeau du mode assistance, sous les onglets */
     const A = assistNow(), bar = document.querySelector('.assist-bar');
     if (A && !bar) {
