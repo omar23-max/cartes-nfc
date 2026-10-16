@@ -602,7 +602,7 @@
     let ct = $('.cur-tag');
     if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; ($('.top .brand') || $('#steps')).after(ct); }
     const tg = curTag();
-    ct.hidden = !tg; if (tg) { ct.className = `cur-tag no-rw ${tg.cls}`; ct.innerHTML = tg.html; ct.title = tg.title; }
+    ct.hidden = !tg; if (tg) { ct.dataset.act = tg.act || 'curtag'; ct.className = `cur-tag no-rw ${tg.cls}`; ct.innerHTML = tg.html; ct.title = tg.title; }
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
     document.documentElement.lang = ui();
     document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : 'NexTap Studio';
@@ -1115,11 +1115,11 @@
     else {
       /* Aucune création dans ce studio : on montre la création active (de l'autre studio), sans en créer une fantôme */
       if (!S.pf) {
-        const lv = regAll().find((x) => isLive(x.k, x.id));
-        if (!lv || S.sectorId) return null;
-        const pzl = cardPaused();
-        return { cls: pzl ? 'is-pause' : 'is-other', title: TT('Touchez pour voir vos créations et modifier celle-ci.', 'Tap to see your creations and edit this one.'),
-          html: `${ic(pzl ? 'pause' : 'nfc', 14)}<span class="ct-l">${TT('Votre création active&nbsp;:', 'Your active creation:')}</span><b>${esc(lv.name)}</b><em class="ct-t">${pzl ? TT('En pause', 'Paused') : KIND_L[lv.k]}</em>` };
+        if (!regAll().length || S.sectorId) return null;
+        /* La création active est déjà indiquée par « Version active » juste à côté : ici, on dit qu'il n'y a rien de ce type */
+        const NONE = { cards: TT('Aucune carte de visite pour l’instant', 'No business card yet'), stores: TT('Aucune boutique pour l’instant', 'No store yet'), events: TT('Aucune invitation pour l’instant', 'No invitation yet') }[KIND];
+        return { cls: 'is-other', act: 'newc', title: TT('Touchez pour créer', 'Tap to create'),
+          html: `${ic('plus', 14)}<span class="ct-l">${NONE}</span><em class="ct-t">${TT('Créer', 'Create')}</em>` };
       }
       const P = S.pf, e = P.list.find((x) => x.id === P.cur) || {};
       name = e.name || ''; live = isLive(KIND, P.cur);
@@ -2323,7 +2323,7 @@
     const lv = isLive(x.k, x.id), pz = isPaused(x.k, x.id), cp = lv && cardPaused();
     const me = x.k === KIND && S.pf && S.pf.cur === x.id;
     const nm = esc(x.name);
-    const pauseBtn = lv
+    const pauseBtn = !x.pub && !lv && !pz ? '<span class="pf-ed pf-void" aria-hidden="true"></span>' : lv
       ? (cp ? `<button type="button" class="pf-ed pf-pz on" data-act="cardresume" title="${TT('Reprendre ma carte', 'Resume my card')}" aria-label="${TT('Reprendre ma carte', 'Resume my card')}">${ic('play', 19)}</button>`
         : `<button type="button" class="pf-ed pf-pz" data-act="cardpause" title="${TT('Version active : mettre toute la carte en pause', 'Active version: pause the whole card')}" aria-label="${TT('Mettre ma carte en pause', 'Pause my card')}">${ic('pause', 21)}</button>`)
       : (pz ? `<button type="button" class="pf-ed pf-pz on" data-act="pfresume" data-k="${x.k}" data-v="${x.id}" title="${TT('En pause : reprendre cette création', 'Paused: resume this creation')}" aria-label="${TT(`Reprendre « ${nm} »`, `Resume “${nm}”`)}">${ic('play', 19)}</button>`
@@ -2333,8 +2333,9 @@
     /* « Activer » seulement pour une création déjà publiée (sinon : l'activer à l'étape Publication) */
     const act = edit && !lv && !pz && x.pub ? `<span class="pf-actv" role="button" tabindex="0" data-act="pflive" data-direct="1" data-k="${x.k}" data-v="${x.id}" title="${TT('Afficher cette création sur votre carte', 'Show this creation on your card')}">${ic('nfc', 12)}${TT('Activer', 'Activate')}</span>` : '';
     /* Création jamais publiée : « En création » ; déjà publiée : « En cours » (comme le repère de l'en-tête) */
+    const unp = !x.pub && !(edit && me) ? `<em class="pf-unp">${TT('Non publiée', 'Not published')}</em>` : '';
     const cur = edit && me ? (x.pub ? `<em class="pf-curt">${TT('En cours', 'Editing')}</em>` : `<em class="pf-curt is-new">${TT('En création', 'Creating')}</em>`) : '';
-    return `<div class="pf-pr${edit && me ? ' is-me' : ''}"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="${edit ? (me ? 'modal-close' : 'pfedit') : 'pflive'}" data-k="${x.k}" data-v="${x.id}"${edit ? ` title="${TT('Modifier cette création', 'Edit this creation')}"` : ''}><span class="pf-ic">${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}</span><span class="pf-tx"><span class="pf-l1"><span class="pf-cn">${nm}</span><span class="pf-ren" role="button" tabindex="0" data-act="pfren" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier le nom', 'Rename')}" aria-label="${TT(`Modifier le nom de « ${nm} »`, `Rename “${nm}”`)}">${ic('pen', 13)}</span></span><span class="pf-ck">${KIND_L[x.k]}</span></span>${(() => { const pzt = pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''; return cur || pzt || act ? `<span class="pf-rt">${cur}${pzt}${act}</span>` : ''; })()}</button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
+    return `<div class="pf-pr${edit && me ? ' is-me' : ''}"><button type="button" class="pf-c${lv ? (cp ? ' on paused' : ' on') : pz ? ' is-pz' : ''}" data-act="${edit ? (me ? 'modal-close' : 'pfedit') : 'pflive'}" data-k="${x.k}" data-v="${x.id}"${edit ? ` title="${TT('Modifier cette création', 'Edit this creation')}"` : ''}><span class="pf-ic">${lv && !cp ? ic('nfc', 13) : pz || cp ? ic('pause', 13) : ''}</span><span class="pf-tx"><span class="pf-l1"><span class="pf-cn">${nm}</span><span class="pf-ren" role="button" tabindex="0" data-act="pfren" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier le nom', 'Rename')}" aria-label="${TT(`Modifier le nom de « ${nm} »`, `Rename “${nm}”`)}">${ic('pen', 13)}</span></span><span class="pf-ck">${KIND_L[x.k]}</span></span>${(() => { const pzt = pz || cp ? `<em class="pf-pzt">${TT('En pause', 'Paused')}</em>` : ''; return cur || unp || pzt || act ? `<span class="pf-rt">${cur}${unp}${pzt}${act}</span>` : ''; })()}</button>${pauseBtn}<button type="button" class="pf-ed" data-act="pfedit" data-k="${x.k}" data-v="${x.id}" title="${TT('Modifier cette version', 'Edit this version')}" aria-label="${TT(`Modifier « ${nm} »`, `Edit “${nm}”`)}">${ic('pen', 16)}</button>${del}</div>`;
   }
   /* Renommer une création sans ouvrir l'éditeur */
   function renameForm(row, k, id) {
