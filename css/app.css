@@ -1507,3 +1507,12 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 @media (max-width: 900px) { .ed-top { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
 @media (max-width: 560px) { .ed-top > .ed-inf { display: none; } }
 @media (max-width: 1180px) and (min-width: 901px) { .ed-top .ed-links > .b.sm .lbl-l { display: none; } .ed-top .ed-links > .b.sm .lbl-s { display: inline; } }
+/* v=301 : langue de la carte dans la boîte d'outils, à droite des boutons (ordinateur) ; au-dessus sur mobile */
+@media (min-width: 561px) {
+  .ed-lang { display: none; }
+  .ed-top .ed-links .lang-sw { display: inline-flex; order: 3; align-items: center; gap: 10px; margin-left: auto; }
+  .ed-top .ed-links .lang-sw .seg { order: 0; }
+  .ed-top .ed-links .lang-sw .bili-ck { order: 1; margin: 0; }
+  .ed-top .ed-links .lang-sw .lbl-l { display: none; } .ed-top .ed-links .lang-sw .lbl-s { display: inline; }
+}
+@media (max-width: 560px) { .ed-top .ed-links .lang-sw { display: none !important; } }

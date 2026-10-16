@@ -551,6 +551,7 @@
 
   /* ---------- Rendu global ---------- */
   function render() {
+    requestAnimationFrame(() => alignTop());
     if (S.sectorId && !sec()) S.sectorId = null;
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     if (S.step > maxStep()) S.step = maxStep();
@@ -653,6 +654,30 @@
     if (bar) document.body.style.setProperty('--mbar-h', bar.getBoundingClientRect().height + 'px');
   }
   window.addEventListener('resize', () => { clearTimeout(fitPreview.t); fitPreview.t = setTimeout(fitPreview, 150); });
+  /* Ordinateur : les étapes (1re ligne) et « Vous modifiez · Version active » (2e ligne) sont centrées au-dessus de la colonne de gauche */
+  function alignTop() {
+    const st = $('#steps'), ct = $('.top .cur-tag'), hl = $('.top .hd-live');
+    [st, ct, hl].forEach((e) => { if (e) e.style.transform = ''; });
+    const col = document.querySelector('.ed-grid > :first-child, .split > :first-child');
+    if (!st || !col || innerWidth <= 900 || !col.offsetWidth) return;
+    const cr = col.getBoundingClientRect(), mid = cr.left + cr.width / 2;
+    const sts = st.querySelectorAll('.st'); if (!sts.length) return;
+    const a = sts[0].getBoundingClientRect().left, b = sts[sts.length - 1].getBoundingClientRect().right;
+    const rgt = [...document.querySelectorAll('.top > *')].filter((e) => e.offsetParent && e !== st && Math.abs(e.getBoundingClientRect().top - st.getBoundingClientRect().top) < 30 && e.getBoundingClientRect().left > b).map((e) => e.getBoundingClientRect().left);
+    let d = mid - (a + b) / 2;
+    if (rgt.length) d = Math.min(d, Math.min(...rgt) - 16 - b);
+    st.style.transform = `translateX(${Math.round(d)}px)`;
+    const g = [ct, hl].filter((e) => e && !e.hidden && e.offsetParent);
+    if (!g.length) return;
+    const l = Math.min(...g.map((e) => e.getBoundingClientRect().left)), r = Math.max(...g.map((e) => e.getBoundingClientRect().right));
+    const nx = [...document.querySelectorAll('.top .mycre, .top .newc2')].filter((e) => e.offsetParent && !e.hidden).map((e) => e.getBoundingClientRect().left);
+    let d2 = mid - (l + r) / 2;
+    if (nx.length) d2 = Math.min(d2, Math.min(...nx) - 16 - r);
+    d2 = Math.max(d2, 0);
+    g.forEach((e) => { e.style.transform = `translateX(${Math.round(d2)}px)`; });
+  }
+  window.addEventListener('resize', () => { clearTimeout(alignTop.t); alignTop.t = setTimeout(alignTop, 100); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => alignTop());
   const icons = () => { if (window.lucide) window.lucide.createIcons({ attrs: { 'stroke-width': 1.8 } }); };
 
   function renderPreview() {
@@ -1614,6 +1639,7 @@
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i><span class="lbl-l">Éditer avec l’IA</span><span class="lbl-s">IA</span></button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
+          ${langSwitch()}
           ${regAll().length > 0 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
       </div>
