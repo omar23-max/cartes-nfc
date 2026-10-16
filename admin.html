@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=292">
+  <link rel="stylesheet" href="css/app.css?v=293">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -106,32 +106,32 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=292"></script>
-  <script src="js/data.js?v=292"></script>
-  <script src="js/sectors.js?v=292"></script>
-  <script src="js/media.js?v=292"></script>
-  <script src="js/extras.js?v=292"></script>
-  <script src="js/locale-na.js?v=292"></script>
-  <script src="js/locale-na-en.js?v=292"></script>
-  <script src="js/google.js?v=292"></script>
-  <script src="js/profiles.js?v=292"></script>
-  <script src="js/profiles-sport.js?v=292"></script>
-  <script src="js/profiles-sante.js?v=292"></script>
-  <script src="js/profiles-archi.js?v=292"></script>
-  <script src="js/profiles-resto.js?v=292"></script>
-  <script src="js/profiles-auto.js?v=292"></script>
-  <script src="js/profiles-edu.js?v=292"></script>
-  <script src="js/designs-immo.js?v=292"></script>
-  <script src="js/sector-prestige.js?v=292"></script>
-  <script src="js/custom-catalog.js?v=292"></script>
-  <script src="js/jobs.js?v=292"></script>
-  <script src="js/render.js?v=292"></script>
-  <script src="js/designs-immo-der.js?v=292"></script>
-  <script src="js/demo-faces.js?v=292"></script>
-  <script src="js/designs-noir.js?v=292"></script>
-  <script src="js/section-suggest.js?v=292"></script>
+  <script src="js/services.js?v=293"></script>
+  <script src="js/data.js?v=293"></script>
+  <script src="js/sectors.js?v=293"></script>
+  <script src="js/media.js?v=293"></script>
+  <script src="js/extras.js?v=293"></script>
+  <script src="js/locale-na.js?v=293"></script>
+  <script src="js/locale-na-en.js?v=293"></script>
+  <script src="js/google.js?v=293"></script>
+  <script src="js/profiles.js?v=293"></script>
+  <script src="js/profiles-sport.js?v=293"></script>
+  <script src="js/profiles-sante.js?v=293"></script>
+  <script src="js/profiles-archi.js?v=293"></script>
+  <script src="js/profiles-resto.js?v=293"></script>
+  <script src="js/profiles-auto.js?v=293"></script>
+  <script src="js/profiles-edu.js?v=293"></script>
+  <script src="js/designs-immo.js?v=293"></script>
+  <script src="js/sector-prestige.js?v=293"></script>
+  <script src="js/custom-catalog.js?v=293"></script>
+  <script src="js/jobs.js?v=293"></script>
+  <script src="js/render.js?v=293"></script>
+  <script src="js/designs-immo-der.js?v=293"></script>
+  <script src="js/demo-faces.js?v=293"></script>
+  <script src="js/designs-noir.js?v=293"></script>
+  <script src="js/section-suggest.js?v=293"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=292"></script>
+  <script src="events/js/events-data.js?v=293"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -236,6 +236,7 @@
     /* 4. Marque NexTap */
     P.brand = () => `<div class="sh"><h1>Marque NexTap</h1><p>Noms affichés dans les studios et mention en bas des cartes.</p></div>
       ${box('Noms des studios', LIVE, '', fTxt('brand.studio', 'Nom du studio des cartes', 'Vide = NexTap Studio', 'NexTap Studio') + fTxt('brand.stores', 'Nom du studio des boutiques', 'Vide = NexTap Studio – Stores', 'NexTap Studio – Stores') + fTxt('brand.events', 'Nom du studio des invitations', 'Vide = NexTap Studio – Événements', 'NexTap Studio – Événements'))}
+      ${box('Noms des onglets', LIVE, 'Onglets tout en haut des studios.', fTxt('tabs.cards', 'Onglet des cartes', 'Vide = Carte digitale', 'Carte digitale') + fTxt('tabs.stores', 'Onglet des boutiques', 'Vide = Boutique', 'Boutique') + fTxt('tabs.events', 'Onglet des événements', 'Vide = Événements', 'Événements'))}
       ${box('Mention en bas des cartes', LIVE, '', fTxt('brand.footCards', 'Cartes de visite', 'Vide = « Carte de visite NFC »', 'Créé avec NexTap') + fTxt('brand.footStores', 'Boutiques', 'Vide = « Boutique NFC »', 'Boutique NexTap') + fTxt('brand.footEvents', 'Invitations', 'Vide = « Invitation créée avec NexTap »', 'Invitation NexTap') +
         `<div class="adm-f"><div>Masquer la mention pour les forfaits<small>Avantage des forfaits supérieurs.</small></div><div class="adm-act">${PLANS.map(([p, l]) => `<label class="adm-i" style="padding:4px 8px"><span>${l}</span>${sw(`data-hidefoot="${p}"`, C.get('brand.hideFoot', []).includes(p))}</label>`).join('')}</div></div>`)}
       ${box('Adresse des cartes', LIVE, 'Début du lien de chaque carte (le code de la carte est ajouté à la fin).', fTxt('brand.linkBase', 'Adresse de base', 'Vide = https://votre-site.com/c/', 'https://nextap.ca/'))}
