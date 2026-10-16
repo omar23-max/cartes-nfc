@@ -590,7 +590,11 @@
     if (!hi) { hi = document.createElement('span'); hi.className = 'hd-info no-rw'; $('#steps').before(hi); }
     { const s0 = S.step === 4 && S.sectorId ? sec() : null, p0 = s0 ? ((NFC.palsOf ? NFC.palsOf(s0) : s0.palettes)[S.palette] || s0.palettes[0]) : null;
       hi.hidden = !s0;
-      if (s0) { hi.innerHTML = `<span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span class="hd-info-t">${s0.profile ? profName(s0.profile) : s0.name} · ${designOf(S.design).name} · ${p0.name}</span>`; hi.title = hi.textContent; } }
+      if (s0) {
+        const kl = KIND === 'events' ? (cfg('tabs.events', '') || 'Événements') : KIND === 'stores' ? (cfg('tabs.stores', '') || 'Boutique') : (cfg('tabs.cards', '') || 'Carte digitale');
+        hi.innerHTML = `<span class="hi-1"><b>${esc(kl)}</b><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span class="hi-t">${s0.profile ? profName(s0.profile) : s0.name}</span></span><span class="hi-2">${designOf(S.design).name} · ${p0.name}</span>`;
+        hi.title = `${kl} · ${code()} · ${s0.profile ? profName(s0.profile) : s0.name} · ${designOf(S.design).name} · ${p0.name}`;
+      } }
     let ct = $('.cur-tag');
     if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; ($('.top .brand') || $('#steps')).after(ct); }
     const tg = curTag();
@@ -1610,7 +1614,6 @@
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 0 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
-          <span class="ed-inf" title="${esc(`${code()} · ${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}`)}"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span class="ed-inf-t">${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></span>
         </div>
       </div>
       <div class="mtabs">
