@@ -16,8 +16,9 @@
   /* Produit : cartes, boutiques ou événements (invitations) */
   const isEvents = X.kind === 'events';
   const isStores = X.kind ? X.kind === 'stores' : !!X.key && X.key !== 'nfc-studio-v6';
-  /* Événements : pas de versions ni de mode titulaire, pas de commande de carte NFC ; registre séparé */
-  const NOVER = isEvents;
+  /* Événements : plusieurs invitations possibles (comme les cartes et boutiques, v=310), mais pas de mode titulaire
+     ni de commande de carte NFC ; registre séparé (nextap-events) */
+  const NOVER = false;
   const REG = X.regKey || 'nextap-pages';
   /* Secteurs (ou types de boutique) : masqués, « Bientôt », ordre */
   const ADM = () => !!(NFC.isAdmin && NFC.isAdmin());
@@ -552,6 +553,8 @@
   /* ---------- Rendu global ---------- */
   function render() {
     requestAnimationFrame(() => alignTop());
+    /* Événements (v=310) : l'invitation déjà créée garde son nom (avant, une seule invitation, nom dans S.vname) */
+    if (isEvents && S.vname && S.pf && S.pf.list.length === 1 && !S.pf.list[0].named) { const e0 = S.pf.list[0]; e0.name = S.vname; e0.named = true; if (S.pub) { e0.pub = true; delete e0.draft; } delete S.vname; save(); }
     if (S.sectorId && !sec()) S.sectorId = null;
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     if (S.step > maxStep()) S.step = maxStep();
@@ -617,6 +620,9 @@
       document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs(isEvents ? 'events' : isStores ? 'stores' : 'cards', isStores || isEvents ? '../' : ''));
       document.querySelector('.ptabs').addEventListener('click', (e) => { const a = e.target.closest('a[data-ptab]'); if (a && a.dataset.ptab !== 'admin') a.href = a.getAttribute('href').split('?')[0] + '?ui=' + ui(); });
     }
+    /* Noms des onglets dans la langue du site (FR : réglables dans l'admin ; EN : noms fixes) */
+    { const en = ui() === 'en', L = { cards: [cfg('tabs.cards', '') || 'Carte digitale', 'Digital card', 'Carte', 'Card'], stores: [cfg('tabs.stores', '') || 'Boutique', 'Shop', 'Boutique', 'Shop'], events: [cfg('tabs.events', '') || 'Événements', 'Events', 'Événements', 'Events'], admin: ['Studio admin', 'Studio admin', 'Admin', 'Admin'] };
+      document.querySelectorAll('.ptabs a[data-ptab]').forEach((a) => { const t = L[a.dataset.ptab]; if (!t) return; const l = a.querySelector('.pt-l'), sh = a.querySelector('.pt-s'); if (l) l.textContent = en ? t[1] : t[0]; if (sh) sh.textContent = en ? t[3] : t[2]; }); }
     /* Ordinateur : « NexTap Studio · Site test » monte dans la barre des onglets, à gauche ; l'info du modèle prend sa place */
     { const pt = document.querySelector('.ptabs'), br = document.querySelector('.top .brand');
       if (pt && br && window.matchMedia('(min-width: 561px)').matches) { br.classList.add('pt-brand'); pt.prepend(br); } }
@@ -954,7 +960,7 @@
     if (isNew) {
       if (regAll().length >= pfMax()) return;
       const s = SECTORS.find((x) => x.id === pd.id), sn = (ui() === 'en' ? (window.NFC_EN_APP || {})[s.name] || s.name : s.name).split(/ et | and | & |, /)[0]; /* « Beauté et bien-être » → « Beauté » */
-      const base = KIND === 'stores' ? TT(`Ma boutique ${sn}`, `My ${sn} store`) : TT(`Ma carte ${sn}`, `My ${sn} card`);
+      const base = KIND === 'stores' ? TT(`Ma boutique ${sn}`, `My ${sn} store`) : KIND === 'events' ? TT(`Mon invitation ${sn}`, `My ${sn} invitation`) : TT(`Ma carte ${sn}`, `My ${sn} card`);
       let name = base.slice(0, 24);
       for (let i = 2; pfTaken(name); i++) name = `${base.slice(0, 21)} ${i}`;
       pfNewFresh(name);
@@ -1215,12 +1221,12 @@
      Registre commun (localStorage « nextap-pages ») : lien, QR, paiement, liste de toutes les versions et version affichée. */
   const KIND = isEvents ? 'events' : isStores ? 'stores' : 'cards', OTHER_URL = isStores ? '../index.html' : 'stores/index.html';
   const TT = (fr, en) => (ui() === 'en' ? en : fr);
-  const KIND_L = { get cards() { return TT('Carte de visite', 'Business card'); }, get stores() { return TT('Boutique', 'Store'); } };
+  const KIND_L = { get cards() { return TT('Carte de visite', 'Business card'); }, get stores() { return TT('Boutique', 'Store'); }, get events() { return TT('Événement', 'Event'); } };
   const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
   const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
   const pfApply = (d) => PF_KEYS.forEach((k) => { if (!d || d[k] === undefined) delete S[k]; else S[k] = clone(d[k]); });
   const pfMax = () => Math.max(1, +plan().profiles || 1);
-  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: KIND === 'stores' ? TT('Boutique principale', 'Main store') : TT('Carte principale', 'Main card'), data: null, draft: true }] }; return S.pf; }
+  function pfInit() { if (!S.pf) S.pf = { cur: 'p1', live: 'p1', list: [{ id: 'p1', name: KIND === 'stores' ? TT('Boutique principale', 'Main store') : KIND === 'events' ? TT('Événement principal', 'Main event') : TT('Carte principale', 'Main card'), data: null, draft: true }] }; if (KIND === 'events' && S.pub) { S.pf.list[0].pub = true; delete S.pf.list[0].draft; } return S.pf; }
   const pfName = (id) => (pfInit().list.find((x) => x.id === id) || {}).name || '';
   const regGet = () => { try { return JSON.parse(localStorage.getItem(REG) || 'null'); } catch (e) { return null; } };
   const regSet = (r) => { try { localStorage.setItem(REG, JSON.stringify(r)); } catch (e) { /* rien */ } };
@@ -1461,7 +1467,7 @@
     if (!e) return go();
     if (!S.sectorId) { dropDraft(); return go(); } /* brouillon vide (pas encore de secteur) : rien à perdre */
     pendingLeave = go;
-    const typ = KIND === 'stores' ? TT('boutique', 'store') : TT('carte', 'card');
+    const typ = KIND === 'stores' ? TT('boutique', 'store') : KIND === 'events' ? TT('invitation', 'invitation') : TT('carte', 'card');
     $('#modal').innerHTML = `<div class="mb" data-act="modal-close"></div>
       <div class="md no-rw lv-md" role="dialog" aria-modal="true" aria-labelledby="md-t">
         <button class="md-x" data-act="modal-close" aria-label="${TT('Fermer', 'Close')}">${ic('x')}</button>
@@ -1522,8 +1528,8 @@
           ${KIND !== 'events' && S.sectorId && curN ? o('copy', 'copy', TT(`Une copie de « ${esc(curN)} »`, `A copy of “${esc(curN)}”`), TT('Même contenu, même modèle et mêmes couleurs, à modifier librement', 'Same content, template and colors, to edit freely')) : ''}
         </div>
         ${newPick ? `<form data-ncf>
-          ${full && newPick !== 'events' ? `<p class="pf-err" role="alert">${TT(`Vous utilisez déjà vos ${pfMax()} créations. Supprimez-en une dans « Versions » pour en ajouter une autre.`, `You already use your ${pfMax()} creations. Delete one in “Versions” to add another.`)}</p>` : `<label class="f"><span class="f-l">${TT('Nom (pour vous seulement)', 'Name (only for you)')}</span><input name="n" maxlength="24" placeholder="${esc(def)}" autocomplete="off"></label>`}
-          <div class="btns">${full && newPick !== 'events' ? `<button type="button" class="b pri" data-act="pfmanage">${TT('Voir mes versions', 'See my versions')}</button>` : `<button type="submit" class="b pri">${TT('Créer', 'Create')} ${ic('arrow', 16)}</button>`}<button type="button" class="b" data-act="modal-close">${TT('Annuler', 'Cancel')}</button></div>
+          ${full && (newPick !== 'events' || isEvents) ? `<p class="pf-err" role="alert">${TT(`Vous utilisez déjà vos ${pfMax()} créations. Supprimez-en une dans « Versions » pour en ajouter une autre.`, `You already use your ${pfMax()} creations. Delete one in “Versions” to add another.`)}</p>` : `<label class="f"><span class="f-l">${TT('Nom (pour vous seulement)', 'Name (only for you)')}</span><input name="n" maxlength="24" placeholder="${esc(def)}" autocomplete="off"></label>`}
+          <div class="btns">${full && (newPick !== 'events' || isEvents) ? `<button type="button" class="b pri" data-act="pfmanage">${TT('Voir mes versions', 'See my versions')}</button>` : `<button type="submit" class="b pri">${TT('Créer', 'Create')} ${ic('arrow', 16)}</button>`}<button type="button" class="b" data-act="modal-close">${TT('Annuler', 'Cancel')}</button></div>
         </form>` : ''}
       </div>`;
     $('#modal').classList.add('on');
@@ -1533,7 +1539,12 @@
     f.addEventListener('submit', (e) => {
       e.preventDefault();
       const name = ((inp && inp.value.trim()) || def).slice(0, 24);
-      if (newPick === 'events') { save(); location.href = `${isEvents ? '' : root + 'events/'}index.html?start=1&ui=${ui()}&vname=${encodeURIComponent(name)}`; return; }
+      if (newPick === 'events' && !isEvents) {
+        save();
+        /* Le studio Événements a déjà des invitations : on y ajoute une nouvelle création ; sinon, premier départ */
+        let evN = 0; try { evN = ((JSON.parse(localStorage.getItem('nextap-events') || 'null') || {}).list || []).length; } catch (er) { /* rien */ }
+        location.href = `${root}events/index.html?${evN ? `newver=${encodeURIComponent(name)}` : `start=1&vname=${encodeURIComponent(name)}`}&ui=${ui()}`; return;
+      }
       if (pfTaken(name)) { pfErr(f, TT(`Le nom « ${name} » existe déjà. Choisissez un autre nom.`, `The name “${name}” already exists. Choose another name.`)); if (inp) inp.focus(); return; }
       if (newPick === 'copy') {
         const P = pfInit(), curE = P.list.find((x) => x.id === P.cur), id = 'p' + rid();
@@ -1546,7 +1557,7 @@
       }
       if (newPick !== KIND) { save(); location.href = `${{ cards: root + 'index.html', stores: root + 'stores/index.html' }[newPick]}?newver=${encodeURIComponent(name)}&ui=${ui()}`; return; }
       pfNewFresh(name); newPick = ''; closeModal(); save(); render(); window.scrollTo(0, 0);
-      toast(TT(`« ${name} » créée, sur la même carte NFC : rien à repayer. Choisissez maintenant ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `“${name}” created on the same NFC card: nothing to pay again. Now choose ${isStores ? 'the store type' : 'your industry'}.`));
+      toast(TT(`« ${name} » créée, sur la même carte NFC : rien à repayer. Choisissez maintenant ${isStores ? 'le type de boutique' : isEvents ? 'votre événement' : 'votre secteur'}.`, `“${name}” created on the same NFC card: nothing to pay again. Now choose ${isStores ? 'the store type' : isEvents ? 'your event' : 'your industry'}.`));
     });
   }
 
@@ -1623,7 +1634,7 @@
       }
       if (ver && S.sectorId && S.design) S.step = 4;
       if (nv && (S.sectorId || S.pf) && regAll().length >= pfMax()) toast(TT(`Votre forfait permet ${pfMax()} créations par carte NFC. Supprimez-en une pour en ajouter.`, `Your plan allows ${pfMax()} creations per NFC card. Delete one to add more.`));
-      else if (nv) { pfNewFresh(nv.slice(0, 24)); toast(TT(`Nouvelle création « ${nv.slice(0, 24)} » : choisissez ${isStores ? 'le type de boutique' : 'votre secteur'}.`, `New version “${nv.slice(0, 24)}”: choose ${isStores ? 'the store type' : 'your industry'}.`)); }
+      else if (nv) { pfNewFresh(nv.slice(0, 24)); toast(TT(`Nouvelle création « ${nv.slice(0, 24)} » : choisissez ${isStores ? 'le type de boutique' : isEvents ? 'votre événement' : 'votre secteur'}.`, `New version “${nv.slice(0, 24)}”: choose ${isStores ? 'the store type' : isEvents ? 'your event' : 'your industry'}.`)); }
       if (ver || nv) { save(); history.replaceState(null, '', location.pathname); }
     } catch (e) { /* rien */ }
   }
@@ -1646,7 +1657,7 @@
           ${regAll().length > 0 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
         </div>
       </div>
-      ${(() => { const kl = KIND === 'events' ? (cfg('tabs.events', '') || 'Événements') : KIND === 'stores' ? (cfg('tabs.stores', '') || 'Boutique') : (cfg('tabs.cards', '') || 'Carte digitale'), sn = s.profile ? profName(s.profile) : s.name;
+      ${(() => { const kl = ui() === 'en' ? (KIND === 'events' ? 'Events' : KIND === 'stores' ? 'Shop' : 'Digital card') : KIND === 'events' ? (cfg('tabs.events', '') || 'Événements') : KIND === 'stores' ? (cfg('tabs.stores', '') || 'Boutique') : (cfg('tabs.cards', '') || 'Carte digitale'), sn = s.profile ? profName(s.profile) : s.name;
             return `<span class="ed-inf" title="${esc(`${kl} · ${code()} · ${sn} · ${designOf(S.design).name} · ${p.name}`)}"><span class="ed-inf-in"><b>${esc(kl)}</b> <span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span> ${sn} · ${designOf(S.design).name} · ${p.name}</span></span>`; })()}
       </div>
       <div class="mtabs">
@@ -2365,7 +2376,7 @@
           </div>
           ${regAll().length >= 1 && !NOVER ? `<div class="box no-rw"><span class="box-l">${TT('Version active de votre carte', 'Your card’s active version')}</span><div class="pf-pub">${regAll().slice().sort((a, b) => isLive(b.k, b.id) - isLive(a.k, a.id)).map((x) => pubRow(x)).join('')}</div><p class="muted small">${TT('Changez-la quand vous voulez : le lien et le QR code restent les mêmes, rien à reprogrammer.', 'Change it anytime: the link and QR code stay the same, nothing to reprogram.')}</p></div>` : ''}
           ${pauseBox()}
-          ${locked() || NOVER ? '' : `<div class="box no-rw ownbox">
+          ${locked() || isEvents ? '' : `<div class="box no-rw ownbox">
             <span class="box-l">${TT('Votre carte sur votre téléphone', 'Your card on your phone')}</span>
             <p class="muted small">${TT('Ouvrez-la en mode titulaire et mettez-la sur votre écran d’accueil.', 'Open it in owner mode and add it to your home screen.')}</p>
             <div class="own2"><button type="button" class="b sm" data-act="pfhome">${ic(locked() ? 'lock' : 'smartphone', 15)}${TT('Mettre sur mon écran d’accueil', 'Add to my home screen')}</button><button type="button" class="b sm" data-act="pfowner">${ic(locked() ? 'lock' : 'nfc', 15)}${TT('Ouvrir en mode titulaire', 'Open in owner mode')}</button></div>

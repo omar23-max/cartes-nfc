@@ -8,7 +8,7 @@
 (function () {
   'use strict';
   const NFC = (window.NFC = window.NFC || {});
-  const reg = () => { try { return JSON.parse(localStorage.getItem('nextap-pages') || 'null'); } catch (e) { return null; } };
+  const reg = (kind) => { try { return JSON.parse(localStorage.getItem(kind === 'events' ? 'nextap-events' : 'nextap-pages') || 'null'); } catch (e) { return null; } };
   const en = () => (document.documentElement.lang || '').startsWith('en') || /[?&]lang=en/.test(location.search);
   const T = (fr, eng) => (en() ? eng : fr);
 
@@ -18,12 +18,12 @@
 
   /* kind : 'cards' ou 'stores' ; renvoie { redirect } | { page } | { id, key } */
   NFC.pfResolve = (kind, q) => {
-    const R = reg();
+    const R = reg(kind);
     if (!R) return {};
     const other = kind === 'cards' ? 'stores/view.html' : '../view.html';
     /* Carte en pause (titulaire) : tous ses liens affichent « Carte temporairement indisponible » ; le titulaire (?owner=1) voit sa carte */
     const livePaused = R.live && (R.paused || []).includes(`${R.live.k}:${R.live.id}`); /* version active « en pause » = carte en pause */
-    if ((R.cardPaused || livePaused) && q.get('owner') !== '1') return { page: page(T('Carte temporairement indisponible', 'Card temporarily unavailable'), T('Cette carte reviendra bientôt.', 'This card will be back soon.'), true) };
+    if ((R.cardPaused || livePaused) && q.get('owner') !== '1') return { page: page((kind === 'events' ? T('Invitation temporairement indisponible', 'Invitation temporarily unavailable') : T('Carte temporairement indisponible', 'Card temporarily unavailable')), (kind === 'events' ? T('Cette invitation reviendra bientôt.', 'This invitation will be back soon.') : T('Cette carte reviendra bientôt.', 'This card will be back soon.')), true) };
     let key = q.get('ver');
     const seen = new Set();
     while (key && R.gone && R.gone[key] && !seen.has(key)) {
@@ -48,7 +48,7 @@
   /* Barre du titulaire : choisir la version active juste avant de taper la carte */
   NFC.pfOwnerBar = (kind, q) => {
     if (q.get('owner') !== '1') return;
-    const R = reg();
+    const R = reg(kind);
     if (!R || !(R.list || []).length) return;
     const paused = R.paused || [], live = R.live || {};
     const list = R.list.filter((x) => !paused.includes(`${x.k}:${x.id}`));
