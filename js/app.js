@@ -1673,7 +1673,7 @@
       let h = grp('identity', 'Titre & photos', 'Noms, sous-titre, photos', `
         ${inp('Titre (noms des hôtes)', 'identity.name', { ph: 'Sophie & Lucas' })}
         ${inp('Sous-titre', 'identity.role', { ph: 'Se disent oui' })}
-        <div class="row2">${imgF('Photo principale', 'identity.photo')}${imgF('Image de couverture', 'identity.cover')}</div>
+        <div class="row2">${imgF('Photo principale', 'identity.photo')}</div>
         ${coverEd()}`);
       h += grp('contact', 'Contact des hôtes', 'Pour les questions des invités', `
         <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('Email', 'contact.email', { type: 'email' })}</div>`);
@@ -1683,7 +1683,7 @@
       ${inp(est ? 'Nom de l’établissement' : 'Nom et prénom', 'identity.name')}
       <div class="row2">${inp(est ? 'Activité' : 'Fonction', 'identity.role', { ph: est ? 'Ex. Bistrot' : 'Ex. Attaché commercial' })}${inp('Entreprise', 'identity.company', { ph: 'Facultatif' })}</div>
       ${inp('Spécialité ou accroche', 'identity.specialty', { ph: 'Ex. Gestion de patrimoine', hint: 'S’affiche sous votre fonction. Facultatif.' })}
-      <div class="row3">${imgF(est ? 'Photo / logo principal' : 'Photo de profil', 'identity.photo')}${imgF('Logo', 'identity.logo')}${imgF('Image de couverture', 'identity.cover')}</div>
+      <div class="row2">${imgF(est ? 'Photo / logo principal' : 'Photo de profil', 'identity.photo')}${imgF('Logo', 'identity.logo')}</div>
       ${coverEd()}`);
     h += grp('contact', 'Coordonnées & action principale', 'Téléphone, email, site', `
       <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('WhatsApp', 'contact.whatsapp', { type: 'tel', hint: 'Format international : +33 6…' })}</div>
@@ -1704,8 +1704,10 @@
     const id = card().identity, video = id.coverType === 'video';
     const kind = id.coverVideoFile ? 'Vidéo téléversée' : id.coverVideoUrl ? 'Lien vidéo' : id.coverVideo ? 'Vidéo d’exemple' : '';
     const cur = VC.vsrc(id.coverVideoFile) || id.coverVideoUrl || id.coverVideo;
-    return `<div class="f"><span class="f-l">Couverture</span>
-        <div class="seg" role="group" aria-label="Type de couverture"><button type="button" class="${video ? '' : 'on'}" data-act="setcover" data-v="image">${ic('image', 15)}Image</button>${plan().video || video ? `<button type="button" class="${video ? 'on' : ''}" data-act="setcover" data-v="video">${ic('play', 13)}Vidéo</button>` : ''}</div></div>
+    const opt = (v, on, icn, lab) => `<button type="button" class="cv-opt${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="setcover" data-v="${v}"><span class="cv-ck">${on ? ic('check', 13) : ''}</span>${ic(icn, 15)}${lab}</button>`;
+    return `<div class="f cv-f"><span class="f-l">${TT('Couverture : une image OU une vidéo', 'Cover: an image OR a video')}</span>
+        <div class="cv-opts" role="radiogroup" aria-label="${TT('Type de couverture', 'Cover type')}">${opt('image', !video, 'image', TT('Image de couverture', 'Cover image'))}${plan().video || video ? opt('video', video, 'play', TT('Vidéo de couverture', 'Cover video')) : ''}</div></div>
+      ${video ? '' : `<div class="cv-img">${imgF('Image de couverture', 'identity.cover')}</div>`}
       ${video ? `<div class="cover-vid">
           ${cur ? `<div class="demo-vid"><video src="${esc(cur)}" muted playsinline preload="metadata"></video><div><b>${kind}</b><span>Démarre sans le son et tourne en boucle.</span>${id.coverVideoFile || id.coverVideoUrl ? `<button class="b xs ghost" data-act="coverclear">Retirer ma vidéo</button>` : ''}</div></div>` : ''}
           <div class="f"><span class="f-l">Votre vidéo de couverture</span>
@@ -1713,7 +1715,7 @@
           </div>
           ${inp('Ou collez un lien vers la vidéo', 'identity.coverVideoUrl', { ph: 'https://…/ma-video.mp4', hint: 'Lien direct vers un fichier vidéo (.mp4). Les liens YouTube ne peuvent pas servir de couverture.' })}
         </div>` : ''}
-      <p class="f-h">La couverture apparaît dans les modèles Showcase, Immersive, Classic, Mosaic et Wave. L’image de couverture sert aussi d’affiche à la vidéo.</p>`;
+      <p class="f-h">${TT('Une seule couverture à la fois : cochez Image ou Vidéo. Elle apparaît dans les modèles qui ont une couverture (Showcase, Immersive, Classic, Mosaic, Wave…).', 'One cover at a time: tick Image or Video. It shows in templates with a cover (Showcase, Immersive, Classic, Mosaic, Wave…).')}</p>`;
   }
 
   const galEd = (path, images, help) => `<div class="gal-ed">${(images || []).map((x, i) => `<div class="gt"><div class="gt-im"><img src="${VC.img(x.src, mdl())}" alt="">${del(path, i, 'Retirer la photo')}</div>${mini(`${path}.${i}.cap`, 'Légende')}</div>`).join('')}

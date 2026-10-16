@@ -1442,3 +1442,10 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .lv-md h2 { color: #9a3412; }
 .lv-md .lv-quit { color: #b91c1c; border-color: #fca5a5; }
 .lv-md .lv-quit:hover { background: #fef2f2; }
+/* Couverture : Image OU Vidéo (cases exclusives) */
+.cv-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.cv-opt { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 10px; border: 1px solid var(--line2, #e4e4e7); border-radius: 12px; background: #fff; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.cv-opt .cv-ck { display: grid; place-items: center; width: 18px; height: 18px; border: 1.5px solid #a1a1aa; border-radius: 5px; background: #fff; color: #fff; }
+.cv-opt.on { border-color: #111114; box-shadow: 0 0 0 1px #111114 inset; }
+.cv-opt.on .cv-ck { background: #111114; border-color: #111114; }
+.cv-img { margin-top: 10px; }
