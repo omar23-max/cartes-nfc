@@ -1456,3 +1456,8 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .cv-tag.vid { background: #ede9fe; color: #5b21b6; }
 .cv-tag.img { background: #e0f2fe; color: #075985; }
 .tpl-top { flex-wrap: wrap; row-gap: 4px; }
+/* Modèle Gallery : explication de la mosaïque */
+.cv-mosaic { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 12px; background: #eff6ff; color: #1e3a8a; }
+.cv-mosaic > svg { flex: none; margin-top: 2px; }
+.cv-mosaic b { display: block; font-size: 14px; }
+.cv-mosaic span { display: block; margin: 2px 0 8px; font-size: 13px; color: #1e40af; }

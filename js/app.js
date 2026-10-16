@@ -1719,6 +1719,15 @@
   }
   const designHasCover = () => { const c = coverCaps(); return c.img || c.vid; };
   function coverEd() {
+    /* Modèle Gallery : la mosaïque du haut = les 6 premières photos de la section Galerie */
+    if (S.design === 'd18' && !isEvents) {
+      const def = (sec().blocks || []).find((b) => b.type === 'gallery');
+      if (def) {
+        const b = card().blocks[def.key] || {}, n = (b.images || []).filter((x) => x.src).length, ttl = esc(b.title || def.title);
+        return `<div class="cv-mosaic">${ic('image', 16)}<div><b>${TT('Mosaïque de photos en haut de la carte', 'Photo mosaic at the top of the card')}</b><span>${TT(`Dans ce modèle, la mosaïque affiche les 6 premières photos de votre section « ${ttl} » (au moins 3 photos).`, `In this template, the mosaic shows the first 6 photos of your “${ttl}” section (at least 3 photos).`)}${b.on ? '' : TT(' Cette section est masquée : la mosaïque n’apparaît pas.', ' This section is hidden: the mosaic does not show.')}</span>
+          <button type="button" class="b sm" data-act="gogal" data-id="b-${def.key}" data-k="${def.key}">${ic('pen', 14)}${b.on ? TT(`Modifier ces photos (${n})`, `Edit these photos (${n})`) : TT('Afficher et modifier ces photos', 'Show and edit these photos')}</button></div></div>`;
+      }
+    }
     if (!designHasCover()) return `<p class="f-h cv-none">${ic('image', 14)}${TT('Ce modèle n’a pas de couverture. Changez de modèle pour ajouter une image ou une vidéo de couverture.', 'This template has no cover. Change template to add a cover image or video.')}</p>`;
     const caps = coverCaps(), id = card().identity, video = id.coverType === 'video' && caps.vid;
     const kind = id.coverVideoFile ? 'Vidéo téléversée' : id.coverVideoUrl ? 'Lien vidéo' : id.coverVideo ? 'Vidéo d’exemple' : '';
@@ -2763,6 +2772,13 @@
       case 'leaveok': { const g = pendingLeave; pendingLeave = null; closeModal(); dropDraft(); render(); toast(TT('Brouillon supprimé.', 'Draft deleted.')); if (g) g(); break; }
       case 'curtag': curModal('edit'); break;
       case 'mycre': curModal('list'); break;
+      case 'gogal': {
+        const id = t.dataset.id, k = t.dataset.k;
+        if (k && !(card().blocks[k] || {}).on) { card().blocks[k] = Object.assign({}, card().blocks[k], { on: true }); }
+        openGroups.add(id); structChanged();
+        setTimeout(() => { const el = document.querySelector(`[data-grp="${id}"]`); if (el) { el.classList.add('open'); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }, 80);
+        break;
+      }
       case 'hdact': {
         const v = ($('[data-hdpick]') || {}).value || ''; const [k, ...rest] = v.split(':'), id = rest.join(':');
         if (!k || !id || !liveOk(k, id)) break;
