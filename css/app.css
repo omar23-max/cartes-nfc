@@ -1490,3 +1490,11 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .top .hd-info .hi-2 { display: block; font-size: 12.5px; }
 }
 @media (max-width: 560px) { .top .hd-info { display: none !important; } }
+/* v=297 : le bloc d'info (deux lignes) va dans la boîte d'outils, à droite ; plus dans l'en-tête */
+.top .hd-info { display: none !important; }
+.ed-tools .ed-links > .ed-inf { order: 3; margin-left: auto; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; max-width: 52%; line-height: 1.25; text-align: center; font-size: 13px; font-weight: 500; color: var(--mut); }
+.ed-inf .hi-1 { display: flex; align-items: center; justify-content: center; gap: 7px; max-width: 100%; min-width: 0; white-space: nowrap; }
+.ed-inf .hi-1 b { color: var(--ink); font-weight: 700; }
+.ed-inf .hi-t, .ed-inf .hi-2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.ed-inf .hi-2 { font-size: 12.5px; }
+@media (max-width: 560px) { .ed-tools .ed-links > .ed-inf { display: none; } }
