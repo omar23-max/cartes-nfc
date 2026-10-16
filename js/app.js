@@ -658,9 +658,12 @@
   function alignTop() {
     const st = $('#steps'), ct = $('.top .cur-tag'), hl = $('.top .hd-live');
     [st, ct, hl].forEach((e) => { if (e) e.style.transform = ''; });
-    const col = document.querySelector('.ed-grid > :first-child, .split > :first-child');
-    if (!st || !col || innerWidth <= 900 || !col.offsetWidth) return;
-    const cr = col.getBoundingClientRect(), mid = cr.left + cr.width / 2;
+    /* Même repère à toutes les étapes : la colonne d'édition de l'étape Contenu (cadre large 1280 px, moins le téléphone 391 px + 40 px d'écart) */
+    const sec0 = document.querySelector('section.wrap'), box = sec0 && sec0.parentElement;
+    if (!st || !box || innerWidth <= 900) return;
+    const bs = getComputedStyle(box), br = box.getBoundingClientRect();
+    const cl = br.left + parseFloat(bs.paddingLeft), cw = br.width - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
+    const ww = Math.min(1280, cw), wl = cl + (cw - ww) / 2, mid = wl + (ww - 431) / 2;
     const sts = st.querySelectorAll('.st'); if (!sts.length) return;
     const a = sts[0].getBoundingClientRect().left, b = sts[sts.length - 1].getBoundingClientRect().right;
     const rgt = [...document.querySelectorAll('.top > *')].filter((e) => e.offsetParent && e !== st && Math.abs(e.getBoundingClientRect().top - st.getBoundingClientRect().top) < 30 && e.getBoundingClientRect().left > b).map((e) => e.getBoundingClientRect().left);
