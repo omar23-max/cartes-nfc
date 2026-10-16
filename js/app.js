@@ -1610,6 +1610,7 @@
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 0 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
+          <span class="ed-inf" title="${esc(`${code()} · ${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}`)}"><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span class="ed-inf-t">${s.profile ? profName(s.profile) : s.name} · ${designOf(S.design).name} · ${p.name}</span></span>
         </div>
       </div>
       <div class="mtabs">
