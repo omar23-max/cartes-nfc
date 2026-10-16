@@ -1449,3 +1449,4 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .cv-opt.on { border-color: #111114; box-shadow: 0 0 0 1px #111114 inset; }
 .cv-opt.on .cv-ck { background: #111114; border-color: #111114; }
 .cv-img { margin-top: 10px; }
+.cv-none { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 10px; background: #f4f4f5; }

@@ -1700,7 +1700,21 @@
     return h;
   }
 
+  /* Le modèle choisi affiche-t-il une couverture ? (on le vérifie en le dessinant avec une image témoin) */
+  const cvCache = {};
+  function designHasCover() {
+    const key = [KIND, S.sectorId, JSON.stringify(S.prof || {}), S.design].join('|');
+    if (key in cvCache) return cvCache[key];
+    let has = true;
+    try {
+      const m = mdl(); if (!m) return true;
+      const c = Object.assign({}, m.card, { identity: Object.assign({}, m.card.identity, { cover: 'media/__cvprobe__.jpg', coverType: 'image' }) });
+      has = VC.render(Object.assign({}, m, { card: c, thumb: true })).includes('__cvprobe__');
+    } catch (e) { has = true; }
+    return (cvCache[key] = has);
+  }
   function coverEd() {
+    if (!designHasCover()) return `<p class="f-h cv-none">${ic('image', 14)}${TT('Ce modèle n’a pas de couverture. Changez de modèle pour ajouter une image ou une vidéo de couverture.', 'This template has no cover. Change template to add a cover image or video.')}</p>`;
     const id = card().identity, video = id.coverType === 'video';
     const kind = id.coverVideoFile ? 'Vidéo téléversée' : id.coverVideoUrl ? 'Lien vidéo' : id.coverVideo ? 'Vidéo d’exemple' : '';
     const cur = VC.vsrc(id.coverVideoFile) || id.coverVideoUrl || id.coverVideo;
