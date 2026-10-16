@@ -1209,11 +1209,9 @@
           ${back(2, 'Changer de modèle')}
           ${editLine()}
           ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · ${nPal === 6 ? '6 palettes pensées pour votre secteur.' : ui() === 'en' ? `${nPal} palettes designed for your industry.` : `${nPal} palettes pensées pour votre secteur.`}`)}
-          <div class="pals-row">
-            <div class="pals">${pals}</div>
-            <div class="pal-next">${palNextBtn()}</div>
-          </div>
+          <div class="pals">${pals}</div>
           ${isEvents ? '' : '<p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>'}
+          <div class="pal-next">${palNextBtn()}</div>
         </div>
         <div class="pv-col">${phone()}</div>
       </div>
