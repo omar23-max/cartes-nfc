@@ -1689,13 +1689,14 @@
       <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('WhatsApp', 'contact.whatsapp', { type: 'tel', hint: 'Format international : +33 6…' })}</div>
       <div class="row2">${inp('Email', 'contact.email', { type: 'email' })}${inp('Site web', 'contact.website', { ph: 'monsite.fr' })}</div>
       <label class="f"><span class="f-l">Action principale</span><select data-path="primary">${primaryOptions()}</select><span class="f-h">Le gros bouton toujours visible en bas de la carte.</span></label>`);
-    h += grp('leads', TT('Échange de coordonnées', 'Contact exchange'), TT('Recevez les coordonnées des personnes qui ouvrent votre carte, et choisissez où les retrouver', 'Get the details of people who open your card, and choose where to find them'), leadsEd());
     normSocials(card());
     const socRow = ([k, l]) => { const on = !!(card().socialsOn || {})[k]; return `<div class="soc-f ${on ? 'on' : ''}" data-socf="${k}">
         <label class="soc-ck" title="Afficher ${l} sur la carte"><input type="checkbox" data-path="socialsOn.${k}" data-socck="${k}" ${on ? 'checked' : ''}><span class="soc-lg">${VC.brandIc(k, 18)}</span><span class="soc-n">${l}</span></label>
         <input type="text" data-path="socials.${k}" data-soc="${k}" inputmode="url" spellcheck="false" value="${esc(g('socials.' + k))}" placeholder="${VC.SOC_BASE[k]}…" aria-label="Adresse ${l}">
       </div>`; };
     h += grp('socials', 'Réseaux sociaux', 'Cochez vos réseaux, complétez l’adresse', `<div class="soc-ed">${VC.SOC.filter(([k]) => svcOn('soc:' + k) || (card().socialsOn || {})[k]).map(socRow).join('')}</div>`);
+    /* Réseaux sociaux avant l’échange de coordonnées */
+    h += grp('leads', TT('Échange de coordonnées', 'Contact exchange'), TT('Recevez les coordonnées des personnes qui ouvrent votre carte, et choisissez où les retrouver', 'Get the details of people who open your card, and choose where to find them'), leadsEd());
     h += sectionsEd();
     return h;
   }
