@@ -1637,6 +1637,8 @@
     const v = g(path);
     return `<label class="thf" title="${v ? 'Changer la photo' : 'Ajouter une photo'}">${v ? `<img src="${VC.img(v, mdl())}" alt="">` : ic('image', 18)}<input type="file" accept="image/*" hidden data-img="${path}"></label>`;
   };
+  /* Champ que le modèle n'affiche pas : une ligne grise à la place */
+  const notShown = (label, what) => `<div class="f"><span class="f-l">${label}</span><p class="f-h cv-none">${ic('eye', 14)}${TT(`Ce modèle n’affiche pas ${what}.`, `This template doesn’t show ${what}.`)}</p></div>`;
   function imgF(label, path, hint) {
     const v = g(path);
     return `<div class="f"><span class="f-l">${label}</span><div class="imgf">
@@ -1673,7 +1675,7 @@
       let h = grp('identity', 'Titre & photos', 'Noms, sous-titre, photos', `
         ${inp('Titre (noms des hôtes)', 'identity.name', { ph: 'Sophie & Lucas' })}
         ${inp('Sous-titre', 'identity.role', { ph: 'Se disent oui' })}
-        <div class="row2">${imgF('Photo principale', 'identity.photo')}</div>
+        <div class="row2">${coverCaps().photo ? imgF('Photo principale', 'identity.photo') : notShown('Photo principale', TT('de photo principale', 'a main photo'))}</div>
         ${coverEd()}`);
       h += grp('contact', 'Contact des hôtes', 'Pour les questions des invités', `
         <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('Email', 'contact.email', { type: 'email' })}</div>`);
@@ -1682,8 +1684,8 @@
     let h = grp('identity', 'Identité', est ? TT('Nom, activité, image de couverture, photo de profil, logo', 'Name, business, cover image, profile photo, logo') : TT('Nom, fonction, image de couverture, photo de profil, logo', 'Name, job title, cover image, profile photo, logo'), `
       ${inp(est ? 'Nom de l’établissement' : 'Nom et prénom', 'identity.name')}
       <div class="row2">${inp(est ? 'Activité' : 'Fonction', 'identity.role', { ph: est ? 'Ex. Bistrot' : 'Ex. Attaché commercial' })}${inp('Entreprise', 'identity.company', { ph: 'Facultatif' })}</div>
-      ${inp('Spécialité ou accroche', 'identity.specialty', { ph: 'Ex. Gestion de patrimoine', hint: 'S’affiche sous votre fonction. Facultatif.' })}
-      <div class="row2">${imgF(TT('Image principale (photo de profil)', 'Main image (profile photo)'), 'identity.photo', est ? TT('La photo ronde ou carrée à côté du nom : votre logo ou une photo de l’établissement.', 'The round or square picture next to the name: your logo or a photo of the place.') : TT('La photo ronde ou carrée à côté de votre nom.', 'The round or square photo next to your name.'))}${imgF(TT('Petit logo (facultatif)', 'Small logo (optional)'), 'identity.logo', TT('Affiché en petit à côté du nom de l’entreprise, dans certains modèles.', 'Shown small next to the company name, in some templates.'))}</div>
+      ${coverCaps().spec ? inp('Spécialité ou accroche', 'identity.specialty', { ph: 'Ex. Gestion de patrimoine', hint: 'S’affiche sous votre fonction. Facultatif.' }) : notShown(TT('Spécialité ou accroche', 'Specialty or tagline'), TT('d’accroche', 'a tagline'))}
+      <div class="row2">${!coverCaps().photo ? notShown(TT('Image principale (photo de profil)', 'Main image (profile photo)'), TT('de photo de profil', 'a profile photo')) : imgF(TT('Image principale (photo de profil)', 'Main image (profile photo)'), 'identity.photo', est ? TT('La photo ronde ou carrée à côté du nom : votre logo ou une photo de l’établissement.', 'The round or square picture next to the name: your logo or a photo of the place.') : TT('La photo ronde ou carrée à côté de votre nom.', 'The round or square photo next to your name.'))}${coverCaps().logo ? imgF(TT('Petit logo (facultatif)', 'Small logo (optional)'), 'identity.logo', TT('Affiché en petit à côté du nom de l’entreprise.', 'Shown small next to the company name.')) : notShown(TT('Petit logo', 'Small logo'), TT('de petit logo', 'a small logo'))}</div>
       ${coverEd()}`);
     h += grp('contact', 'Coordonnées & action principale', 'Téléphone, email, site', `
       <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('WhatsApp', 'contact.whatsapp', { type: 'tel', hint: 'Format international : +33 6…' })}</div>
@@ -1708,12 +1710,13 @@
     const d = dId || S.design;
     const key = [KIND, S.sectorId, JSON.stringify(S.prof || {}), d].join('|');
     if (key in cvCache) return cvCache[key];
-    let caps = { img: true, vid: true };
+    let caps = { img: true, vid: true, photo: true, logo: true, spec: true };
     try {
       const m = dId ? mdl(dId) : mdl(); if (!m) return caps;
-      const c = Object.assign({}, m.card, { identity: Object.assign({}, m.card.identity, { cover: 'media/__cvprobe__.jpg', coverType: 'video', coverVideo: 'media/__cvvid__.mp4', coverVideoFile: '', coverVideoUrl: '' }) });
-      const h = VC.render(Object.assign({}, m, { card: c }));
-      caps = { img: h.includes('__cvprobe__'), vid: h.includes('__cvvid__') };
+      /* Rendu témoin : couverture image + vidéo, petit logo, accroche ; puis sans logo pour tester la photo principale */
+      const probe = (extra) => VC.render(Object.assign({}, m, { card: Object.assign({}, m.card, { identity: Object.assign({}, m.card.identity, { cover: 'media/__cvprobe__.jpg', coverType: 'video', coverVideo: 'media/__cvvid__.mp4', coverVideoFile: '', coverVideoUrl: '', logo: 'https://probe.test/__lgprobe__.png', specialty: 'XSPECPROBEX', photo: 'https://probe.test/__phprobe__.jpg' }, extra) }) }));
+      const h = probe({}), h2 = probe({ logo: '' });
+      caps = { img: h.includes('__cvprobe__'), vid: h.includes('__cvvid__'), logo: h.includes('__lgprobe__'), spec: h.includes('XSPECPROBEX'), photo: h2.includes('__phprobe__') };
     } catch (e) { /* par défaut : tout est proposé */ }
     return (cvCache[key] = caps);
   }
