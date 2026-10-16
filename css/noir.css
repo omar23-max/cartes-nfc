@@ -150,3 +150,6 @@
 }
 .vc-n1 .sticky .btn svg, .vc-n2 .sticky .btn svg, .vc-n3 .sticky .btn svg { color: #0a0a0b; }
 .vc-n1 .stars, .vc-n2 .stars, .vc-n3 .stars { color: var(--p); }
+/* Le bandeau défilant et le fond flouté ne doivent jamais élargir la carte (pas de défilement horizontal sur téléphone) */
+.vc-n1, .vc-n2, .vc-n3 { overflow-x: clip; }
+.nx-mq, .nx-bg { overflow: hidden; contain: paint; }
