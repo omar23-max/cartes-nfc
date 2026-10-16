@@ -138,7 +138,7 @@ window.NFC = window.NFC || {};
     /* Noms des onglets (réglables dans l’admin, « Marque NexTap ») — distincts du nom des studios */
     const T = [['cards', root || './', g('tabs.cards', 'Carte digitale'), 'Carte'], ['stores', (root || '') + 'stores/', g('tabs.stores', 'Boutique'), 'Boutique'], ['events', (root || '') + 'events/', g('tabs.events', 'Événements'), 'Événements']];
     /* Visible pour l’administrateur : mode administrateur actif, ou admin déjà ouverte dans ce navigateur (sur GoBiz : administrateur connecté) */
-    if (cur === 'admin' || NFC.isAdmin() || NFC.cfg.get('admTab', false)) T.push(['admin', (root || '') + 'admin.html', 'Admin NexTap Studio', 'Admin']);
+    if (cur === 'admin' || NFC.isAdmin() || NFC.cfg.get('admTab', false)) T.push(['admin', (root || '') + 'admin.html', 'Studio admin', 'Admin']);
     return `<nav class="ptabs" aria-label="Produits NexTap">${T.map(([k, h, l, s]) => `<a href="${h}" class="${k === cur ? 'on' : ''}${k === 'admin' ? ' adm' : ''}" ${k === cur ? 'aria-current="page"' : ''} data-ptab="${k}"><span class="pt-l">${l}</span><span class="pt-s">${s}</span></a>`).join('')}</nav>`;
   };
 })();
