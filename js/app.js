@@ -1679,7 +1679,7 @@
         <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('Email', 'contact.email', { type: 'email' })}</div>`);
       return h + sectionsEd();
     }
-    let h = grp('identity', 'Identité', est ? 'Nom, activité, logo' : 'Nom, fonction, photo', `
+    let h = grp('identity', 'Identité', est ? TT('Nom, activité, image de couverture, photo de profil, logo', 'Name, business, cover image, profile photo, logo') : TT('Nom, fonction, image de couverture, photo de profil, logo', 'Name, job title, cover image, profile photo, logo'), `
       ${inp(est ? 'Nom de l’établissement' : 'Nom et prénom', 'identity.name')}
       <div class="row2">${inp(est ? 'Activité' : 'Fonction', 'identity.role', { ph: est ? 'Ex. Bistrot' : 'Ex. Attaché commercial' })}${inp('Entreprise', 'identity.company', { ph: 'Facultatif' })}</div>
       ${inp('Spécialité ou accroche', 'identity.specialty', { ph: 'Ex. Gestion de patrimoine', hint: 'S’affiche sous votre fonction. Facultatif.' })}
