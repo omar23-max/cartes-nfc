@@ -1608,15 +1608,17 @@
       </div>
       <div class="ed-lang">${langSwitch()}</div>
       ${biliNote()}
+      <div class="ed-top">
       <div class="ed-tools">
         <div class="ed-links">
           ${svcOn('ai:edit') && plan().ai ? '<button class="b sm ai-b" data-act="aiedit"><i data-lucide="sparkles"></i><span class="lbl-l">Éditer avec l’IA</span><span class="lbl-s">IA</span></button>' : ''}
           <button class="b sm" data-act="go" data-n="2"><i data-lucide="layout-template"></i><span class="lbl-l">Changer de modèle</span><span class="lbl-s">Modèle</span></button>
           <button class="b sm" data-act="go" data-n="3"><i data-lucide="palette"></i><span class="lbl-l">Changer de couleurs</span><span class="lbl-s">Couleurs</span></button>
           ${regAll().length > 0 || NOVER ? '' : `<button class="b sm pf-tb" data-act="pfopen"><i data-lucide="copy"></i><span class="lbl-l">Versions</span><span class="lbl-s">Versions</span><em>${Math.max(1, regAll().length)} / ${pfMax()}</em></button>`}
-          ${(() => { const kl = KIND === 'events' ? (cfg('tabs.events', '') || 'Événements') : KIND === 'stores' ? (cfg('tabs.stores', '') || 'Boutique') : (cfg('tabs.cards', '') || 'Carte digitale'), sn = s.profile ? profName(s.profile) : s.name;
-            return `<span class="ed-inf" title="${esc(`${kl} · ${code()} · ${sn} · ${designOf(S.design).name} · ${p.name}`)}"><span class="hi-1"><b>${esc(kl)}</b><span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span><span class="hi-t">${sn}</span></span><span class="hi-2">${designOf(S.design).name} · ${p.name}</span></span>`; })()}
         </div>
+      </div>
+      ${(() => { const kl = KIND === 'events' ? (cfg('tabs.events', '') || 'Événements') : KIND === 'stores' ? (cfg('tabs.stores', '') || 'Boutique') : (cfg('tabs.cards', '') || 'Carte digitale'), sn = s.profile ? profName(s.profile) : s.name;
+            return `<span class="ed-inf" title="${esc(`${kl} · ${code()} · ${sn} · ${designOf(S.design).name} · ${p.name}`)}"><span class="ed-inf-in"><b>${esc(kl)}</b> <span class="code">${code()}${lang() === 'en' ? ' · EN' : ''}</span> ${sn} · ${designOf(S.design).name} · ${p.name}</span></span>`; })()}
       </div>
       <div class="mtabs">
         <button class="${mobileTab === 'edit' ? 'on' : ''}" data-act="mtab" data-t="edit">Modifier</button>

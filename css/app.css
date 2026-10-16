@@ -1498,3 +1498,12 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .ed-inf .hi-t, .ed-inf .hi-2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .ed-inf .hi-2 { font-size: 12.5px; }
 @media (max-width: 560px) { .ed-tools .ed-links > .ed-inf { display: none; } }
+/* v=298 : deux blocs séparés, chacun avec sa bordure : outils (colonne de gauche) | info (au-dessus du téléphone) */
+.ed-top { display: grid; grid-template-columns: minmax(0, 1fr) 391px; gap: 40px; align-items: stretch; margin: 0 0 18px; }
+.ed-top > .ed-tools { margin: 0; }
+.ed-top > .ed-inf { box-sizing: border-box; display: flex; align-items: center; justify-content: center; max-width: none; margin: 0; padding: 10px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); text-align: center; line-height: 1.55; font-size: 13px; font-weight: 500; color: var(--mut); }
+.ed-top > .ed-inf b { color: var(--ink); font-weight: 700; }
+.ed-top > .ed-inf .code { display: inline-block; margin: 0 2px; font-size: 11.5px; vertical-align: 1px; }
+@media (max-width: 900px) { .ed-top { grid-template-columns: minmax(0, 1fr); gap: 10px; } }
+@media (max-width: 560px) { .ed-top > .ed-inf { display: none; } }
+@media (max-width: 1180px) and (min-width: 901px) { .ed-top .ed-links > .b.sm .lbl-l { display: none; } .ed-top .ed-links > .b.sm .lbl-s { display: inline; } }
