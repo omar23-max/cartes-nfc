@@ -1104,6 +1104,10 @@
     return true;
   }
 
+  /* Étape 3 : « Suivant » s'active une fois la palette choisie (création déjà publiée : déjà choisie) */
+  const palDone = () => !!S.palPick || !!(S.pf && (S.pf.list.find((x) => x.id === S.pf.cur) || {}).pub);
+  const palNextBtn = () => `<button class="b pri lg pal-go" data-act="go" data-n="4" ${palDone() ? '' : 'disabled aria-disabled="true"'}><span class="pal-go-k">${TT('Suivant', 'Next')}</span>${TT('Remplir mes informations', 'Fill in my details')} ${ic('arrow', 18)}</button>
+      <small class="pal-go-h"${palDone() ? ' hidden' : ''}>${TT('Choisissez d’abord une palette.', 'Choose a palette first.')}</small>`;
   /* ---------- Étape 2 : modèle ---------- */
   /* Repère de l'en-tête (tous les studios, toutes les étapes) :
      « Nouvelle carte : <nom> » tant que la création n'a jamais été publiée, puis « Vous modifiez : <nom> · Active / Inactive » */
@@ -1205,9 +1209,11 @@
           ${back(2, 'Changer de modèle')}
           ${editLine()}
           ${head('Choisissez vos couleurs', `Modèle <b>${designOf(S.design).name}</b> · ${nPal === 6 ? '6 palettes pensées pour votre secteur.' : ui() === 'en' ? `${nPal} palettes designed for your industry.` : `${nPal} palettes pensées pour votre secteur.`}`)}
-          <div class="pals">${pals}</div>
+          <div class="pals-row">
+            <div class="pals">${pals}</div>
+            <div class="pal-next">${palNextBtn()}</div>
+          </div>
           ${isEvents ? '' : '<p class="muted small">Une couleur personnalisée ou extraite de votre logo pourra être ajoutée plus tard.</p>'}
-          <button class="b pri lg" data-act="go" data-n="4">Remplir mes informations ${ic('arrow', 18)}</button>
         </div>
         <div class="pv-col">${phone()}</div>
       </div>
@@ -1225,7 +1231,7 @@
   const urlOf = (k) => (isStores || isEvents ? '../' : '') + (STU[k] || STU.cards).path;
   const TT = (fr, en) => (ui() === 'en' ? en : fr);
   const KIND_L = { get cards() { return TT('Carte de visite', 'Business card'); }, get stores() { return TT('Boutique', 'Store'); }, get events() { return TT('Invitation', 'Invitation'); } };
-  const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
+  const PF_KEYS = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang', 'palPick'];
   const pfSnap = () => { const o = {}; PF_KEYS.forEach((k) => { o[k] = S[k] === undefined ? undefined : clone(S[k]); }); return o; };
   const pfApply = (d) => PF_KEYS.forEach((k) => { if (!d || d[k] === undefined) delete S[k]; else S[k] = clone(d[k]); });
   const pfMax = () => Math.max(1, +plan().profiles || 1);
@@ -1433,7 +1439,7 @@
     let O = null;
     try { O = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) { O = null; }
     if (O) {
-      const keys = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang'];
+      const keys = ['sectorId', 'prof', 'design', 'palette', 'cards', 'bili', 'lang', 'palPick'];
       const wipe = () => { keys.forEach((k) => delete O[k]); O.palette = 0; O.cards = {}; O.step = 1; delete O.pf; };
       if (!O.pf) wipe();
       else {
@@ -1921,17 +1927,21 @@
     }).length;
   }
   const catTile = (x, en) => { const n = catCount(x.id); return `<button type="button" class="as-t${n ? ' has' : ''}" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}${n ? `<span class="as-has">${en ? 'Already on your card' : 'Déjà sur votre carte'}${n > 1 ? ' ×' + n : ''}</span>` : ''}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`; };
-  function catGroups(en) {
-    return CAT_GROUPS.map(([g, fr, eng]) => `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${CAT.filter((x) => x.g === g && catOn(x)).map((x) => catTile(x, en)).join('')}</div></div>`).join('');
+  function catGroups(en, skip) {
+    return CAT_GROUPS.map(([g, fr, eng]) => { const L = CAT.filter((x) => x.g === g && catOn(x) && !(skip && skip.includes(x.id))); return L.length ? `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${L.map((x) => catTile(x, en)).join('')}</div></div>` : ''; }).join('');
   }
+  /* « Voir plus de sections » reste ouvert d'un affichage à l'autre (ajout d'une section, etc.) */
+  let asOpen = false;
+  document.addEventListener('toggle', (e) => { if (e.target.classList && e.target.classList.contains('as-more-d')) asOpen = e.target.open; }, true);
   function addSecHTML() {
     const en = ui() === 'en';
     const sug = sugIds().filter((id) => !catPresent(id) && catOn(catOf(id))).slice(0, 4).map(catOf);
     return `<div class="add-sec">
       <span class="f-l">${ic('plus', 15)}${en ? 'Add a section' : 'Ajouter une section'}</span>
       ${sug.length ? `<div class="as-g as-sug"><span class="as-h">${en ? 'Suggested for you' : 'Suggérées pour vous'}</span><div class="as-grid">${sug.map((x) => catTile(x, en)).join('')}</div></div>` : ''}
-      <div class="as-all">${catGroups(en)}</div>
-      <button type="button" class="b as-more" data-act="addcat">${ic('plus', 16)}${en ? `See all sections (${CAT.filter(catOn).length})` : `Voir toutes les sections (${CAT.filter(catOn).length})`}</button>
+      ${(() => { const n = CAT.filter(catOn).length - sug.length;
+        return `<details class="as-more-d"${!sug.length || asOpen ? ' open' : ''}><summary>${ic('chevd', 16)}${en ? `See more sections (${n})` : `Voir plus de sections (${n})`}</summary><div class="as-all">${catGroups(en, sug.map((x) => x.id))}</div></details>
+          <button type="button" class="b as-more" data-act="addcat">${ic('plus', 16)}${en ? `See more sections (${n})` : `Voir plus de sections (${n})`}</button>`; })()}
     </div>`;
   }
   /* Éditer avec l’IA : maquette de l’assistant (activé plus tard côté serveur, la clé IA ne doit jamais être dans le navigateur) */
@@ -2676,7 +2686,8 @@
       case 'leadtest': { const b = document.querySelector('.pv-col [data-vc="vcard"], .preview [data-vc="vcard"], #pv [data-vc="vcard"], .phone [data-vc="vcard"]') || [...document.querySelectorAll('[data-vc="vcard"]')].find((x) => !x.closest('.ed, .editor')); if (b) { b.scrollIntoView({ block: 'center', behavior: 'smooth' }); setTimeout(() => b.click(), 350); } else toast(TT('Ouvrez l’aperçu pour essayer.', 'Open the preview to try it.')); break; }
       case 'leadconnect': toast(`La connexion à ${t.dataset.v} se fera depuis votre espace NexTap, une fois votre carte en ligne.`); break;
       case 'palette': {
-        S.palette = +t.dataset.i; save();
+        S.palette = +t.dataset.i; S.palPick = true; save();
+        { const nx = document.querySelector('.pal-next'); if (nx) { nx.innerHTML = palNextBtn(); icons(); } }
         /* Seul l’aperçu est redessiné : il garde sa position de défilement, on voit l’effet sur la section regardée */
         document.querySelectorAll('.pal').forEach((b) => b.classList.toggle('sel', b === t));
         renderPreview();
