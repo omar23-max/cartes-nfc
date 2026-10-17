@@ -1593,3 +1593,19 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 }
 /* v=326 : sections du menu déroulant de la même taille que les suggestions (même nombre de colonnes) */
 @media (min-width: 901px) { .add-sec .as-more-d .as-grid { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); } }
+/* v=327 téléphone : FR | EN + Recommencer dans la barre des onglets ; plus de ligne logo */
+@media (max-width: 560px) {
+  .ptabs { align-items: center; gap: 2px; padding: 4px 6px 0; }
+  .ptabs a { padding: 7px 9px 8px; font-size: 12.5px; }
+  .ptabs > .pt-tools { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; padding-bottom: 3px; flex: none; }
+  .ptabs > .pt-tools .lang-ui, .ptabs > .pt-tools #uisw > * { transform: scale(.9); transform-origin: right center; }
+  .ptabs > .pt-tools .reset { padding: 0 6px; min-height: 30px; }
+  .top > .brand { display: none; }
+}
+@media (max-width: 560px) {
+  .ptabs a { padding: 7px 7px 8px; font-size: 12px; }
+  .ptabs > .pt-tools #uisw svg { display: none; }
+  .ptabs > .pt-tools #uisw > * { transform: none; }
+  .ptabs > .pt-tools #uisw button { padding: 0 7px; min-height: 26px; font-size: 12px; }
+}
+@media (max-width: 560px) { .ptabs { gap: 0; padding-left: 4px; padding-right: 4px; } .ptabs a { padding-left: 6px; padding-right: 6px; } }

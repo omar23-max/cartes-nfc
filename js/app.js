@@ -625,7 +625,12 @@
       document.querySelectorAll('.ptabs a[data-ptab]').forEach((a) => { const t = L[a.dataset.ptab]; if (!t) return; const l = a.querySelector('.pt-l'), sh = a.querySelector('.pt-s'); if (l) l.textContent = en ? t[1] : t[0]; if (sh) sh.textContent = en ? t[3] : t[2]; }); }
     /* Ordinateur : « NexTap Studio · Site test » monte dans la barre des onglets, à gauche ; l'info du modèle prend sa place */
     { const pt = document.querySelector('.ptabs'), br = document.querySelector('.top .brand');
-      if (pt && br && window.matchMedia('(min-width: 561px)').matches) { br.classList.add('pt-brand'); pt.prepend(br); } }
+      if (pt && br && window.matchMedia('(min-width: 561px)').matches) { br.classList.add('pt-brand'); pt.prepend(br); }
+      /* Téléphone : FR | EN et « Recommencer » montent dans la barre des onglets, à droite (la ligne du logo disparaît) */
+      const uw = $('#uisw'), rs = $('.top .reset');
+      if (pt && uw && rs && window.matchMedia('(max-width: 560px)').matches && !pt.querySelector('.pt-tools')) {
+        const tl = document.createElement('span'); tl.className = 'pt-tools'; tl.append(uw, rs); pt.append(tl);
+      } }
     /* Bandeau du mode assistance, sous les onglets */
     const A = assistNow(), bar = document.querySelector('.assist-bar');
     if (A && !bar) {
