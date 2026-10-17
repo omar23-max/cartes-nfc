@@ -1591,3 +1591,5 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 @media (min-width: 901px) {
   .add-sec .as-sug .as-grid { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); }
 }
+/* v=326 : sections du menu déroulant de la même taille que les suggestions (même nombre de colonnes) */
+@media (min-width: 901px) { .add-sec .as-more-d .as-grid { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); } }

@@ -1930,9 +1930,9 @@
   function addSecHTML() {
     const en = ui() === 'en';
     const sug = sugIds().filter((id) => !catPresent(id) && catOn(catOf(id))).slice(0, 4).map(catOf);
-    return `<div class="add-sec">
+    return `<div class="add-sec" style="--n:${sug.length >= 3 ? sug.length : 4}">
       <span class="f-l">${ic('plus', 15)}${en ? 'Add a section' : 'Ajouter une section'}</span>
-      ${sug.length ? `<div class="as-g as-sug"><span class="as-h">${en ? 'Suggested for you' : 'Suggérées pour vous'}</span><div class="as-grid" style="--n:${sug.length}">${sug.map((x) => catTile(x, en)).join('')}</div></div>` : ''}
+      ${sug.length ? `<div class="as-g as-sug"><span class="as-h">${en ? 'Suggested for you' : 'Suggérées pour vous'}</span><div class="as-grid">${sug.map((x) => catTile(x, en)).join('')}</div></div>` : ''}
       ${(() => { const n = CAT.filter(catOn).length - sug.length;
         return `<details class="as-more-d"${!sug.length || asOpen ? ' open' : ''}><summary>${ic('chevd', 16)}${en ? `See more sections (${n})` : `Voir plus de sections (${n})`}</summary><div class="as-all">${catGroups(en, sug.map((x) => x.id))}</div></details>
           <button type="button" class="b as-more" data-act="addcat">${ic('plus', 16)}${en ? `See more sections (${n})` : `Voir plus de sections (${n})`}</button>`; })()}
