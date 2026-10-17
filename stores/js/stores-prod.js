@@ -56,7 +56,7 @@
   NFC.SECTORS.splice(at < 0 ? NFC.SECTORS.length : at + 1, 0, T);
 
   /* Miniatures choisies pour les types de boutique (media/tiles/b-<id>.jpg) */
-  ['mode', 'friperie', 'bijoux', 'fleuriste', 'deco', 'librairie', 'cadeaux', 'velos', 'cosmetiques', 'telephones', 'epicerie', 'animalerie', 'coiffure', 'esthetique', 'r-sushi', 'r-pizzeria', 'r-steak', 'r-cafe', 'r-brasserie'].forEach((id) => { const t = NFC.SECTORS.find((s) => s.id === id); if (t) t.tile = '../media/tiles/b-' + id + '.jpg'; });
+  ['mode', 'friperie', 'bijoux', 'fleuriste', 'deco', 'librairie', 'cadeaux', 'velos', 'cosmetiques', 'telephones', 'epicerie', 'animalerie', 'coiffure', 'esthetique', 'r-sushi', 'r-pizzeria', 'r-steak', 'r-cafe', 'r-brasserie', 'r-wok', 'r-cocktail', 'r-gastro'].forEach((id) => { const t = NFC.SECTORS.find((s) => s.id === id); if (t) t.tile = '../media/tiles/b-' + id + '.jpg'; });
 
   const EN = { [T.name]: T.nameEn, [T.ex]: T.exEn, 'Vos produits, prix et la façon de commander': 'Your products, prices and how customers order', 'Notre boutique': 'Our shop' };
   Object.assign(window.NFC_EN_APP || (window.NFC_EN_APP = {}), EN);
