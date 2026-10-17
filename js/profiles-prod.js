@@ -1,4 +1,4 @@
-/* Commerces du secteur « Producteurs et commerces alimentaires » (10 commerces). Même principe que profiles.js.
+/* Commerces du secteur « Producteurs et commerces alimentaires » (11 commerces). Même principe que profiles.js.
    Photos et vidéos : Mixkit, licence gratuite usage commercial (dossier media/prod/). */
 (function () {
   'use strict';
@@ -39,7 +39,30 @@
   });
 
   const PROD = [
-    { id: 'maraicher', icon: 'carrot', keep: true, tile: 'media/tiles/prod-maraicher.jpg', n: ['Légumes de saison', 'Seasonal vegetables'], ex: ['Maraîcher, paniers bio, kiosque', 'Vegetable farm, organic baskets'] },
+    { id: 'maraicher', icon: 'carrot', keep: true, tile: 'media/tiles/prod-maraicher.jpg', n: ['Ferme maraîchère', 'Market garden farm'], ex: ['Légumes de saison, paniers bio, kiosque', 'Seasonal vegetables, organic baskets, farm stand'] },
+
+    { id: 'ferme', icon: 'tractor', rec: 'd4',
+      n: ['Ferme', 'Farm'], ex: ['Élevage, grandes cultures, autocueillette, visites', 'Livestock, field crops, pick-your-own, tours'],
+      pal: [pal('Vert prairie', '#3f6212', '#fbbf24'), pal('Rouge grange', '#991b1b', '#fef3c7'), pal('Blé doré', '#a16207', '#14532d'), pal('Bleu ciel', '#0369a1', '#fde68a'), pal('Terre', '#78350f', '#bef264'), pal('Ardoise', '#334155', '#facc15')],
+      M: { cover: 15344, gal: [44922, 45782, 34835, 7687, 45105, 41565], video: 31433 },
+      fr: { id: ['Ferme du Coteau', 'Ferme familiale', 'Élevage · Grandes cultures · Autocueillette · Visites', 'Famille Pelletier'], ct: ['+1 418 555-0177', 'info@fermeducoteau.ca', 'fermeducoteau.ca'],
+        about: ['La ferme', 'Depuis quatre générations, notre famille élève des vaches laitières et des moutons et cultive le blé, l’orge et le foin sur 120 acres. Venez cueillir vos pommes, rencontrer les animaux et repartir avec nos produits.'],
+        prodTitle: 'À la ferme', prod: [['Visite de la ferme', 'Animaux, étable, champs · 1 h 30', '12 $ / pers.'], ['Autocueillette de pommes', 'Sac de 10 lb', '15 $'], ['Bœuf et agneau de la ferme', 'Boîtes de 10 kg', 'dès 180 $'], ['Farine de blé moulue sur pierre', 'Sac de 2 kg', '9 $']],
+        sais: ['En ce moment', 'Pommes, Citrouilles, Agneaux du printemps, Balades en charrette', 'Calendrier mis à jour chaque semaine sur notre page.'],
+        whereTitle: 'Horaires', where: [['Visites', 'Samedi et dimanche, 10 h et 14 h'], ['Autocueillette', 'Tous les jours, 9 h – 17 h (sept. – oct.)'], ['Boutique de la ferme', 'Jeudi – dimanche, 10 h – 17 h']],
+        order: ['Réserver', 'Réserver une visite', 'Groupes et écoles bienvenus, sur réservation.'],
+        galTitle: 'À la ferme', gal: ['Nos vaches au pâturage', 'La moisson du blé', 'Cueillette des pommes', 'Les champs après la récolte', 'La bergerie', 'Visite au pré'],
+        locTitle: 'La ferme', loc: ['2850, rang du Coteau, Saint-Jean-Port-Joli (Québec) G0R 3G0', 'Grand stationnement · Aire de pique-nique'], vid: 'Le troupeau au pré',
+        rev: [['Valérie D.', 'Visite en famille', 'Les enfants ont nourri les agneaux, une journée inoubliable.'], ['Pierre-Luc M.', 'Boîte de bœuf', 'Une viande excellente, élevée avec soin.']] },
+      en: { id: ['Hillcrest Farm', 'Family farm', 'Livestock · Field crops · Pick-your-own · Tours', 'The Pelletier family'], ct: ['+1 717 555-0177', 'info@hillcrestfarm.com', 'hillcrestfarm.com'],
+        about: ['The farm', 'For four generations our family has raised dairy cows and sheep and grown wheat, barley and hay on 120 acres. Come pick your apples, meet the animals and take our goods home.'],
+        prodTitle: 'At the farm', prod: [['Farm tour', 'Animals, barn, fields · 90 min', '$12 / person'], ['Pick-your-own apples', '10 lb bag', '$15'], ['Farm-raised beef and lamb', '20 lb boxes', 'from $180'], ['Stone-ground wheat flour', '5 lb bag', '$9']],
+        sais: ['Right now', 'Apples, Pumpkins, Spring lambs, Hayrides', 'Schedule updated weekly on our page.'],
+        whereTitle: 'Hours', where: [['Tours', 'Saturday and Sunday, 10 a.m. and 2 p.m.'], ['Pick-your-own', 'Every day, 9 a.m. – 5 p.m. (Sept – Oct)'], ['Farm store', 'Thursday – Sunday, 10 a.m. – 5 p.m.']],
+        order: ['Book', 'Book a farm tour', 'Groups and schools welcome, by reservation.'],
+        galTitle: 'On the farm', gal: ['Cows on pasture', 'Wheat harvest', 'Apple picking', 'Fields after harvest', 'The sheep barn', 'A walk in the pasture'],
+        locTitle: 'The farm', loc: ['2850 Hillcrest Road, Lancaster, PA 17602', 'Large parking lot · Picnic area'], vid: 'The herd in the pasture',
+        rev: [['Valerie D.', 'Family visit', 'The kids fed the lambs, an unforgettable day.'], ['Peter M.', 'Beef box', 'Excellent meat, raised with care.']] } },
 
     { id: 'bio', icon: 'leaf', rec: 'd4',
       n: ['Épicerie bio', 'Organic grocery'], ex: ['Fruits, légumes et vrac biologiques', 'Organic produce and bulk foods'],
@@ -257,6 +280,6 @@
       return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, tile: p.tile, rec: p.rec, palettes: p.pal,
         demo: build(sec.demo, p.M, p.fr), demoEn: build(sec.demoEn, p.M, p.en), media: mediaOf(p.M, p.fr) };
     });
-    sec.ex = 'Maraîcher, épicerie bio, vignoble, œufs, charcuterie, miel…';
+    sec.ex = 'Ferme, maraîcher, épicerie bio, vignoble, œufs, charcuterie, miel…';
   }
 })();

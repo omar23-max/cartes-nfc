@@ -294,6 +294,8 @@ Object.assign(window.NFC_EN_APP, {
   "Portrait noir et blanc plein cadre, nom en grand : intemporel et affirmé.": "Full-frame black-and-white portrait, big name: timeless and bold.",
   /* Commerces du secteur Producteurs (v=332) */
   'Maraîcher, épicerie bio, vignoble, œufs, charcuterie, miel…': 'Vegetable farm, organic grocery, winery, eggs, butcher, honey…',
+  'Ferme, maraîcher, épicerie bio, vignoble, œufs, charcuterie, miel…': 'Farm, market garden, organic grocery, winery, eggs, butcher, honey…',
+  'Vert prairie': 'Prairie green', 'Blé doré': 'Golden wheat', 'Bleu ciel': 'Sky blue', 'Terre': 'Earth',
   'Vert feuille': 'Leaf green',
   'Terre cuite': 'Terracotta',
   'Kraft': 'Kraft',
