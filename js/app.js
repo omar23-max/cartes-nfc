@@ -803,7 +803,7 @@
   function stepProf() {
     const b = baseSec(), cur = prof(), en = ui() === 'en';
     const tiles = b.profiles.filter((p) => (ADM() ? !profDel(b, p) : profOk(b, p))).map((p) => admWrap(`
-      <button class="tile has-bg ${cur && cur.id === p.id && S.design ? 'sel' : ''} ${ADM() && !profOk(b, p) ? 'adm-off' : ''}" data-act="profile" data-id="${p.id}" style="background-image:url('${(p.media && p.media.cover) || ''}')">
+      <button class="tile has-bg ${cur && cur.id === p.id && S.design ? 'sel' : ''} ${ADM() && !profOk(b, p) ? 'adm-off' : ''}" data-act="profile" data-id="${p.id}" style="background-image:url('${p.tile || (p.media && p.media.cover) || ''}')">
         <span class="tile-top"><span class="tile-ic"><i data-lucide="${p.icon}"></i></span></span>
         <span class="tile-n">${p.n[en ? 1 : 0]}</span>
         <span class="tile-ex">${p.ex[en ? 1 : 0]}</span>

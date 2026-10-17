@@ -39,7 +39,7 @@
   });
 
   const PROD = [
-    { id: 'maraicher', icon: 'carrot', keep: true, n: ['Légumes de saison', 'Seasonal vegetables'], ex: ['Maraîcher, paniers bio, kiosque', 'Vegetable farm, organic baskets'] },
+    { id: 'maraicher', icon: 'carrot', keep: true, tile: 'media/tiles/prod-maraicher.jpg', n: ['Légumes de saison', 'Seasonal vegetables'], ex: ['Maraîcher, paniers bio, kiosque', 'Vegetable farm, organic baskets'] },
 
     { id: 'bio', icon: 'leaf', rec: 'd4',
       n: ['Épicerie bio', 'Organic grocery'], ex: ['Fruits, légumes et vrac biologiques', 'Organic produce and bulk foods'],
@@ -253,7 +253,7 @@
   if (sec && sec.demo) {
     const keepMedia = NFC.MEDIA.producteurs;
     sec.profiles = PROD.map((p) => {
-      if (p.keep) return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, demo: sec.demo, demoEn: sec.demoEn, palettes: sec.palettes, rec: sec.rec, media: keepMedia };
+      if (p.keep) return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, tile: p.tile, demo: sec.demo, demoEn: sec.demoEn, palettes: sec.palettes, rec: sec.rec, media: keepMedia };
       return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, rec: p.rec, palettes: p.pal,
         demo: build(sec.demo, p.M, p.fr), demoEn: build(sec.demoEn, p.M, p.en), media: mediaOf(p.M, p.fr) };
     });
