@@ -808,7 +808,9 @@
       </button>`, 'prof', b.id + '~' + p.id, profOk(b, p) ? 'on' : 'off')).join('');
     return `<section class="wrap">${admBar()}
       <button class="back" data-act="profback">${ic('arrowl', 16)}${en ? 'Change industry' : 'Changer de secteur'}</button>
-      ${head(en ? 'What is your profession?' : 'Quel est votre métier ?', en ? `${b.profiles.length} profiles for <b>${b.name}</b>, each with its own example, colors and photos. Everything stays customizable.` : `${b.profiles.length} métiers pour <b>${b.name}</b>, chacun avec son exemple, ses couleurs et ses photos. Tout reste personnalisable.`)}
+      ${b.establishment
+        ? head(en ? 'What kind of business do you run?' : 'Quel est votre commerce ?', en ? `${b.profiles.length} businesses for <b>${b.name}</b>, each with its own example, colors and photos. Everything stays customizable.` : `${b.profiles.length} commerces pour <b>${b.name}</b>, chacun avec son exemple, ses couleurs et ses photos. Tout reste personnalisable.`)
+        : head(en ? 'What is your profession?' : 'Quel est votre métier ?', en ? `${b.profiles.length} profiles for <b>${b.name}</b>, each with its own example, colors and photos. Everything stays customizable.` : `${b.profiles.length} métiers pour <b>${b.name}</b>, chacun avec son exemple, ses couleurs et ses photos. Tout reste personnalisable.`)}
       <div class="tiles">${tiles}${ADM() ? `<a class="tile adm-addt" href="${isStores || isEvents ? '../' : ''}admin.html?addprof=${b.id}&back=${encodeURIComponent('index.html?profpick=' + b.id)}#cat"><span class="tile-ic"><i data-lucide="plus"></i></span><span class="tile-n">Ajouter un métier</span><span class="tile-ex">Visible seulement par vous · manuel ou IA</span></a>` : ''}</div>
     </section>`;
   }
