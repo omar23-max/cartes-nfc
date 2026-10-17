@@ -792,7 +792,9 @@
     : `<div class="qr-note">${ic('qr', 16)}<span>Pas encore de QR code : il sera créé à la fin, avec votre lien.</span><button type="button" class="linkish" data-act="hasqr" data-v="yes">J’ai déjà un QR code</button></div>`);
 
   /* Photo d’arrière-plan de chaque secteur : la couverture de sa carte d’exemple */
-  const bgOf = (s) => ((NFC.MEDIA || {})[s.id] || {}).cover || (s.demo && s.demo.identity && s.demo.identity.cover) || '';
+  /* Miniatures des secteurs : images choisies (media/tiles/) ; à défaut, la couverture de l'exemple */
+  const TILES = ['sante', 'conseil', 'pro', 'education', 'freelance', 'immobilier', 'archi', 'artisans', 'beaute', 'producteurs', 'evenementiel', 'portfolio', 'musique', 'hebergement', 'animaux', 'auto'];
+  const bgOf = (s) => (!isStores && !isEvents && TILES.includes(s.id) ? `media/tiles/${s.id}.jpg` : '') || ((NFC.MEDIA || {})[s.id] || {}).cover || (s.demo && s.demo.identity && s.demo.identity.cover) || '';
 
   /* ---------- Étape 1 bis : le métier, pour les secteurs qui en proposent plusieurs ---------- */
   let profPick = false;
