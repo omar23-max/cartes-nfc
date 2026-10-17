@@ -1617,3 +1617,7 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .ptabs > .pt-mk { display: block; flex: none; width: 24px; height: 24px; margin: 0 4px 4px 2px; border-radius: 7px; background: #1a1424 url(../media/brand/nextap-mark.png) center / cover no-repeat; }
   .ptabs a[data-ptab] { padding-left: 5px; padding-right: 5px; font-size: 11.5px; }
 }
+/* v=331 : voile des images de secteur allégé : la photo reste lumineuse, seul le bas (texte) est assombri */
+.tile.has-bg::before { background: linear-gradient(180deg, rgba(12,12,16,0) 0%, rgba(12,12,16,.10) 40%, rgba(12,12,16,.75) 100%); }
+.tile.has-bg:hover::before { background: linear-gradient(180deg, rgba(12,12,16,0) 0%, rgba(12,12,16,.06) 40%, rgba(12,12,16,.68) 100%); }
+.tile.has-bg .tile-code { text-shadow: 0 1px 4px rgba(0,0,0,.5); }
