@@ -1587,3 +1587,7 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .top .newc.newc2 { background: #fff; color: var(--ink); border: 1px solid var(--line2, #e4e4e7); }
   .top .newc.newc2:hover { background: #f4f4f5; }
 }
+/* v=325 : sections suggérées sur une seule ligne (3 ou 4), sur ordinateur */
+@media (min-width: 901px) {
+  .add-sec .as-sug .as-grid { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); }
+}
