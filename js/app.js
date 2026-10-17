@@ -794,7 +794,7 @@
   /* Photo d’arrière-plan de chaque secteur : la couverture de sa carte d’exemple */
   /* Miniatures des secteurs : images choisies (media/tiles/) ; à défaut, la couverture de l'exemple */
   const TILES = ['sante', 'conseil', 'pro', 'education', 'freelance', 'immobilier', 'archi', 'artisans', 'beaute', 'producteurs', 'evenementiel', 'portfolio', 'musique', 'hebergement', 'animaux', 'auto', 'boutiques'];
-  const bgOf = (s) => (!isStores && !isEvents && TILES.includes(s.id) ? `media/tiles/${s.id}.jpg` : '') || ((NFC.MEDIA || {})[s.id] || {}).cover || (s.demo && s.demo.identity && s.demo.identity.cover) || '';
+  const bgOf = (s) => s.tile || (!isStores && !isEvents && TILES.includes(s.id) ? `media/tiles/${s.id}.jpg` : '') || ((NFC.MEDIA || {})[s.id] || {}).cover || (s.demo && s.demo.identity && s.demo.identity.cover) || '';
 
   /* ---------- Étape 1 bis : le métier, pour les secteurs qui en proposent plusieurs ---------- */
   let profPick = false;

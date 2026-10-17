@@ -281,5 +281,6 @@
         demo: build(sec.demo, p.M, p.fr), demoEn: build(sec.demoEn, p.M, p.en), media: mediaOf(p.M, p.fr) };
     });
     sec.ex = 'Ferme, maraîcher, épicerie bio, vignoble, œufs, charcuterie, miel…';
+    NFC.PROD_SECTOR = sec; /* repris par le studio Stores (stores/js/stores-prod.js) */
   }
 })();
