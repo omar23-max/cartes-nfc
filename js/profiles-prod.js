@@ -87,7 +87,7 @@
         locTitle: 'The stand', loc: ['845 County Route 9, Saratoga Springs, NY 12866', 'Large parking lot · Cards accepted'], vid: 'A day at the stand',
         rev: [['Natalie R.', 'Saturday customer', 'The best corn around, always with a smile.'], ['Ian D.', 'Pick your own', 'A perfect outing with the kids.']] } },
 
-    { id: 'vignoble', icon: 'wine', rec: 'd7',
+    { id: 'vignoble', icon: 'wine', rec: 'd7', tile: 'media/tiles/prod-vignoble.jpg',
       n: ['Vignoble et vente de vins', 'Winery'], ex: ['Vins du domaine, dégustations', 'Estate wines, tastings'],
       pal: [pal('Bordeaux', '#7f1d1d', '#e8c39e'), pal('Raisin', '#581c87', '#e9d5ff'), pal('Vert vigne', '#3f6212', '#e8c39e'), pal('Rosé', '#be185d', '#fde2e4'), pal('Chêne', '#78350f', '#fcd34d'), pal('Nuit', '#1e1b4b', '#c4b5fd')],
       M: { cover: 29340, gal: [24754, 17782, 29341, 24768, 12963, 22745], video: 29340 },
@@ -254,7 +254,7 @@
     const keepMedia = NFC.MEDIA.producteurs;
     sec.profiles = PROD.map((p) => {
       if (p.keep) return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, tile: p.tile, demo: sec.demo, demoEn: sec.demoEn, palettes: sec.palettes, rec: sec.rec, media: keepMedia };
-      return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, rec: p.rec, palettes: p.pal,
+      return { id: p.id, icon: p.icon, n: p.n, ex: p.ex, tile: p.tile, rec: p.rec, palettes: p.pal,
         demo: build(sec.demo, p.M, p.fr), demoEn: build(sec.demoEn, p.M, p.en), media: mediaOf(p.M, p.fr) };
     });
     sec.ex = 'Maraîcher, épicerie bio, vignoble, œufs, charcuterie, miel…';
