@@ -635,10 +635,6 @@
       const pt = document.querySelector('.ptabs');
       if (pt) pt.after(el); else document.body.prepend(el);
     } else if (!A && bar) bar.remove();
-    /* Noms complets des onglets en anglais (sauf nom personnalisé dans l’admin) */
-    if (ui() === 'en') document.querySelectorAll('.ptabs .pt-l').forEach((x) => { x.textContent = x.textContent.replace(/–\s*Événements$/, '– Events'); });
-    const ptl = document.querySelectorAll('.ptabs .pt-s');
-    ptl.forEach((x) => { x.textContent = { cards: ui() === 'en' ? 'Cards' : 'Cartes', stores: ui() === 'en' ? 'Stores' : 'Boutiques', events: ui() === 'en' ? 'Events' : 'Événements', admin: 'Admin' }[x.parentNode.dataset.ptab]; });
   }
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
   function reword(root) {

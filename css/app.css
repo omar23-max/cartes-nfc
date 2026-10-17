@@ -1132,7 +1132,7 @@ html[lang="en"] .qrbox.locked .qr::after { content: "PREVIEW"; }
 @media (max-width: 560px) { .ld-how { grid-template-columns: 1fr; } .ld-how-ar { transform: rotate(90deg); justify-self: center; } }
 /* Téléphone : haut d’écran compact pendant la création (étapes 2 à 5), le contenu commence plus haut */
 @media (max-width: 560px) {
-  body[data-step="2"] .ptabs, body[data-step="3"] .ptabs, body[data-step="4"] .ptabs, body[data-step="5"] .ptabs { display: none; }
+  /* v=323 : les onglets restent visibles à toutes les étapes (demande) */
   header.top { padding-top: 6px; padding-bottom: 6px; row-gap: 4px; }
   #steps .st { gap: 2px; padding: 2px 0; }
   #steps .st-n { width: 24px; height: 24px; font-size: 12px; }
@@ -1580,3 +1580,10 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 @media (max-width: 900px) { .pal-next { align-items: stretch !important; } }
 /* v=322 : sans « Suivant » : bouton simple sur une ligne, comme à l'origine */
 .pal-go { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; padding-top: 0; padding-bottom: 0; }
+/* v=323 téléphone : « Vous modifiez » et « Active » de même hauteur ; « Nouvelle création » sur fond blanc */
+@media (max-width: 560px) {
+  .top .cur-tag, .top .hd-live { box-sizing: border-box; min-height: 42px; height: 42px; padding-top: 0; padding-bottom: 0; align-items: center; }
+  .top .hd-live .hd-sw select { padding-top: 3px; padding-bottom: 3px; }
+  .top .newc.newc2 { background: #fff; color: var(--ink); border: 1px solid var(--line2, #e4e4e7); }
+  .top .newc.newc2:hover { background: #f4f4f5; }
+}
