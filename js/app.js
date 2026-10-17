@@ -630,6 +630,7 @@
       const uw = $('#uisw'), rs = $('.top .reset');
       if (pt && uw && rs && window.matchMedia('(max-width: 560px)').matches && !pt.querySelector('.pt-tools')) {
         const tl = document.createElement('span'); tl.className = 'pt-tools'; tl.append(uw, rs); pt.append(tl);
+        const mk = document.createElement('a'); mk.className = 'pt-mk'; mk.href = (isStores || isEvents ? '../' : '') + 'index.html'; mk.setAttribute('aria-label', 'NexTap'); pt.prepend(mk);
       } }
     /* Bandeau du mode assistance, sous les onglets */
     const A = assistNow(), bar = document.querySelector('.assist-bar');
