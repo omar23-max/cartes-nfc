@@ -202,7 +202,7 @@
         locTitle: 'The brewery', loc: ['90 Harbor Drive, Grand Haven, MI 49417', 'Patio on the lake · Harbor view'], vid: 'From tank to glass',
         rev: [['Max T.', 'Taproom', 'The maple stout is worth the trip.'], ['Isabel C.', 'Group tour', 'Great welcome and a beautiful lake view.']] } },
 
-    { id: 'boulangerie', icon: 'croissant', rec: 'd16',
+    { id: 'boulangerie', icon: 'croissant', rec: 'd16', tile: 'media/tiles/prod-boulangerie.jpg',
       n: ['Boulangerie artisanale', 'Artisan bakery'], ex: ['Pains au levain, viennoiseries', 'Sourdough bread, pastries'],
       pal: [pal('Croûte', '#92400e', '#fde68a'), pal('Farine', '#57534e', '#fcd34d'), pal('Blé', '#a16207', '#fef3c7'), pal('Chocolat', '#3f2a1d', '#f5d0a9'), pal('Bleu tablier', '#1e40af', '#fde68a'), pal('Vert olive', '#4d5b1f', '#fde68a')],
       M: { cover: 21927, gal: [19165, 43903, 42467, 42464, 4866, 21927], video: 42467 },
