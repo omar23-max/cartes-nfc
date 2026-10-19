@@ -321,7 +321,9 @@
   const favs = () => (Array.isArray(S.favs) ? S.favs : []);
   const designsNow = () => {
     /* Certains métiers (immobilier) ont leurs propres modèles, à la place des modèles communs */
-    const all = (sec() && sec().designsOnly ? [] : DESIGNS).concat((sec() && sec().designs) || []), x = desX();
+    const all0 = (sec() && sec().designsOnly ? [] : DESIGNS).concat((sec() && sec().designs) || []), x = desX();
+    /* Modèles ajoutés à ce secteur par l'administrateur (pris dans la bibliothèque complète) */
+    const all = all0.concat((x.add || []).filter((id) => !all0.some((d) => d.id === id)).map((id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id)).filter(Boolean));
     const off = cfg('designsOff', []).concat(x.off), del = cfg('designsDel', []).concat(x.del);
     const on = all.filter((d) => (ADM() ? !del.includes(d.id) : (!off.includes(d.id) && !del.includes(d.id))) || d.id === S.design);
     const list = on.length ? on : all;

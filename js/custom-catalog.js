@@ -62,6 +62,8 @@
       demoEn: patchDemo((prof && prof.demoEn) || base.demoEn || base.demo, x.en, photos),
     });
     delete s.profiles;
+    /* Image de la miniature choisie dans l'admin (image du site, adresse https ou photo envoyée) */
+    if (x.tile && (/^(data:image\/|https:\/\/)/.test(x.tile) || /^media\//.test(x.tile))) s.tile = /^media\//.test(x.tile) && kind !== 'cards' ? '../' + x.tile : x.tile;
     NFC.SECTORS.push(s);
     if (NFC.MEDIA) NFC.MEDIA[x.id] = mediaOf(photos, NFC.MEDIA[base.id] || (prof && prof.media));
     if (x.nameEn) EN[x.name] = x.nameEn;

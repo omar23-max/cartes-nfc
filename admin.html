@@ -8,11 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/card.css?v=357">
-  <link rel="stylesheet" href="css/card-plus.css?v=357">
-  <link rel="stylesheet" href="css/noir.css?v=357">
-  <link rel="stylesheet" href="css/immo.css?v=357">
-  <link rel="stylesheet" href="css/app.css?v=357">
+  <link rel="stylesheet" href="css/card.css?v=358">
+  <link rel="stylesheet" href="css/card-plus.css?v=358">
+  <link rel="stylesheet" href="css/noir.css?v=358">
+  <link rel="stylesheet" href="css/immo.css?v=358">
+  <link rel="stylesheet" href="css/app.css?v=358">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -90,6 +90,20 @@
     .adm-tl-ft select { flex: 1; min-width: 0; height: 32px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font: inherit; font-size: 12.5px; padding: 0 4px; }
     .adm-tl-ft .mv { display: flex; gap: 4px; }
     .adm-tl-ft .adm-btn { padding: 0 8px; height: 32px; }
+    .adm-add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 150px; border: 2px dashed #c4b5fd; border-radius: 12px; background: #faf5ff; color: #5b21b6; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 12px; text-align: center; }
+    .adm-add span { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 2px solid currentColor; font-size: 28px; font-weight: 400; line-height: 1; }
+    .adm-add:hover { background: #f3e8ff; border-color: #7c3aed; }
+    .adm-add-d { min-height: 240px; }
+    .adm-pick { padding: 0; font: inherit; text-align: left; cursor: pointer; }
+    .adm-pick:hover { outline: 2px solid #7c3aed; }
+    .adm-pk { flex: 1; text-align: center; font-size: 13px; font-weight: 700; color: #5b21b6; padding: 6px 0; }
+    .ca-tile { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .ca-tprev { width: 128px; aspect-ratio: 16 / 10; border-radius: 10px; border: 1px solid var(--line); background: #f4f4f5 center / cover no-repeat; display: grid; place-items: center; font-size: 11.5px; color: var(--mut); }
+    .ca-tbtns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ca-tlib { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 6px; margin-top: 8px; max-height: 220px; overflow: auto; padding: 2px; }
+    .ca-tlib[hidden] { display: none; }
+    .ca-tlib button { aspect-ratio: 16 / 10; border: 0; border-radius: 8px; background: #ddd center / cover no-repeat; cursor: pointer; }
+    .ca-tlib button:hover { outline: 2px solid #7c3aed; }
     .adm-tl-ghost { position: fixed; z-index: 99; pointer-events: none; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.25); opacity: .95; }
     .adm-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
     .adm-tbl th, .adm-tbl td { padding: 8px 6px; border-top: 1px solid #f0eee8; text-align: left; vertical-align: middle; }
@@ -141,33 +155,33 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=357"></script>
-  <script src="js/data.js?v=357"></script>
-  <script src="js/sectors.js?v=357"></script>
-  <script src="js/media.js?v=357"></script>
-  <script src="js/extras.js?v=357"></script>
-  <script src="js/locale-na.js?v=357"></script>
-  <script src="js/locale-na-en.js?v=357"></script>
-  <script src="js/google.js?v=357"></script>
-  <script src="js/profiles.js?v=357"></script>
-  <script src="js/profiles-sport.js?v=357"></script>
-  <script src="js/profiles-sante.js?v=357"></script>
-  <script src="js/profiles-archi.js?v=357"></script>
-  <script src="js/profiles-resto.js?v=357"></script>
-  <script src="js/profiles-auto.js?v=357"></script>
-  <script src="js/profiles-prod.js?v=357"></script>
-  <script src="js/profiles-edu.js?v=357"></script>
-  <script src="js/designs-immo.js?v=357"></script>
-  <script src="js/sector-prestige.js?v=357"></script>
-  <script src="js/custom-catalog.js?v=357"></script>
-  <script src="js/jobs.js?v=357"></script>
-  <script src="js/render.js?v=357"></script>
-  <script src="js/designs-immo-der.js?v=357"></script>
-  <script src="js/demo-faces.js?v=357"></script>
-  <script src="js/designs-noir.js?v=357"></script>
-  <script src="js/section-suggest.js?v=357"></script>
+  <script src="js/services.js?v=358"></script>
+  <script src="js/data.js?v=358"></script>
+  <script src="js/sectors.js?v=358"></script>
+  <script src="js/media.js?v=358"></script>
+  <script src="js/extras.js?v=358"></script>
+  <script src="js/locale-na.js?v=358"></script>
+  <script src="js/locale-na-en.js?v=358"></script>
+  <script src="js/google.js?v=358"></script>
+  <script src="js/profiles.js?v=358"></script>
+  <script src="js/profiles-sport.js?v=358"></script>
+  <script src="js/profiles-sante.js?v=358"></script>
+  <script src="js/profiles-archi.js?v=358"></script>
+  <script src="js/profiles-resto.js?v=358"></script>
+  <script src="js/profiles-auto.js?v=358"></script>
+  <script src="js/profiles-prod.js?v=358"></script>
+  <script src="js/profiles-edu.js?v=358"></script>
+  <script src="js/designs-immo.js?v=358"></script>
+  <script src="js/sector-prestige.js?v=358"></script>
+  <script src="js/custom-catalog.js?v=358"></script>
+  <script src="js/jobs.js?v=358"></script>
+  <script src="js/render.js?v=358"></script>
+  <script src="js/designs-immo-der.js?v=358"></script>
+  <script src="js/demo-faces.js?v=358"></script>
+  <script src="js/designs-noir.js?v=358"></script>
+  <script src="js/section-suggest.js?v=358"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=357"></script>
+  <script src="events/js/events-data.js?v=358"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -228,6 +242,8 @@
       const TB = ['mode', 'friperie', 'bijoux', 'fleuriste', 'deco', 'librairie', 'cadeaux', 'velos', 'cosmetiques', 'telephones', 'epicerie', 'animalerie', 'coiffure', 'esthetique', 'r-sushi', 'r-pizzeria', 'r-steak', 'r-cafe', 'r-brasserie', 'r-wok', 'r-cocktail', 'r-gastro'];
       const okImg = (u) => (/^media\//.test(u || '') ? u : '');
       const thumb = (s) => {
+        const ad = s.custom && (C.get('secAdd', []) || []).find((z) => z.id === s.id);
+        if (ad) return ad.tile || (ad.photos || [])[1] || (ad.photos || [])[0] || '';
         if (group === 'cards') return TC.includes(s.id) ? `media/tiles/${s.id}.jpg` : okImg(((NFC.MEDIA || {})[s.id] || {}).cover) || okImg(s.demo && s.demo.identity && s.demo.identity.cover);
         if (group === 'stores') {
           if (TB.includes(s.id)) return `media/tiles/b-${s.id}.jpg`;
@@ -241,7 +257,7 @@
         return `<div class="adm-tl ${stt}" data-tl="${s.id}" data-g="${group}">
           <div class="adm-tl-im"${im ? ` style="background-image:url('${esc(im)}')"` : ''}><span class="adm-tl-grip" title="Glisser pour déplacer" aria-hidden="true">⠿</span><span class="adm-tl-n">${i + 1}</span>${stt === 'soon' ? '<em>Bientôt</em>' : stt === 'off' ? '<em class="off">Masqué</em>' : ''}<b>${esc(s.name)}</b></div>
           <div class="adm-tl-ft"><select data-secst="${s.id}" aria-label="État de ${esc(s.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué'], ['del', 'Supprimer']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''} ${v === 'on' && !s.active ? 'disabled' : ''}>${l}</option>`).join('')}</select>
-          <span class="mv"><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Avancer">←</button><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="1" ${i === sorted.length - 1 ? 'disabled' : ''} aria-label="Reculer">→</button></span></div></div>`; }).join('')}</div>`;
+          <span class="mv"><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Avancer">←</button><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="1" ${i === sorted.length - 1 ? 'disabled' : ''} aria-label="Reculer">→</button></span></div></div>`; }).join('')}<button type="button" class="adm-add" data-catadd="${group === 'stores' ? 'store' : group === 'events' ? 'event' : 'sector'}"><span>+</span>${group === 'stores' ? 'Ajouter un type de boutique' : group === 'events' ? 'Ajouter un événement' : 'Ajouter un secteur'}</button></div>`;
     };
     P.cat = () => {
       const withProf = CARDS.filter((s) => s.profiles);
@@ -375,6 +391,10 @@
     /* ---------- Ajouter un secteur, un métier ou un type de boutique (manuel ou IA) ---------- */
     const slug = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30);
     let catKind = 'sector';
+    const TILE_LIB = ['animaux', 'archi', 'artisans', 'auto', 'b-animalerie', 'b-bijoux', 'b-cadeaux', 'b-coiffure', 'b-cosmetiques', 'b-deco', 'b-epicerie', 'b-esthetique', 'b-fleuriste', 'b-friperie', 'b-librairie', 'b-mode', 'b-r-brasserie', 'b-r-cafe', 'b-r-cocktail', 'b-r-gastro', 'b-r-pizzeria', 'b-r-steak', 'b-r-sushi', 'b-r-wok', 'b-telephones', 'b-velos', 'beaute', 'boutiques', 'conseil', 'education', 'evenementiel', 'freelance', 'hebergement', 'immobilier', 'musique', 'portfolio', 'pro', 'prod-boulangerie', 'prod-maraicher', 'prod-vignoble', 'producteurs', 'sante'];
+    const setTile = (u) => { const f = $('[data-catf]'); if (!f || !f.tile) return; f.tile.value = u || ''; const pv = $('.ca-tprev'); pv.style.backgroundImage = u ? `url('${u.replace(/'/g, '%27')}')` : ''; pv.textContent = u ? '' : 'Aucune image'; };
+    /* Photo envoyée depuis l'ordinateur : réduite (480 px) pour tenir dans les réglages du navigateur */
+    const tileFile = (file) => { if (!file || !/^image\//.test(file.type)) return; const rd = new FileReader(); rd.onload = () => { const im = new Image(); im.onload = () => { const w = Math.min(480, im.width), h = Math.round(im.height * w / im.width), cv = document.createElement('canvas'); cv.width = w; cv.height = h; cv.getContext('2d').drawImage(im, 0, 0, w, h); setTile(cv.toDataURL('image/jpeg', 0.72)); }; im.src = rd.result; }; rd.readAsDataURL(file); };
     function openCatAdd(k, sid) {
       catKind = k;
       const T = k === 'prof' ? 'Ajouter un métier' : 'Ajouter un secteur';
@@ -395,6 +415,13 @@
             <p class="ai-note" hidden style="margin:0 0 10px;padding:8px 10px;border-radius:9px;background:#f3e8ff;color:#5b21b6;font-size:12.5px">Simulation : sur le site test, la proposition suit un gabarit. Sur GoBiz, l’IA (clé côté serveur) rédigera des textes adaptés au métier, en français et en anglais. Relisez et corrigez avant d’ajouter.</p>
             ${k !== 'prof' ? f2('ex', 'Exemples (français)', 'exEn', 'Exemples (anglais)', ev ? 'Soirée de fiançailles, bague, RSVP…' : 'Vétérinaire, toiletteur, éleveur…', ev ? 'Engagement party, ring, RSVP…' : 'Vet, groomer, breeder…') : ''}
             <label class="f"><span class="f-l">Mots-clés pour la recherche</span><input name="kw" placeholder="animaux chien chat clinique veterinaire pet"></label>
+            ${k === 'prof' ? '' : `<div class="f"><span class="f-l">Image de la miniature</span>
+              <input type="hidden" name="tile"><div class="ca-tile"><div class="ca-tprev" aria-hidden="true">Aucune image</div><div class="ca-tbtns">
+                <button type="button" class="b sm" data-tilelib="1">Choisir une image du site</button>
+                <label class="b sm" style="cursor:pointer">Depuis mon ordinateur<input type="file" accept="image/*" data-tilefile="1" hidden></label>
+                <button type="button" class="b sm" data-tileurl="1">Adresse https</button></div></div>
+              <div class="ca-tlib" hidden>${TILE_LIB.map((t) => `<button type="button" data-tilepick="media/tiles/${t}.jpg" style="background-image:url('media/tiles/${t}.jpg')" aria-label="${t}"></button>`).join('')}</div>
+              <small class="adm-d">Sans image : la photo de couverture ci-dessous, sinon celle du ${k === 'store' ? 'type de boutique' : k === 'event' ? 'l’événement' : 'secteur'} de départ.</small></div>`}
             <label class="f"><span class="f-l">Photos (une adresse https par ligne : photo de la personne, couverture, galerie)</span><textarea name="photos" rows="3" placeholder="https://images.unsplash.com/photo-…"></textarea></label>
             <p class="adm-d" style="margin:12px 0 4px"><b>${k === 'store' ? 'Boutique d’exemple' : ev ? 'Invitation d’exemple' : 'Personne d’exemple'}</b> (${ev ? 'invitation' : 'carte'} de démonstration)</p>
             ${k === 'store' ? f2('pname', 'Nom de la boutique', 'role', 'Accroche (français)', 'Ex. Chocolaterie Laurier', 'Ex. Chocolats faits main') : ev ? f2('pname', 'Titre (noms des hôtes)', 'role', 'Sous-titre (français)', 'Ex. Emma & Noah', 'Ex. Se fiancent !') : f2('pname', 'Nom', 'role', 'Fonction (français)', 'Ex. Dre Sarah Collins', 'Ex. Médecin vétérinaire')}
@@ -441,7 +468,7 @@
       const f = $('[data-catf]'), v = (k) => (f[k] ? f[k].value.trim() : ''), name = v('name');
       if (!name) { $('.ca-err').hidden = false; return; }
       const photos = v('photos').split(/\s+/).filter((u) => /^https:\/\//.test(u)).slice(0, 8);
-      const x = { name, nameEn: v('nameEn'), kw: v('kw'), photos, base: v('base'), ai: f.dataset.ai === '1',
+      const x = { name, nameEn: v('nameEn'), kw: v('kw'), photos, base: v('base'), ai: f.dataset.ai === '1', tile: v('tile'),
         fr: { name: v('pname'), role: v('role'), specialty: catKind === 'event' ? '' : v('spec'), env: catKind === 'event' ? v('spec') : '', about: v('about') },
         en: { name: v('pname'), role: v('roleEn') || v('role'), specialty: v('spec'), about: v('aboutEn') || v('about') } };
       if (catKind === 'prof') {
@@ -513,12 +540,39 @@
     });
     document.addEventListener('input', (e) => { if (e.target.id === 'q') filterSvc(); });
     /* Modèles d'un secteur, d'un type de boutique ou d'un événement : ordre, visible / Bientôt / masqué / supprimé */
-    const desOf = (g, sid) => {
+    const desOf0 = (g, sid) => {
       const base = NFC.DESIGNS || [];
       if (g === 'cards') { const s = CARDS.find((x) => x.id === sid) || {}; return (s.designsOnly ? [] : base).concat(s.designs || []); }
       if (g === 'events') { const s = EVENTS.find((x) => x.id === sid) || {}; return (s.designsOnly ? [] : base).concat(s.designs || []); }
       return base;
     };
+    /* Bibliothèque : modèles que chaque studio sait afficher (immobilier, prestige : cartes seulement ; invitations : événements) */
+    const LIB_OK = { cards: (id) => !/^e\d/.test(id), stores: (id) => /^(d\d+|n[1-3])$/.test(id), events: (id) => /^(d\d+|n[1-3]|e\d+)$/.test(id) };
+    const desLib = (g) => { const seen = {}; return (NFC.DESIGNS_ALL || NFC.DESIGNS || []).filter((d) => LIB_OK[g](d.id) && !seen[d.id] && (seen[d.id] = 1)); };
+    const desOf = (g, sid) => { const l = desOf0(g, sid), add = ((C.get('desSec', {})[sid] || {}).add || []);
+      return l.concat(add.filter((id) => !l.some((d) => d.id === id)).map((id) => desLib(g).find((d) => d.id === id)).filter(Boolean)); };
+    function openDesAdd(g, sid) {
+      const x = Object.assign({ del: [] }, C.get('desSec', {})[sid] || {}), mine = desOf(g, sid);
+      const cand = desLib(g).filter((d) => !mine.some((z) => z.id === d.id) || (x.del || []).includes(d.id));
+      const m = $('#modal');
+      m.innerHTML = `<div class="mb" data-assistx="1"></div>
+        <div class="md adm-desm" role="dialog" aria-modal="true" aria-labelledby="da-t">
+          <h2 id="da-t">Ajouter un modèle : ${esc(SECNAME(sid))}</h2>
+          <p class="adm-d">Touchez un modèle pour l’ajouter à la fin de la liste de ce secteur. Ensuite, vous pourrez le déplacer, le passer en « Bientôt », le masquer ou le supprimer. Un modèle au design entièrement nouveau se crée dans le code : demandez-le, il apparaîtra ici.</p>
+          ${cand.length ? `<div class="adm-tiles adm-dtiles">${cand.map((d) => `<button type="button" class="adm-tl adm-pick" data-despick="${g}|${sid}|${d.id}"><div class="adm-tl-im adm-dim" style="cursor:pointer">${desPreview(g, sid, d.id)}${(x.del || []).includes(d.id) ? '<em class="off">Supprimé</em>' : ''}<b>${esc(d.name)} · ${d.id.toUpperCase()}</b></div><div class="adm-tl-ft"><span class="adm-pk">+ Ajouter</span></div></button>`).join('')}</div>`
+            : '<p class="adm-empty">Tous les modèles de la bibliothèque sont déjà dans ce secteur.</p>'}
+          <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b" data-desback="${g}|${sid}">← Retour aux modèles</button><button type="button" class="b pri" data-assistx="1">Fermer</button></div>
+        </div>`;
+      m.classList.add('on');
+    }
+    /* Aperçu d'un modèle : dessiné dans la page pour les cartes ; page d'exemple réduite pour les boutiques et les événements */
+    function desPreview(g, sid, id) {
+      const sc = g === 'cards' ? CARDS.find((x) => x.id === sid) : null;
+      if (sc && sc.demo && window.VC) {
+        try { NFC.curDesign = id; const pal = (NFC.palsOf ? NFC.palsOf(sc) : sc.palettes)[0] || sc.palettes[0]; return `<div class="adm-th"><div class="phone-screen">${VC.render({ card: sc.demo, sec: sc, d: id, pal, thumb: true, lang: 'fr' })}</div></div>`; } catch (er) { /* rien */ }
+      }
+      return `<iframe src="${(g === 'stores' ? 'stores/view.html' : g === 'events' ? 'events/view.html' : 'view.html') + '?noenv=1&s=' + encodeURIComponent(sid) + '&d=' + id}" loading="lazy" tabindex="-1" title="${id}"></iframe>`;
+    }
     function openDes(g, sid) {
       const x = Object.assign({ order: [], off: [], soon: [], del: [] }, C.get('desSec', {})[sid] || {});
       const pos = (id) => { const i = x.order.indexOf(id); return i < 0 ? 999 : i; };
@@ -541,7 +595,7 @@
           <div class="adm-tiles adm-dtiles" data-tiles="des|${g}|${sid}">${list.map((d, i) => { const stt = stOf(d.id);
             return `<div class="adm-tl ${stt}" data-tl="${d.id}">
               <div class="adm-tl-im adm-dim">${preview(d.id)}<span class="adm-tl-grip" aria-hidden="true">⠿</span><span class="adm-tl-n">${i + 1}</span>${stt === 'soon' ? '<em>Bientôt</em>' : stt === 'off' ? '<em class="off">Masqué</em>' : ''}<b>${esc(d.name)} · ${d.id.toUpperCase()}</b></div>
-              <div class="adm-tl-ft"><select data-desst="${g}|${sid}|${d.id}" aria-label="État du modèle ${esc(d.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué'], ['del', 'Supprimer']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`; }).join('')}</div>
+              <div class="adm-tl-ft"><select data-desst="${g}|${sid}|${d.id}" aria-label="État du modèle ${esc(d.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué'], ['del', 'Supprimer']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`; }).join('')}<button type="button" class="adm-add adm-add-d" data-desadd="${g}|${sid}"><span>+</span>Ajouter un modèle</button></div>
           <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b pri" data-assistx="1">Fermer</button></div>
         </div>`;
       m.classList.add('on');
@@ -550,7 +604,7 @@
     /* Glisser-déposer des miniatures (souris et doigt) : on attrape l'image, on la lâche parmi les autres du même groupe */
     let dg = null;
     document.addEventListener('pointerdown', (e) => {
-      const im = e.target.closest && e.target.closest('.adm-tl-im'); if (!im) return;
+      const im = e.target.closest && e.target.closest('.adm-tl-im'); if (!im || im.closest('.adm-pick')) return;
       const tl = im.closest('.adm-tl'); e.preventDefault();
       const r = tl.getBoundingClientRect(), gh = tl.cloneNode(true); gh.classList.add('adm-tl-ghost'); gh.style.width = r.width + 'px'; document.body.appendChild(gh);
       dg = { tl, gh, box: tl.parentElement, dx: e.clientX - r.left, dy: e.clientY - r.top, x0: e.clientX, y0: e.clientY, moved: false };
@@ -586,6 +640,7 @@
     };
     document.addEventListener('pointerup', dragEnd);
     document.addEventListener('pointercancel', dragEnd);
+    document.addEventListener('change', (e) => { if (e.target.dataset && e.target.dataset.tilefile) tileFile(e.target.files && e.target.files[0]); });
     document.addEventListener('click', (e) => {
       const t = e.target.closest('button, a[data-tab]');
       if (!t) return;
@@ -593,8 +648,17 @@
       if (d.tab) { e.preventDefault(); tab = d.tab; history.replaceState(null, '', '#' + tab); window.scrollTo(0, 0); draw(); return; }
       if (d.assist) { openAssist(d.assist, d.key, d.name); return; }
       if (d.catadd) { openCatAdd(d.catadd, d.sec); return; }
-      if (d.catdom) { const f0 = $('[data-catf]'), keep = ['name', 'nameEn', 'kw', 'photos'].map((n) => [n, f0[n] ? f0[n].value : '']); openCatAdd(d.catdom); const f1 = $('[data-catf]'); keep.forEach(([n, v]) => { if (f1[n]) f1[n].value = v; }); return; }
+      if (d.catdom) { const f0 = $('[data-catf]'), keep = ['name', 'nameEn', 'kw', 'photos', 'tile'].map((n) => [n, f0[n] ? f0[n].value : '']); openCatAdd(d.catdom); const f1 = $('[data-catf]'); keep.forEach(([n, v]) => { if (f1[n]) f1[n].value = v; }); return; }
       if (d.catai) { aiFill(); return; }
+      if (d.tilelib) { const l = $('.ca-tlib'); l.hidden = !l.hidden; return; }
+      if (d.tilepick) { setTile(d.tilepick); $('.ca-tlib').hidden = true; return; }
+      if (d.tileurl) { const u = prompt('Adresse de l’image (https://…)', ''); if (u && /^https:\/\//.test(u.trim())) setTile(u.trim()); else if (u) toast('L’adresse doit commencer par https://'); return; }
+      if (d.desadd) { const [g, sid] = d.desadd.split('|'); openDesAdd(g, sid); return; }
+      if (d.despick) { const [g, sid, id] = d.despick.split('|'), all = C.get('desSec', {}), x = Object.assign({ order: [], off: [], soon: [], del: [], add: [] }, all[sid] || {});
+        x.del = (x.del || []).filter((z) => z !== id); x.add = (x.add || []).filter((z) => z !== id); if (!desOf(g, sid).some((z) => z.id === id)) x.add.push(id);
+        if (x.order.length) x.order = x.order.filter((z) => z !== id).concat([id]);
+        all[sid] = x; C.set('desSec', all, `Modèle ${id.toUpperCase()} ajouté : ${SECNAME(sid)}`); openDes(g, sid); draw(); return saved('Modèle ajouté à la fin de la liste.'); }
+      if (d.desback) { const [g, sid] = d.desback.split('|'); openDes(g, sid); return; }
       if (d.catsave) { catSave(); return; }
       if (d.secrm !== undefined) { const a = C.get('secAdd', []).slice(), x = a.splice(+d.secrm, 1)[0]; if (x && confirm(`Retirer « ${x.name} » du catalogue ?`)) { C.set('secAdd', a, `Catalogue : « ${x.name} » retiré`); draw(); } return; }
       if (d.profrm) { const [sid, pid] = d.profrm.split('|'), o = Object.assign({}, C.get('profAdd', {})), x = (o[sid] || []).find((z) => z.id === pid); if (x && confirm(`Retirer le métier « ${x.name} » ?`)) { o[sid] = o[sid].filter((z) => z.id !== pid); C.set('profAdd', o, `Catalogue : métier « ${x.name} » retiré`); location.reload(); } return; }
