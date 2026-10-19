@@ -315,11 +315,19 @@
   };
   const designOf = (id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id) || DESIGNS[0];
   /* Mises en page proposées : les 10 communes + celles propres au secteur (ex. beauté) */
+  /* Réglages des modèles propres à un secteur / type de boutique / événement (page admin ou mode administrateur) */
+  const desX = (sid = S.sectorId) => Object.assign({ order: [], off: [], soon: [], del: [] }, cfg('desSec', {})[sid] || {});
+  const desSoon = (id) => desX().soon.includes(id);
+  const favs = () => (Array.isArray(S.favs) ? S.favs : []);
   const designsNow = () => {
     /* Certains métiers (immobilier) ont leurs propres modèles, à la place des modèles communs */
-    const all = (sec() && sec().designsOnly ? [] : DESIGNS).concat((sec() && sec().designs) || []), off = cfg('designsOff', []), del = cfg('designsDel', []);
+    const all = (sec() && sec().designsOnly ? [] : DESIGNS).concat((sec() && sec().designs) || []), x = desX();
+    const off = cfg('designsOff', []).concat(x.off), del = cfg('designsDel', []).concat(x.del);
     const on = all.filter((d) => (ADM() ? !del.includes(d.id) : (!off.includes(d.id) && !del.includes(d.id))) || d.id === S.design);
-    return on.length ? on : all;
+    const list = on.length ? on : all;
+    /* Ordre : favoris du client d'abord, puis l'ordre choisi par l'administrateur */
+    const pos = (id) => { const i = x.order.indexOf(id); return i < 0 ? 999 : i; }, fv = ADM() ? [] : favs();
+    return list.map((d, i) => [d, i]).sort((a, b) => ((fv.includes(b[0].id) ? 1 : 0) - (fv.includes(a[0].id) ? 1 : 0)) || (pos(a[0].id) - pos(b[0].id)) || (a[1] - b[1])).map((z) => z[0]);
   };
   const code = (d = S.design) => `${sec().code}-${String(d || sec().rec).toUpperCase()}`;
 
@@ -479,7 +487,8 @@
   const admBar = () => (ADM() ? `<div class="adm-bar">${ic('shield', 16)}<span><b>Mode administrateur</b> · vos clients ne voient pas ces boutons. Désactivé = caché aux clients (grisé pour vous) ; supprimé = retiré, à restaurer depuis la page admin.</span><a class="linkish" href="${isStores || isEvents ? '../' : ''}admin.html#cat">Page admin</a><button type="button" class="linkish" data-act="adm" data-op="quit">Quitter le mode admin</button></div>` : '');
   function admTools(kind, id, state, soon, rec) {
     const b = (op, label, cls = '') => `<button type="button" class="adm-t ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}">${label}</button>`;
-    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? b('off', 'Désactiver') : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? b('soon', 'Bientôt') : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on">Recommandé</span>' : b('rec', 'Recommander')) : ''}${b('del', 'Supprimer', 'danger')}</div>`;
+    const mv = kind === 'sec' || kind === 'des' ? `<span class="adm-t adm-mv" data-dnd="1" title="Glisser pour déplacer" role="button" tabindex="-1">⠿ Déplacer</span>` : '';
+    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? b('off', 'Désactiver') : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? b('soon', 'Bientôt') : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on">Recommandé</span>' : b('rec', 'Recommander')) : ''}${b('del', 'Supprimer', 'danger')}${mv}</div>`;
   }
   const admWrap = (html, kind, id, state, soon) => (ADM() ? `<div class="adm-w">${html}${admTools(kind, id, state, soon)}</div>` : html);
   const addTo = (path, v) => { const a = cfg(path, []).filter((x) => x !== v); a.push(v); return a; };
@@ -501,9 +510,12 @@
       if (op === 'on') C.set('profOff', rmFrom('profOff', id), `Métier ${id} : activé`);
       if (op === 'del') C.set('profDel', addTo('profDel', id), `Métier ${id} : supprimé`);
     } else if (kind === 'des') {
-      if (op === 'off') C.set('designsOff', addTo('designsOff', id), `Modèle ${name} : désactivé`);
-      if (op === 'on') C.set('designsOff', rmFrom('designsOff', id), `Modèle ${name} : activé`);
-      if (op === 'del') { C.set('designsDel', addTo('designsDel', id), `Modèle ${name} : supprimé`); if (S.design === id) S.design = null; }
+      const all = Object.assign({}, cfg('desSec', {})), x = desX();
+      ['off', 'soon', 'del'].forEach((k) => { x[k] = x[k].filter((z) => z !== id); });
+      if (op === 'off' || op === 'soon' || op === 'del') x[op].push(id);
+      if (op === 'on') C.set('designsOff', rmFrom('designsOff', id)); /* l'ancien réglage global ne bloque plus */
+      if (op !== 'rec') { all[S.sectorId] = x; C.set('desSec', all, `Modèle ${name} (${sec().name}) : ${{ on: 'visible', off: 'désactivé', soon: 'Bientôt', del: 'supprimé' }[op]}`); }
+      if (op === 'del' && S.design === id) S.design = null;
       if (op === 'rec') { const r = cfg('rec', {}); r[S.sectorId] = id; C.set('rec', r, `Modèle recommandé ${sec().name} : ${name}`); }
     } else if (kind === 'pal') {
       const k = NFC.palKey(sec()), i = +id, map = (p) => Object.assign({}, cfg(p, {}));
@@ -516,6 +528,43 @@
     save(); render();
     toast(op === 'del' ? 'Supprimé. Restaurable depuis la page admin.' : op === 'off' ? 'Désactivé : caché à vos clients.' : op === 'soon' ? 'Affiché « Bientôt » à vos clients.' : op === 'rec' ? 'Modèle recommandé changé.' : 'Activé : visible par vos clients.');
   }
+  /* Glisser-déposer (mode administrateur) : on attrape « Déplacer », on lâche sur un autre secteur / modèle */
+  let dnd = null;
+  document.addEventListener('pointerdown', (e) => {
+    const h = e.target.closest && e.target.closest('[data-dnd]'); if (!h || !ADM()) return;
+    const box = h.closest('[data-dnd-box]'); if (!box) return;
+    const it = [...box.children].find((c) => c.contains(h)); if (!it) return;
+    e.preventDefault(); e.stopPropagation();
+    const r = it.getBoundingClientRect(), gh = it.cloneNode(true);
+    gh.className += ' dnd-ghost'; gh.style.width = r.width + 'px'; gh.style.left = r.left + 'px'; gh.style.top = r.top + 'px';
+    document.body.appendChild(gh); it.classList.add('dnd-src');
+    dnd = { it, gh, box, dx: e.clientX - r.left, dy: e.clientY - r.top };
+  }, true);
+  document.addEventListener('pointermove', (e) => {
+    if (!dnd) return;
+    if (e.clientY < 70) window.scrollBy(0, -18); else if (e.clientY > innerHeight - 70) window.scrollBy(0, 18); /* défilement près des bords */
+    dnd.gh.style.left = (e.clientX - dnd.dx) + 'px'; dnd.gh.style.top = (e.clientY - dnd.dy) + 'px';
+    const over = document.elementFromPoint(e.clientX, e.clientY), t = over && [...dnd.box.children].find((c) => c !== dnd.it && c.contains(over));
+    if (!t) return;
+    const tr = t.getBoundingClientRect();
+    dnd.box.insertBefore(dnd.it, e.clientX > tr.left + tr.width / 2 ? t.nextSibling : t);
+  });
+  const dndEnd = () => {
+    if (!dnd) return;
+    const { it, gh, box } = dnd; dnd = null; gh.remove(); it.classList.remove('dnd-src');
+    const kind = box.dataset.dndBox, idOf = (c) => (c.querySelector('[data-act="sector"]') || c).dataset.id || c.querySelector('[data-id]').dataset.id;
+    const ids = [...box.children].map(idOf).filter(Boolean), C = NFC.cfg;
+    if (kind === 'sec') {
+      const ord = cfg('sectors.order', []), mine = SECTORS.map((x) => x.id);
+      C.set('sectors.order', ids.concat(mine.filter((id) => !ids.includes(id)), ord.filter((id) => !mine.includes(id))), 'Ordre des secteurs modifié (studio)');
+    } else {
+      const all = Object.assign({}, cfg('desSec', {})), x = desX(); x.order = ids; all[S.sectorId] = x;
+      C.set('desSec', all, `Ordre des modèles : ${sec().name}`);
+    }
+    render(); toast('Ordre enregistré.');
+  };
+  document.addEventListener('pointerup', dndEnd);
+  document.addEventListener('pointercancel', dndEnd);
   /* Ajouter une palette : nom, couleur principale, couleur d’accent ; aperçu immédiat */
   function openPalAdd() {
     const s = sec(), base = (NFC.palsOf(s)[S.palette] || s.palettes[0]);
@@ -845,7 +894,7 @@
         <div class="sq-r" id="secqr"></div>
         <p class="sq-none" id="secqn" hidden>Aucun résultat. Essayez un autre mot, ou choisissez le secteur le plus proche ci-dessous.</p>
       </div>
-      <div class="tiles">${tiles}
+      <div class="tiles" ${ADM() ? 'data-dnd-box="sec"' : ''}>${tiles}
       </div>
     </section>`;
   }
@@ -1174,24 +1223,27 @@
   }
   function step2() {
     const s = sec();
-    const dOff = (d) => cfg('designsOff', []).includes(d.id);
-    const cards = designsNow().map((d) => `
-      <div class="tpl ${S.design === d.id ? 'sel' : ''} ${ADM() && dOff(d) ? 'adm-off' : ''}" role="button" tabindex="0" aria-label="Choisir le modèle ${d.name}" data-act="design" data-id="${d.id}">
+    const dOff = (d) => cfg('designsOff', []).includes(d.id) || desX().off.includes(d.id);
+    const fv = favs();
+    const cards = designsNow().map((d) => { const sn = desSoon(d.id), fav = fv.includes(d.id); return `
+      <div class="tpl ${S.design === d.id ? 'sel' : ''} ${ADM() && dOff(d) ? 'adm-off' : ''} ${sn ? 'soon' : ''}" role="button" tabindex="0" aria-label="Choisir le modèle ${d.name}" data-act="${sn && !ADM() ? 'dsoon' : 'design'}" data-id="${d.id}">
+        <button type="button" class="tpl-fav ${fav ? 'on' : ''}" data-act="fav" data-id="${d.id}" aria-pressed="${fav}" title="${fav ? TT('Retirer des favoris', 'Remove from favorites') : TT('Ajouter aux favoris', 'Add to favorites')}" aria-label="${fav ? TT('Retirer des favoris', 'Remove from favorites') : TT('Ajouter aux favoris', 'Add to favorites')}">${fav ? '★' : '☆'}</button>
         <div class="tpl-view"><div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(d.id), { thumb: true }))}</div></div></div>
           <button type="button" class="tpl-zoom" data-act="fullpreview" data-id="${d.id}" aria-label="Aperçu plein écran du modèle ${d.name}">${ic('eye', 15)}Aperçu</button></div>
         <div class="tpl-meta">
-          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}${isEvents ? '' : (() => { const c = coverCaps(d.id); return c.vid ? `<span class="cv-tag vid" title="${TT('Couverture : image ou vidéo', 'Cover: image or video')}">${ic('play', 11)}${TT('Couverture vidéo', 'Video cover')}</span>` : c.img ? `<span class="cv-tag img" title="${TT('Couverture : image seulement (pas de vidéo)', 'Cover: image only (no video)')}">${ic('image', 11)}${TT('Couverture image', 'Image cover')}</span>` : ''; })()}</div>
+          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${fav ? `<span class="tpl-favb">★ ${TT('Favori', 'Favorite')}</span>` : ''}${sn ? `<span class="tpl-soon">${TT('Bientôt', 'Coming soon')}</span>` : ''}${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}${isEvents ? '' : (() => { const c = coverCaps(d.id); return c.vid ? `<span class="cv-tag vid" title="${TT('Couverture : image ou vidéo', 'Cover: image or video')}">${ic('play', 11)}${TT('Couverture vidéo', 'Video cover')}</span>` : c.img ? `<span class="cv-tag img" title="${TT('Couverture : image seulement (pas de vidéo)', 'Cover: image only (no video)')}">${ic('image', 11)}${TT('Couverture image', 'Image cover')}</span>` : ''; })()}</div>
           <p>${d.desc}</p>
           <div class="tpl-foot"><span class="tpl-code">${s.code}-${d.id.toUpperCase()}</span><span class="tpl-go">Choisir ${ic('arrow', 14)}</span></div>
-          ${ADM() ? admTools('des', d.id, dOff(d) ? 'off' : 'on', false, recOf(s) === d.id) : ''}
+          ${ADM() ? admTools('des', d.id, dOff(d) ? 'off' : sn ? 'soon' : 'on', true, recOf(s) === d.id) : ''}
         </div>
-      </div>`).join('');
+      </div>`; }).join('');
     return `<section class="wrap">${admBar()}
       ${back(1, X.backTo || 'Changer de secteur')}${s.profiles ? `<button class="back" data-act="profpick">${ic('arrowl', 16)}${ui() === 'en' ? 'Change profession' : 'Changer de métier'}</button>` : ''}
       ${editLine()}
       ${langSwitch()}
       ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Cliquez pour choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.`)}
-      <div class="tpls">${cards}</div>
+      ${fv.length ? `<p class="muted small tpl-favh">★ ${TT('Vos modèles favoris apparaissent en premier.', 'Your favorite templates come first.')}</p>` : ''}
+      <div class="tpls" ${ADM() ? 'data-dnd-box="des"' : ''}>${cards}</div>
     </section>`;
   }
 
@@ -2528,6 +2580,8 @@
       case 'kindpick': kindPick = t.dataset.v; render(); setTimeout(() => { const i = $('[data-kindform] input'); if (i) { i.focus(); i.scrollIntoView({ block: 'center', behavior: 'smooth' }); } }, 50); break;
       case 'kindgo': kindGo(); break;
       case 'nameskip': nameDone(false); break;
+      case 'fav': { e.stopPropagation(); const id = t.dataset.id, f = favs().filter((z) => z !== id); if (!favs().includes(id)) f.push(id); S.favs = f; save(); render(); toast(f.includes(id) ? TT('Ajouté à vos favoris.', 'Added to your favorites.') : TT('Retiré de vos favoris.', 'Removed from your favorites.')); break; }
+      case 'dsoon': toast(TT('Ce modèle arrive bientôt.', 'This template is coming soon.')); break;
       case 'design': closeModal(); if (/^n[1-3]$/.test(t.dataset.id) !== /^n[1-3]$/.test(S.design || '')) S.palette = 0; S.design = t.dataset.id; NFC.curDesign = S.design; go(3); break;
       case 'adm': admAct(t); break;
       case 'poster': if (!locked()) openPoster(); break;

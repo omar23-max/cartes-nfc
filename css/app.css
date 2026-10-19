@@ -1621,3 +1621,16 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .tile.has-bg::before { background: linear-gradient(180deg, rgba(12,12,16,0) 0%, rgba(12,12,16,.10) 40%, rgba(12,12,16,.75) 100%); }
 .tile.has-bg:hover::before { background: linear-gradient(180deg, rgba(12,12,16,0) 0%, rgba(12,12,16,.06) 40%, rgba(12,12,16,.68) 100%); }
 .tile.has-bg .tile-code { text-shadow: 0 1px 4px rgba(0,0,0,.5); }
+/* v=346 : favoris des modèles, modèles « Bientôt », glisser-déposer en mode administrateur */
+.tpl { position: relative; }
+.tpl-fav { position: absolute; top: 10px; left: 10px; z-index: 3; width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(255,255,255,.94); color: #a1a1aa; font-size: 19px; line-height: 1; cursor: pointer; box-shadow: 0 4px 12px -4px rgba(0,0,0,.25); }
+.tpl-fav:hover { color: #f59e0b; }
+.tpl-fav.on { color: #f59e0b; }
+.tpl-favb { padding: 2px 8px; border-radius: 99px; background: #fef3c7; color: #92400e; font-size: 11.5px; font-weight: 700; }
+.tpl-soon { padding: 2px 8px; border-radius: 99px; background: #e4e4e7; color: #3f3f46; font-size: 11.5px; font-weight: 700; }
+.tpl.soon .tpl-view { filter: grayscale(1); opacity: .6; }
+.tpl.soon { cursor: default; }
+.tpl-favh { margin: -6px 0 12px; }
+.adm-mv { cursor: grab; display: inline-flex; align-items: center; gap: 4px; touch-action: none; user-select: none; }
+.dnd-src { opacity: .35; outline: 2px dashed #7a3fd1; outline-offset: 2px; border-radius: 14px; }
+.dnd-ghost { position: fixed !important; z-index: 9999; pointer-events: none; opacity: .92; box-shadow: 0 14px 34px rgba(0,0,0,.28); }

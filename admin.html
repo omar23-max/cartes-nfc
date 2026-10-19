@@ -8,7 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=345">
+  <link rel="stylesheet" href="css/card.css?v=347">
+  <link rel="stylesheet" href="css/card-plus.css?v=347">
+  <link rel="stylesheet" href="css/noir.css?v=347">
+  <link rel="stylesheet" href="css/immo.css?v=347">
+  <link rel="stylesheet" href="css/app.css?v=347">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -59,7 +63,21 @@
     /* Miniatures déplaçables (secteurs, types de boutique, événements) */
     .adm-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
     .adm-tl { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; display: grid; user-select: none; }
-    .adm-tl.off { opacity: .55; }
+    .adm-tl.off, .adm-tl.soon { background: #f4f4f5; }
+    .adm-tl.off .adm-tl-im, .adm-tl.soon .adm-tl-im { filter: grayscale(1); }
+    .adm-tl.off .adm-tl-im::after, .adm-tl.soon .adm-tl-im::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.55); }
+    .adm-tl.off .adm-tl-im > *, .adm-tl.soon .adm-tl-im > * { z-index: 1; }
+    .adm-tl.off .adm-tl-im b, .adm-tl.soon .adm-tl-im b { color: #3f3f46; text-shadow: none; }
+    .adm-sech { margin: 22px 0 8px; padding: 0 0 6px; border-bottom: 2px solid #ede9fe; font-size: 17px; font-weight: 800; color: #5b21b6; }
+    .adm-sech:first-of-type { margin-top: 8px; }
+    .adm-desm { width: min(1100px, 100%); max-height: calc(100vh - 32px); overflow: auto; }
+    .adm-dtiles { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .adm-dim { aspect-ratio: 9 / 16; background: #fff; overflow: hidden; }
+    .adm-dim iframe { position: absolute; top: 0; left: 0; width: 375px; height: 667px; border: 0; transform: scale(.4); transform-origin: 0 0; pointer-events: none; }
+    .adm-dim::before { z-index: 1; }
+    .adm-dim .adm-th { position: absolute; top: 0; left: 0; width: 375px; transform: scale(.4); transform-origin: 0 0; pointer-events: none; }
+    .adm-dim .adm-th .phone-screen { width: 375px; height: 667px; overflow: hidden; background: #fff; }
+    .adm-dim > b, .adm-dim > span, .adm-dim > em { z-index: 2; }
     .adm-tl.drag { opacity: .35; outline: 2px dashed #7a3fd1; }
     .adm-tl-im { position: relative; aspect-ratio: 16 / 10; background: #2a2833 center / cover no-repeat; cursor: grab; display: flex; align-items: flex-end; padding: 8px; touch-action: none; }
     .adm-tl-im::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.72) 100%); }
@@ -123,33 +141,33 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=345"></script>
-  <script src="js/data.js?v=345"></script>
-  <script src="js/sectors.js?v=345"></script>
-  <script src="js/media.js?v=345"></script>
-  <script src="js/extras.js?v=345"></script>
-  <script src="js/locale-na.js?v=345"></script>
-  <script src="js/locale-na-en.js?v=345"></script>
-  <script src="js/google.js?v=345"></script>
-  <script src="js/profiles.js?v=345"></script>
-  <script src="js/profiles-sport.js?v=345"></script>
-  <script src="js/profiles-sante.js?v=345"></script>
-  <script src="js/profiles-archi.js?v=345"></script>
-  <script src="js/profiles-resto.js?v=345"></script>
-  <script src="js/profiles-auto.js?v=345"></script>
-  <script src="js/profiles-prod.js?v=345"></script>
-  <script src="js/profiles-edu.js?v=345"></script>
-  <script src="js/designs-immo.js?v=345"></script>
-  <script src="js/sector-prestige.js?v=345"></script>
-  <script src="js/custom-catalog.js?v=345"></script>
-  <script src="js/jobs.js?v=345"></script>
-  <script src="js/render.js?v=345"></script>
-  <script src="js/designs-immo-der.js?v=345"></script>
-  <script src="js/demo-faces.js?v=345"></script>
-  <script src="js/designs-noir.js?v=345"></script>
-  <script src="js/section-suggest.js?v=345"></script>
+  <script src="js/services.js?v=347"></script>
+  <script src="js/data.js?v=347"></script>
+  <script src="js/sectors.js?v=347"></script>
+  <script src="js/media.js?v=347"></script>
+  <script src="js/extras.js?v=347"></script>
+  <script src="js/locale-na.js?v=347"></script>
+  <script src="js/locale-na-en.js?v=347"></script>
+  <script src="js/google.js?v=347"></script>
+  <script src="js/profiles.js?v=347"></script>
+  <script src="js/profiles-sport.js?v=347"></script>
+  <script src="js/profiles-sante.js?v=347"></script>
+  <script src="js/profiles-archi.js?v=347"></script>
+  <script src="js/profiles-resto.js?v=347"></script>
+  <script src="js/profiles-auto.js?v=347"></script>
+  <script src="js/profiles-prod.js?v=347"></script>
+  <script src="js/profiles-edu.js?v=347"></script>
+  <script src="js/designs-immo.js?v=347"></script>
+  <script src="js/sector-prestige.js?v=347"></script>
+  <script src="js/custom-catalog.js?v=347"></script>
+  <script src="js/jobs.js?v=347"></script>
+  <script src="js/render.js?v=347"></script>
+  <script src="js/designs-immo-der.js?v=347"></script>
+  <script src="js/demo-faces.js?v=347"></script>
+  <script src="js/designs-noir.js?v=347"></script>
+  <script src="js/section-suggest.js?v=347"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=345"></script>
+  <script src="events/js/events-data.js?v=347"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -222,7 +240,7 @@
       return `<div class="adm-tiles" data-tiles="${group}">${sorted.map((s, i) => { const im = thumb(s), stt = st(s);
         return `<div class="adm-tl ${stt}" data-tl="${s.id}" data-g="${group}">
           <div class="adm-tl-im"${im ? ` style="background-image:url('${esc(im)}')"` : ''}><span class="adm-tl-grip" title="Glisser pour déplacer" aria-hidden="true">⠿</span><span class="adm-tl-n">${i + 1}</span>${stt === 'soon' ? '<em>Bientôt</em>' : stt === 'off' ? '<em class="off">Masqué</em>' : ''}<b>${esc(s.name)}</b></div>
-          <div class="adm-tl-ft"><select data-secst="${s.id}" aria-label="État de ${esc(s.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''} ${v === 'on' && !s.active ? 'disabled' : ''}>${l}</option>`).join('')}</select>
+          <div class="adm-tl-ft"><select data-secst="${s.id}" aria-label="État de ${esc(s.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué'], ['del', 'Supprimer']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''} ${v === 'on' && !s.active ? 'disabled' : ''}>${l}</option>`).join('')}</select>
           <span class="mv"><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Avancer">←</button><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="1" ${i === sorted.length - 1 ? 'disabled' : ''} aria-label="Reculer">→</button></span></div></div>`; }).join('')}</div>`;
     };
     P.cat = () => {
@@ -232,6 +250,7 @@
       C.get('sectors.del', []).forEach((id) => del.push([`Secteur : ${SECNAME(id)}`, 'sectors.del', id]));
       C.get('profDel', []).forEach((id) => { const [sid, pid] = id.split('~'), s = CARDS.find((x) => x.id === sid), p = s && (s.profiles || []).find((x) => x.id === pid); del.push([`Métier : ${p ? p.n[0] : pid} (${SECNAME(sid)})`, 'profDel', id]); });
       C.get('designsDel', []).forEach((id) => del.push([`Modèle : ${(DESIGNS.find((d) => d.id === id) || {}).name || id}`, 'designsDel', id]));
+      Object.entries(C.get('desSec', {})).forEach(([sid, x]) => ((x && x.del) || []).forEach((id) => del.push([`Modèle ${id.toUpperCase()} : ${SECNAME(sid)}`, 'desSec', sid + '|' + id])));
       Object.entries(C.get('palDel', {})).forEach(([k, arr]) => (arr || []).forEach((i) => del.push([`Palette n° ${i + 1} : ${SECNAME(k.split('~')[0])}${k.includes('~') ? ' – ' + k.split('~')[1] : ''}`, 'pal', k + '|' + i])));
       const added = Object.entries(C.get('palAdd', {})).filter(([, a]) => a && a.length);
       const sa = C.get('secAdd', []), pa = Object.entries(C.get('profAdd', {})).flatMap(([sid, l]) => (l || []).map((x) => [sid, x]));
@@ -246,7 +265,7 @@
       ${box('Secteurs des cartes', LIVE, 'Visible, « Bientôt » (affiché mais pas encore ouvert) ou masqué. Glissez une miniature pour changer l’ordre d’affichage (ou utilisez les flèches).', secRows(CARDS, 'cards'))}
       ${box('Types de boutique', LIVE, 'Même principe pour le studio des boutiques (dont les 10 restaurants, cafés et bars).', secRows(STORES, 'stores'))}
       ${box('Événements', LIVE, 'Même principe pour le studio des invitations (mariage, naissance, anniversaire…).', secRows(EVENTS, 'events'))}
-      ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<p class="adm-d" style="margin:10px 0 4px"><b>${esc(s.name)}</b></p><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div><button type="button" class="adm-t" style="margin-top:6px" data-catadd="prof" data-sec="${s.id}">+ Ajouter un métier à ce secteur</button>`).join('')
+      ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<h3 class="adm-sech">${esc(s.name)}</h3><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div><button type="button" class="adm-t" style="margin-top:6px" data-catadd="prof" data-sec="${s.id}">+ Ajouter un métier à ce secteur</button>`).join('')
         + `<p class="adm-d" style="margin:16px 0 6px"><b>Secteurs sans métiers</b> : ajoutez-leur un premier métier (l’exemple actuel devient alors le métier « par défaut »).</p><div style="display:flex;flex-wrap:wrap;gap:6px">${CARDS.filter((s) => !s.profiles).map((s) => `<button type="button" class="adm-t" data-catadd="prof" data-sec="${s.id}">+ ${esc(s.name)}</button>`).join('')}</div>`)}
       ${box('Modèles (mises en page)', LIVE, 'Un modèle désactivé n’est plus proposé ; un client qui l’a déjà choisi le garde.', `<div class="adm-list">${DESIGNS.map((d) => { const on = !C.get('designsOff', []).includes(d.id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(d.name)} <small style="color:var(--mut)">${esc(d.id.toUpperCase())}</small></span>${sw(`data-des="${d.id}"`, on)}</label>`; }).join('')}</div>`)}
       ${box('Modèle recommandé par secteur et par événement', LIVE, 'Le badge « Recommandé » à l’étape Modèle.', CARDS.filter((s) => s.active).concat(EVENTS).map((s) => `<div class="adm-f"><div>${esc(s.name)}</div><div><select data-rec="${s.id}"><option value="">Par défaut (${esc(String(s.rec || '').toUpperCase())})</option>${DESIGNS.map((d) => `<option value="${d.id}" ${C.get('rec', {})[s.id] === d.id ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}</select></div></div>`).join(''))}
@@ -472,9 +491,16 @@
       if (d.cfg) { const v = d.k === 'bool' ? t.checked : d.k === 'num' ? (t.value === '' ? '' : +t.value) : t.value; C.set(d.cfg, v, `${d.cfg} = ${v === '' ? '(vide)' : v}`); if (d.cfg === 'planSim') draw(); return saved(); }
       if (d.secst) {
         const id = d.secst, v = t.value;
+        if (v === 'del') { C.set('sectors.del', C.get('sectors.del', []).filter((x) => x !== id).concat([id]), `Supprimé : ${SECNAME(id)}`); draw(); return saved('Supprimé. Restaurable dans « Éléments supprimés ».'); }
         C.set('sectors.off', C.get('sectors.off', []).filter((x) => x !== id).concat(v === 'off' ? [id] : []));
         C.set('sectors.soon', C.get('sectors.soon', []).filter((x) => x !== id).concat(v === 'soon' ? [id] : []), `Secteur ${SECNAME(id)} : ${v === 'on' ? 'visible' : v === 'soon' ? 'Bientôt' : 'masqué'}`);
-        return saved();
+        draw(); return saved();
+      }
+      if (d.desst) {
+        const [g, sid, id] = d.desst.split('|'), v = t.value, all = C.get('desSec', {}), x = Object.assign({ order: [], off: [], soon: [], del: [] }, all[sid] || {});
+        ['off', 'soon', 'del'].forEach((k) => { x[k] = (x[k] || []).filter((z) => z !== id); if (v === k) x[k].push(id); });
+        all[sid] = x; C.set('desSec', all, `Modèle ${id.toUpperCase()} (${SECNAME(sid)}) : ${{ on: 'visible', soon: 'Bientôt', off: 'masqué', del: 'supprimé' }[v]}`);
+        openDes(g, sid); draw(); return saved(v === 'del' ? 'Modèle supprimé pour ce secteur. Restaurable dans « Éléments supprimés ».' : 'Enregistré');
       }
       if (d.prof) { toggleIn('profOff', d.prof, t.checked, `Métier ${d.prof} : ${t.checked ? 'proposé' : 'retiré'}`); draw(); return saved(); }
       if (d.des) { toggleIn('designsOff', d.des, t.checked, `Modèle ${d.des} : ${t.checked ? 'proposé' : 'retiré'}`); draw(); return saved(); }
@@ -486,18 +512,56 @@
       if (d.rw !== undefined) { const r = C.get('lang.reword', []); r[+d.rw][+d.f] = t.value; C.set('lang.reword', r, `Texte remplacé : « ${r[+d.rw][0]} » → « ${r[+d.rw][1]} »`); return saved(); }
     });
     document.addEventListener('input', (e) => { if (e.target.id === 'q') filterSvc(); });
+    /* Modèles d'un secteur, d'un type de boutique ou d'un événement : ordre, visible / Bientôt / masqué / supprimé */
+    const desOf = (g, sid) => {
+      const base = NFC.DESIGNS || [];
+      if (g === 'cards') { const s = CARDS.find((x) => x.id === sid) || {}; return (s.designsOnly ? [] : base).concat(s.designs || []); }
+      if (g === 'events') { const s = EVENTS.find((x) => x.id === sid) || {}; return (s.designsOnly ? [] : base).concat(s.designs || []); }
+      return base;
+    };
+    function openDes(g, sid) {
+      const x = Object.assign({ order: [], off: [], soon: [], del: [] }, C.get('desSec', {})[sid] || {});
+      const pos = (id) => { const i = x.order.indexOf(id); return i < 0 ? 999 : i; };
+      const list = desOf(g, sid).filter((d) => !x.del.includes(d.id)).map((d, i) => [d, i]).sort((a, b) => (pos(a[0].id) - pos(b[0].id)) || (a[1] - b[1])).map((z) => z[0]);
+      const stOf = (id) => (x.off.includes(id) || C.get('designsOff', []).includes(id) ? 'off' : x.soon.includes(id) ? 'soon' : 'on');
+      const view = (g === 'stores' ? 'stores/view.html' : g === 'events' ? 'events/view.html' : 'view.html') + '?noenv=1&s=' + encodeURIComponent(sid) + '&d=';
+      /* Aperçu : dessiné dans la page pour les cartes ; page d'exemple réduite pour les boutiques et les événements */
+      const sc = g === 'cards' ? CARDS.find((x) => x.id === sid) : null;
+      const preview = (id) => {
+        if (sc && sc.demo && window.VC) {
+          try { NFC.curDesign = id; const pal = (NFC.palsOf ? NFC.palsOf(sc) : sc.palettes)[0] || sc.palettes[0]; return `<div class="adm-th"><div class="phone-screen">${VC.render({ card: sc.demo, sec: sc, d: id, pal, thumb: true, lang: 'fr' })}</div></div>`; } catch (er) { /* rien */ }
+        }
+        return `<iframe src="${view}${id}" loading="lazy" tabindex="-1" title="${id}"></iframe>`;
+      };
+      const m = $('#modal');
+      m.innerHTML = `<div class="mb" data-assistx="1"></div>
+        <div class="md adm-desm" role="dialog" aria-modal="true" aria-labelledby="ds-t">
+          <h2 id="ds-t">Modèles : ${esc(SECNAME(sid))}</h2>
+          <p class="adm-d">Glissez une miniature pour changer l’ordre. Visible, « Bientôt » (montré mais pas choisissable), masqué ou supprimé : pour ce secteur seulement.</p>
+          <div class="adm-tiles adm-dtiles" data-tiles="des|${g}|${sid}">${list.map((d, i) => { const stt = stOf(d.id);
+            return `<div class="adm-tl ${stt}" data-tl="${d.id}">
+              <div class="adm-tl-im adm-dim">${preview(d.id)}<span class="adm-tl-grip" aria-hidden="true">⠿</span><span class="adm-tl-n">${i + 1}</span>${stt === 'soon' ? '<em>Bientôt</em>' : stt === 'off' ? '<em class="off">Masqué</em>' : ''}<b>${esc(d.name)} · ${d.id.toUpperCase()}</b></div>
+              <div class="adm-tl-ft"><select data-desst="${g}|${sid}|${d.id}" aria-label="État du modèle ${esc(d.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué'], ['del', 'Supprimer']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`; }).join('')}</div>
+          <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b pri" data-assistx="1">Fermer</button></div>
+        </div>`;
+      m.classList.add('on');
+    }
+
     /* Glisser-déposer des miniatures (souris et doigt) : on attrape l'image, on la lâche parmi les autres du même groupe */
     let dg = null;
     document.addEventListener('pointerdown', (e) => {
       const im = e.target.closest && e.target.closest('.adm-tl-im'); if (!im) return;
       const tl = im.closest('.adm-tl'); e.preventDefault();
       const r = tl.getBoundingClientRect(), gh = tl.cloneNode(true); gh.classList.add('adm-tl-ghost'); gh.style.width = r.width + 'px'; document.body.appendChild(gh);
-      dg = { tl, gh, box: tl.parentElement, dx: e.clientX - r.left, dy: e.clientY - r.top, moved: false };
+      dg = { tl, gh, box: tl.parentElement, dx: e.clientX - r.left, dy: e.clientY - r.top, x0: e.clientX, y0: e.clientY, moved: false };
       gh.style.left = r.left + 'px'; gh.style.top = r.top + 'px'; tl.classList.add('drag');
     });
     document.addEventListener('pointermove', (e) => {
       if (!dg) return;
+      if (!dg.moved && Math.abs(e.clientX - dg.x0) + Math.abs(e.clientY - dg.y0) < 6) return;
       dg.moved = true;
+      { const sc = dg.box.closest('.md') || null, top = sc ? sc.getBoundingClientRect().top : 0, bot = sc ? sc.getBoundingClientRect().bottom : innerHeight, d = e.clientY < top + 60 ? -16 : e.clientY > bot - 60 ? 16 : 0;
+        if (d) { if (sc) sc.scrollTop += d; else window.scrollBy(0, d); } }
       dg.gh.style.left = (e.clientX - dg.dx) + 'px'; dg.gh.style.top = (e.clientY - dg.dy) + 'px';
       const over = document.elementFromPoint(e.clientX, e.clientY), t = over && over.closest('.adm-tl');
       if (!t || t === dg.tl || t.parentElement !== dg.box) return;
@@ -507,8 +571,13 @@
     const dragEnd = () => {
       if (!dg) return;
       const { tl, gh, box, moved } = dg; dg = null; gh.remove(); tl.classList.remove('drag');
-      if (!moved) return;
-      const ids = [...box.querySelectorAll('.adm-tl')].map((x) => x.dataset.tl), g = box.dataset.tiles;
+      const g = box.dataset.tiles;
+      if (!moved) { if (!/^des\|/.test(g)) openDes(g, tl.dataset.tl); return; }
+      const ids = [...box.querySelectorAll('.adm-tl')].map((x) => x.dataset.tl);
+      if (/^des\|/.test(g)) {
+        const [, gg, sid] = g.split('|'), all = C.get('desSec', {}), x = Object.assign({ order: [], off: [], soon: [], del: [] }, all[sid] || {});
+        x.order = ids; all[sid] = x; C.set('desSec', all, `Ordre des modèles : ${SECNAME(sid)}`); openDes(gg, sid); return saved();
+      }
       const list = (g === 'cards' ? CARDS : g === 'events' ? EVENTS : STORES), ord = C.get('sectors.order', []);
       const rest = list.map((x) => x.id).filter((id) => !ids.includes(id));
       const other = CARDS.concat(STORES, EVENTS).filter((x) => !list.includes(x)).map((x) => x.id).filter((id) => ord.includes(id));
@@ -554,6 +623,7 @@
         draw(); return saved();
       }
       if (d.restore) {
+        if (d.restore === 'desSec') { const [sid, id] = d.v.split('|'), all = C.get('desSec', {}); if (all[sid]) all[sid].del = (all[sid].del || []).filter((z) => z !== id); C.set('desSec', all, `Modèle restauré : ${id} (${SECNAME(sid)})`); draw(); return saved('Restauré'); }
         if (d.restore === 'pal') { const [k, i] = d.v.split('|'), m = Object.assign({}, C.get('palDel', {})); m[k] = (m[k] || []).filter((x) => x !== +i); C.set('palDel', m, `Palette restaurée (${k})`); }
         else C.set(d.restore, C.get(d.restore, []).filter((x) => x !== d.v), `Restauré : ${d.v}`);
         draw(); return saved('Restauré');
