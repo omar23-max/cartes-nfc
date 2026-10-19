@@ -487,8 +487,13 @@
   const admBar = () => (ADM() ? `<div class="adm-bar">${ic('shield', 16)}<span><b>Mode administrateur</b> · vos clients ne voient pas ces boutons. Désactivé = caché aux clients (grisé pour vous) ; supprimé = retiré, à restaurer depuis la page admin.</span><a class="linkish" href="${isStores || isEvents ? '../' : ''}admin.html#cat">Page admin</a><button type="button" class="linkish" data-act="adm" data-op="quit">Quitter le mode admin</button></div>` : '');
   function admTools(kind, id, state, soon, rec) {
     const b = (op, label, cls = '') => `<button type="button" class="adm-t ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}">${label}</button>`;
-    const mv = kind === 'sec' || kind === 'des' ? `<span class="adm-t adm-mv" data-dnd="1" title="Glisser pour déplacer" role="button" tabindex="-1">⠿ Déplacer</span>` : '';
-    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? b('off', 'Désactiver') : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? b('soon', 'Bientôt') : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on">Recommandé</span>' : b('rec', 'Recommander')) : ''}${b('del', 'Supprimer', 'danger')}${mv}</div>`;
+    /* Une seule ligne : Supprimer = corbeille, Déplacer = poignée (libellés en info-bulle) */
+    const bi = (op, html, title, cls = '') => `<button type="button" class="adm-t adm-ti ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}" title="${title}" aria-label="${title}">${html}</button>`;
+    const mv = kind === 'sec' || kind === 'des' ? `<span class="adm-t adm-ti adm-mv" data-dnd="1" title="Glisser pour déplacer" aria-label="Déplacer" role="button" tabindex="-1">⠿</span>` : '';
+    /* Modèles (cartes étroites) : Désactiver et Bientôt en icônes */
+    const offB = kind === 'des' ? bi('off', ic('eye', 14), 'Désactiver (masquer aux clients)') : b('off', 'Désactiver');
+    const soonB = kind === 'des' ? bi('soon', ic('clock', 14), 'Bientôt') : b('soon', 'Bientôt');
+    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? offB : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? soonB : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on" title="Modèle recommandé">Reco ✓</span>' : b('rec', 'Reco')) : ''}${bi('del', ic('trash', 14), 'Supprimer', 'danger')}${mv}</div>`;
   }
   const admWrap = (html, kind, id, state, soon) => (ADM() ? `<div class="adm-w">${html}${admTools(kind, id, state, soon)}</div>` : html);
   const addTo = (path, v) => { const a = cfg(path, []).filter((x) => x !== v); a.push(v); return a; };
