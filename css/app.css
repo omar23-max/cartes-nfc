@@ -1659,3 +1659,17 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .tpl .adm-tb { gap: 2px; }
 .tpl .adm-tb .adm-t { padding-left: 4px; padding-right: 4px; font-size: 10.5px; }
 .tpl .adm-tb .adm-ti { width: 22px; }
+/* v=353 : outils des modèles sur deux lignes lisibles */
+.tpl .adm-tb { flex-wrap: wrap; gap: 4px; }
+.tpl .adm-tb .adm-t { padding: 4px 7px; font-size: 11.5px; }
+.adm-br { flex-basis: 100%; height: 0; }
+.adm-delt { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; }
+.adm-delt svg { width: 13px; height: 13px; }
+.tpl .adm-tb .adm-t { padding: 4px 6px; font-size: 11px; }
+.tpl .adm-tb { gap: 3px; }
+.tpl .adm-tb .adm-t { padding-left: 5px; padding-right: 5px; }
+/* v=356 : en mode administrateur, la miniature elle-même s'attrape à la souris */
+[data-dnd-box] > * { -webkit-user-drag: none; }
+[data-dnd-box] img { -webkit-user-drag: none; user-select: none; }
+@media (hover: hover) { [data-dnd-box] > .adm-w > .tile, [data-dnd-box] > .tpl .tpl-view { cursor: grab; } }
+.dnd-src, .dnd-src * { cursor: grabbing; }

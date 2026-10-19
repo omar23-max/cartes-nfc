@@ -490,10 +490,9 @@
     /* Une seule ligne : Supprimer = corbeille, Déplacer = poignée (libellés en info-bulle) */
     const bi = (op, html, title, cls = '') => `<button type="button" class="adm-t adm-ti ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}" title="${title}" aria-label="${title}">${html}</button>`;
     const mv = kind === 'sec' || kind === 'des' ? `<span class="adm-t adm-mv" data-dnd="1" title="Glisser pour déplacer" role="button" tabindex="-1">⠿ Déplacer</span>` : '';
-    /* Modèles (cartes étroites) : Désactiver et Bientôt en icônes */
-    const offB = kind === 'des' ? bi('off', ic('eye', 14), 'Désactiver (masquer aux clients)') : b('off', 'Désactiver');
-    const soonB = kind === 'des' ? bi('soon', ic('clock', 14), 'Bientôt') : b('soon', 'Bientôt');
-    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? offB : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? soonB : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on" title="Modèle recommandé">Reco ✓</span>' : b('rec', 'Reco')) : ''}${mv}${bi('del', ic('trash', 14), 'Supprimer', 'danger')}</div>`;
+    /* Modèles (cartes étroites) : deux lignes en toutes lettres — état et recommandation, puis Déplacer et Supprimer */
+    const offB = b('off', 'Désactiver'), soonB = b('soon', 'Bientôt');
+    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? offB : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? soonB : '') : ''}${kind === 'des' ? `${mv}<span class="adm-br"></span>${rec ? '<span class="adm-t on" title="Modèle recommandé">Recommandé ✓</span>' : b('rec', 'Recommander')}${b('del', `${ic('trash', 13)} Supprimer`, 'danger adm-delt')}` : `${mv}${bi('del', ic('trash', 14), 'Supprimer', 'danger')}`}</div>`;
   }
   const admWrap = (html, kind, id, state, soon) => (ADM() ? `<div class="adm-w">${html}${admTools(kind, id, state, soon)}</div>` : html);
   const addTo = (path, v) => { const a = cfg(path, []).filter((x) => x !== v); a.push(v); return a; };
@@ -534,18 +533,30 @@
     toast(op === 'del' ? 'Supprimé. Restaurable depuis la page admin.' : op === 'off' ? 'Désactivé : caché à vos clients.' : op === 'soon' ? 'Affiché « Bientôt » à vos clients.' : op === 'rec' ? 'Modèle recommandé changé.' : 'Activé : visible par vos clients.');
   }
   /* Glisser-déposer (mode administrateur) : on attrape « Déplacer », on lâche sur un autre secteur / modèle */
-  let dnd = null;
-  document.addEventListener('pointerdown', (e) => {
-    const h = e.target.closest && e.target.closest('[data-dnd]'); if (!h || !ADM()) return;
-    const box = h.closest('[data-dnd-box]'); if (!box) return;
-    const it = [...box.children].find((c) => c.contains(h)); if (!it) return;
-    e.preventDefault(); e.stopPropagation();
+  let dnd = null, dndWait = null, dndEat = false;
+  const dndStart = (it, box, x, y) => {
     const r = it.getBoundingClientRect(), gh = it.cloneNode(true);
     gh.className += ' dnd-ghost'; gh.style.width = r.width + 'px'; gh.style.left = r.left + 'px'; gh.style.top = r.top + 'px';
     document.body.appendChild(gh); it.classList.add('dnd-src');
-    dnd = { it, gh, box, dx: e.clientX - r.left, dy: e.clientY - r.top };
+    dnd = { it, gh, box, dx: x - r.left, dy: y - r.top };
+  };
+  document.addEventListener('pointerdown', (e) => {
+    if (!ADM() || !e.target.closest) return;
+    const box = e.target.closest('[data-dnd-box]'); if (!box) return;
+    const it = [...box.children].find((c) => c.contains(e.target)); if (!it) return;
+    const h = e.target.closest('[data-dnd]');
+    /* Poignée « Déplacer » : tout de suite (souris et doigt) */
+    if (h) { e.preventDefault(); e.stopPropagation(); dndStart(it, box, e.clientX, e.clientY); return; }
+    /* Souris : on peut aussi attraper la miniature elle-même (le glisser commence après quelques pixels ; un simple clic reste un clic) */
+    if (e.pointerType === 'mouse' && e.button === 0 && !e.target.closest('.adm-tb, select, input, a, .tpl-fav, .tpl-zoom')) dndWait = { it, box, x: e.clientX, y: e.clientY };
   }, true);
+  document.addEventListener('dragstart', (e) => { if (ADM() && e.target.closest && e.target.closest('[data-dnd-box]')) e.preventDefault(); });
+  document.addEventListener('click', (e) => { if (dndEat) { dndEat = false; e.preventDefault(); e.stopPropagation(); } }, true);
   document.addEventListener('pointermove', (e) => {
+    if (dndWait && !dnd) {
+      if (Math.abs(e.clientX - dndWait.x) + Math.abs(e.clientY - dndWait.y) < 8) return;
+      const w = dndWait; dndWait = null; dndStart(w.it, w.box, w.x, w.y);
+    }
     if (!dnd) return;
     if (e.clientY < 70) window.scrollBy(0, -18); else if (e.clientY > innerHeight - 70) window.scrollBy(0, 18); /* défilement près des bords */
     dnd.gh.style.left = (e.clientX - dnd.dx) + 'px'; dnd.gh.style.top = (e.clientY - dnd.dy) + 'px';
@@ -555,7 +566,9 @@
     dnd.box.insertBefore(dnd.it, e.clientX > tr.left + tr.width / 2 ? t.nextSibling : t);
   });
   const dndEnd = () => {
+    dndWait = null;
     if (!dnd) return;
+    dndEat = true; setTimeout(() => { dndEat = false; }, 0); /* le relâché ne doit pas « choisir » le modèle */
     const { it, gh, box } = dnd; dnd = null; gh.remove(); it.classList.remove('dnd-src');
     const kind = box.dataset.dndBox, idOf = (c) => (c.querySelector('[data-act="sector"]') || c).dataset.id || c.querySelector('[data-id]').dataset.id;
     const ids = [...box.children].map(idOf).filter(Boolean), C = NFC.cfg;
