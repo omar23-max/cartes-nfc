@@ -8,11 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/card.css?v=359">
-  <link rel="stylesheet" href="css/card-plus.css?v=359">
-  <link rel="stylesheet" href="css/noir.css?v=359">
-  <link rel="stylesheet" href="css/immo.css?v=359">
-  <link rel="stylesheet" href="css/app.css?v=359">
+  <link rel="stylesheet" href="css/card.css?v=360">
+  <link rel="stylesheet" href="css/card-plus.css?v=360">
+  <link rel="stylesheet" href="css/noir.css?v=360">
+  <link rel="stylesheet" href="css/immo.css?v=360">
+  <link rel="stylesheet" href="css/app.css?v=360">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -93,7 +93,10 @@
     .adm-add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 150px; border: 2px dashed #c4b5fd; border-radius: 12px; background: #faf5ff; color: #5b21b6; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 12px; text-align: center; }
     .adm-add span { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 2px solid currentColor; font-size: 28px; font-weight: 400; line-height: 1; }
     .adm-add:hover { background: #f3e8ff; border-color: #7c3aed; }
-    .adm-add-d { min-height: 240px; }
+    .adm-add-d { min-height: 0; }
+    .adm-tl-im.adm-dim { aspect-ratio: 375 / 667; padding: 0; }
+    .adm-tl-im.adm-dim > b { position: absolute; left: 8px; right: 8px; bottom: 8px; }
+    .adm-dim::before { background: linear-gradient(180deg, rgba(0,0,0,0) 70%, rgba(0,0,0,.72) 100%); }
     .adm-pick { padding: 0; font: inherit; text-align: left; cursor: pointer; }
     .adm-pick:hover { outline: 2px solid #7c3aed; }
     .adm-pk { flex: 1; text-align: center; font-size: 13px; font-weight: 700; color: #5b21b6; padding: 6px 0; }
@@ -155,33 +158,33 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=359"></script>
-  <script src="js/data.js?v=359"></script>
-  <script src="js/sectors.js?v=359"></script>
-  <script src="js/media.js?v=359"></script>
-  <script src="js/extras.js?v=359"></script>
-  <script src="js/locale-na.js?v=359"></script>
-  <script src="js/locale-na-en.js?v=359"></script>
-  <script src="js/google.js?v=359"></script>
-  <script src="js/profiles.js?v=359"></script>
-  <script src="js/profiles-sport.js?v=359"></script>
-  <script src="js/profiles-sante.js?v=359"></script>
-  <script src="js/profiles-archi.js?v=359"></script>
-  <script src="js/profiles-resto.js?v=359"></script>
-  <script src="js/profiles-auto.js?v=359"></script>
-  <script src="js/profiles-prod.js?v=359"></script>
-  <script src="js/profiles-edu.js?v=359"></script>
-  <script src="js/designs-immo.js?v=359"></script>
-  <script src="js/sector-prestige.js?v=359"></script>
-  <script src="js/custom-catalog.js?v=359"></script>
-  <script src="js/jobs.js?v=359"></script>
-  <script src="js/render.js?v=359"></script>
-  <script src="js/designs-immo-der.js?v=359"></script>
-  <script src="js/demo-faces.js?v=359"></script>
-  <script src="js/designs-noir.js?v=359"></script>
-  <script src="js/section-suggest.js?v=359"></script>
+  <script src="js/services.js?v=360"></script>
+  <script src="js/data.js?v=360"></script>
+  <script src="js/sectors.js?v=360"></script>
+  <script src="js/media.js?v=360"></script>
+  <script src="js/extras.js?v=360"></script>
+  <script src="js/locale-na.js?v=360"></script>
+  <script src="js/locale-na-en.js?v=360"></script>
+  <script src="js/google.js?v=360"></script>
+  <script src="js/profiles.js?v=360"></script>
+  <script src="js/profiles-sport.js?v=360"></script>
+  <script src="js/profiles-sante.js?v=360"></script>
+  <script src="js/profiles-archi.js?v=360"></script>
+  <script src="js/profiles-resto.js?v=360"></script>
+  <script src="js/profiles-auto.js?v=360"></script>
+  <script src="js/profiles-prod.js?v=360"></script>
+  <script src="js/profiles-edu.js?v=360"></script>
+  <script src="js/designs-immo.js?v=360"></script>
+  <script src="js/sector-prestige.js?v=360"></script>
+  <script src="js/custom-catalog.js?v=360"></script>
+  <script src="js/jobs.js?v=360"></script>
+  <script src="js/render.js?v=360"></script>
+  <script src="js/designs-immo-der.js?v=360"></script>
+  <script src="js/demo-faces.js?v=360"></script>
+  <script src="js/designs-noir.js?v=360"></script>
+  <script src="js/section-suggest.js?v=360"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=359"></script>
+  <script src="events/js/events-data.js?v=360"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -559,11 +562,11 @@
         <div class="md adm-desm" role="dialog" aria-modal="true" aria-labelledby="da-t">
           <h2 id="da-t">Ajouter un modèle : ${esc(SECNAME(sid))}</h2>
           <p class="adm-d">Touchez un modèle pour l’ajouter à la fin de la liste de ce secteur. Ensuite, vous pourrez le déplacer, le passer en « Bientôt », le masquer ou le supprimer. Un modèle au design entièrement nouveau se crée dans le code : demandez-le, il apparaîtra ici.</p>
-          ${cand.length ? `<div class="adm-tiles adm-dtiles">${cand.map((d) => `<button type="button" class="adm-tl adm-pick" data-despick="${g}|${sid}|${d.id}"><div class="adm-tl-im adm-dim" style="cursor:pointer">${desPreview(g, sid, d.id)}${(x.del || []).includes(d.id) ? '<em class="off">Supprimé</em>' : ''}<b>${esc(d.name)} · ${d.id.toUpperCase()}</b></div><div class="adm-tl-ft"><span class="adm-pk">+ Ajouter</span></div></button>`).join('')}</div>`
+          ${cand.length ? `<div class="adm-tiles adm-dtiles">${cand.map((d) => `<div class="adm-tl adm-pick" role="button" tabindex="0" data-despick="${g}|${sid}|${d.id}"><div class="adm-tl-im adm-dim" style="cursor:pointer">${desPreview(g, sid, d.id)}${(x.del || []).includes(d.id) ? '<em class="off">Supprimé</em>' : ''}<b>${esc(d.name)} · ${d.id.toUpperCase()}</b></div><div class="adm-tl-ft"><span class="adm-pk">+ Ajouter</span></div></div>`).join('')}</div>`
             : '<p class="adm-empty">Tous les modèles de la bibliothèque sont déjà dans ce secteur.</p>'}
           <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b" data-desback="${g}|${sid}">← Retour aux modèles</button><button type="button" class="b pri" data-assistx="1">Fermer</button></div>
         </div>`;
-      m.classList.add('on');
+      m.classList.add('on'); fitDes();
     }
     /* Aperçu d'un modèle : dessiné dans la page pour les cartes ; page d'exemple réduite pour les boutiques et les événements */
     function desPreview(g, sid, id) {
@@ -598,8 +601,11 @@
               <div class="adm-tl-ft"><select data-desst="${g}|${sid}|${d.id}" aria-label="État du modèle ${esc(d.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué'], ['del', 'Supprimer']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div></div>`; }).join('')}<button type="button" class="adm-add adm-add-d" data-desadd="${g}|${sid}"><span>+</span>Ajouter un modèle</button></div>
           <div style="display:flex;gap:8px;margin-top:14px"><button type="button" class="b pri" data-assistx="1">Fermer</button></div>
         </div>`;
-      m.classList.add('on');
+      m.classList.add('on'); fitDes();
     }
+    /* Aperçus des modèles : l'écran de téléphone (375 px) est réduit à la largeur exacte de la tuile */
+    function fitDes() { document.querySelectorAll('.adm-dim').forEach((im) => { const w = im.clientWidth; if (w) im.querySelectorAll(':scope > .adm-th, :scope > iframe').forEach((x) => { x.style.transform = `scale(${w / 375})`; }); }); }
+    addEventListener('resize', fitDes);
 
     /* Glisser-déposer des miniatures (souris et doigt) : on attrape l'image, on la lâche parmi les autres du même groupe */
     let dg = null;
@@ -642,7 +648,7 @@
     document.addEventListener('pointercancel', dragEnd);
     document.addEventListener('change', (e) => { if (e.target.dataset && e.target.dataset.tilefile) tileFile(e.target.files && e.target.files[0]); });
     document.addEventListener('click', (e) => {
-      const t = e.target.closest('button, a[data-tab]');
+      const t = e.target.closest('[data-despick], button, a[data-tab]');
       if (!t) return;
       const d = t.dataset;
       if (d.tab) { e.preventDefault(); tab = d.tab; history.replaceState(null, '', '#' + tab); window.scrollTo(0, 0); draw(); return; }
