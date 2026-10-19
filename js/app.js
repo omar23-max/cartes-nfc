@@ -489,11 +489,11 @@
     const b = (op, label, cls = '') => `<button type="button" class="adm-t ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}">${label}</button>`;
     /* Une seule ligne : Supprimer = corbeille, Déplacer = poignée (libellés en info-bulle) */
     const bi = (op, html, title, cls = '') => `<button type="button" class="adm-t adm-ti ${cls}" data-act="adm" data-kind="${kind}" data-id="${esc(id)}" data-op="${op}" title="${title}" aria-label="${title}">${html}</button>`;
-    const mv = kind === 'sec' || kind === 'des' ? `<span class="adm-t adm-ti adm-mv" data-dnd="1" title="Glisser pour déplacer" aria-label="Déplacer" role="button" tabindex="-1">⠿</span>` : '';
+    const mv = kind === 'sec' || kind === 'des' ? `<span class="adm-t adm-mv" data-dnd="1" title="Glisser pour déplacer" role="button" tabindex="-1">⠿ Déplacer</span>` : '';
     /* Modèles (cartes étroites) : Désactiver et Bientôt en icônes */
     const offB = kind === 'des' ? bi('off', ic('eye', 14), 'Désactiver (masquer aux clients)') : b('off', 'Désactiver');
     const soonB = kind === 'des' ? bi('soon', ic('clock', 14), 'Bientôt') : b('soon', 'Bientôt');
-    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? offB : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? soonB : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on" title="Modèle recommandé">Reco ✓</span>' : b('rec', 'Reco')) : ''}${bi('del', ic('trash', 14), 'Supprimer', 'danger')}${mv}</div>`;
+    return `<div class="adm-tb">${state === 'on' || state === 'soon' ? offB : b('on', 'Activer', 'pri')}${soon ? (state === 'soon' ? b('on', 'Ouvrir') : state === 'on' ? soonB : '') : ''}${kind === 'des' ? (rec ? '<span class="adm-t on" title="Modèle recommandé">Reco ✓</span>' : b('rec', 'Reco')) : ''}${mv}${bi('del', ic('trash', 14), 'Supprimer', 'danger')}</div>`;
   }
   const admWrap = (html, kind, id, state, soon) => (ADM() ? `<div class="adm-w">${html}${admTools(kind, id, state, soon)}</div>` : html);
   const addTo = (path, v) => { const a = cfg(path, []).filter((x) => x !== v); a.push(v); return a; };

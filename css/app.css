@@ -1643,3 +1643,19 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .adm-w { justify-content: flex-start; }
 .adm-w > .tile, .adm-w > .tpl, .adm-w > .pal { flex: none; }
 .tiles > .adm-w { align-self: start; }
+/* v=350 : « ⠿ Déplacer » en toutes lettres, corbeille à la fin (poussée à droite) */
+.adm-tb .adm-t.danger.adm-ti { margin-left: auto; }
+.adm-mv { font-size: 11.5px; }
+.tpl .adm-tb { gap: 3px; }
+.tpl .adm-tb .adm-t { padding-left: 6px; padding-right: 6px; }
+.tpl .adm-tb .adm-ti { width: 26px; padding: 0; }
+/* v=350 (suite) : tout tient sur une ligne ; toutes les miniatures de même hauteur (la ligne d'outils a partout la même hauteur) */
+.adm-tb { gap: 3px; }
+.adm-t { padding: 4px 5px; font-size: 11px; }
+.adm-ti, .tpl .adm-tb .adm-ti { width: 24px; height: 24px; }
+.adm-mv { font-size: 11px; }
+.tiles > .adm-w { align-self: stretch; }
+.adm-w > .tile { flex: 1 1 auto; }
+.tpl .adm-tb { gap: 2px; }
+.tpl .adm-tb .adm-t { padding-left: 4px; padding-right: 4px; font-size: 10.5px; }
+.tpl .adm-tb .adm-ti { width: 22px; }
