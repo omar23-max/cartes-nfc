@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/app.css?v=344">
+  <link rel="stylesheet" href="css/app.css?v=345">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -56,6 +56,23 @@
     .adm-sec:hover { background: #f7f6f2; }
     .adm-sec select { height: 34px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font: inherit; font-size: 13px; padding: 0 6px; }
     .adm-sec .mv { display: flex; gap: 4px; }
+    /* Miniatures déplaçables (secteurs, types de boutique, événements) */
+    .adm-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
+    .adm-tl { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; display: grid; user-select: none; }
+    .adm-tl.off { opacity: .55; }
+    .adm-tl.drag { opacity: .35; outline: 2px dashed #7a3fd1; }
+    .adm-tl-im { position: relative; aspect-ratio: 16 / 10; background: #2a2833 center / cover no-repeat; cursor: grab; display: flex; align-items: flex-end; padding: 8px; touch-action: none; }
+    .adm-tl-im::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 35%, rgba(0,0,0,.72) 100%); }
+    .adm-tl-im b { position: relative; color: #fff; font-size: 13px; line-height: 1.25; text-shadow: 0 1px 4px rgba(0,0,0,.4); }
+    .adm-tl-grip { position: absolute; top: 6px; left: 7px; color: #fff; font-size: 16px; text-shadow: 0 1px 3px rgba(0,0,0,.6); }
+    .adm-tl-n { position: absolute; top: 6px; right: 7px; min-width: 22px; padding: 2px 6px; border-radius: 99px; background: rgba(0,0,0,.55); color: #fff; font: 600 11px/1.4 ui-monospace, monospace; text-align: center; }
+    .adm-tl-im em { position: absolute; top: 30px; right: 7px; padding: 2px 7px; border-radius: 99px; background: #fef3c7; color: #92400e; font-size: 10.5px; font-weight: 700; font-style: normal; }
+    .adm-tl-im em.off { background: #e4e4e7; color: #3f3f46; }
+    .adm-tl-ft { display: flex; gap: 6px; align-items: center; padding: 8px; }
+    .adm-tl-ft select { flex: 1; min-width: 0; height: 32px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font: inherit; font-size: 12.5px; padding: 0 4px; }
+    .adm-tl-ft .mv { display: flex; gap: 4px; }
+    .adm-tl-ft .adm-btn { padding: 0 8px; height: 32px; }
+    .adm-tl-ghost { position: fixed; z-index: 99; pointer-events: none; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.25); opacity: .95; }
     .adm-tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
     .adm-tbl th, .adm-tbl td { padding: 8px 6px; border-top: 1px solid #f0eee8; text-align: left; vertical-align: middle; }
     .adm-tbl th { font-size: 12.5px; color: var(--mut); font-weight: 700; text-transform: uppercase; letter-spacing: .03em; border-top: 0; }
@@ -106,33 +123,33 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=344"></script>
-  <script src="js/data.js?v=344"></script>
-  <script src="js/sectors.js?v=344"></script>
-  <script src="js/media.js?v=344"></script>
-  <script src="js/extras.js?v=344"></script>
-  <script src="js/locale-na.js?v=344"></script>
-  <script src="js/locale-na-en.js?v=344"></script>
-  <script src="js/google.js?v=344"></script>
-  <script src="js/profiles.js?v=344"></script>
-  <script src="js/profiles-sport.js?v=344"></script>
-  <script src="js/profiles-sante.js?v=344"></script>
-  <script src="js/profiles-archi.js?v=344"></script>
-  <script src="js/profiles-resto.js?v=344"></script>
-  <script src="js/profiles-auto.js?v=344"></script>
-  <script src="js/profiles-prod.js?v=344"></script>
-  <script src="js/profiles-edu.js?v=344"></script>
-  <script src="js/designs-immo.js?v=344"></script>
-  <script src="js/sector-prestige.js?v=344"></script>
-  <script src="js/custom-catalog.js?v=344"></script>
-  <script src="js/jobs.js?v=344"></script>
-  <script src="js/render.js?v=344"></script>
-  <script src="js/designs-immo-der.js?v=344"></script>
-  <script src="js/demo-faces.js?v=344"></script>
-  <script src="js/designs-noir.js?v=344"></script>
-  <script src="js/section-suggest.js?v=344"></script>
+  <script src="js/services.js?v=345"></script>
+  <script src="js/data.js?v=345"></script>
+  <script src="js/sectors.js?v=345"></script>
+  <script src="js/media.js?v=345"></script>
+  <script src="js/extras.js?v=345"></script>
+  <script src="js/locale-na.js?v=345"></script>
+  <script src="js/locale-na-en.js?v=345"></script>
+  <script src="js/google.js?v=345"></script>
+  <script src="js/profiles.js?v=345"></script>
+  <script src="js/profiles-sport.js?v=345"></script>
+  <script src="js/profiles-sante.js?v=345"></script>
+  <script src="js/profiles-archi.js?v=345"></script>
+  <script src="js/profiles-resto.js?v=345"></script>
+  <script src="js/profiles-auto.js?v=345"></script>
+  <script src="js/profiles-prod.js?v=345"></script>
+  <script src="js/profiles-edu.js?v=345"></script>
+  <script src="js/designs-immo.js?v=345"></script>
+  <script src="js/sector-prestige.js?v=345"></script>
+  <script src="js/custom-catalog.js?v=345"></script>
+  <script src="js/jobs.js?v=345"></script>
+  <script src="js/render.js?v=345"></script>
+  <script src="js/designs-immo-der.js?v=345"></script>
+  <script src="js/demo-faces.js?v=345"></script>
+  <script src="js/designs-noir.js?v=345"></script>
+  <script src="js/section-suggest.js?v=345"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=344"></script>
+  <script src="events/js/events-data.js?v=345"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -148,7 +165,7 @@
     /* Données des trois studios (le secteur Restaurant, déplacé dans Stores, n’est plus dans les cartes) */
     const CARDS = NFC.SECTORS.filter((s) => !s.moved);
     const EVENTS = (NFC.EVENT_SECTORS || []).concat((NFC.cfg.get('secAdd', []) || []).filter((x) => x.kind === 'events').map((x) => ({ id: x.id, name: x.name, active: true, custom: true })));
-    const STORES0 = [['mode', 'Mode et vêtements'], ['friperie', 'Friperie et seconde main'], ['bijoux', 'Bijouterie'], ['fleuriste', 'Fleuriste'], ['deco', 'Décoration et mobilier'], ['librairie', 'Librairie et papeterie'], ['cadeaux', 'Cadeaux et souvenirs'], ['velos', 'Vélos'], ['cosmetiques', 'Cosmétiques naturels'], ['telephones', 'Réparation de téléphones'], ['epicerie', 'Supermarché et épicerie'], ['traiteur', 'Traiteur'], ['animalerie', 'Animalerie'], ['resto', 'Restaurant (pour emporter)'], ['coiffure', 'Coiffure (produits)'], ['esthetique', 'Esthétique (produits de soin)']].map(([id, name]) => ({ id, name, active: true }))
+    const STORES0 = [['mode', 'Mode et vêtements'], ['friperie', 'Friperie et seconde main'], ['bijoux', 'Bijouterie'], ['fleuriste', 'Fleuriste'], ['deco', 'Décoration et mobilier'], ['librairie', 'Librairie et papeterie'], ['cadeaux', 'Cadeaux et souvenirs'], ['velos', 'Vélos'], ['cosmetiques', 'Cosmétiques naturels'], ['telephones', 'Réparation de téléphones'], ['epicerie', 'Supermarché et épicerie'], ['prod', 'Producteurs et commerces alimentaires'], ['traiteur', 'Traiteur'], ['animalerie', 'Animalerie'], ['resto', 'Restaurant (pour emporter)'], ['coiffure', 'Coiffure (produits)'], ['esthetique', 'Esthétique (produits de soin)']].map(([id, name]) => ({ id, name, active: true }))
       /* Les 10 restaurants, cafés et bars (stores/js/stores-resto.js), juste après « Restaurant (pour emporter) » */
       .flatMap((x) => (x.id === 'resto' ? [x].concat(((NFC.RESTO_SECTOR || {}).profiles || []).map((p) => ({ id: 'r-' + p.id, name: p.n[0], active: true }))) : [x]));
     const DESIGNS = NFC.DESIGNS_ALL || NFC.DESIGNS;
@@ -189,9 +206,24 @@
       const ord = C.get('sectors.order', []), pos = (s) => { const i = ord.indexOf(s.id); return i < 0 ? 999 : i; };
       const sorted = list.filter((s) => !C.get('sectors.del', []).includes(s.id)).map((s, i) => [s, i]).sort((a, b) => (pos(a[0]) - pos(b[0])) || (a[1] - b[1])).map((x) => x[0]);
       const st = (s) => (C.get('sectors.off', []).includes(s.id) ? 'off' : (!s.active || C.get('sectors.soon', []).includes(s.id)) ? 'soon' : 'on');
-      return sorted.map((s, i) => `<div class="adm-sec"><span>${esc(s.name)}${s.active ? '' : ' <small style="color:var(--mut)">(exemple pas encore prêt)</small>'}</span>
-        <select data-secst="${s.id}" aria-label="État de ${esc(s.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué']].map(([v, l]) => `<option value="${v}" ${st(s) === v ? 'selected' : ''} ${v === 'on' && !s.active ? 'disabled' : ''}>${l}</option>`).join('')}</select>
-        <span class="mv"><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="1" ${i === sorted.length - 1 ? 'disabled' : ''} aria-label="Descendre">↓</button></span></div>`).join('');
+      const TC = ['sante', 'conseil', 'pro', 'education', 'freelance', 'immobilier', 'archi', 'artisans', 'beaute', 'producteurs', 'evenementiel', 'portfolio', 'musique', 'hebergement', 'animaux', 'auto', 'boutiques'];
+      const TB = ['mode', 'friperie', 'bijoux', 'fleuriste', 'deco', 'librairie', 'cadeaux', 'velos', 'cosmetiques', 'telephones', 'epicerie', 'animalerie', 'coiffure', 'esthetique', 'r-sushi', 'r-pizzeria', 'r-steak', 'r-cafe', 'r-brasserie', 'r-wok', 'r-cocktail', 'r-gastro'];
+      const okImg = (u) => (/^media\//.test(u || '') ? u : '');
+      const thumb = (s) => {
+        if (group === 'cards') return TC.includes(s.id) ? `media/tiles/${s.id}.jpg` : okImg(((NFC.MEDIA || {})[s.id] || {}).cover) || okImg(s.demo && s.demo.identity && s.demo.identity.cover);
+        if (group === 'stores') {
+          if (TB.includes(s.id)) return `media/tiles/b-${s.id}.jpg`;
+          if (s.id === 'prod') return 'media/tiles/producteurs.jpg';
+          const rp = (((NFC.RESTO_SECTOR || {}).profiles) || []).find((p) => 'r-' + p.id === s.id || (s.id === 'resto' && p.keep));
+          return rp ? okImg((rp.media || {}).cover) : '';
+        }
+        const c = okImg(s.demo && s.demo.identity && s.demo.identity.cover); return c ? 'events/' + c : '';
+      };
+      return `<div class="adm-tiles" data-tiles="${group}">${sorted.map((s, i) => { const im = thumb(s), stt = st(s);
+        return `<div class="adm-tl ${stt}" data-tl="${s.id}" data-g="${group}">
+          <div class="adm-tl-im"${im ? ` style="background-image:url('${esc(im)}')"` : ''}><span class="adm-tl-grip" title="Glisser pour déplacer" aria-hidden="true">⠿</span><span class="adm-tl-n">${i + 1}</span>${stt === 'soon' ? '<em>Bientôt</em>' : stt === 'off' ? '<em class="off">Masqué</em>' : ''}<b>${esc(s.name)}</b></div>
+          <div class="adm-tl-ft"><select data-secst="${s.id}" aria-label="État de ${esc(s.name)}">${[['on', 'Visible'], ['soon', 'Bientôt'], ['off', 'Masqué']].map(([v, l]) => `<option value="${v}" ${stt === v ? 'selected' : ''} ${v === 'on' && !s.active ? 'disabled' : ''}>${l}</option>`).join('')}</select>
+          <span class="mv"><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="Avancer">←</button><button type="button" class="adm-btn" data-mv="${s.id}" data-g="${group}" data-d="1" ${i === sorted.length - 1 ? 'disabled' : ''} aria-label="Reculer">→</button></span></div></div>`; }).join('')}</div>`;
     };
     P.cat = () => {
       const withProf = CARDS.filter((s) => s.profiles);
@@ -211,7 +243,7 @@
       ${box('Mode administrateur dans les studios', LIVE, 'Affiche, directement dans les studios, les boutons Désactiver, Supprimer, Recommander et Ajouter une palette. Vos clients ne les voient pas (sur GoBiz : réservé à l’administrateur connecté).', fBool('adminMode', 'Activer le mode administrateur', 'Raccourci : ajoutez ?admin=1 à l’adresse d’un studio (?admin=0 pour quitter).') + '<p class="adm-d" style="margin-top:10px"><a class="adm-btn pri" style="text-decoration:none" href="index.html">Ouvrir le studio des cartes</a> <a class="adm-btn" style="text-decoration:none" href="stores/">Ouvrir le studio des boutiques</a></p>')}
       ${box('Éléments supprimés', LIVE, 'Supprimés depuis le studio en mode administrateur. Restaurez-les pour les proposer de nouveau.', del.length ? del.map(([l, path, v]) => `<div class="adm-f"><div>${esc(l)}</div><div><button type="button" class="adm-btn" data-restore="${esc(path)}" data-v="${esc(v)}">Restaurer</button></div></div>`).join('') : '<p class="adm-empty">Rien n’a été supprimé.</p>')}
       ${box('Palettes ajoutées', LIVE, 'Ajoutées depuis l’étape Couleurs du studio, en mode administrateur.', added.length ? added.map(([k, a]) => a.map((x) => `<div class="adm-f"><div><span style="display:inline-flex;gap:4px;vertical-align:middle;margin-right:8px"><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.p)};display:inline-block"></i><i style="width:18px;height:18px;border-radius:50%;background:${esc(x.a)};display:inline-block"></i></span>${esc(x.name)}<small>${esc(SECNAME(k.split('~')[0]))}${k.includes('~') ? ' – ' + esc(k.split('~')[1]) : ''}</small></div><div><span class="adm-d">Pour la retirer : « Supprimer » sur la palette, dans le studio.</span></div></div>`).join('')).join('') : '<p class="adm-empty">Aucune palette ajoutée.</p>')}
-      ${box('Secteurs des cartes', LIVE, 'Visible, « Bientôt » (affiché mais pas encore ouvert) ou masqué. Les flèches changent l’ordre d’affichage.', secRows(CARDS, 'cards'))}
+      ${box('Secteurs des cartes', LIVE, 'Visible, « Bientôt » (affiché mais pas encore ouvert) ou masqué. Glissez une miniature pour changer l’ordre d’affichage (ou utilisez les flèches).', secRows(CARDS, 'cards'))}
       ${box('Types de boutique', LIVE, 'Même principe pour le studio des boutiques (dont les 10 restaurants, cafés et bars).', secRows(STORES, 'stores'))}
       ${box('Événements', LIVE, 'Même principe pour le studio des invitations (mariage, naissance, anniversaire…).', secRows(EVENTS, 'events'))}
       ${box('Métiers proposés', LIVE, 'Décochez un métier pour ne plus le proposer après le choix du secteur.', withProf.map((s) => `<p class="adm-d" style="margin:10px 0 4px"><b>${esc(s.name)}</b></p><div class="adm-list">${s.profiles.map((p) => { const id = s.id + '~' + p.id, on = !C.get('profOff', []).includes(id); return `<label class="adm-i ${on ? '' : 'off'}"><span>${esc(p.n[0])}</span>${sw(`data-prof="${id}"`, on)}</label>`; }).join('')}</div><button type="button" class="adm-t" style="margin-top:6px" data-catadd="prof" data-sec="${s.id}">+ Ajouter un métier à ce secteur</button>`).join('')
@@ -454,6 +486,37 @@
       if (d.rw !== undefined) { const r = C.get('lang.reword', []); r[+d.rw][+d.f] = t.value; C.set('lang.reword', r, `Texte remplacé : « ${r[+d.rw][0]} » → « ${r[+d.rw][1]} »`); return saved(); }
     });
     document.addEventListener('input', (e) => { if (e.target.id === 'q') filterSvc(); });
+    /* Glisser-déposer des miniatures (souris et doigt) : on attrape l'image, on la lâche parmi les autres du même groupe */
+    let dg = null;
+    document.addEventListener('pointerdown', (e) => {
+      const im = e.target.closest && e.target.closest('.adm-tl-im'); if (!im) return;
+      const tl = im.closest('.adm-tl'); e.preventDefault();
+      const r = tl.getBoundingClientRect(), gh = tl.cloneNode(true); gh.classList.add('adm-tl-ghost'); gh.style.width = r.width + 'px'; document.body.appendChild(gh);
+      dg = { tl, gh, box: tl.parentElement, dx: e.clientX - r.left, dy: e.clientY - r.top, moved: false };
+      gh.style.left = r.left + 'px'; gh.style.top = r.top + 'px'; tl.classList.add('drag');
+    });
+    document.addEventListener('pointermove', (e) => {
+      if (!dg) return;
+      dg.moved = true;
+      dg.gh.style.left = (e.clientX - dg.dx) + 'px'; dg.gh.style.top = (e.clientY - dg.dy) + 'px';
+      const over = document.elementFromPoint(e.clientX, e.clientY), t = over && over.closest('.adm-tl');
+      if (!t || t === dg.tl || t.parentElement !== dg.box) return;
+      const tr = t.getBoundingClientRect(), after = e.clientX > tr.left + tr.width / 2;
+      dg.box.insertBefore(dg.tl, after ? t.nextSibling : t);
+    });
+    const dragEnd = () => {
+      if (!dg) return;
+      const { tl, gh, box, moved } = dg; dg = null; gh.remove(); tl.classList.remove('drag');
+      if (!moved) return;
+      const ids = [...box.querySelectorAll('.adm-tl')].map((x) => x.dataset.tl), g = box.dataset.tiles;
+      const list = (g === 'cards' ? CARDS : g === 'events' ? EVENTS : STORES), ord = C.get('sectors.order', []);
+      const rest = list.map((x) => x.id).filter((id) => !ids.includes(id));
+      const other = CARDS.concat(STORES, EVENTS).filter((x) => !list.includes(x)).map((x) => x.id).filter((id) => ord.includes(id));
+      C.set('sectors.order', ids.concat(rest, other), `Ordre modifié : ${SECNAME(tl.dataset.tl)}`);
+      draw(); saved();
+    };
+    document.addEventListener('pointerup', dragEnd);
+    document.addEventListener('pointercancel', dragEnd);
     document.addEventListener('click', (e) => {
       const t = e.target.closest('button, a[data-tab]');
       if (!t) return;
