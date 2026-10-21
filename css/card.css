@@ -434,3 +434,7 @@
 .vc-d5 .stat-v { font-family: Fraunces, Georgia, serif; font-weight: 500; font-size: 30px; color: var(--a); }
 .vc-d5 .cd-b .cd-p { color: var(--a); }
 .vc-d5 .sticky { background: rgba(12,12,15,.82); }
+
+/* Studio : section activée mais encore vide (jamais montrée aux visiteurs) */
+.vc .sec-empty { display: flex; align-items: center; gap: 10px; margin: 0; padding: 14px 16px; border: 1.5px dashed var(--ln); border-radius: 14px; color: var(--mu); font-size: 13px; line-height: 1.4; }
+.vc .sec-empty svg { flex: none; color: var(--a); }

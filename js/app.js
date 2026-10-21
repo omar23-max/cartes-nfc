@@ -312,7 +312,7 @@
     const s = sec();
     if (!s) return null; /* aucun secteur encore choisi (écrans d’accueil) */
     const ps = NFC.palsOf ? NFC.palsOf(s) : s.palettes;
-    return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: ps[p] || ps[0], link: link(), locked: locked(), lang: lang(), bilingual: bili() };
+    return { card: card() || demoOf(s), sec: s, d: d || s.rec, pal: ps[p] || ps[0], link: link(), locked: locked(), lang: lang(), bilingual: bili(), edit: true };
   };
   const designOf = (id) => (NFC.DESIGNS_ALL || DESIGNS).find((d) => d.id === id) || DESIGNS[0];
   /* Mises en page proposées : les 10 communes + celles propres au secteur (ex. beauté) */

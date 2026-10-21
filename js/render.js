@@ -541,13 +541,19 @@
     if (!src) return '';
     return `<div class="vid"><video src="${esc(src)}" poster="${cover}" controls playsinline preload="none"></video></div>`;
   }
+  /* Studio (aperçu en direct) : une section activée mais encore vide reste visible, avec une invitation à la remplir.
+     Les visiteurs ne la voient jamais tant qu'elle est vide. */
+  function emptySec(def, m) {
+    if (!m || !m.edit || m.thumb || def.type === 'envelope') return '';
+    return `<p class="sec-empty">${ic('plus', 16)}<span>${L2('Section vide : ajoutez son contenu dans l’éditeur, à gauche. Vos visiteurs ne la verront qu’une fois remplie.', 'Empty section: add its content in the editor on the left. Visitors will only see it once it is filled in.')}</span></p>`;
+  }
   function customOne(c, i, m, ctx) {
     /* Section ajoutée ou dupliquée masquée par son interrupteur */
     if (c.on === false) return '';
     if (c.type === 'block') {
       const def = Object.assign({}, c.def, { key: 'custom-' + i });
-      if (!S[def.type] || !c.data) return '';
-      const inner = S[def.type](def, c.data, m);
+      if (!S[def.type] || (!c.data && !(m.edit && !m.thumb))) return '';
+      const inner = (c.data && S[def.type](def, c.data, m)) || emptySec(def, m);
       return inner ? wrap(Object.assign({}, def, { title: c.title || def.title }), inner, ctx) : '';
     }
     {
@@ -947,7 +953,7 @@ ${o.sub ? `<text x="${W / 2}" y="198" text-anchor="middle" ${font} font-size="34
       }
       const def = sec.blocks.find((b) => b.key === k.slice(2)), b = def && card.blocks[def.key];
       if (!b || !b.on || !S[def.type]) return;
-      const inner = S[def.type](def, b, m);
+      const inner = S[def.type](def, b, m) || emptySec(def, m);
       if (inner) body += wrap(b.title ? Object.assign({}, def, { title: b.title }) : def, inner, ctx);
     });
     const style = `--p:${pal.p};--a:${pal.a};--bg0:${pal.bg};--sf0:${pal.sf};--tx0:${pal.tx};--mu0:${pal.mu};--ln0:${pal.ln}`;
