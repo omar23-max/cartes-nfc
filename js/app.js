@@ -654,7 +654,7 @@
       if (all.length && cp) hl.innerHTML = `<span class="hd-ll">${ic('pause', 14)}<span class="hd-lg">${TT('Aucune création activée', 'No creation active')}</span><span class="hd-sh">${TT('Aucune active', 'None active')}</span></span>
         <span class="hd-sw"><select data-hdpick aria-label="${TT('Création à activer', 'Creation to activate')}">${opts()}</select>${ic('chevd', 14)}</span>
         <button type="button" class="hd-act" data-act="hdact">${ic('nfc', 13)}${TT('Activer', 'Activate')}</button>`;
-      else if (all.length) hl.innerHTML = `<span class="hd-ll">${ic('nfc', 14)}<span class="hd-lg">${TT('Version active', 'Active version')}</span><span class="hd-sh">${TT('Active', 'Active')}</span>&nbsp;:</span>
+      else if (all.length) hl.innerHTML = `<span class="hd-ll">${ic('nfc', 14)}<span class="hd-lg">${TT('Version active', 'Active version')}</span><span class="hd-sh">${TT('Active', 'Active')}</span><span class="hd-col">&nbsp;:</span></span>
         <span class="hd-sw"><select data-pflivesel aria-label="${TT('Version active de la carte : ce que voient vos visiteurs', 'Card’s active version: what your visitors see')}">${opts()}<option value="__none">${TT('Aucune (carte en pause)', 'None (card paused)')}</option></select>${ic('chevd', 14)}</span>`; }
     nb.classList.add('newc2');
     nb.innerHTML = `${ic('plus', 16)}<span>${TT('Nouvelle création', 'New creation')}</span>`; nb.title = TT('Nouvelle création', 'New creation');
@@ -672,6 +672,17 @@
     if (!ct) { ct = document.createElement('button'); ct.type = 'button'; ct.className = 'cur-tag no-rw'; ct.dataset.act = 'curtag'; ($('.top .brand') || $('#steps')).after(ct); }
     const tg = curTag();
     ct.hidden = !tg; if (tg) { ct.dataset.act = tg.act || 'curtag'; ct.className = `cur-tag no-rw ${tg.cls}`; ct.innerHTML = tg.html; ct.title = tg.title; }
+    /* Ordinateur : « Vous modifiez » devient un bloc avec un menu pour passer d'une création à l'autre */
+    let he = $('.hd-ed');
+    if (!he) { he = document.createElement('label'); he.className = 'hd-ed no-rw'; hl.before(he); }
+    { const all = regAll(), on = !NOVER && S.pf && tg && tg.cls !== 'is-other' && all.length;
+      he.hidden = !on; ct.classList.toggle('ct-alt', !!on);
+      if (on) {
+        const cur = `${KIND}:${S.pf.cur}`, st = tg.cls === 'is-live' ? ['ok', TT('Active', 'Active')] : tg.cls === 'is-off' ? ['off', TT('Inactive', 'Inactive')] : tg.cls === 'is-pause' ? ['pz', TT('En pause', 'Paused')] : ['new', TT('Brouillon', 'Draft')];
+        he.className = `hd-ed no-rw ${tg.cls}`;
+        he.innerHTML = `<span class="hd-ll">${ic('pen', 14)}<span>${TT('Vous modifiez', 'Editing')}</span><em class="hd-st ${st[0]}">${st[1]}</em></span>
+          <span class="hd-sw"><select data-hdedit aria-label="${TT('Création à modifier', 'Creation to edit')}">${all.map((x) => `<option value="${x.k}:${x.id}" ${`${x.k}:${x.id}` === cur ? 'selected' : ''}>${esc(x.name)} · ${KIND_L[x.k]}${!x.pub ? TT(' — brouillon', ' — draft') : ''}</option>`).join('')}</select>${ic('chevd', 14)}</span>`;
+      } }
     const us = $('#uisw'); if (us) us.innerHTML = uiSwitch();
     document.documentElement.lang = ui();
     document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : 'NexTap Studio';
@@ -747,13 +758,12 @@
     let d = mid - (a + b) / 2;
     if (rgt.length) d = Math.min(d, Math.min(...rgt) - 16 - b);
     st.style.transform = `translateX(${Math.round(d)}px)`;
-    const g = [ct, hl].filter((e) => e && !e.hidden && e.offsetParent);
+    const g = [ct, $('.top .hd-ed'), hl, $('.top .mycre'), $('.top .newc2')].filter((e) => e && !e.hidden && e.offsetParent);
     if (!g.length) return;
+    g.forEach((e) => { e.style.transform = ''; });
     const l = Math.min(...g.map((e) => e.getBoundingClientRect().left)), r = Math.max(...g.map((e) => e.getBoundingClientRect().right));
-    const nx = [...document.querySelectorAll('.top .mycre, .top .newc2')].filter((e) => e.offsetParent && !e.hidden).map((e) => e.getBoundingClientRect().left);
     let d2 = mid - (l + r) / 2;
-    if (nx.length) d2 = Math.min(d2, Math.min(...nx) - 16 - r);
-    d2 = Math.max(d2, 0);
+    d2 = Math.min(d2, innerWidth - 24 - r); d2 = Math.max(d2, 0);
     g.forEach((e) => { e.style.transform = `translateX(${Math.round(d2)}px)`; });
   }
   window.addEventListener('resize', () => { clearTimeout(alignTop.t); alignTop.t = setTimeout(alignTop, 100); });
@@ -3129,6 +3139,14 @@
   }
   /* PDF téléversé dans « Liens et documents » */
   /* Version affichée par la carte : choix direct dans la liste */
+  document.addEventListener('change', (e) => {
+    if (!e.target.matches || !e.target.matches('[data-hdedit]')) return;
+    const [k, ...rest] = e.target.value.split(':'), id = rest.join(':');
+    render(); /* le menu revient sur la création en cours tant que le changement n'est pas fait */
+    if (k === KIND && S.pf && id === S.pf.cur) return;
+    if (pzOf(k, id)) { pzEditModal(k, id); return; }
+    leaveGuard(() => editVer(k, id));
+  });
   document.addEventListener('change', (e) => {
     if (!e.target.matches || !e.target.matches('[data-pflivesel]')) return;
     if (e.target.value === '__none') {

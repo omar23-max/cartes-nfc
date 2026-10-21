@@ -1673,3 +1673,35 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 [data-dnd-box] img { -webkit-user-drag: none; user-select: none; }
 @media (hover: hover) { [data-dnd-box] > .adm-w > .tile, [data-dnd-box] > .tpl .tpl-view { cursor: grab; } }
 .dnd-src, .dnd-src * { cursor: grabbing; }
+
+/* En-tête, 2e ligne (v=361) : quatre blocs de même taille, centrés sous les étapes :
+   Vous modifiez (menu) · Active (menu) · Mes créations · Nouvelle création */
+.hd-ed[hidden] { display: none; }
+@media (max-width: 900px) { .top .hd-ed { display: none !important; } }
+@media (min-width: 901px) {
+  .top .cur-tag.ct-alt { display: none; }
+  .top .hd-ed, .top .hd-live, .top .mycre, .top .newc.newc2 { box-sizing: border-box; width: 232px; flex: none; height: 72px; min-height: 0; margin: 0; padding: 8px 12px; border-radius: 14px; }
+  .top .hd-ed { order: 20; } .top .hd-live { order: 21; } .top .mycre { order: 22; } .top .newc.newc2 { order: 23; }
+  .top .hd-ed, .top .hd-live { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-content: center; gap: 5px 6px; }
+  .top .hd-ed { border: 1px solid #d4d4d8; background: #fff; font-size: 13px; }
+  .top .hd-ed.is-live { border-color: #a6e9c1; background: #ecfdf3; }
+  .top .hd-ed.is-off { border-color: #f7c1bb; background: #fef3f2; }
+  .top .hd-ed.is-new { border-color: #bfdbfe; background: #eff6ff; }
+  .top .hd-ed.is-pause { border-color: #fdba74; background: #fff7ed; }
+  .top .hd-ed .hd-ll, .top .hd-live .hd-ll { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; font-weight: 600; white-space: nowrap; }
+  .top .hd-ed .hd-ll { color: #3f3f46; }
+  .top .hd-ed .hd-st { margin-left: auto; padding: 1px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; font-style: normal; }
+  .top .hd-st.ok { background: #dcfce7; color: #166534; } .top .hd-st.off { background: #fee2e2; color: #b91c1c; }
+  .top .hd-st.new { background: #dbeafe; color: #1e40af; } .top .hd-st.pz { background: #ffedd5; color: #c2410c; }
+  .top .hd-ed .hd-sw, .top .hd-live .hd-sw { position: relative; display: flex; align-items: center; min-width: 0; }
+  .top .hd-ed .hd-sw { grid-column: 1 / -1; }
+  .top .hd-ed select, .top .hd-live select { width: 100%; max-width: none; min-width: 0; appearance: none; -webkit-appearance: none; padding: 5px 28px 5px 10px; border: 1px solid #e4e4e7; border-radius: 9px; background: #fff; font: inherit; font-size: 13px; font-weight: 700; color: var(--ink); cursor: pointer; text-overflow: ellipsis; }
+  .top .hd-ed .hd-sw svg, .top .hd-live .hd-sw svg { position: absolute; right: 9px; pointer-events: none; color: #52525b; }
+  .top .hd-live .hd-lg { display: none; } .top .hd-live .hd-sh { display: inline; } .top .hd-live .hd-col { display: none; }
+  .top .hd-live > .hd-ll ~ .hd-sw:last-child { grid-column: 1 / -1; }
+  .top .hd-live .hd-act { padding: 5px 10px; font-size: 12.5px; }
+  .top .mycre, .top .newc.newc2 { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 700; }
+  .top .mycre span, .top .newc.newc2 span { display: inline !important; }
+  .top .hd-ed, .top .hd-live, .top .mycre, .top .newc.newc2 { transition: none; }
+}
+@media (min-width: 901px) and (max-width: 1180px) { .top .hd-ed, .top .hd-live, .top .mycre, .top .newc.newc2 { width: 200px; } }
