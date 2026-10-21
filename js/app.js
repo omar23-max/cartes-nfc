@@ -629,6 +629,8 @@
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     /* Section Musique ajoutée à un secteur (v=369) : les cartes déjà créées la reçoivent, désactivée */
     if (!isEvents && S.sectorId && NFC.musicDefault && (sec().blocks || []).some((d) => d.key === 'music') && card().blocks && !card().blocks.music) card().blocks.music = NFC.musicDefault(S.sectorId);
+    /* Section ajoutée à un secteur après la création de la carte : elle arrive avec le contenu d'exemple, désactivée */
+    if (S.sectorId && card().blocks) { const dm = (demoOf(sec()) || {}).blocks || {}; (sec().blocks || []).forEach((d) => { if (!card().blocks[d.key] && dm[d.key]) card().blocks[d.key] = Object.assign(clone(dm[d.key]), { on: false }); }); }
     if (!isEvents && S.sectorId && NFC.playlistDefault && card().blocks) (sec().blocks || []).filter((d) => d.type === 'playlist' && !card().blocks[d.key]).forEach((d) => { card().blocks[d.key] = NFC.playlistDefault(S.sectorId); });
     if (isEvents && S.sectorId) { const mb = (card().blocks || {}).music; if (mb && mb.track === undefined && mb.title && (NFC.EV_MUSIC || []).some((x) => x.fr === mb.title || x.en === mb.title)) { mb.track = mb.title; delete mb.title; } }
     if (S.step > maxStep()) S.step = maxStep();
@@ -2018,6 +2020,10 @@
     { id: 'gallery', g: 'media', ic: 'images', n: ['Galerie photos', 'Photo gallery'], d: ['1, 2 ou 4 photos côte à côte.', '1, 2 or 4 photos side by side.'] },
     { id: 'imgcar', g: 'media', ic: 'gallery-horizontal', n: ['Carrousel de photos', 'Photo carousel'], d: ['Des photos qui défilent sur le côté.', 'Photos that scroll sideways.'] },
     { id: 'vidcar', g: 'media', ic: 'clapperboard', n: ['Carrousel de vidéos', 'Video carousel'], d: ['Plusieurs vidéos à faire défiler.', 'Several videos to scroll through.'] },
+    { id: 'engage', g: 'content', ic: 'heart-handshake', n: ['Activités et engagement', 'Activities & involvement'], d: ['Bénévolat, vie associative, activités extrascolaires.', 'Volunteering, community life, extracurriculars.'],
+      make: (en) => blk('list', en ? 'Activities & involvement' : 'Activités et engagement', { items: en ? [
+        { t: 'Volunteer · local food bank', d: 'Twice a month', p: '' }, { t: 'Student association · member', d: 'Event planning', p: '' }, { t: 'Sports club', d: 'Weekly training', p: '' }] : [
+        { t: 'Bénévole · banque alimentaire', d: 'Deux fois par mois', p: '' }, { t: 'Association étudiante · membre', d: 'Organisation d’événements', p: '' }, { t: 'Club sportif', d: 'Entraînement chaque semaine', p: '' }] }) },
     { id: 'playlist', g: 'media', ic: 'list-music', n: ['Mes créations musicales', 'My music'], d: ['Vos morceaux, à écouter en un clic.', 'Your tracks, played in one click.'],
       make: (en) => blk('playlist', en ? 'My tracks' : 'Mes créations', { vol: 70, items: (NFC.EV_MUSIC || []).slice(2, 4).map((z) => ({ t: en ? z.en : z.fr, by: '', src: z.src })) }) },
     { id: 'favmusic', g: 'media', ic: 'heart', n: ['Mes musiques préférées', 'My favorite music'], d: ['Les morceaux que vous aimez.', 'The tracks you love.'],
@@ -2035,6 +2041,7 @@
       if (id === 'google') return d.type === 'greviews' || s.blocks.some((b) => b.type === 'greviews');
       if (id === 'imgcar') return d.type === 'imgcar'; /* le carrousel reste proposé même s’il y a une galerie */
       if (id === 'gallery') return d.type === 'gallery';
+      if (id === 'engage') return d.type === 'list' && /engag|b[ée]n[ée]vol|associati|activit|involvement|volunteer/i.test(d.title || '');
       if (id === 'playlist' || id === 'favmusic') return d.type === 'playlist' && (id === 'favmusic') === /pr[ée]f[ée]r|favorite/i.test(d.title || '');
       return d.type === id;
     });

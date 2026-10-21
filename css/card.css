@@ -442,3 +442,7 @@
 /* Recommandations : coordonnées de la personne */
 .vc .rev-ct { display: flex; gap: 8px; margin-top: 10px; }
 .vc .rev-ct a { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--ln); background: var(--sf); color: var(--p); text-decoration: none; }
+
+/* v=376 : moins d'espace entre le titre d'une section et son contenu (Editorial, Signature) */
+.vc-d2 .sec-t, .vc-d5 .sec-t { margin-bottom: 12px; }
+.vc-d2 .list > .li:first-child { padding-top: 4px; }

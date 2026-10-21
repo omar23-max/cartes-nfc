@@ -17,6 +17,7 @@
     B('parcours', 'list', 'Parcours', { help: 'Formation, diplômes, expériences' }),
     B('skills', 'tags', 'Compétences', { icon: 'check' }),
     B('projects', 'cards', 'Projets', { help: 'Travaux, réalisations, projets d’équipe' }),
+    B('engage', 'list', 'Activités et engagement', { help: 'Activités extrascolaires, vie associative, bénévolat, sport' }),
     B('gallery', 'gallery', 'En images'),
     B('booking', 'action', 'Rendez-vous', { cta: 'Prendre rendez-vous', icon: 'cal', help: 'Lien Calendly ou équivalent' }),
     B('docs', 'links', 'CV et documents', { help: 'CV, portfolio, lettre de recommandation…' }),
@@ -56,6 +57,21 @@
   const media = (M, x) => ({ portrait: U(M.portrait, 400), cover: U(M.cover, 1200), gallery: M.gal.map((id, i) => ({ src: U(id), cap: ((x.gallery || {}).caps || [])[i] || '' })), cards: M.cards.map((id) => U(id)) });
   const P = (o) => ({ id: o.id, icon: o.icon, n: o.n, ex: o.ex, rec: o.rec, palettes: o.pal, demo: demo(o.fr, o.M), demoEn: demo(o.en, o.M), media: media(o.M, o.fr) });
 
+  /* Activités extrascolaires, vie associative, bénévolat (v=376) : affichées d'office pour les étudiants et stagiaires,
+     proposées (désactivées) pour les autres métiers de l'éducation */
+  const ENGAGE = {
+    etudiant: [true, 'Activités et engagement', 'Activities & involvement', [['Comité étudiant de génie · trésorière', 'Budget de 12 000 $, organisation de la semaine d’accueil', 'Engineering student committee · treasurer', '$12,000 budget, organized welcome week'], ['Bénévole · Banque alimentaire de l’Estrie', '4 heures par mois depuis 2024', 'Volunteer · Estrie Food Bank', '4 hours a month since 2024'], ['Équipe de volleyball universitaire', 'Entraînements 3 fois par semaine', 'University volleyball team', 'Training three times a week']]],
+    stagiaire: [true, 'Activités et engagement', 'Activities & involvement', [['Association étudiante en communication · vice-présidente', 'Organisation de 6 conférences par année', 'Communication student association · vice-president', 'Organized 6 talks a year'], ['Bénévole · Festival de films étudiants', 'Accueil des invités et réseaux sociaux', 'Volunteer · Student film festival', 'Guest welcome and social media'], ['Club de course à pied', 'Demi-marathon de Montréal 2026', 'Running club', 'Montreal half marathon 2026']]],
+    professeur: [false, 'Vie associative et bénévolat', 'Community involvement', [['Entraîneur · club de soccer jeunesse', 'Équipe U12, depuis 2019', 'Coach · youth soccer club', 'U12 team, since 2019'], ['Bénévole · aide aux devoirs', 'Bibliothèque de quartier, le mercredi', 'Volunteer · homework help', 'Neighborhood library, Wednesdays']]],
+    educateur: [false, 'Engagement et bénévolat', 'Involvement & volunteering', [['Animatrice · camp de jour estival', '3 étés, groupes de 6 à 8 ans', 'Leader · summer day camp', '3 summers, ages 6 to 8'], ['Bénévole · Fondation pour la petite enfance', 'Collectes de jouets et de livres', 'Volunteer · Early childhood foundation', 'Toy and book drives']]],
+    tuteur: [false, 'Activités et engagement', 'Activities & involvement', [['Mentor · programme de persévérance scolaire', 'Accompagnement de 3 élèves du secondaire', 'Mentor · school perseverance program', 'Supporting 3 high school students'], ['Club d’échecs', 'Animation d’ateliers pour débutants', 'Chess club', 'Running beginner workshops']]],
+    charge: [false, 'Engagement', 'Involvement', [['Membre du comité de programme', 'Révision des cours de 1re année', 'Program committee member', 'Revising first-year courses'], ['Bénévole · vulgarisation scientifique', 'Conférences dans les écoles secondaires', 'Volunteer · science outreach', 'Talks in high schools']]],
+    orientation: [false, 'Engagement', 'Involvement', [['Bénévole · salon de l’emploi jeunesse', 'Ateliers CV et entrevue', 'Volunteer · youth job fair', 'Résumé and interview workshops']]],
+    orthopedagogue: [false, 'Engagement', 'Involvement', [['Bénévole · association des parents d’enfants dyslexiques', 'Soirées d’information mensuelles', 'Volunteer · parents of dyslexic children association', 'Monthly information evenings']]],
+    directeur: [false, 'Vie de l’école et engagement', 'School life & involvement', [['Fondation de l’école · membre du conseil', 'Financement des sorties culturelles', 'School foundation · board member', 'Funding cultural outings'], ['Bénévole · Centraide', 'Campagne annuelle', 'Volunteer · United Way', 'Annual campaign']]],
+    formateur: [false, 'Engagement', 'Involvement', [['Bénévole · programme de mentorat pour nouveaux arrivants', 'Aide à l’intégration professionnelle', 'Volunteer · newcomer mentoring program', 'Helping with workplace integration']]],
+  };
+  const engageOf = (id, en) => { const e = ENGAGE[id]; return e ? { on: e[0], title: en ? e[2] : e[1], items: e[3].map((x) => ({ t: en ? x[2] : x[0], d: en ? x[3] : x[1], p: '' })) } : { on: false, title: '', items: [] }; };
   const PROFILES = [
     /* ---------- Étudiant ---------- */
     P({ id: 'etudiant', icon: 'graduation-cap', rec: 'd4', n: ['Étudiant', 'Student'], ex: ['Cégep, université, recherche de stage', 'College, university, internship search'],
@@ -308,6 +324,7 @@
   ];
 
   const first = PROFILES[0];
+  PROFILES.forEach((p) => { p.demo.blocks.engage = engageOf(p.id, false); p.demoEn.blocks.engage = engageOf(p.id, true); });
   const education = {
     id: 'education', code: 'F21', name: 'Éducation', icon: 'graduation-cap', active: true, rec: first.rec,
     ex: 'Étudiant, professeur, stagiaire, éducateur…',
