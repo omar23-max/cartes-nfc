@@ -23,7 +23,7 @@
     B('langs', 'tags', 'Langues', { icon: 'globe' }),
     B('hours', 'hours', 'Disponibilités'),
     B('location', 'location', 'Où me trouver'),
-    B('reviews', 'reviews', 'Recommandations'),
+    B('reviews', 'reviews', 'Recommandations', { refs: true, help: 'Qui vous recommande, avec ses coordonnées (avec son accord)' }),
     B('form', 'form', 'Me contacter', { cta: 'Me contacter', help: 'Formulaire envoyé à votre adresse courriel' }),
   ];
 

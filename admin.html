@@ -8,11 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/card.css?v=372">
-  <link rel="stylesheet" href="css/card-plus.css?v=372">
-  <link rel="stylesheet" href="css/noir.css?v=372">
-  <link rel="stylesheet" href="css/immo.css?v=372">
-  <link rel="stylesheet" href="css/app.css?v=372">
+  <link rel="stylesheet" href="css/card.css?v=375">
+  <link rel="stylesheet" href="css/card-plus.css?v=375">
+  <link rel="stylesheet" href="css/noir.css?v=375">
+  <link rel="stylesheet" href="css/immo.css?v=375">
+  <link rel="stylesheet" href="css/app.css?v=375">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -158,34 +158,34 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=372"></script>
-  <script src="js/data.js?v=372"></script>
-  <script src="js/sectors.js?v=372"></script>
-  <script src="js/media.js?v=372"></script>
-  <script src="js/extras.js?v=372"></script>
-  <script src="js/locale-na.js?v=372"></script>
-  <script src="js/locale-na-en.js?v=372"></script>
-  <script src="js/google.js?v=372"></script>
-  <script src="js/profiles.js?v=372"></script>
-  <script src="js/profiles-sport.js?v=372"></script>
-  <script src="js/profiles-sante.js?v=372"></script>
-  <script src="js/profiles-archi.js?v=372"></script>
-  <script src="js/profiles-resto.js?v=372"></script>
-  <script src="js/profiles-auto.js?v=372"></script>
-  <script src="js/profiles-prod.js?v=372"></script>
-  <script src="js/profiles-edu.js?v=372"></script>
-  <script src="js/designs-immo.js?v=372"></script>
-  <script src="js/sector-prestige.js?v=372"></script>
-  <script src="js/custom-catalog.js?v=372"></script>
-  <script src="js/jobs.js?v=372"></script>
-  <script src="js/render.js?v=372"></script>
-  <script src="js/designs-immo-der.js?v=372"></script>
-  <script src="js/demo-faces.js?v=372"></script>
-  <script src="js/designs-noir.js?v=372"></script>
-  <script src="js/section-suggest.js?v=372"></script>
-  <script src="js/section-music.js?v=372"></script>
+  <script src="js/services.js?v=375"></script>
+  <script src="js/data.js?v=375"></script>
+  <script src="js/sectors.js?v=375"></script>
+  <script src="js/media.js?v=375"></script>
+  <script src="js/extras.js?v=375"></script>
+  <script src="js/locale-na.js?v=375"></script>
+  <script src="js/locale-na-en.js?v=375"></script>
+  <script src="js/google.js?v=375"></script>
+  <script src="js/profiles.js?v=375"></script>
+  <script src="js/profiles-sport.js?v=375"></script>
+  <script src="js/profiles-sante.js?v=375"></script>
+  <script src="js/profiles-archi.js?v=375"></script>
+  <script src="js/profiles-resto.js?v=375"></script>
+  <script src="js/profiles-auto.js?v=375"></script>
+  <script src="js/profiles-prod.js?v=375"></script>
+  <script src="js/profiles-edu.js?v=375"></script>
+  <script src="js/designs-immo.js?v=375"></script>
+  <script src="js/sector-prestige.js?v=375"></script>
+  <script src="js/custom-catalog.js?v=375"></script>
+  <script src="js/jobs.js?v=375"></script>
+  <script src="js/render.js?v=375"></script>
+  <script src="js/designs-immo-der.js?v=375"></script>
+  <script src="js/demo-faces.js?v=375"></script>
+  <script src="js/designs-noir.js?v=375"></script>
+  <script src="js/section-suggest.js?v=375"></script>
+  <script src="js/section-music.js?v=375"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=372"></script>
+  <script src="events/js/events-data.js?v=375"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -205,7 +205,7 @@
       /* Les 10 restaurants, cafés et bars (stores/js/stores-resto.js), juste après « Restaurant (pour emporter) » */
       .flatMap((x) => (x.id === 'resto' ? [x].concat(((NFC.RESTO_SECTOR || {}).profiles || []).map((p) => ({ id: 'r-' + p.id, name: p.n[0], active: true }))) : [x]));
     const DESIGNS = NFC.DESIGNS_ALL || NFC.DESIGNS;
-    const CATSEC = [['text', 'Texte libre'], ['services', 'Services et tarifs'], ['faq', 'Questions fréquentes'], ['hours', 'Horaires'], ['location', 'Adresse et plan'], ['cards', 'Fiches avec photo'], ['reviews', 'Avis clients'], ['google', 'Avis Google'], ['stats', 'Chiffres clés'], ['tags', 'Engagements'], ['booking', 'Prise de rendez-vous'], ['form', 'Formulaire de demande'], ['products', 'Produits'], ['action', 'Bouton vers un lien'], ['links', 'Liens et documents'], ['gallery', 'Galerie photos'], ['imgcar', 'Carrousel de photos'], ['vidcar', 'Carrousel de vidéos']];
+    const CATSEC = [['text', 'Texte libre'], ['services', 'Services et tarifs'], ['faq', 'Questions fréquentes'], ['hours', 'Horaires'], ['location', 'Adresse et plan'], ['cards', 'Fiches avec photo'], ['reviews', 'Avis clients'], ['google', 'Avis Google'], ['stats', 'Chiffres clés'], ['tags', 'Engagements'], ['booking', 'Prise de rendez-vous'], ['form', 'Formulaire de demande'], ['products', 'Produits'], ['action', 'Bouton vers un lien'], ['links', 'Liens et documents'], ['gallery', 'Galerie photos'], ['imgcar', 'Carrousel de photos'], ['vidcar', 'Carrousel de vidéos'], ['playlist', 'Mes créations musicales'], ['favmusic', 'Mes musiques préférées']];
     const STORES = STORES0.concat((NFC.cfg.get('secAdd', []) || []).filter((x) => x.kind === 'stores').map((x) => ({ id: x.id, name: x.name, active: true, custom: true })));
     const PLANS = [['gratuit', 'Gratuit'], ['pro', 'Pro'], ['premium', 'Premium']];
     const SECNAME = (id) => (CARDS.concat(STORES, EVENTS).find((s) => s.id === id) || {}).name || id;

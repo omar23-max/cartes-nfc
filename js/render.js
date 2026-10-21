@@ -722,7 +722,13 @@
     reviews(def, b) {
       const items = (b.items || []).filter((x) => x.t);
       if (!items.length) return '';
-      return `<div class="revs">${items.map((x) => `<figure class="rev">${stars(x.s)}<blockquote>${nl(x.t)}</blockquote><figcaption><b>${esc(x.n)}</b>${x.r ? `<span>${esc(x.r)}</span>` : ''}</figcaption></figure>`).join('')}</div>`;
+      /* Recommandations : coordonnées de la personne (téléphone, courriel, LinkedIn), si elles sont renseignées */
+      const ct = (x) => { const L = [];
+        if (x.tel) L.push(`<a href="tel:${tel(x.tel)}" aria-label="${L2('Appeler', 'Call')} ${esc(x.n || '')}">${ic('phone', 15)}</a>`);
+        if (x.mail) L.push(`<a href="mailto:${esc(x.mail)}" aria-label="${L2('Écrire à', 'Email')} ${esc(x.n || '')}">${ic('mail', 15)}</a>`);
+        if (x.li) L.push(`<a href="${esc(url(x.li))}" target="_blank" rel="noopener" aria-label="LinkedIn ${esc(x.n || '')}">${ic('linkedin', 15)}</a>`);
+        return L.length ? `<span class="rev-ct">${L.join('')}</span>` : ''; };
+      return `<div class="revs">${items.map((x) => `<figure class="rev">${stars(x.s)}<blockquote>${nl(x.t)}</blockquote><figcaption><b>${esc(x.n)}</b>${x.r ? `<span>${esc(x.r)}</span>` : ''}${def.refs ? ct(x) : ''}</figcaption></figure>`).join('')}</div>`;
     },
     tags(def, b) {
       const tags = String(b.tags || '').split(',').map((t) => t.trim()).filter(Boolean);

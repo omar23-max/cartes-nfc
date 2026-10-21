@@ -438,3 +438,7 @@
 /* Studio : section activée mais encore vide (jamais montrée aux visiteurs) */
 .vc .sec-empty { display: flex; align-items: center; gap: 10px; margin: 0; padding: 14px 16px; border: 1.5px dashed var(--ln); border-radius: 14px; color: var(--mu); font-size: 13px; line-height: 1.4; }
 .vc .sec-empty svg { flex: none; color: var(--a); }
+
+/* Recommandations : coordonnées de la personne */
+.vc .rev-ct { display: flex; gap: 8px; margin-top: 10px; }
+.vc .rev-ct a { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--ln); background: var(--sf); color: var(--p); text-decoration: none; }

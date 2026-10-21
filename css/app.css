@@ -1775,3 +1775,14 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .top .mycre span, .top .newc.newc2 span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
 @media (min-width: 901px) and (max-width: 1250px) { .top .hd-lng { padding: 8px 10px; } .top .hd-lng .lang-sw { gap: 8px; } .top .hd-lng .lang-sw .seg button { padding: 0 8px; } }
+
+/* v=373 : éditeur de plusieurs morceaux */
+.pl-it .it-f { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; min-width: 0; }
+.pl-it .it-f > .mus-pick, .pl-it .it-f > .mini.strong { grid-column: 1 / -1; }
+.pl-it .mini { width: 100%; box-sizing: border-box; min-width: 0; }
+.pl-it .it-f > label.b { justify-self: start; align-self: center; }
+.mus-pick select { height: 40px; padding: 0 32px 0 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font: inherit; font-size: 14px; color: var(--ink); }
+
+/* v=375 : recommandations avec coordonnées */
+.ref-f .ref-ct { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.ref-f .ref-ct .mini:last-child { grid-column: 1 / -1; }

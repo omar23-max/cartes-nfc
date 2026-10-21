@@ -629,6 +629,7 @@
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     /* Section Musique ajoutée à un secteur (v=369) : les cartes déjà créées la reçoivent, désactivée */
     if (!isEvents && S.sectorId && NFC.musicDefault && (sec().blocks || []).some((d) => d.key === 'music') && card().blocks && !card().blocks.music) card().blocks.music = NFC.musicDefault(S.sectorId);
+    if (!isEvents && S.sectorId && NFC.playlistDefault && card().blocks) (sec().blocks || []).filter((d) => d.type === 'playlist' && !card().blocks[d.key]).forEach((d) => { card().blocks[d.key] = NFC.playlistDefault(S.sectorId); });
     if (isEvents && S.sectorId) { const mb = (card().blocks || {}).music; if (mb && mb.track === undefined && mb.title && (NFC.EV_MUSIC || []).some((x) => x.fr === mb.title || x.en === mb.title)) { mb.track = mb.title; delete mb.title; } }
     if (S.step > maxStep()) S.step = maxStep();
     NFC.curDesign = S.design || ''; /* palettes propres à certains modèles (modèles noirs) */
@@ -2017,6 +2018,10 @@
     { id: 'gallery', g: 'media', ic: 'images', n: ['Galerie photos', 'Photo gallery'], d: ['1, 2 ou 4 photos côte à côte.', '1, 2 or 4 photos side by side.'] },
     { id: 'imgcar', g: 'media', ic: 'gallery-horizontal', n: ['Carrousel de photos', 'Photo carousel'], d: ['Des photos qui défilent sur le côté.', 'Photos that scroll sideways.'] },
     { id: 'vidcar', g: 'media', ic: 'clapperboard', n: ['Carrousel de vidéos', 'Video carousel'], d: ['Plusieurs vidéos à faire défiler.', 'Several videos to scroll through.'] },
+    { id: 'playlist', g: 'media', ic: 'list-music', n: ['Mes créations musicales', 'My music'], d: ['Vos morceaux, à écouter en un clic.', 'Your tracks, played in one click.'],
+      make: (en) => blk('playlist', en ? 'My tracks' : 'Mes créations', { vol: 70, items: (NFC.EV_MUSIC || []).slice(2, 4).map((z) => ({ t: en ? z.en : z.fr, by: '', src: z.src })) }) },
+    { id: 'favmusic', g: 'media', ic: 'heart', n: ['Mes musiques préférées', 'My favorite music'], d: ['Les morceaux que vous aimez.', 'The tracks you love.'],
+      make: (en) => blk('playlist', en ? 'My favorite music' : 'Mes musiques préférées', { vol: 70, items: (NFC.EV_MUSIC || []).slice(0, 2).map((z) => ({ t: en ? z.en : z.fr, by: '', src: z.src })) }) },
   ];
   const catOf = (id) => CAT.find((x) => x.id === id);
   /* Une section du catalogue est-elle déjà visible sur la carte ? */
@@ -2030,6 +2035,7 @@
       if (id === 'google') return d.type === 'greviews' || s.blocks.some((b) => b.type === 'greviews');
       if (id === 'imgcar') return d.type === 'imgcar'; /* le carrousel reste proposé même s’il y a une galerie */
       if (id === 'gallery') return d.type === 'gallery';
+      if (id === 'playlist' || id === 'favmusic') return d.type === 'playlist' && (id === 'favmusic') === /pr[ée]f[ée]r|favorite/i.test(d.title || '');
       return d.type === id;
     });
   }
@@ -2202,6 +2208,17 @@
           ${isEvents ? `<label class="ck mus-auto"><input type="checkbox" data-path="${base}.auto" ${b.auto === false ? '' : 'checked'}><span>${TT('Démarrer la musique à l’ouverture de l’invitation', 'Start the music when the invitation opens')}</span></label>` : `<p class="f-h">${TT('Sur une carte ou une boutique, la musique ne démarre jamais toute seule : le visiteur appuie sur lecture.', 'On a card or a store, the music never starts on its own: visitors tap play.')}</p>`}
           <p class="f-h">${TT('Musiques de la bibliothèque : libres de droits (Pixabay). Pour votre propre morceau, vous devez avoir le droit de le diffuser. L’invité peut couper la musique à tout moment.', 'Library tracks are royalty-free (Pixabay). For your own track, you must have the right to share it. Guests can stop the music at any time.')}</p>`;
       }
+      /* Plusieurs morceaux (Mes créations, Mes musiques préférées) */
+      case 'playlist': {
+        const list = NFC.EV_MUSIC || [], vol = b.vol == null ? 70 : +b.vol;
+        const row = (x, i) => { const p = `${base}.items.${i}`, mine = /^idb:/.test(x.src || '');
+          return `<div class="it pl-it"><div class="it-f"><div class="mus-pick"><button type="button" class="mus-pp" data-act="musprev" data-path="${p}" data-volpath="${base}.vol" aria-label="${TT('Écouter', 'Play')}">${ic('play', 16)}</button><select data-musel="${p}" data-tk="t">${mine ? `<option value="${esc(x.src)}" selected>${esc(TT('Mon morceau : ', 'My track: ') + (x.file || x.t || ''))}</option>` : ''}${!x.src ? `<option value="" selected>${TT('— Choisir un morceau —', '— Choose a track —')}</option>` : ''}${list.map((z) => `<option value="${esc(z.src)}" ${x.src === z.src ? 'selected' : ''}>${esc(ui() === 'en' ? z.en : z.fr)}</option>`).join('')}</select></div>
+            ${mini(p + '.t', TT('Titre du morceau', 'Track title'), 'strong')}${mini(p + '.by', TT('Artiste ou précision (facultatif)', 'Artist or note (optional)'))}
+            <label class="b xs">${ic('upload', 14)}${TT('Téléverser ce morceau', 'Upload this track')}<input type="file" accept="audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a,.wav,.ogg" hidden data-aud="${p}" data-tk="t"></label></div>${del(base + '.items', i)}</div>`; };
+        return `<div class="items">${(b.items || []).map(row).join('')}</div>${(b.items || []).length >= 12 ? `<p class="f-h">${TT('12 morceaux maximum.', '12 tracks maximum.')}</p>` : add(base + '.items', 'track', TT('Ajouter un morceau', 'Add a track'))}
+          <label class="f mus-vol"><span class="f-l">${TT('Volume', 'Volume')} <b data-volv>${vol} %</b></span><input type="range" min="0" max="100" step="5" value="${vol}" data-path="${base}.vol"></label>
+          <p class="f-h">${TT('Téléversez vos propres morceaux (MP3, M4A, WAV ou OGG, 15 Mo chacun) ou prenez-en dans la bibliothèque libre de droits. Les morceaux ne démarrent jamais tout seuls ; ils s’enchaînent quand le visiteur en lance un. Vous devez avoir le droit de diffuser les morceaux que vous téléversez.', 'Upload your own tracks (MP3, M4A, WAV or OGG, 15 MB each) or pick from the royalty-free library. Tracks never start on their own; they play one after another once a visitor starts one. You must have the right to share the tracks you upload.')}</p>`;
+      }
       /* Immobilier : bien vedette (juste inscrit, portes ouvertes, vendu) */
       case 'listing': {
         const kinds = [['just', 'Juste inscrit'], ['open', 'Portes ouvertes'], ['pending', 'Vente en cours'], ['sold', 'Vendu']];
@@ -2289,6 +2306,10 @@
         return body + area('Texte d’accompagnement', base + '.text', { rows: 2 });
       }
       case 'reviews':
+        /* Recommandations (étudiants, stagiaires…) : coordonnées de la personne qui recommande */
+        if (def.refs) return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f ref-f">${mini(p + '.n', 'Nom de la personne', 'strong')}${mini(p + '.r', 'Fonction (ex. Professeur, Superviseure de stage)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Sa recommandation">${esc(x.t)}</textarea>
+            <div class="ref-ct">${mini(p + '.tel', 'Téléphone')}${mini(p + '.mail', 'Courriel')}${mini(p + '.li', 'Profil LinkedIn (https://linkedin.com/in/…)')}</div></div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter une recommandation')}
+          <p class="f-h">Les coordonnées sont facultatives. Ne les affichez qu’avec l’accord de la personne qui vous recommande.</p>`;
         return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f">${mini(p + '.n', 'Nom du client', 'strong')}${mini(p + '.r', 'Contexte (ex. Client depuis 2021)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Son avis">${esc(x.t)}</textarea></div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter un avis')}`;
       case 'contact':
         return `${inp('Adresse de réception des messages', base + '.email', { type: 'email' })}${area('Texte d’introduction', base + '.text', { rows: 2 })}
@@ -2391,7 +2412,7 @@
   }
 
   const TPL = X.tpl || {};
-  Object.assign(TPL, { rev: { n: '', r: '', t: '', s: 5 }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } }, X.tpl || {});
+  Object.assign(TPL, { track: { t: '', by: '', src: '' }, rev: { n: '', r: '', t: '', s: 5 }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } }, X.tpl || {});
 
   function structChanged() {
     save();
@@ -2954,7 +2975,7 @@
         const A = musPrev.au || (musPrev.au = new Audio());
         if (!A.paused && A.dataset.src === src) { A.pause(); musPrevUi(false); break; }
         A.pause(); A.src = src; A.dataset.src = src; A.loop = false;
-        const v = b.vol == null ? 80 : +b.vol; A.volume = Math.max(0, Math.min(1, v / 100));
+        const vb = t.dataset.volpath ? g(t.dataset.volpath) : b.vol, v = vb == null ? 80 : +vb; A.volume = Math.max(0, Math.min(1, v / 100));
         A.onended = () => musPrevUi(false);
         A.play().then(() => musPrevUi(true)).catch(() => { musPrevUi(false); toast(TT('Ce morceau ne peut pas être lu.', 'This track cannot be played.')); });
         break;
@@ -3277,9 +3298,9 @@
   /* Section Musique : morceau de la bibliothèque (le nom affiché suit), morceau envoyé, volume */
   document.addEventListener('change', (e) => {
     const t = e.target; if (!t.dataset || !t.dataset.musel) return;
-    const base = t.dataset.musel, x = (NFC.EV_MUSIC || []).find((z) => z.src === t.value);
+    const base = t.dataset.musel, tk = t.dataset.tk || 'track', x = (NFC.EV_MUSIC || []).find((z) => z.src === t.value);
     setP(card(), base + '.src', t.value);
-    if (x) { setP(card(), base + '.track', ui() === 'en' ? x.en : x.fr); setP(card(), base + '.file', ''); }
+    if (x) { setP(card(), base + '.' + tk, ui() === 'en' ? x.en : x.fr); setP(card(), base + '.file', ''); }
     musStop(); structChanged();
   });
   document.addEventListener('input', (e) => { const t = e.target; if (t.type === 'range' && /\.vol$/.test(t.dataset.path || '')) { const v = t.closest('.mus-vol') && t.closest('.mus-vol').querySelector('[data-volv]'); if (v) v.textContent = t.value + ' %'; if (musPrev.au) musPrev.au.volume = Math.max(0, Math.min(1, +t.value / 100)); } });
@@ -3291,7 +3312,7 @@
     try {
       toast(TT('Envoi du morceau…', 'Uploading the track…'));
       const ref = await VC.idb.put('a' + Date.now().toString(36) + rid(), f), base = t.dataset.aud, nm = f.name.replace(/\.[^.]+$/, '').slice(0, 60);
-      setP(card(), base + '.src', ref); setP(card(), base + '.file', nm); setP(card(), base + '.track', nm);
+      setP(card(), base + '.src', ref); setP(card(), base + '.file', nm); setP(card(), base + '.' + (t.dataset.tk || 'track'), nm);
       structChanged();
       toast(TT('Morceau ajouté.', 'Track added.'));
     } catch (err) { toast(TT('Le morceau n’a pas pu être enregistré dans ce navigateur.', 'The track could not be saved in this browser.')); }
