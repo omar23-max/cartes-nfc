@@ -3066,6 +3066,8 @@
     }
     if (t.dataset.struct === 'toggle') {
       t.closest('.grp').classList.toggle('off', !t.checked); renderPreview();
+      /* Section activée : l'aperçu défile jusqu'à elle et la met en évidence */
+      if (t.checked) { const ge = t.closest('.grp'), gid = ge && (ge.dataset.grp || (ge.dataset.key || '').replace(':', '-')); if (gid) setTimeout(() => showInPreview(gid), 60); }
       /* Une section affichée ou masquée peut changer les messages du panneau « Échange de contacts » */
       const lb = document.querySelector('[data-grp="leads"] .grp-b');
       if (lb) { lb.innerHTML = leadsEd() + `<button type="button" class="b sm done-b" data-act="done" data-id="leads">${ic('check', 15)}Terminé</button>`; translateTree(lb); }
