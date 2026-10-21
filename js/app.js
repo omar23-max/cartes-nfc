@@ -98,7 +98,8 @@
   const ckey = (id = kid()) => (lang() === 'en' ? id + ':en' : id);
   const demoOf = (s) => (lang() === 'en' && s.demoEn ? s.demoEn : s.demo);
   const card = () => S.cards[ckey()];
-  const bili = () => !!(S.bili && S.bili[S.sectorId]);
+  /* Avant le choix du secteur (étape 1), « Bilingue » est retenu dans S.biliPre puis appliqué au secteur choisi */
+  const bili = () => (S.sectorId ? !!(S.bili && S.bili[S.sectorId]) : !!S.biliPre);
   /* Réseaux sociaux : chaque champ est prérempli avec l’adresse du réseau ; une case l’affiche ou le masque.
      Par défaut, sont cochés les réseaux déjà présents dans la carte (ceux proposés pour le secteur). */
   const SOC_DEFAULT = ['instagram', 'linkedin', 'facebook'];
@@ -624,6 +625,7 @@
     /* Événements (v=310) : l'invitation déjà créée garde son nom (avant, une seule invitation, nom dans S.vname) */
     if (isEvents && S.vname && S.pf && S.pf.list.length === 1 && !S.pf.list[0].named) { const e0 = S.pf.list[0]; e0.name = S.vname; e0.named = true; if (S.pub) { e0.pub = true; delete e0.draft; } delete S.vname; save(); }
     if (S.sectorId && !sec()) S.sectorId = null;
+    if (S.sectorId && S.biliPre !== undefined) { S.bili = S.bili || {}; S.bili[S.sectorId] = !!S.biliPre; if (S.biliPre) { const l0 = S.lang; ['fr', 'en'].forEach((l) => { S.lang = l; ensureCard(); }); S.lang = l0; } delete S.biliPre; save(); }
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
     if (S.step > maxStep()) S.step = maxStep();
     NFC.curDesign = S.design || ''; /* palettes propres à certains modèles (modèles noirs) */
@@ -747,9 +749,8 @@
     if (!slot) return;
     slot.classList.remove('ph');
     if (ls.length) { slot.append(ls.find((e) => e.closest('.ed-links')) || ls[0]); ls.forEach((e) => { if (!slot.contains(e)) e.remove(); }); slot.hidden = false; const el = main.querySelector('.ed-lang'); if (el && !el.children.length) el.remove(); }
-    /* Même ligne à toutes les étapes : la langue reste là dès qu'une création est en cours ; sinon sa place est gardée (invisible) */
-    else if (S.sectorId) { slot.innerHTML = langSwitch(); slot.hidden = false; }
-    else if (regAll().length) { slot.innerHTML = langSwitch(); slot.classList.add('ph'); slot.hidden = false; }
+    /* Même ligne à toutes les étapes : la langue est là dès qu'une création existe (aussi à l'étape 1, avant le choix du type) */
+    else if (S.sectorId || regAll().length) { slot.innerHTML = langSwitch(); slot.hidden = false; }
   }
   window.addEventListener('resize', () => { const st = $('#steps'), want = window.matchMedia('(min-width: 901px)').matches; if (st && want === !st.closest('.top')) return; clearTimeout(desktopLayout.t); desktopLayout.t = setTimeout(render, 150); });
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
@@ -2856,6 +2857,7 @@
       case 'chipdel': { const l = chipList(t.dataset.base, t.dataset.field); l.splice(+t.dataset.i, 1); chipSet(t.dataset.base, t.dataset.field, l); break; }
       case 'chipreset': { const b = g(t.dataset.base); b[t.dataset.field] = ''; b[t.dataset.field + 'Custom'] = false; structChanged(); break; }
       case 'bili': {
+        if (!S.sectorId) { S.biliPre = t.checked; S.lang = ui(); save(); render(); toast(t.checked ? TT('Bilingue : la carte aura une version française et une version anglaise.', 'Bilingual: the card will have a French and an English version.') : TT('Une seule langue.', 'One language only.')); break; }
         S.bili = S.bili || {};
         S.bili[S.sectorId] = t.checked;
         if (t.checked) {
@@ -2886,7 +2888,7 @@
       case 'lang': {
         if (t.dataset.v === lang() || !bili()) break;
         S.lang = t.dataset.v;
-        ensureCard();
+        if (S.sectorId) ensureCard();
         save();
         const pvEl = $('#pv'), st = pvEl ? pvEl.scrollTop : 0;
         render();
