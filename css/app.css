@@ -1761,3 +1761,17 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .mus-vol input[type=range] { width: 100%; accent-color: var(--ink); }
 .mus-vol .f-l b { margin-left: 6px; font-weight: 700; color: var(--ink); }
 .mus-auto { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; font-size: 14px; }
+
+/* v=370 : écouter le morceau dans l'éditeur */
+.mus-pick { display: flex; align-items: center; gap: 8px; }
+.mus-pick select { flex: 1; min-width: 0; }
+.mus-pp { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: var(--ink); color: #fff; cursor: pointer; }
+.mus-pp.on { background: #16a34a; }
+/* v=370 : écrans moyens — les blocs de la 2e ligne rétrécissent pour tenir sur une ligne (plus de chevauchement) */
+@media (min-width: 901px) {
+  .top .hd-ed, .top .hd-live, .top .mycre, .top .newc.newc2, .top .cur-tag:not(.ct-alt) { flex: 1 1 0; min-width: 0; max-width: 232px; width: auto; }
+  .top { flex-wrap: wrap; }
+  .top .hd-lng { flex: 0 1 auto; min-width: 0; }
+  .top .mycre span, .top .newc.newc2 span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+@media (min-width: 901px) and (max-width: 1250px) { .top .hd-lng { padding: 8px 10px; } .top .hd-lng .lang-sw { gap: 8px; } .top .hd-lng .lang-sw .seg button { padding: 0 8px; } }

@@ -744,7 +744,7 @@
     if (!top || !st || !main || !window.matchMedia('(min-width: 901px)').matches) return;
     if (!$('#steps-home')) { const h = document.createElement('span'); h.id = 'steps-home'; h.hidden = true; st.before(h); }
     /* Sous le titre de la page (entre le titre et son texte) ; sans titre : en haut de la page */
-    const sec0 = main.querySelector('section.wrap') || main, h1 = sec0.querySelector('.sh h1, h1');
+    const sec0 = main.querySelector('section.wrap') || main, h1 = [...sec0.querySelectorAll('.sh > h1')].find((e) => !e.closest('#pv, .vc, .phone')); /* jamais le titre de la carte dans l'aperçu */
     const line = document.createElement('div'); line.className = 'st-line';
     line.append(st);
     if (h1) h1.after(line); else sec0.prepend(line);
@@ -2195,8 +2195,8 @@
           <p class="f-h">Site test : les réponses sont enregistrées dans ce navigateur et s’affichent à l’étape Publication. Sur la vraie plateforme, vous les recevrez par courriel et dans votre tableau de bord.</p>`;
       case 'music': {
         const list = NFC.EV_MUSIC || [], mine = /^idb:/.test(b.src || ''), vol = b.vol == null ? 80 : +b.vol;
-        return `<label class="f"><span class="f-l">Morceau</span><select data-musel="${base}">${mine ? `<option value="${esc(b.src)}" selected>${esc(TT('Mon morceau : ', 'My track: ') + (b.file || b.track || ''))}</option>` : ''}${list.map((x) => `<option value="${esc(x.src)}" ${b.src === x.src ? 'selected' : ''}>${esc(ui() === 'en' ? x.en : x.fr)}</option>`).join('')}</select></label>
-          <div class="vsrc"><label class="b sm">${ic('upload', 15)}${TT('Envoyer mon propre morceau', 'Upload my own track')}<input type="file" accept="audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a,.wav,.ogg" hidden data-aud="${base}"></label><span class="f-h">${TT('MP3, M4A, WAV ou OGG, 15 Mo maximum.', 'MP3, M4A, WAV or OGG, 15 MB maximum.')}</span></div>
+        return `<label class="f"><span class="f-l">Morceau</span><span class="mus-pick"><button type="button" class="mus-pp" data-act="musprev" data-path="${base}" aria-label="${TT('Écouter le morceau', 'Play the track')}" title="${TT('Écouter / mettre en pause', 'Play / pause')}">${ic('play', 16)}</button><select data-musel="${base}">${mine ? `<option value="${esc(b.src)}" selected>${esc(TT('Mon morceau : ', 'My track: ') + (b.file || b.track || ''))}</option>` : ''}${list.map((x) => `<option value="${esc(x.src)}" ${b.src === x.src ? 'selected' : ''}>${esc(ui() === 'en' ? x.en : x.fr)}</option>`).join('')}</select></span></label>
+          <div class="vsrc"><label class="b sm">${ic('upload', 15)}${TT('Téléverser mon propre morceau', 'Upload my own track')}<input type="file" accept="audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a,.wav,.ogg" hidden data-aud="${base}"></label><span class="f-h">${TT('MP3, M4A, WAV ou OGG, 15 Mo maximum.', 'MP3, M4A, WAV or OGG, 15 MB maximum.')}</span></div>
           ${inp(TT('Nom du morceau affiché', 'Track name shown'), base + '.track', { ph: 'Piano romantique' })}
           <label class="f mus-vol"><span class="f-l">${TT('Volume', 'Volume')} <b data-volv>${vol} %</b></span><input type="range" min="0" max="100" step="5" value="${vol}" data-path="${base}.vol"></label>
           ${isEvents ? `<label class="ck mus-auto"><input type="checkbox" data-path="${base}.auto" ${b.auto === false ? '' : 'checked'}><span>${TT('Démarrer la musique à l’ouverture de l’invitation', 'Start the music when the invitation opens')}</span></label>` : `<p class="f-h">${TT('Sur une carte ou une boutique, la musique ne démarre jamais toute seule : le visiteur appuie sur lecture.', 'On a card or a store, the music never starts on its own: visitors tap play.')}</p>`}
@@ -2946,6 +2946,19 @@
       case 'fullpreview': openFull(t.dataset.id); break;
       case 'del': g(t.dataset.path).splice(+t.dataset.i, 1); structChanged(); break;
       case 'imgdel': setP(card(), t.dataset.path, ''); structChanged(); break;
+      /* Section Musique : écouter le morceau choisi dans l'éditeur (lecture / pause) */
+      case 'musprev': {
+        const b = g(t.dataset.path) || {}, raw = VC.vsrc ? VC.vsrc(b.src) : b.src;
+        const src = /^events\/media\//.test(raw || '') && (isStores || isEvents) ? '../' + raw : raw;
+        if (!src) break;
+        const A = musPrev.au || (musPrev.au = new Audio());
+        if (!A.paused && A.dataset.src === src) { A.pause(); musPrevUi(false); break; }
+        A.pause(); A.src = src; A.dataset.src = src; A.loop = false;
+        const v = b.vol == null ? 80 : +b.vol; A.volume = Math.max(0, Math.min(1, v / 100));
+        A.onended = () => musPrevUi(false);
+        A.play().then(() => musPrevUi(true)).catch(() => { musPrevUi(false); toast(TT('Ce morceau ne peut pas être lu.', 'This track cannot be played.')); });
+        break;
+      }
       case 'clear':
         if (ask('Vider tous les textes et photos d’exemple ? La structure et vos choix de blocs sont conservés.')) { clearCard(); structChanged(); toast('Exemples vidés : à vous de jouer.'); }
         break;
@@ -3255,15 +3268,19 @@
     }
   });
 
+  /* Écoute dans l'éditeur : un seul lecteur ; le bouton passe de ▶ à ❚❚ */
+  const musPrev = {};
+  function musPrevUi(on) { document.querySelectorAll('.mus-pp').forEach((x) => { x.classList.toggle('on', on); x.innerHTML = ic(on ? 'pause' : 'play', 16); }); }
+  const musStop = () => { if (musPrev.au && !musPrev.au.paused) { musPrev.au.pause(); musPrevUi(false); } };
   /* Section Musique : morceau de la bibliothèque (le nom affiché suit), morceau envoyé, volume */
   document.addEventListener('change', (e) => {
     const t = e.target; if (!t.dataset || !t.dataset.musel) return;
     const base = t.dataset.musel, x = (NFC.EV_MUSIC || []).find((z) => z.src === t.value);
     setP(card(), base + '.src', t.value);
     if (x) { setP(card(), base + '.track', ui() === 'en' ? x.en : x.fr); setP(card(), base + '.file', ''); }
-    structChanged();
+    musStop(); structChanged();
   });
-  document.addEventListener('input', (e) => { const t = e.target; if (t.type === 'range' && /\.vol$/.test(t.dataset.path || '')) { const v = t.closest('.mus-vol') && t.closest('.mus-vol').querySelector('[data-volv]'); if (v) v.textContent = t.value + ' %'; } });
+  document.addEventListener('input', (e) => { const t = e.target; if (t.type === 'range' && /\.vol$/.test(t.dataset.path || '')) { const v = t.closest('.mus-vol') && t.closest('.mus-vol').querySelector('[data-volv]'); if (v) v.textContent = t.value + ' %'; if (musPrev.au) musPrev.au.volume = Math.max(0, Math.min(1, +t.value / 100)); } });
   document.addEventListener('change', async (e) => {
     const t = e.target; if (t.type !== 'file' || !t.dataset.aud) return;
     const f = t.files[0]; if (!f) return;
