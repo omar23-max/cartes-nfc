@@ -1748,3 +1748,11 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 /* v=364 : un bloc caché reste caché (les styles des blocs ne doivent pas le réafficher) ; place de la langue gardée */
 .top .hd-ed[hidden], .top .hd-live[hidden], .top .mycre[hidden], .top .newc[hidden], .top .hd-lng[hidden], .top .cur-tag[hidden] { display: none !important; }
 .top .hd-lng.ph { visibility: hidden; pointer-events: none; }
+
+/* v=366 : « Aucune boutique / Aucun événement pour l'instant · Créer » prend la place du bloc « Vous modifiez » (même taille) */
+@media (min-width: 901px) {
+  .top .cur-tag:not(.ct-alt) { order: 20; box-sizing: border-box; width: 232px; max-width: none; height: 72px; margin: 0; padding: 8px 14px; border-radius: 14px; flex: none;
+    display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 4px 8px; white-space: normal; text-align: center; line-height: 1.25; }
+  .top .cur-tag:not(.ct-alt) .ct-l { font-weight: 600; }
+}
+@media (min-width: 901px) and (max-width: 1500px) { .top .cur-tag:not(.ct-alt) { width: 196px; } }

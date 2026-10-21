@@ -1240,7 +1240,7 @@
       if (!S.pf) {
         if (!regAll().length || S.sectorId) return null;
         /* La création active est déjà indiquée par « Version active » juste à côté : ici, on dit qu'il n'y a rien de ce type */
-        const NONE = { cards: TT('Aucune carte de visite pour l’instant', 'No business card yet'), stores: TT('Aucune boutique pour l’instant', 'No store yet'), events: TT('Aucune invitation pour l’instant', 'No invitation yet') }[KIND];
+        const NONE = { cards: TT('Aucune carte de visite pour l’instant', 'No business card yet'), stores: TT('Aucune boutique pour l’instant', 'No store yet'), events: TT('Aucun événement pour l’instant', 'No event yet') }[KIND];
         return { cls: 'is-other', act: 'newc', title: TT('Touchez pour créer', 'Tap to create'),
           html: `${ic('plus', 14)}<span class="ct-l">${NONE}</span><em class="ct-t">${TT('Créer', 'Create')}</em>` };
       }
