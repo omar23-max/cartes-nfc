@@ -1744,3 +1744,7 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .tpl-fav { display: grid; place-items: center; color: #a1a1aa; }
 .tpl-fav:hover, .tpl-fav.on { color: #e11d48; }
 .tpl-favb { background: #ffe4e6; color: #be123c; }
+
+/* v=364 : un bloc caché reste caché (les styles des blocs ne doivent pas le réafficher) ; place de la langue gardée */
+.top .hd-ed[hidden], .top .hd-live[hidden], .top .mycre[hidden], .top .newc[hidden], .top .hd-lng[hidden], .top .cur-tag[hidden] { display: none !important; }
+.top .hd-lng.ph { visibility: hidden; pointer-events: none; }

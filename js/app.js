@@ -744,7 +744,12 @@
     line.append(st);
     if (h1) h1.after(line); else sec0.prepend(line);
     const ls = [...main.querySelectorAll('.lang-sw')];
-    if (ls.length && slot) { slot.append(ls.find((e) => e.closest('.ed-links')) || ls[0]); ls.forEach((e) => { if (!slot.contains(e)) e.remove(); }); slot.hidden = false; const el = main.querySelector('.ed-lang'); if (el && !el.children.length) el.remove(); }
+    if (!slot) return;
+    slot.classList.remove('ph');
+    if (ls.length) { slot.append(ls.find((e) => e.closest('.ed-links')) || ls[0]); ls.forEach((e) => { if (!slot.contains(e)) e.remove(); }); slot.hidden = false; const el = main.querySelector('.ed-lang'); if (el && !el.children.length) el.remove(); }
+    /* Même ligne à toutes les étapes : la langue reste là dès qu'une création est en cours ; sinon sa place est gardée (invisible) */
+    else if (S.sectorId) { slot.innerHTML = langSwitch(); slot.hidden = false; }
+    else if (regAll().length) { slot.innerHTML = langSwitch(); slot.classList.add('ph'); slot.hidden = false; }
   }
   window.addEventListener('resize', () => { const st = $('#steps'), want = window.matchMedia('(min-width: 901px)').matches; if (st && want === !st.closest('.top')) return; clearTimeout(desktopLayout.t); desktopLayout.t = setTimeout(render, 150); });
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
