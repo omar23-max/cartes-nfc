@@ -1241,7 +1241,7 @@
         if (!regAll().length || S.sectorId) return null;
         /* La création active est déjà indiquée par « Version active » juste à côté : ici, on dit qu'il n'y a rien de ce type */
         const NONE = { cards: TT('Aucune carte de visite pour l’instant', 'No business card yet'), stores: TT('Aucune boutique pour l’instant', 'No store yet'), events: TT('Aucun événement pour l’instant', 'No event yet') }[KIND];
-        return { cls: 'is-other', act: 'newc', title: TT('Touchez pour créer', 'Tap to create'),
+        return { cls: 'is-other', act: 'newhere', title: TT('Touchez pour créer', 'Tap to create'),
           html: `${ic('plus', 14)}<span class="ct-l">${NONE}</span><em class="ct-t">${TT('Créer', 'Create')}</em>` };
       }
       const P = S.pf, e = P.list.find((x) => x.id === P.cur) || {};
@@ -2961,6 +2961,14 @@
       case 'json': exportJSON(); break;
       case 'full': openFull(); break;
       case 'newc': leaveGuard(() => { newPick = ''; newModal(); }); break;
+      /* « Aucune … pour l'instant · Créer » : on crée directement dans ce studio, sans la fenêtre de choix */
+      case 'newhere': leaveGuard(() => {
+        const all = regAll();
+        if (KIND !== 'events' && all.length >= pfMax()) { newPick = ''; newModal(); return; } /* forfait plein : la fenêtre l'explique */
+        const D = { cards: TT('Carte', 'Card'), stores: TT('Boutique', 'Store'), events: TT('Événement', 'Event') }[KIND];
+        let name = ''; for (let i = all.filter((x) => x.k === KIND).length + 1; ; i++) { name = `${D} ${i}`; if (!pfTaken(name)) break; }
+        pfNewFresh(name); save(); render(); window.scrollTo(0, 0);
+      }); break;
       case 'leaveok': { const g = pendingLeave; pendingLeave = null; closeModal(); dropDraft(); render(); toast(TT('Brouillon supprimé.', 'Draft deleted.')); if (g) g(); break; }
       case 'curtag': curModal('edit'); break;
       case 'mycre': curModal('list'); break;
