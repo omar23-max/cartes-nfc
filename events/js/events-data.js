@@ -65,7 +65,7 @@
         video: { on: false, url: '', cap: '', cover: '' },
         registry: { on: !!(L.registry && L.registry.length), title: L.registryTitle || '', items: (L.registry || []).map(([label, url]) => ({ label, url })) },
         rsvp: { on: e.rsvp !== false, deadline: L.deadline || '', meals: L.meals || '', guests: e.guests || 4, email: L.mail || 'reponse@exemple.com', text: L.rsvpText || t('Merci de nous répondre avant la date indiquée.', 'Please let us know before the date below.') },
-        music: { on: true, src: MUS(e.music), title: MUSIC[e.music][en ? 1 : 0] },
+        music: { on: true, src: MUS(e.music), track: MUSIC[e.music][en ? 1 : 0], vol: 80, auto: true },
         contact: { on: false, email: L.mail || 'reponse@exemple.com', text: t('Une question ? Écrivez-nous.', 'A question? Write to us.'), files: false },
       },
     };

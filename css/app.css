@@ -1756,3 +1756,8 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .top .cur-tag:not(.ct-alt) .ct-l { font-weight: 600; }
 }
 @media (min-width: 901px) and (max-width: 1500px) { .top .cur-tag:not(.ct-alt) { width: 196px; } }
+
+/* v=369 : section Musique — volume et démarrage à l'ouverture */
+.mus-vol input[type=range] { width: 100%; accent-color: var(--ink); }
+.mus-vol .f-l b { margin-left: 6px; font-weight: 700; color: var(--ink); }
+.mus-auto { display: flex; align-items: center; gap: 8px; margin: 6px 0 4px; font-size: 14px; }

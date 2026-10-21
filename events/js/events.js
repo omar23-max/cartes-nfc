@@ -122,7 +122,10 @@
       <button type="button" class="btn" data-vc="ev-rsvp">${ic('send', 18)}<span>${L2('Envoyer ma réponse', 'Send my reply')}</span></button>
     </form>`;
   };
-  V.S.music = (def, b) => (b.src ? `<div class="ev-mus"><button type="button" class="ev-play" data-vc="ev-music" aria-label="${L2('Lire la musique', 'Play music')}">${SVG.play}</button><div><b>${esc(b.title || L2('Musique', 'Music'))}</b><small>${L2('Musique de l’invitation', 'Invitation music')}</small></div>${SVG.note}<audio src="${esc(b.src)}" preload="none" loop></audio></div>` : '');
+  /* Musique : nom du morceau (b.track ; anciennes invitations : b.title), volume (b.vol, 0 à 100), démarrage à l'ouverture (b.auto) */
+  const trackOf = (b) => b.track || b.title || L2('Musique', 'Music');
+  V.S.music = (def, b) => { const src = V.vsrc ? V.vsrc(b.src) : b.src; return src ? `<div class="ev-mus"><button type="button" class="ev-play" data-vc="ev-music" aria-label="${L2('Lire la musique', 'Play music')}">${SVG.play}</button><div><b>${esc(trackOf(b))}</b><small>${L2('Musique de l’invitation', 'Invitation music')}</small></div>${SVG.note}<audio src="${esc(src)}" preload="none" loop data-vol="${b.vol == null ? 80 : +b.vol}" data-auto="${b.auto === false ? 0 : 1}"></audio></div>` : ''; };
+  const volOf = (au) => { const v = +au.dataset.vol; return Math.max(0, Math.min(1, (isNaN(v) ? 80 : v) / 100)); };
 
   /* ---------- Actions : RSVP, musique ---------- */
   function setPlaying(btn, on) { if (btn) { btn.innerHTML = on ? SVG.pause : SVG.play; btn.classList.toggle('on', on); } }
@@ -132,7 +135,7 @@
       e.preventDefault();
       const box = t.closest('.ev-mus'), au = box && box.querySelector('audio');
       if (!au) return true;
-      if (au.paused) au.play().then(() => setPlaying(t, true)).catch(() => {}); else { au.pause(); setPlaying(t, false); }
+      if (au.paused) { au.volume = volOf(au); au.play().then(() => setPlaying(t, true)).catch(() => {}); } else { au.pause(); setPlaying(t, false); }
       return true;
     }
     if (a === 'ev-rsvp') {
@@ -225,7 +228,7 @@
       ov.classList.add('open');
       /* La musique démarre au geste de l’invité (les navigateurs l’exigent) */
       const btn = app.querySelector('.ev-play'), au = btn && btn.parentElement.querySelector('audio');
-      if (au) au.play().then(() => setPlaying(btn, true)).catch(() => {});
+      if (au && au.dataset.auto !== '0') { au.volume = volOf(au); au.play().then(() => setPlaying(btn, true)).catch(() => {}); }
       setTimeout(() => { ov.classList.add('gone'); document.body.style.overflow = ''; }, 2100);
       setTimeout(() => ov.remove(), 2800);
     });

@@ -627,6 +627,9 @@
     if (S.sectorId && !sec()) S.sectorId = null;
     if (S.sectorId && S.biliPre !== undefined) { S.bili = S.bili || {}; S.bili[S.sectorId] = !!S.biliPre; if (S.biliPre) { const l0 = S.lang; ['fr', 'en'].forEach((l) => { S.lang = l; ensureCard(); }); S.lang = l0; } delete S.biliPre; save(); }
     if (S.sectorId) { ensureCard(); if (NFC.demoSync && S.design) NFC.demoSync(card(), sec(), S.design); }
+    /* Section Musique ajoutée à un secteur (v=369) : les cartes déjà créées la reçoivent, désactivée */
+    if (!isEvents && S.sectorId && NFC.musicDefault && (sec().blocks || []).some((d) => d.key === 'music') && card().blocks && !card().blocks.music) card().blocks.music = NFC.musicDefault(S.sectorId);
+    if (isEvents && S.sectorId) { const mb = (card().blocks || {}).music; if (mb && mb.track === undefined && mb.title && (NFC.EV_MUSIC || []).some((x) => x.fr === mb.title || x.en === mb.title)) { mb.track = mb.title; delete mb.title; } }
     if (S.step > maxStep()) S.step = maxStep();
     NFC.curDesign = S.design || ''; /* palettes propres à certains modèles (modèles noirs) */
     VC.leadSrc = !NOVER && S.pf ? `${KIND}:${S.pf.cur}` : null; /* contact laissé depuis l'aperçu : vient de la création en cours */
@@ -2191,8 +2194,13 @@
           ${inp('Adresse qui reçoit les réponses', base + '.email', { type: 'email' })}${area('Texte d’accompagnement', base + '.text', { rows: 2 })}
           <p class="f-h">Site test : les réponses sont enregistrées dans ce navigateur et s’affichent à l’étape Publication. Sur la vraie plateforme, vous les recevrez par courriel et dans votre tableau de bord.</p>`;
       case 'music': {
-        const list = NFC.EV_MUSIC || [];
-        return `<label class="f"><span class="f-l">Morceau</span><select data-path="${base}.src">${list.map((x) => `<option value="${esc(x.src)}" ${b.src === x.src ? 'selected' : ''}>${esc(ui() === 'en' ? x.en : x.fr)}</option>`).join('')}</select></label>${inp('Titre affiché', base + '.title', { ph: 'Piano romantique' })}<p class="f-h">Musiques libres de droits (Pixabay). La musique démarre quand l’invité ouvre l’enveloppe ; il peut la couper à tout moment.</p>`;
+        const list = NFC.EV_MUSIC || [], mine = /^idb:/.test(b.src || ''), vol = b.vol == null ? 80 : +b.vol;
+        return `<label class="f"><span class="f-l">Morceau</span><select data-musel="${base}">${mine ? `<option value="${esc(b.src)}" selected>${esc(TT('Mon morceau : ', 'My track: ') + (b.file || b.track || ''))}</option>` : ''}${list.map((x) => `<option value="${esc(x.src)}" ${b.src === x.src ? 'selected' : ''}>${esc(ui() === 'en' ? x.en : x.fr)}</option>`).join('')}</select></label>
+          <div class="vsrc"><label class="b sm">${ic('upload', 15)}${TT('Envoyer mon propre morceau', 'Upload my own track')}<input type="file" accept="audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a,.wav,.ogg" hidden data-aud="${base}"></label><span class="f-h">${TT('MP3, M4A, WAV ou OGG, 15 Mo maximum.', 'MP3, M4A, WAV or OGG, 15 MB maximum.')}</span></div>
+          ${inp(TT('Nom du morceau affiché', 'Track name shown'), base + '.track', { ph: 'Piano romantique' })}
+          <label class="f mus-vol"><span class="f-l">${TT('Volume', 'Volume')} <b data-volv>${vol} %</b></span><input type="range" min="0" max="100" step="5" value="${vol}" data-path="${base}.vol"></label>
+          ${isEvents ? `<label class="ck mus-auto"><input type="checkbox" data-path="${base}.auto" ${b.auto === false ? '' : 'checked'}><span>${TT('Démarrer la musique à l’ouverture de l’invitation', 'Start the music when the invitation opens')}</span></label>` : `<p class="f-h">${TT('Sur une carte ou une boutique, la musique ne démarre jamais toute seule : le visiteur appuie sur lecture.', 'On a card or a store, the music never starts on its own: visitors tap play.')}</p>`}
+          <p class="f-h">${TT('Musiques de la bibliothèque : libres de droits (Pixabay). Pour votre propre morceau, vous devez avoir le droit de le diffuser. L’invité peut couper la musique à tout moment.', 'Library tracks are royalty-free (Pixabay). For your own track, you must have the right to share it. Guests can stop the music at any time.')}</p>`;
       }
       /* Immobilier : bien vedette (juste inscrit, portes ouvertes, vendu) */
       case 'listing': {
@@ -3245,6 +3253,29 @@
     } catch (err) {
       toast('La vidéo n’a pas pu être enregistrée dans ce navigateur.');
     }
+  });
+
+  /* Section Musique : morceau de la bibliothèque (le nom affiché suit), morceau envoyé, volume */
+  document.addEventListener('change', (e) => {
+    const t = e.target; if (!t.dataset || !t.dataset.musel) return;
+    const base = t.dataset.musel, x = (NFC.EV_MUSIC || []).find((z) => z.src === t.value);
+    setP(card(), base + '.src', t.value);
+    if (x) { setP(card(), base + '.track', ui() === 'en' ? x.en : x.fr); setP(card(), base + '.file', ''); }
+    structChanged();
+  });
+  document.addEventListener('input', (e) => { const t = e.target; if (t.type === 'range' && /\.vol$/.test(t.dataset.path || '')) { const v = t.closest('.mus-vol') && t.closest('.mus-vol').querySelector('[data-volv]'); if (v) v.textContent = t.value + ' %'; } });
+  document.addEventListener('change', async (e) => {
+    const t = e.target; if (t.type !== 'file' || !t.dataset.aud) return;
+    const f = t.files[0]; if (!f) return;
+    if (!/^audio\//.test(f.type) && !/\.(mp3|m4a|wav|ogg)$/i.test(f.name)) { toast(TT('Choisissez un fichier audio (MP3, M4A, WAV ou OGG).', 'Choose an audio file (MP3, M4A, WAV or OGG).')); return; }
+    if (f.size > 15 * 1024 * 1024) { toast(TT('Morceau trop lourd : 15 Mo maximum.', 'Track too large: 15 MB maximum.')); return; }
+    try {
+      toast(TT('Envoi du morceau…', 'Uploading the track…'));
+      const ref = await VC.idb.put('a' + Date.now().toString(36) + rid(), f), base = t.dataset.aud, nm = f.name.replace(/\.[^.]+$/, '').slice(0, 60);
+      setP(card(), base + '.src', ref); setP(card(), base + '.file', nm); setP(card(), base + '.track', nm);
+      structChanged();
+      toast(TT('Morceau ajouté.', 'Track added.'));
+    } catch (err) { toast(TT('Le morceau n’a pas pu être enregistré dans ce navigateur.', 'The track could not be saved in this browser.')); }
   });
 
   /* Glisser-déposer des sections par leur poignée */
