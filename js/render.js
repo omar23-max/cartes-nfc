@@ -601,19 +601,20 @@
       const more = m.d === 'd3' && b.text.length > 170 ? '<button type="button" class="more" data-vc="more">Lire la suite</button>' : '';
       return `<p class="txt">${nl(b.text)}</p>${more}`;
     },
-    list(def, b) {
+    list(def, b, m) {
       const items = (b.items || []).filter((x) => x.t);
       if (!items.length) return '';
-      return `<div class="list">${items.map((x) => `<div class="li"><div class="li-m"><div class="li-t">${esc(x.t)}</div>${x.d ? `<div class="li-d">${esc(x.d)}</div>` : ''}</div>${def.price && x.p ? `<div class="li-p">${esc(x.p)}</div>` : ''}</div>`).join('')}</div>`;
+      return `<div class="list">${items.map((x) => `<div class="li${def.photo && x.img ? ' li-ph' : ''}">${def.photo && x.img ? `<img class="li-im" src="${img(x.img, m)}" alt="" loading="lazy">` : ''}<div class="li-m"><div class="li-t">${esc(x.t)}</div>${x.d ? `<div class="li-d">${esc(x.d)}</div>` : ''}</div>${def.price && x.p ? `<div class="li-p">${esc(x.p)}</div>` : ''}</div>`).join('')}</div>`;
     },
     cards(def, b, m) {
-      const items = (b.items || []).filter((x) => x.t);
+      /* Loi 25 : une fiche (personne de l'équipe) sans accord (ok === false) n'est jamais montrée aux visiteurs */
+      const items = (b.items || []).filter((x) => x.t && (x.ok !== false || (m && m.edit && !m.thumb)));
       if (!items.length) return '';
       return `<div class="cards">${items.map((x) => {
         const tag = x.url ? 'a' : 'div';
         const href = x.url ? ` href="${esc(url(x.url))}" target="_blank" rel="noopener"` : '';
         const price = def.price && x.p ? `<span class="cd-p">${esc(x.p)}</span>` : '';
-        return `<${tag} class="cd"${href}>${x.img ? `<div class="cd-im"><img src="${img(x.img, m)}" alt="" loading="lazy">${price}</div>` : ''}<div class="cd-b"><div class="cd-t">${esc(x.t)}</div>${x.d ? `<div class="cd-d">${esc(x.d)}</div>` : ''}${!x.img ? price : ''}</div></${tag}>`;
+        return `<${tag} class="cd${x.ok === false ? ' rev-wait' : ''}"${href}>${x.ok === false ? `<span class="rev-wt">${L2('Accord à confirmer', 'Consent pending')}</span>` : ''}${x.img ? `<div class="cd-im"><img src="${img(x.img, m)}" alt="" loading="lazy">${price}</div>` : ''}<div class="cd-b"><div class="cd-t">${esc(x.t)}</div>${x.d ? `<div class="cd-d">${esc(x.d)}</div>` : ''}${!x.img ? price : ''}</div></${tag}>`;
       }).join('')}</div>`;
     },
     /* Bien vedette : juste inscrit, portes ouvertes, vente en cours ou vendu */
@@ -719,8 +720,9 @@
       if (!b.email) return '';
       return `<form class="qform" novalidate data-subject="Message">${b.text ? `<p class="txt">${nl(b.text)}</p>` : ''}<input name="nom" placeholder="Votre nom" autocomplete="name"><div class="qf-2"><input name="email" type="email" placeholder="Email" autocomplete="email"><input name="tel" type="tel" placeholder="Téléphone" autocomplete="tel"></div><textarea name="msg" rows="4" placeholder="Votre message…"></textarea>${fileField(b)}${consentBox()}<p class="f-err" hidden>Indiquez votre nom et un email ou un téléphone.</p><button class="btn" type="submit">${ic('send', 18)}<span>Envoyer le message</span></button></form>`;
     },
-    reviews(def, b) {
-      const items = (b.items || []).filter((x) => x.t);
+    reviews(def, b, m) {
+      /* Loi 25 : un avis ou une recommandation sans accord (ok === false) n'est jamais montré aux visiteurs */
+      const items = (b.items || []).filter((x) => x.t && (x.ok !== false || (m && m.edit && !m.thumb)));
       if (!items.length) return '';
       /* Recommandations : coordonnées de la personne (téléphone, courriel, LinkedIn), si elles sont renseignées */
       const ct = (x) => { const L = [];
@@ -728,7 +730,7 @@
         if (x.mail) L.push(`<a href="mailto:${esc(x.mail)}" aria-label="${L2('Écrire à', 'Email')} ${esc(x.n || '')}">${ic('mail', 15)}</a>`);
         if (x.li) L.push(`<a href="${esc(url(x.li))}" target="_blank" rel="noopener" aria-label="LinkedIn ${esc(x.n || '')}">${ic('linkedin', 15)}</a>`);
         return L.length ? `<span class="rev-ct">${L.join('')}</span>` : ''; };
-      return `<div class="revs">${items.map((x) => `<figure class="rev">${stars(x.s)}<blockquote>${nl(x.t)}</blockquote><figcaption><b>${esc(x.n)}</b>${x.r ? `<span>${esc(x.r)}</span>` : ''}${def.refs ? ct(x) : ''}</figcaption></figure>`).join('')}</div>`;
+      return `<div class="revs">${items.map((x) => `<figure class="rev${x.ok === false ? ' rev-wait' : ''}">${x.ok === false ? `<span class="rev-wt">${L2('Accord à confirmer : invisible sur la carte publiée', 'Consent pending: hidden on the published card')}</span>` : ''}${stars(x.s)}<blockquote>${nl(x.t)}</blockquote><figcaption><b>${esc(x.n)}</b>${x.r ? `<span>${esc(x.r)}</span>` : ''}${def.refs ? ct(x) : ''}</figcaption></figure>`).join('')}</div>`;
     },
     tags(def, b) {
       const tags = String(b.tags || '').split(',').map((t) => t.trim()).filter(Boolean);

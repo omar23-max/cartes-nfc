@@ -446,3 +446,9 @@
 /* v=376 : moins d'espace entre le titre d'une section et son contenu (Editorial, Signature) */
 .vc-d2 .sec-t, .vc-d5 .sec-t { margin-bottom: 12px; }
 .vc-d2 .list > .li:first-child { padding-top: 4px; }
+
+/* v=378 : photo par activité ; avis ou recommandation en attente d'accord (aperçu du studio seulement) */
+.vc .li.li-ph { align-items: center; }
+.vc .li-im { flex: none; width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
+.vc .rev-wait { opacity: .55; border-style: dashed; }
+.vc .rev-wt { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 700; color: #b45309; }

@@ -1816,6 +1816,15 @@
   const mini = (path, ph, cls = '') => `<input class="mini ${cls}" data-path="${path}" value="${esc(g(path))}" placeholder="${esc(ph)}">`;
   const del = (path, i, label = 'Supprimer') => `<button class="ib" data-act="del" data-path="${path}" data-i="${i}" aria-label="${label}" title="${label}">${ic('trash', 16)}</button>`;
   const add = (path, tpl, label) => `<button class="add" data-act="add" data-path="${path}" data-tpl="${tpl}">${ic('plus', 16)}${label}</button>`;
+  /* Loi 25 (Québec) : les personnes citées sur la carte doivent avoir donné leur accord */
+  const isTeam = (def, b) => def.key === 'team' || /[ée]quipe|\bteam\b/i.test((b && b.title) || def.title || '');
+  const loi25 = (refs) => `<div class="loi25">${ic('shield', 16)}<div><b>Loi 25 (Québec) : protection des renseignements personnels</b><span>${refs === 'team'
+    ? 'Le nom, la fonction et la photo d’un employé ou d’un associé sont des renseignements personnels : publiez-les seulement avec l’accord de chaque personne. Sans la case d’accord cochée, la fiche n’apparaît pas sur votre carte publiée.'
+    : refs
+    ? 'Le nom, la recommandation et les coordonnées (téléphone, courriel, LinkedIn) d’une personne sont des renseignements personnels. Vous êtes responsable de ce que vous saisissez : vérifiez l’exactitude des informations et obtenez l’accord de chaque personne avant de les publier. Sans la case d’accord cochée, la recommandation n’apparaît pas sur votre carte publiée.'
+    : 'Le nom et l’avis d’un client sont des renseignements personnels : publiez-les seulement avec son accord. Sans la case d’accord cochée, l’avis n’apparaît pas sur votre carte publiée.'}</span></div></div>`;
+  const okBox = (p, x, label) => `<label class="ck ok-ck${x.ok === false ? ' wait' : ''}"><input type="checkbox" data-path="${p}.ok" ${x.ok === false ? '' : 'checked'}><span>${label} <small>(Loi 25)</small></span></label>`;
+  const reviewsEd = (b, base) => `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f">${mini(p + '.n', 'Nom du client', 'strong')}${mini(p + '.r', 'Contexte (ex. Client depuis 2021)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Son avis">${esc(x.t)}</textarea>${okBox(p, x, 'Ce client a accepté que son avis et son nom soient publiés sur ma carte.')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter un avis')}`;
   const thumbF = (path) => {
     const v = g(path);
     return `<label class="thf" title="${v ? 'Changer la photo' : 'Ajouter une photo'}">${v ? `<img src="${VC.img(v, mdl())}" alt="">` : ic('image', 18)}<input type="file" accept="image/*" hidden data-img="${path}"></label>`;
@@ -2023,7 +2032,7 @@
     { id: 'engage', g: 'content', ic: 'heart-handshake', n: ['Activités et engagement', 'Activities & involvement'], d: ['Bénévolat, vie associative, activités extrascolaires.', 'Volunteering, community life, extracurriculars.'],
       make: (en) => blk('list', en ? 'Activities & involvement' : 'Activités et engagement', { items: en ? [
         { t: 'Volunteer · local food bank', d: 'Twice a month', p: '' }, { t: 'Student association · member', d: 'Event planning', p: '' }, { t: 'Sports club', d: 'Weekly training', p: '' }] : [
-        { t: 'Bénévole · banque alimentaire', d: 'Deux fois par mois', p: '' }, { t: 'Association étudiante · membre', d: 'Organisation d’événements', p: '' }, { t: 'Club sportif', d: 'Entraînement chaque semaine', p: '' }] }) },
+        { t: 'Bénévole · banque alimentaire', d: 'Deux fois par mois', p: '' }, { t: 'Association étudiante · membre', d: 'Organisation d’événements', p: '' }, { t: 'Club sportif', d: 'Entraînement chaque semaine', p: '' }] }, { photo: true }) },
     { id: 'playlist', g: 'media', ic: 'list-music', n: ['Mes créations musicales', 'My music'], d: ['Vos morceaux, à écouter en un clic.', 'Your tracks, played in one click.'],
       make: (en) => blk('playlist', en ? 'My tracks' : 'Mes créations', { vol: 70, items: (NFC.EV_MUSIC || []).slice(2, 4).map((z) => ({ t: en ? z.en : z.fr, by: '', src: z.src })) }) },
     { id: 'favmusic', g: 'media', ic: 'heart', n: ['Mes musiques préférées', 'My favorite music'], d: ['Les morceaux que vous aimez.', 'The tracks you love.'],
@@ -2190,7 +2199,7 @@
       case 'text':
         return area('Texte', base + '.text', { rows: 6, hint: def.help });
       case 'list':
-        return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.items.${i}.t`, 'Intitulé', 'strong')}${mini(`${base}.items.${i}.d`, 'Détail (facultatif)', def.price ? '' : 'full')}${def.price ? mini(`${base}.items.${i}.p`, 'Prix (ex. dès 89 €)', 'price') : ''}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'item', 'Ajouter une ligne')}`;
+        return `<div class="items">${(b.items || []).map((x, i) => `<div class="it">${def.photo ? thumbF(`${base}.items.${i}.img`) : ''}<div class="it-f">${mini(`${base}.items.${i}.t`, 'Intitulé', 'strong')}${mini(`${base}.items.${i}.d`, 'Détail (facultatif)', def.price ? '' : 'full')}${def.price ? mini(`${base}.items.${i}.p`, 'Prix (ex. dès 89 €)', 'price') : ''}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'item', 'Ajouter une ligne')}`;
       /* ---------- Événements ---------- */
       case 'envelope':
         return `<span class="f-l">Modèle d’enveloppe</span><div class="ev-envs">${(NFC.EV_ENVS || []).map(([k, fr, en]) => `<button type="button" class="${(b.style || (NFC.EV_ENV_OF || {})[sec().id] || 'or') === k ? 'on' : ''}" data-act="bkmode" data-path="${base}.style" data-v="${k}">${NFC.evEnvHTML ? NFC.evEnvHTML(k, { seal: b.seal }, false).replace('<button type="button" class="ev-stage"', '<span class="ev-stage"').replace(/<\/button><\/div>$/, '</span></div>') : ''}<span class="n">${esc(ui() === 'en' ? en : fr)}</span></button>`).join('')}</div>
@@ -2239,8 +2248,11 @@
       /* Étapes numérotées */
       case 'steps':
         return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f">${mini(`${base}.items.${i}.t`, 'Étape', 'strong')}${mini(`${base}.items.${i}.d`, 'Détail (facultatif)', 'full')}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'item', 'Ajouter une étape')}`;
-      case 'cards':
-        return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it">${thumbF(p + '.img')}<div class="it-f">${mini(p + '.t', 'Titre', 'strong')}${mini(p + '.d', 'Description', def.price ? '' : 'full')}${def.price ? mini(p + '.p', 'Prix', 'price') : ''}${mini(p + '.url', 'Lien (facultatif)', 'full')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'card', 'Ajouter une fiche')}`;
+      case 'cards': {
+        /* Section Équipe (nom et photo d'une personne) : accord Loi 25 comme pour les avis */
+        const team = isTeam(def, b);
+        return `${team ? loi25('team') : ''}<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it">${thumbF(p + '.img')}<div class="it-f">${mini(p + '.t', team ? 'Nom de la personne' : 'Titre', 'strong')}${mini(p + '.d', team ? 'Fonction' : 'Description', def.price ? '' : 'full')}${def.price ? mini(p + '.p', 'Prix', 'price') : ''}${mini(p + '.url', 'Lien (facultatif)', 'full')}${team ? okBox(p, x, 'Cette personne a accepté que son nom, sa fonction et sa photo soient publiés.') : ''}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', team ? 'member' : 'card', team ? 'Ajouter une personne' : 'Ajouter une fiche')}`;
+      }
       case 'stats':
         return `<div class="items">${(b.items || []).map((x, i) => `<div class="it"><div class="it-f stat-f">${mini(`${base}.items.${i}.v`, 'Chiffre (ex. 48)', 'strong')}${mini(`${base}.items.${i}.l`, 'Libellé (ex. biens vendus en 2025)')}</div>${del(base + '.items', i)}</div>`).join('')}</div>${add(base + '.items', 'stat', 'Ajouter un chiffre')}`;
       case 'menu':
@@ -2313,11 +2325,10 @@
         return body + area('Texte d’accompagnement', base + '.text', { rows: 2 });
       }
       case 'reviews':
+        if (!def.refs) return `${loi25(false)}${reviewsEd(b, base)}`;
         /* Recommandations (étudiants, stagiaires…) : coordonnées de la personne qui recommande */
-        if (def.refs) return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f ref-f">${mini(p + '.n', 'Nom de la personne', 'strong')}${mini(p + '.r', 'Fonction (ex. Professeur, Superviseure de stage)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Sa recommandation">${esc(x.t)}</textarea>
-            <div class="ref-ct">${mini(p + '.tel', 'Téléphone')}${mini(p + '.mail', 'Courriel')}${mini(p + '.li', 'Profil LinkedIn (https://linkedin.com/in/…)')}</div></div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter une recommandation')}
-          <p class="f-h">Les coordonnées sont facultatives. Ne les affichez qu’avec l’accord de la personne qui vous recommande.</p>`;
-        return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f">${mini(p + '.n', 'Nom du client', 'strong')}${mini(p + '.r', 'Contexte (ex. Client depuis 2021)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Son avis">${esc(x.t)}</textarea></div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter un avis')}`;
+        if (def.refs) return `${loi25(true)}<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f ref-f">${mini(p + '.n', 'Nom de la personne', 'strong')}${mini(p + '.r', 'Fonction (ex. Professeur, Superviseure de stage)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Sa recommandation">${esc(x.t)}</textarea>
+            <div class="ref-ct">${mini(p + '.tel', 'Téléphone')}${mini(p + '.mail', 'Courriel')}${mini(p + '.li', 'Profil LinkedIn (https://linkedin.com/in/…)')}</div>${okBox(p, x, 'J’ai obtenu l’accord de cette personne pour publier son nom, sa recommandation et les coordonnées saisies ci-dessus.')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter une recommandation')}`;
       case 'contact':
         return `${inp('Adresse de réception des messages', base + '.email', { type: 'email' })}${area('Texte d’introduction', base + '.text', { rows: 2 })}
           <label class="ck"><input type="checkbox" data-path="${base}.files" ${b.files ? 'checked' : ''}><span>Permettre au visiteur de joindre des fichiers (PDF, JPG, PNG)</span></label>`;
@@ -2419,7 +2430,7 @@
   }
 
   const TPL = X.tpl || {};
-  Object.assign(TPL, { track: { t: '', by: '', src: '' }, rev: { n: '', r: '', t: '', s: 5 }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } }, X.tpl || {});
+  Object.assign(TPL, { track: { t: '', by: '', src: '' }, member: { t: '', d: '', p: '', img: '', url: '', ok: false }, rev: { n: '', r: '', t: '', s: 5, ok: false }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } }, X.tpl || {});
 
   function structChanged() {
     save();
@@ -3298,6 +3309,21 @@
     }
   });
 
+  /* Loi 25 : registre des accords déclarés par le client (admin > Confidentialité ; sur GoBiz : enregistré en base) */
+  document.addEventListener('change', (e) => {
+    const t = e.target; if (t.type !== 'checkbox' || !/\.items\.\d+\.ok$/.test(t.dataset.path || '')) return;
+    const ip = t.dataset.path.replace(/\.ok$/, ''), it = g(ip) || {}, bp = ip.replace(/\.items\.\d+$/, ''), bl = g(bp) || {};
+    const key = (bp.match(/^blocks\.([^.]+)$/) || [])[1], def = key ? (sec().blocks || []).find((d) => d.key === key) : null;
+    const cu = (bp.match(/^custom\.(\d+)\.data$/) || [])[1], cdef = cu != null ? ((card().custom || [])[+cu] || {}) : null;
+    const secT = bl.title || (def && def.title) || (cdef && (cdef.title || (cdef.def || {}).title)) || '';
+    const kind = def ? (def.type === 'cards' ? 'team' : def.refs ? 'refs' : 'reviews') : (cdef && (cdef.def || {}).type === 'cards' ? 'team' : 'reviews');
+    const cur = S.pf ? (pfInit().list.find((x) => x.id === S.pf.cur) || {}).name || '' : '';
+    try {
+      const L = JSON.parse(localStorage.getItem('nextap-consents') || '[]');
+      L.unshift({ at: new Date().toISOString(), ok: t.checked, kind, studio: KIND, link: S.id || '', creation: cur, sector: (sec() || {}).name || '', section: secT, person: it.n || it.t || '', role: it.r || it.d || '' });
+      localStorage.setItem('nextap-consents', JSON.stringify(L.slice(0, 1000)));
+    } catch (er) { /* stockage indisponible */ }
+  });
   /* Écoute dans l'éditeur : un seul lecteur ; le bouton passe de ▶ à ❚❚ */
   const musPrev = {};
   function musPrevUi(on) { document.querySelectorAll('.mus-pp').forEach((x) => { x.classList.toggle('on', on); x.innerHTML = ic(on ? 'pause' : 'play', 16); }); }

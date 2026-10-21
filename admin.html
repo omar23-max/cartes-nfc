@@ -8,11 +8,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/card.css?v=377">
-  <link rel="stylesheet" href="css/card-plus.css?v=377">
-  <link rel="stylesheet" href="css/noir.css?v=377">
-  <link rel="stylesheet" href="css/immo.css?v=377">
-  <link rel="stylesheet" href="css/app.css?v=377">
+  <link rel="stylesheet" href="css/card.css?v=379">
+  <link rel="stylesheet" href="css/card-plus.css?v=379">
+  <link rel="stylesheet" href="css/noir.css?v=379">
+  <link rel="stylesheet" href="css/immo.css?v=379">
+  <link rel="stylesheet" href="css/app.css?v=379">
   <style>
     .adm-wrap > main { min-width: 0; }
     .adm-wrap { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; max-width: 1240px; margin: 0 auto; padding: 24px 20px 80px; }
@@ -158,34 +158,34 @@
   <div id="modal" class="modal"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/services.js?v=377"></script>
-  <script src="js/data.js?v=377"></script>
-  <script src="js/sectors.js?v=377"></script>
-  <script src="js/media.js?v=377"></script>
-  <script src="js/extras.js?v=377"></script>
-  <script src="js/locale-na.js?v=377"></script>
-  <script src="js/locale-na-en.js?v=377"></script>
-  <script src="js/google.js?v=377"></script>
-  <script src="js/profiles.js?v=377"></script>
-  <script src="js/profiles-sport.js?v=377"></script>
-  <script src="js/profiles-sante.js?v=377"></script>
-  <script src="js/profiles-archi.js?v=377"></script>
-  <script src="js/profiles-resto.js?v=377"></script>
-  <script src="js/profiles-auto.js?v=377"></script>
-  <script src="js/profiles-prod.js?v=377"></script>
-  <script src="js/profiles-edu.js?v=377"></script>
-  <script src="js/designs-immo.js?v=377"></script>
-  <script src="js/sector-prestige.js?v=377"></script>
-  <script src="js/custom-catalog.js?v=377"></script>
-  <script src="js/jobs.js?v=377"></script>
-  <script src="js/render.js?v=377"></script>
-  <script src="js/designs-immo-der.js?v=377"></script>
-  <script src="js/demo-faces.js?v=377"></script>
-  <script src="js/designs-noir.js?v=377"></script>
-  <script src="js/section-suggest.js?v=377"></script>
-  <script src="js/section-music.js?v=377"></script>
+  <script src="js/services.js?v=379"></script>
+  <script src="js/data.js?v=379"></script>
+  <script src="js/sectors.js?v=379"></script>
+  <script src="js/media.js?v=379"></script>
+  <script src="js/extras.js?v=379"></script>
+  <script src="js/locale-na.js?v=379"></script>
+  <script src="js/locale-na-en.js?v=379"></script>
+  <script src="js/google.js?v=379"></script>
+  <script src="js/profiles.js?v=379"></script>
+  <script src="js/profiles-sport.js?v=379"></script>
+  <script src="js/profiles-sante.js?v=379"></script>
+  <script src="js/profiles-archi.js?v=379"></script>
+  <script src="js/profiles-resto.js?v=379"></script>
+  <script src="js/profiles-auto.js?v=379"></script>
+  <script src="js/profiles-prod.js?v=379"></script>
+  <script src="js/profiles-edu.js?v=379"></script>
+  <script src="js/designs-immo.js?v=379"></script>
+  <script src="js/sector-prestige.js?v=379"></script>
+  <script src="js/custom-catalog.js?v=379"></script>
+  <script src="js/jobs.js?v=379"></script>
+  <script src="js/render.js?v=379"></script>
+  <script src="js/designs-immo-der.js?v=379"></script>
+  <script src="js/demo-faces.js?v=379"></script>
+  <script src="js/designs-noir.js?v=379"></script>
+  <script src="js/section-suggest.js?v=379"></script>
+  <script src="js/section-music.js?v=379"></script>
   <script>NFC.CARD_SECTORS = NFC.SECTORS; /* events-data.js remplace la liste : on la garde */</script>
-  <script src="events/js/events-data.js?v=377"></script>
+  <script src="events/js/events-data.js?v=379"></script>
   <script>NFC.EVENT_SECTORS = NFC.SECTORS; NFC.SECTORS = NFC.CARD_SECTORS;</script>
   <script>
   (function () {
@@ -343,7 +343,15 @@
       ${box('Formulaires et échanges de coordonnées', LIVE, '', fBool('privacy.consent', 'Case de consentement obligatoire', '« J’accepte que mes coordonnées soient transmises à ce professionnel. »'))}
       ${box('Google Maps', LIVE, '', fBool('privacy.mapClick', 'Afficher le plan seulement au clic', 'Aucune donnée n’est envoyée à Google tant que le visiteur ne clique pas.'))}
       ${box('Politique de confidentialité', LIVE, '', fTxt('privacy.policyUrl', 'Lien affiché en bas des cartes', 'Vide = pas de lien', 'https://nextap.ca/confidentialite', 'url'))}
-      ${box('Conservation des contacts reçus', GB, '', fSel('privacy.retention', 'Durée de conservation', [[6, '6 mois'], [12, '12 mois'], [24, '24 mois'], [36, '36 mois']]))}`;
+      ${box('Conservation des contacts reçus', GB, '', fSel('privacy.retention', 'Durée de conservation', [[6, '6 mois'], [12, '12 mois'], [24, '24 mois'], [36, '36 mois']]))}
+      ${box('Accords Loi 25 déclarés par les clients', LIVE, 'Chaque fois qu’un client coche (ou décoche) « J’ai obtenu l’accord de cette personne » dans une recommandation, un avis ou une fiche d’équipe, c’est noté ici avec la date. Sur GoBiz : enregistré en base de données et visible dans la fiche du client. Site test : accords faits dans ce navigateur.', consentsHTML())}`;
+    function consentsHTML() {
+      let L = []; try { L = JSON.parse(localStorage.getItem('nextap-consents') || '[]'); } catch (e) { L = []; }
+      if (!L.length) return '<p class="adm-empty">Aucun accord déclaré pour l’instant.</p>';
+      const K = { refs: 'Recommandation', reviews: 'Avis client', team: 'Équipe' };
+      const d = (x) => { try { return new Date(x).toLocaleString('fr-CA', { dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return x; } };
+      return `<div style="overflow-x:auto"><table class="adm-tab" style="width:100%;border-collapse:collapse;font-size:13px"><thead><tr style="text-align:left;color:var(--mut)"><th style="padding:6px 8px">Date</th><th style="padding:6px 8px">Personne citée</th><th style="padding:6px 8px">Type</th><th style="padding:6px 8px">Création du client</th><th style="padding:6px 8px">Accord</th></tr></thead><tbody>${L.slice(0, 200).map((x) => `<tr style="border-top:1px solid var(--line)"><td style="padding:6px 8px;white-space:nowrap">${esc(d(x.at))}</td><td style="padding:6px 8px"><b>${esc(x.person || '—')}</b>${x.role ? `<br><small style="color:var(--mut)">${esc(x.role)}</small>` : ''}</td><td style="padding:6px 8px">${esc(K[x.kind] || x.kind)}<br><small style="color:var(--mut)">${esc(x.section || '')}</small></td><td style="padding:6px 8px">${esc(x.creation || '—')}<br><small style="color:var(--mut)">${esc(x.sector || '')}${x.link ? ' · ' + esc(x.link) : ''}</small></td><td style="padding:6px 8px">${x.ok ? '<span style="color:#15803d;font-weight:700">✓ Accord donné</span>' : '<span style="color:#b45309;font-weight:700">Retiré</span>'}</td></tr>`).join('')}</tbody></table></div>`;
+    }
 
     /* 10. Cartes et statistiques */
     P.cards = () => {

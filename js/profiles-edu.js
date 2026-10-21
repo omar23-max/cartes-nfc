@@ -17,7 +17,7 @@
     B('parcours', 'list', 'Parcours', { help: 'Formation, diplômes, expériences' }),
     B('skills', 'tags', 'Compétences', { icon: 'check' }),
     B('projects', 'cards', 'Projets', { help: 'Travaux, réalisations, projets d’équipe' }),
-    B('engage', 'list', 'Activités et engagement', { help: 'Activités extrascolaires, vie associative, bénévolat, sport' }),
+    B('engage', 'list', 'Activités et engagement', { photo: true, help: 'Activités extrascolaires, vie associative, bénévolat, sport' }),
     B('gallery', 'gallery', 'En images'),
     B('booking', 'action', 'Rendez-vous', { cta: 'Prendre rendez-vous', icon: 'cal', help: 'Lien Calendly ou équivalent' }),
     B('docs', 'links', 'CV et documents', { help: 'CV, portfolio, lettre de recommandation…' }),
