@@ -687,7 +687,10 @@
     document.documentElement.lang = ui();
     document.title = X.title ? X.title[ui() === 'en' ? 1 : 0] : 'NexTap Studio';
     const main = $('#main');
+    /* Les étapes reviennent dans l'en-tête avant de redessiner la page (ordinateur : elles redescendent juste après) */
+    { const st0 = $('#steps'), home = $('#steps-home'); if (st0 && home && !st0.closest('.top')) home.after(st0); }
     main.innerHTML = [step1, step2, step3, step4, step5][S.step - 1]();
+    desktopLayout();
     main.dataset.step = S.step;
     icons();
     if (S.step === 5) drawQR();
@@ -711,6 +714,10 @@
       if (pt && uw && rs && window.matchMedia('(max-width: 560px)').matches && !pt.querySelector('.pt-tools')) {
         const tl = document.createElement('span'); tl.className = 'pt-tools'; tl.append(uw, rs); pt.append(tl);
         const mk = document.createElement('a'); mk.className = 'pt-mk'; mk.href = (isStores || isEvents ? '../' : '') + 'index.html'; mk.setAttribute('aria-label', 'NexTap'); pt.prepend(mk);
+      }
+      /* Ordinateur (v=362) : les étapes sont descendues dans la page, FR | EN et « Recommencer » montent à droite des onglets */
+      if (pt && uw && rs && window.matchMedia('(min-width: 901px)').matches && !pt.querySelector('.pt-tools')) {
+        const tl = document.createElement('span'); tl.className = 'pt-tools pt-desk'; tl.append(uw, rs); pt.append(tl);
       } }
     /* Bandeau du mode assistance, sous les onglets */
     const A = assistNow(), bar = document.querySelector('.assist-bar');
@@ -722,6 +729,24 @@
       if (pt) pt.after(el); else document.body.prepend(el);
     } else if (!A && bar) bar.remove();
   }
+  /* Ordinateur (v=362) : les étapes descendent dans la page, sur la ligne de « Changer de… » ;
+     le choix de langue de la carte (Français | Anglais | Bilingue) monte dans l'en-tête, à droite de « Nouvelle création » */
+  function desktopLayout() {
+    const top = $('.top'), st = $('#steps'), main = $('#main');
+    let slot = $('.top .hd-lng');
+    if (!slot && top) { slot = document.createElement('div'); slot.className = 'hd-lng no-rw'; top.append(slot); }
+    if (slot) { slot.innerHTML = ''; slot.hidden = true; }
+    if (!top || !st || !main || !window.matchMedia('(min-width: 901px)').matches) return;
+    if (!$('#steps-home')) { const h = document.createElement('span'); h.id = 'steps-home'; h.hidden = true; st.before(h); }
+    const sec0 = main.querySelector('section.wrap') || main;
+    const line = document.createElement('div'); line.className = 'st-line';
+    [...sec0.children].filter((e) => e.matches('.back')).forEach((b) => line.append(b));
+    line.append(st);
+    sec0.prepend(line);
+    const ls = [...main.querySelectorAll('.lang-sw')];
+    if (ls.length && slot) { slot.append(ls.find((e) => e.closest('.ed-links')) || ls[0]); ls.forEach((e) => { if (!slot.contains(e)) e.remove(); }); slot.hidden = false; const el = main.querySelector('.ed-lang'); if (el && !el.children.length) el.remove(); }
+  }
+  window.addEventListener('resize', () => { const st = $('#steps'), want = window.matchMedia('(min-width: 901px)').matches; if (st && want === !st.closest('.top')) return; clearTimeout(desktopLayout.t); desktopLayout.t = setTimeout(render, 150); });
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
   function reword(root) {
     /* Textes remplacés par l’administrateur (en français) */
@@ -753,16 +778,19 @@
     const cl = br.left + parseFloat(bs.paddingLeft), cw = br.width - parseFloat(bs.paddingLeft) - parseFloat(bs.paddingRight);
     const ww = Math.min(1280, cw), wl = cl + (cw - ww) / 2, mid = wl + (ww - 431) / 2;
     const sts = st.querySelectorAll('.st'); if (!sts.length) return;
-    const a = sts[0].getBoundingClientRect().left, b = sts[sts.length - 1].getBoundingClientRect().right;
-    const rgt = [...document.querySelectorAll('.top > *')].filter((e) => e.offsetParent && e !== st && Math.abs(e.getBoundingClientRect().top - st.getBoundingClientRect().top) < 30 && e.getBoundingClientRect().left > b).map((e) => e.getBoundingClientRect().left);
-    let d = mid - (a + b) / 2;
-    if (rgt.length) d = Math.min(d, Math.min(...rgt) - 16 - b);
-    st.style.transform = `translateX(${Math.round(d)}px)`;
-    const g = [ct, $('.top .hd-ed'), hl, $('.top .mycre'), $('.top .newc2')].filter((e) => e && !e.hidden && e.offsetParent);
+    if (st.closest('.top')) {
+      const a = sts[0].getBoundingClientRect().left, b = sts[sts.length - 1].getBoundingClientRect().right;
+      const rgt = [...document.querySelectorAll('.top > *')].filter((e) => e.offsetParent && e !== st && Math.abs(e.getBoundingClientRect().top - st.getBoundingClientRect().top) < 30 && e.getBoundingClientRect().left > b).map((e) => e.getBoundingClientRect().left);
+      let d = mid - (a + b) / 2;
+      if (rgt.length) d = Math.min(d, Math.min(...rgt) - 16 - b);
+      st.style.transform = `translateX(${Math.round(d)}px)`;
+    }
+    const g = [ct, $('.top .hd-ed'), hl, $('.top .mycre'), $('.top .newc2'), $('.top .hd-lng')].filter((e) => e && !e.hidden && e.offsetParent);
     if (!g.length) return;
     g.forEach((e) => { e.style.transform = ''; });
     const l = Math.min(...g.map((e) => e.getBoundingClientRect().left)), r = Math.max(...g.map((e) => e.getBoundingClientRect().right));
-    let d2 = mid - (l + r) / 2;
+    /* Groupe plus large que la colonne de gauche : centré sur la page */
+    let d2 = (r - l > ww - 431 ? wl + ww / 2 : mid) - (l + r) / 2;
     d2 = Math.min(d2, innerWidth - 24 - r); d2 = Math.max(d2, 0);
     g.forEach((e) => { e.style.transform = `translateX(${Math.round(d2)}px)`; });
   }

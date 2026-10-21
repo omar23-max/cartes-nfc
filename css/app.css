@@ -1705,3 +1705,26 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .top .hd-ed, .top .hd-live, .top .mycre, .top .newc.newc2 { transition: none; }
 }
 @media (min-width: 901px) and (max-width: 1180px) { .top .hd-ed, .top .hd-live, .top .mycre, .top .newc.newc2 { width: 200px; } }
+
+/* v=362 — ordinateur : étapes dans la page (ligne de « Changer de… »), langue de la carte dans l'en-tête */
+.hd-lng[hidden] { display: none !important; }
+@media (max-width: 900px) { .top .hd-lng { display: none !important; } }
+@media (min-width: 901px) {
+  .st-line { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 22px; margin: 0 0 22px; }
+  .st-line > .back { margin: 0; }
+  .st-line > #steps { transform: none !important; margin: 0; }
+  .top .hd-lng { order: 24; box-sizing: border-box; height: 72px; flex: none; margin: 0; padding: 8px 14px; border: 1px solid #e4e4e7; border-radius: 14px; background: #fff; display: flex; align-items: center; }
+  .top .hd-lng .lang-sw { display: flex; align-items: center; flex-wrap: nowrap; gap: 12px; margin: 0; }
+  .top .hd-lng .lang-sw .seg { padding: 4px; border-radius: 10px; }
+  .top .hd-lng .lang-sw .seg button { min-height: 34px; padding: 0 12px; font-size: 13.5px; }
+  .top .hd-lng .lang-sw .lbl-l { display: none; } .top .hd-lng .lang-sw .lbl-s { display: inline; }
+  .top .hd-lng .bili-ck { white-space: nowrap; }
+}
+@media (min-width: 901px) and (max-width: 1500px) { .top .hd-ed, .top .hd-live, .top .mycre, .top .newc.newc2 { width: 196px; } .top .mycre, .top .newc.newc2 { font-size: 13px; } }
+
+@media (min-width: 901px) {
+  .ptabs { position: relative; }
+  .ptabs > .pt-tools.pt-desk { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); display: inline-flex; align-items: center; gap: 8px; }
+  .ptabs > .pt-tools.pt-desk .reset { min-height: 32px; padding: 0 8px; }
+  .ptabs > .pt-tools.pt-desk .reset span { display: none; }
+}
