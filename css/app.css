@@ -1728,3 +1728,19 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
   .ptabs > .pt-tools.pt-desk .reset { min-height: 32px; padding: 0 8px; }
   .ptabs > .pt-tools.pt-desk .reset span { display: none; }
 }
+
+/* v=363 — ordinateur : étapes sous le titre, à gauche ; langue avant « Nouvelle création » ; « Nouvelle création » blanc comme les autres blocs */
+@media (min-width: 901px) {
+  .st-line { justify-content: flex-start; margin: 4px 0 16px; }
+  .sh .st-line { margin: 10px 0 14px; }
+  .st-line > #steps { justify-content: flex-start; }
+  .top .hd-lng { order: 23; } .top .newc.newc2 { order: 24; }
+}
+@media (min-width: 561px) {
+  .top .newc.newc2 { background: #fff; color: var(--ink); border: 1px solid #e4e4e7; }
+  .top .newc.newc2:hover { background: #f4f4f5; }
+}
+/* Favoris : cœur */
+.tpl-fav { display: grid; place-items: center; color: #a1a1aa; }
+.tpl-fav:hover, .tpl-fav.on { color: #e11d48; }
+.tpl-favb { background: #ffe4e6; color: #be123c; }

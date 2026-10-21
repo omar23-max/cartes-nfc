@@ -738,11 +738,11 @@
     if (slot) { slot.innerHTML = ''; slot.hidden = true; }
     if (!top || !st || !main || !window.matchMedia('(min-width: 901px)').matches) return;
     if (!$('#steps-home')) { const h = document.createElement('span'); h.id = 'steps-home'; h.hidden = true; st.before(h); }
-    const sec0 = main.querySelector('section.wrap') || main;
+    /* Sous le titre de la page (entre le titre et son texte) ; sans titre : en haut de la page */
+    const sec0 = main.querySelector('section.wrap') || main, h1 = sec0.querySelector('.sh h1, h1');
     const line = document.createElement('div'); line.className = 'st-line';
-    [...sec0.children].filter((e) => e.matches('.back')).forEach((b) => line.append(b));
     line.append(st);
-    sec0.prepend(line);
+    if (h1) h1.after(line); else sec0.prepend(line);
     const ls = [...main.querySelectorAll('.lang-sw')];
     if (ls.length && slot) { slot.append(ls.find((e) => e.closest('.ed-links')) || ls[0]); ls.forEach((e) => { if (!slot.contains(e)) e.remove(); }); slot.hidden = false; const el = main.querySelector('.ed-lang'); if (el && !el.children.length) el.remove(); }
   }
@@ -1285,11 +1285,11 @@
     const fv = favs();
     const cards = designsNow().map((d) => { const sn = desSoon(d.id), fav = fv.includes(d.id); return `
       <div class="tpl ${S.design === d.id ? 'sel' : ''} ${ADM() && dOff(d) ? 'adm-off' : ''} ${sn ? 'soon' : ''}" role="button" tabindex="0" aria-label="Choisir le modèle ${d.name}" data-act="${sn && !ADM() ? 'dsoon' : 'design'}" data-id="${d.id}">
-        <button type="button" class="tpl-fav ${fav ? 'on' : ''}" data-act="fav" data-id="${d.id}" aria-pressed="${fav}" title="${fav ? TT('Retirer des favoris', 'Remove from favorites') : TT('Ajouter aux favoris', 'Add to favorites')}" aria-label="${fav ? TT('Retirer des favoris', 'Remove from favorites') : TT('Ajouter aux favoris', 'Add to favorites')}">${fav ? '★' : '☆'}</button>
+        <button type="button" class="tpl-fav ${fav ? 'on' : ''}" data-act="fav" data-id="${d.id}" aria-pressed="${fav}" title="${fav ? TT('Retirer des favoris', 'Remove from favorites') : TT('Ajouter aux favoris', 'Add to favorites')}" aria-label="${fav ? TT('Retirer des favoris', 'Remove from favorites') : TT('Ajouter aux favoris', 'Add to favorites')}"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.6-9.2C.9 8 2.8 4.5 6.4 4.5c2.1 0 3.6 1.2 4.6 2.7 1-1.5 2.5-2.7 4.6-2.7 3.6 0 5.5 3.5 4 6.8-2.1 4.6-9.6 9.2-9.6 9.2z" fill="${fav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>
         <div class="tpl-view"><div class="thumb" aria-hidden="true"><div class="phone"><div class="phone-screen">${VC.render(Object.assign(mdl(d.id), { thumb: true }))}</div></div></div>
           <button type="button" class="tpl-zoom" data-act="fullpreview" data-id="${d.id}" aria-label="Aperçu plein écran du modèle ${d.name}">${ic('eye', 15)}Aperçu</button></div>
         <div class="tpl-meta">
-          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${fav ? `<span class="tpl-favb">★ ${TT('Favori', 'Favorite')}</span>` : ''}${sn ? `<span class="tpl-soon">${TT('Bientôt', 'Coming soon')}</span>` : ''}${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}${isEvents ? '' : (() => { const c = coverCaps(d.id); return c.vid ? `<span class="cv-tag vid" title="${TT('Couverture : image ou vidéo', 'Cover: image or video')}">${ic('play', 11)}${TT('Couverture vidéo', 'Video cover')}</span>` : c.img ? `<span class="cv-tag img" title="${TT('Couverture : image seulement (pas de vidéo)', 'Cover: image only (no video)')}">${ic('image', 11)}${TT('Couverture image', 'Image cover')}</span>` : ''; })()}</div>
+          <div class="tpl-top"><span class="tpl-n">${d.name}</span>${fav ? `<span class="tpl-favb">♥ ${TT('Favori', 'Favorite')}</span>` : ''}${sn ? `<span class="tpl-soon">${TT('Bientôt', 'Coming soon')}</span>` : ''}${recOf(s) === d.id ? '<span class="rec">Recommandé</span>' : ''}${isEvents ? '' : (() => { const c = coverCaps(d.id); return c.vid ? `<span class="cv-tag vid" title="${TT('Couverture : image ou vidéo', 'Cover: image or video')}">${ic('play', 11)}${TT('Couverture vidéo', 'Video cover')}</span>` : c.img ? `<span class="cv-tag img" title="${TT('Couverture : image seulement (pas de vidéo)', 'Cover: image only (no video)')}">${ic('image', 11)}${TT('Couverture image', 'Image cover')}</span>` : ''; })()}</div>
           <p>${d.desc}</p>
           <div class="tpl-foot"><span class="tpl-code">${s.code}-${d.id.toUpperCase()}</span><span class="tpl-go">Choisir ${ic('arrow', 14)}</span></div>
           ${ADM() ? admTools('des', d.id, dOff(d) ? 'off' : sn ? 'soon' : 'on', true, recOf(s) === d.id) : ''}
@@ -1300,7 +1300,7 @@
       ${editLine()}
       ${langSwitch()}
       ${head('Choisissez votre modèle', `${designsNow().length} mises en page pour <b>${s.profile ? profName(s.profile) : s.name}</b>. Cliquez pour choisir, vous pourrez en changer à tout moment sans perdre vos informations. Les couleurs viennent à la page suivante.`)}
-      ${fv.length ? `<p class="muted small tpl-favh">★ ${TT('Vos modèles favoris apparaissent en premier.', 'Your favorite templates come first.')}</p>` : ''}
+      ${fv.length ? `<p class="muted small tpl-favh">♥ ${TT('Vos modèles favoris apparaissent en premier.', 'Your favorite templates come first.')}</p>` : ''}
       <div class="tpls" ${ADM() ? 'data-dnd-box="des"' : ''}>${cards}</div>
     </section>`;
   }
