@@ -3215,10 +3215,12 @@
     }
     const id = groupOf(e.target);
     if (!id) return;
+    followId = id;
+    /* Téléphone, onglet Aperçu : on referme l'aperçu plein écran, on revient sur « Modifier » et on ouvre le panneau de la section */
     if (mobileTab === 'view' && window.matchMedia('(max-width: 900px)').matches) {
-      mobileTab = 'edit';
-      $('.ed-grid').classList.replace('tab-view', 'tab-edit');
-      document.querySelectorAll('.mtabs button').forEach((b) => b.classList.toggle('on', b.dataset.t === 'edit'));
+      mobileTab = 'edit'; render();
+      setTimeout(() => focusGroup(id), 30);
+      return;
     }
     focusGroup(id);
   });
