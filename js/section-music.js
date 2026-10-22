@@ -31,8 +31,33 @@
   if (!EV) V.S.music = (def, b) => {
     const src = srcOf(b.src);
     if (!src) return '';
-    return `<div class="vc-mus"><button type="button" class="vc-play" data-vc="vc-music" aria-label="${L2('Lire la musique', 'Play music')}">${PLAY}</button><div><b>${esc(b.track || L2('Musique', 'Music'))}</b><small>${L2('Appuyez pour écouter', 'Tap to listen')}</small></div>${NOTE}<audio src="${esc(src)}" preload="none" loop data-vol="${b.vol == null ? 70 : +b.vol}"></audio></div>`;
+    return `<div class="vc-mus"><button type="button" class="vc-play" data-vc="vc-music" aria-label="${L2('Lire la musique', 'Play music')}">${PLAY}</button><div><b>${esc(b.track || L2('Musique', 'Music'))}</b><small>${L2('Appuyez pour écouter', 'Tap to listen')}</small></div>${NOTE}<audio src="${esc(src)}" preload="none" loop data-vol="${b.vol == null ? 70 : +b.vol}" data-auto="${b.auto ? 1 : 0}"></audio></div>`;
   };
+  /* Ambiance musicale qui démarre à l'ouverture (si le client l'a choisi) — pages visiteurs seulement, jamais dans le studio.
+     Les navigateurs bloquent le son avant le premier geste : on essaie tout de suite, sinon au premier toucher.
+     Un bouton flottant « Arrêter la musique » reste affiché tant qu'elle joue. */
+  if (!EV) {
+    let stopped = false, pill = null;
+    const studio = () => !!document.getElementById('pv') || !!document.querySelector('.tpls, .adm-tiles');
+    const autoAu = () => document.querySelector('.vc .vc-mus audio[data-auto="1"]');
+    const showPill = (au) => {
+      if (pill) return;
+      pill = document.createElement('button'); pill.type = 'button'; pill.className = 'vc-mus-stop';
+      pill.innerHTML = `${NOTE}<span>${L2('Arrêter la musique', 'Stop the music')}</span>`;
+      pill.addEventListener('click', () => { stopped = true; au.pause(); const bt = au.parentElement.querySelector('.vc-play'); if (bt) bt.innerHTML = PLAY; pill.remove(); pill = null; });
+      document.body.appendChild(pill);
+    };
+    const start = () => {
+      const au = autoAu(); if (!au || stopped || studio() || !au.paused) return;
+      const v = +au.dataset.vol; au.volume = Math.max(0, Math.min(1, (isNaN(v) ? 70 : v) / 100));
+      au.play().then(() => { const bt = au.parentElement.querySelector('.vc-play'); if (bt) bt.innerHTML = PAUSE; showPill(au); au.addEventListener('pause', () => { if (pill) { pill.remove(); pill = null; } }, { once: true }); }).catch(() => {});
+    };
+    const onGesture = () => { start(); };
+    ['pointerdown', 'touchstart', 'keydown'].forEach((ev) => document.addEventListener(ev, onGesture, { capture: true, passive: true }));
+    let tm = null;
+    new MutationObserver(() => { clearTimeout(tm); tm = setTimeout(start, 400); }).observe(document.documentElement, { childList: true, subtree: true });
+    setTimeout(start, 800);
+  }
   const prev = V.onAct;
   const stopAll = (except) => document.querySelectorAll('.vc-pl audio, .vc-mus audio').forEach((au) => { if (au !== except && !au.paused) { au.pause(); const bt = au.parentElement.querySelector('.vc-play'); if (bt) bt.innerHTML = PLAY; } });
   V.onAct = (a, t, e, m) => {
@@ -68,7 +93,7 @@
   const addTo = (demo, sid, en) => { if (demo && demo.blocks && !demo.blocks.music) { const d = NFC.musicDefault(sid); if (en) d.track = (LIB.find((z) => 'events/media/music/' + z[0] + '.mp3' === d.src) || [])[2] || d.track; demo.blocks.music = d; } };
   (NFC.SECTORS || []).forEach((s) => {
     if (!IDS.includes(s.id) || !Array.isArray(s.blocks) || s.blocks.some((d) => d.type === 'music')) return;
-    const def = { key: 'music', type: 'music', title: 'Musique', help: 'Un morceau à écouter : il ne démarre pas tout seul' };
+    const def = { key: 'music', type: 'music', title: 'Ambiance musicale', help: 'Une musique de fond ; au choix, elle démarre à l’ouverture de la carte' };
     /* Avant « Nous écrire » / le formulaire de contact s'il y en a un, sinon à la fin */
     const i = s.blocks.findIndex((d) => d.type === 'contact' || d.type === 'form');
     if (i < 0) s.blocks.push(def); else s.blocks.splice(i, 0, def);
@@ -90,7 +115,7 @@
     (s.profiles || []).forEach((p) => { plDemo(p.demo, s.id); plDemo(p.demoEn, s.id, true); p._sec = null; });
   });
   Object.assign(window.NFC_EN_UI, { 'Mes créations': 'My tracks', 'Mes musiques préférées': 'My favorite music', 'Vos morceaux : vos visiteurs les écoutent en un clic': 'Your tracks: visitors play them in one click', 'Les morceaux que vous aimez : vos visiteurs les écoutent en un clic': 'The tracks you love: visitors play them in one click' });
-  Object.assign(window.NFC_EN_UI || (window.NFC_EN_UI = {}), { 'Musique': 'Music', 'Un morceau à écouter : il ne démarre pas tout seul': 'A track to listen to: it never starts on its own' });
+  Object.assign(window.NFC_EN_UI || (window.NFC_EN_UI = {}), { 'Ambiance musicale': 'Background music', 'Une musique de fond ; au choix, elle démarre à l’ouverture de la carte': 'Background music; it can start when the card opens', 'Musique': 'Music', 'Un morceau à écouter : il ne démarre pas tout seul': 'A track to listen to: it never starts on its own' });
 
   injectCss();
   /* Style des lecteurs (mêmes couleurs que la carte) */
@@ -99,6 +124,7 @@
   const st = document.createElement('style'); st.id = 'vc-mus-css';
   st.textContent = '.vc .vc-mus{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:999px;background:var(--sf);border:1px solid var(--ln)}'
     + '.vc .vc-mus>div{flex:1;min-width:0}.vc .vc-mus b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.vc .vc-mus small{color:var(--mu);font-size:12px}'
+    + '.vc-mus-stop{position:fixed;left:14px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:60;display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:0;border-radius:999px;background:rgba(17,17,20,.88);color:#fff;font:600 14px/1 system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer}.vc-mus-stop svg{width:18px;height:18px}'
     + '.vc .vc-mus>svg{color:var(--a);flex:none}.vc .vc-play{flex:none;display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:50%;background:var(--p);color:#fff;cursor:pointer}'
     + '.vc .vc-pl{display:grid;gap:8px}.vc .vc-pl-r{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border-radius:999px;background:var(--sf);border:1px solid var(--ln)}'
     + '.vc .vc-pl-r>div{flex:1;min-width:0}.vc .vc-pl-r b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.vc .vc-pl-r small{color:var(--mu);font-size:12px}.vc .vc-pl .vc-play{width:38px;height:38px}';

@@ -340,6 +340,7 @@
 
   function maxStep() { return !S.sectorId ? 1 : !S.design ? 2 : 5; }
   function go(n) {
+    if (n !== S.step) mobileTab = 'edit';
     const pub = n === 5 && S.step !== 5;
     S.step = Math.max(1, Math.min(n, maxStep()));
     if (pub && S.step === 5) { if (NOVER) S.pub = true; else { const P = pfInit(), e = P.list.find((x) => x.id === P.cur); if (e) e.pub = true; } }
@@ -744,13 +745,14 @@
     let slot = $('.top .hd-lng');
     if (!slot && top) { slot = document.createElement('div'); slot.className = 'hd-lng no-rw'; top.append(slot); }
     if (slot) { slot.innerHTML = ''; slot.hidden = true; }
-    if (!top || !st || !main || !window.matchMedia('(min-width: 901px)').matches) return;
+    if (!top || !st || !main) return;
     if (!$('#steps-home')) { const h = document.createElement('span'); h.id = 'steps-home'; h.hidden = true; st.before(h); }
     /* Sous le titre de la page (entre le titre et son texte) ; sans titre : en haut de la page */
     const sec0 = main.querySelector('section.wrap') || main, h1 = [...sec0.querySelectorAll('.sh > h1')].find((e) => !e.closest('#pv, .vc, .phone')); /* jamais le titre de la carte dans l'aperçu */
     const line = document.createElement('div'); line.className = 'st-line';
     line.append(st);
     if (h1) h1.after(line); else sec0.prepend(line);
+    if (!window.matchMedia('(min-width: 901px)').matches) return; /* téléphone et tablette : la langue reste dans la page */
     const ls = [...main.querySelectorAll('.lang-sw')];
     if (!slot) return;
     slot.classList.remove('ph');
@@ -758,7 +760,8 @@
     /* Même ligne à toutes les étapes : la langue est là dès qu'une création existe (aussi à l'étape 1, avant le choix du type) */
     else if (S.sectorId || regAll().length) { slot.innerHTML = langSwitch(); slot.hidden = false; }
   }
-  window.addEventListener('resize', () => { const st = $('#steps'), want = window.matchMedia('(min-width: 901px)').matches; if (st && want === !st.closest('.top')) return; clearTimeout(desktopLayout.t); desktopLayout.t = setTimeout(render, 150); });
+  let dlWide = window.matchMedia('(min-width: 901px)').matches;
+  window.addEventListener('resize', () => { const w = window.matchMedia('(min-width: 901px)').matches; if (w === dlWide) return; dlWide = w; clearTimeout(desktopLayout.t); desktopLayout.t = setTimeout(render, 150); });
   /* Vocabulaire propre à un autre produit (ex. « ma boutique » au lieu de « ma carte »), hors aperçu de la carte */
   function reword(root) {
     /* Textes remplacés par l’administrateur (en français) */
@@ -773,7 +776,7 @@
   }
   /* Téléphone, onglet Aperçu : la carte s’affiche en plein écran, seule la barre Modifier / Aperçu / Publier reste */
   function fitPreview() {
-    const full = S.step === 4 && mobileTab === 'view' && window.innerWidth <= 900;
+    const full = (S.step === 4 || S.step === 3) && mobileTab === 'view' && window.innerWidth <= 900;
     document.body.classList.toggle('pv-full', full);
     const bar = $('.mbar');
     if (bar) document.body.style.setProperty('--mbar-h', bar.getBoundingClientRect().height + 'px');
@@ -1332,7 +1335,7 @@
       </button>`, 'pal', String(i), pst(i) === 'on' ? 'on' : 'off')).join('') + (ADM() ? `<button type="button" class="pal pal-add" data-act="adm" data-op="paladd">${ic('plus', 16)}<span class="pal-n">Ajouter une palette</span></button>` : '');
     /* Titre dans la colonne de gauche : sur ordinateur, l’aperçu remonte en haut, à côté du titre */
     return `<section class="wrap s3w">${admBar()}
-      <div class="split s3">
+      <div class="split s3 tab-${mobileTab}">
         <div class="side">
           ${back(2, 'Changer de modèle')}
           ${editLine()}
@@ -1342,6 +1345,13 @@
           <div class="pal-next">${palNextBtn()}</div>
         </div>
         <div class="pv-col">${phone()}</div>
+      </div>
+      <div class="mbar">
+        <div class="seg mbar-seg" role="group" aria-label="${TT('Modifier ou aperçu', 'Edit or preview')}">
+          <button type="button" class="${mobileTab === 'edit' ? 'on' : ''}" data-act="mtab" data-t="edit">${ic('pen', 15)}${TT('Couleurs', 'Colors')}</button>
+          <button type="button" class="${mobileTab === 'view' ? 'on' : ''}" data-act="mtab" data-t="view">${ic('eye', 15)}${TT('Aperçu', 'Preview')}</button>
+        </div>
+        <button class="b pri sm" data-act="go" data-n="4" ${palDone() ? '' : 'disabled'}>${TT('Suivant', 'Next')}${ic('arrow', 15)}</button>
       </div>
     </section>`;
   }
@@ -2221,7 +2231,8 @@
           <div class="vsrc"><label class="b sm">${ic('upload', 15)}${TT('Téléverser mon propre morceau', 'Upload my own track')}<input type="file" accept="audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/aac,audio/wav,audio/ogg,.mp3,.m4a,.wav,.ogg" hidden data-aud="${base}"></label><span class="f-h">${TT('MP3, M4A, WAV ou OGG, 15 Mo maximum.', 'MP3, M4A, WAV or OGG, 15 MB maximum.')}</span></div>
           ${inp(TT('Nom du morceau affiché', 'Track name shown'), base + '.track', { ph: 'Piano romantique' })}
           <label class="f mus-vol"><span class="f-l">${TT('Volume', 'Volume')} <b data-volv>${vol} %</b></span><input type="range" min="0" max="100" step="5" value="${vol}" data-path="${base}.vol"></label>
-          ${isEvents ? `<label class="ck mus-auto"><input type="checkbox" data-path="${base}.auto" ${b.auto === false ? '' : 'checked'}><span>${TT('Démarrer la musique à l’ouverture de l’invitation', 'Start the music when the invitation opens')}</span></label>` : `<p class="f-h">${TT('Sur une carte ou une boutique, la musique ne démarre jamais toute seule : le visiteur appuie sur lecture.', 'On a card or a store, the music never starts on its own: visitors tap play.')}</p>`}
+          ${isEvents ? `<label class="ck mus-auto"><input type="checkbox" data-path="${base}.auto" ${b.auto === false ? '' : 'checked'}><span>${TT('Démarrer la musique à l’ouverture de l’invitation', 'Start the music when the invitation opens')}</span></label>`
+            : `<label class="ck mus-auto"><input type="checkbox" data-path="${base}.auto" ${b.auto ? 'checked' : ''}><span>${TT(isStores ? 'Démarrer la musique à l’ouverture de la boutique' : 'Démarrer la musique à l’ouverture de la carte', isStores ? 'Start the music when the store opens' : 'Start the music when the card opens')}</span></label><p class="f-h">${TT('Un bouton « Arrêter la musique » s’affiche pour le visiteur. Certains navigateurs attendent son premier toucher sur la page avant de jouer le son.', 'Visitors get a “Stop the music” button. Some browsers wait for the first tap on the page before playing sound.')}</p>`}
           <p class="f-h">${TT('Musiques de la bibliothèque : libres de droits (Pixabay). Pour votre propre morceau, vous devez avoir le droit de le diffuser. L’invité peut couper la musique à tout moment.', 'Library tracks are royalty-free (Pixabay). For your own track, you must have the right to share it. Guests can stop the music at any time.')}</p>`;
       }
       /* Plusieurs morceaux (Mes créations, Mes musiques préférées) */
@@ -2935,6 +2946,8 @@
       case 'lang': {
         if (t.dataset.v === lang() || !bili()) break;
         S.lang = t.dataset.v;
+        /* La langue du site suit la version de la carte qu'on modifie */
+        if (S.ui !== t.dataset.v) { if (t.dataset.v === 'fr') untranslate(); S.ui = t.dataset.v; }
         if (S.sectorId) ensureCard();
         save();
         const pvEl = $('#pv'), st = pvEl ? pvEl.scrollTop : 0;
