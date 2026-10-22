@@ -60,6 +60,9 @@
   /* Tous les panneaux de l’étape Contenu arrivent fermés : le client ouvre celui qu’il veut modifier */
   const openGroups = new Set();
   let mobileTab = 'edit';
+  /* Position de défilement de l'aperçu, gardée d'un affichage à l'autre (changement de couleur, onglet Aperçu) */
+  let pvPos = 0, pv3Pos = 0; /* pv3Pos : propre à l'étape Couleurs (première fois : le haut de la carte) */
+  document.addEventListener('scroll', (e) => { if (e.target && e.target.id === 'pv') { pvPos = e.target.scrollTop; if (S.step === 3) pv3Pos = pvPos; } }, true);
   let pvTimer = null;
 
   function rid() {
@@ -708,6 +711,8 @@
     const bn = $('.brand-n'), bt = cfg(isEvents ? 'brand.events' : isStores ? 'brand.stores' : 'brand.studio', '');
     if (bn && bt) { bn.textContent = bt; document.title = bt; }
     fitPreview();
+    /* Étape Couleurs : l'aperçu reste à l'endroit où on s'était arrêté (première fois : le haut de la carte) */
+    if (S.step === 3) { const pv = $('#pv'); if (pv) pv.scrollTop = pv3Pos; }
     if (!document.querySelector('.ptabs') && NFC.prodTabs) {
       document.body.insertAdjacentHTML('afterbegin', NFC.prodTabs(isEvents ? 'events' : isStores ? 'stores' : 'cards', isStores || isEvents ? '../' : ''));
       document.querySelector('.ptabs').addEventListener('click', (e) => { const a = e.target.closest('a[data-ptab]'); if (a && a.dataset.ptab !== 'admin') a.href = a.getAttribute('href').split('?')[0] + '?ui=' + ui(); });
@@ -3014,7 +3019,13 @@
       case 'clear':
         if (ask('Vider tous les textes et photos d’exemple ? La structure et vos choix de blocs sont conservés.')) { clearCard(); structChanged(); toast('Exemples vidés : à vous de jouer.'); }
         break;
-      case 'mtab': mobileTab = t.dataset.t; window.scrollTo(0, 0); render(); break;
+      case 'mtab': {
+        mobileTab = t.dataset.t; window.scrollTo(0, 0); render();
+        /* Aperçu (téléphone) : on arrive directement sur la section qu'on vient de modifier ; sinon là où on s'était arrêté */
+        if (mobileTab === 'view') setTimeout(() => { const pv = $('#pv'); if (!pv) return; const el = S.step === 4 && followId ? previewOf(followId) : null;
+          if (el) { pv.scrollTop = Math.max(0, el.getBoundingClientRect().top - pv.getBoundingClientRect().top + pv.scrollTop - 12); flash(el, 'pv-sel'); } else pv.scrollTop = S.step === 3 ? pv3Pos : pvPos; }, 30);
+        break;
+      }
       case 'done': {
         /* Referme le panneau et montre le résultat sur la carte */
         const gEl = t.closest('.grp');
@@ -3182,6 +3193,8 @@
     showInPreview(followId);
   };
   document.addEventListener('focusin', follow);
+  /* Dernière section modifiée (texte tapé, case, photo…) : c'est elle que l'onglet Aperçu montre sur téléphone */
+  ['input', 'change'].forEach((ev) => document.addEventListener(ev, (e) => { const gEl = e.target.closest && e.target.closest('#ed .grp[data-grp]'); if (gEl) followId = gEl.dataset.grp; }, true));
   document.addEventListener('pointerdown', follow);
   function showInPreview(id) {
     followId = id;
