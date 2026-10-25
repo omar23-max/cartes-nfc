@@ -1843,13 +1843,24 @@
     return { iso: c[0], local: rest.trim() };
   };
   const telF = (label, path, o = {}) => {
-    const v = g(path), sp = telSplit(v, g(path + 'Cc')), en = ui() === 'en';
+    const v = g(path), sp = telSplit(v, g(path + 'Cc')), en = ui() === 'en', isEx = !!exOf(path);
     const opt = (c, i) => `${i === TEL_TOP ? '<option disabled>──────────</option>' : ''}<option value="${c[0]}" ${c[0] === sp.iso ? 'selected' : ''}>${flagOf(c[0])} ${esc(en ? c[3] : c[2])} (+${c[1]})</option>`;
-    return `<label class="f"><span class="f-l">${label}</span><span class="tel-f"><select data-telcc="${path}" aria-label="${en ? 'Country code' : 'Indicatif du pays'}">${TEL_CC.map(opt).join('')}</select><input type="tel" data-tellocal="${path}" value="${esc(sp.local)}" placeholder="${esc(o.ph ? telSplit(o.ph).local : (sp.iso === 'CA' || sp.iso === 'US' ? '514 555-0101' : '6 12 34 56 78'))}" autocomplete="tel-national"></span>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`;
+    return `<label class="f"><span class="f-l">${label}</span><span class="tel-f"><select data-telcc="${path}" aria-label="${en ? 'Country code' : 'Indicatif du pays'}">${TEL_CC.map(opt).join('')}</select><input type="tel" class="${isEx ? 'is-demo' : ''}" data-tellocal="${path}" value="${isEx ? '' : esc(sp.local)}" placeholder="${esc(isEx ? sp.local : o.ph ? telSplit(o.ph).local : (sp.iso === 'CA' || sp.iso === 'US' ? '514 555-0101' : '6 12 34 56 78'))}" autocomplete="tel-national"></span>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`;
   };
-  const inp = (label, path, o = {}) => `<label class="f"><span class="f-l">${label}</span><input type="${o.type || 'text'}" data-path="${path}" value="${esc(g(path))}" placeholder="${esc(o.ph || '')}"${o.attrs || ''}>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`;
-  const area = (label, path, o = {}) => `<label class="f"><span class="f-l">${label}</span><textarea rows="${o.rows || 4}" data-path="${path}" placeholder="${esc(o.ph || '')}">${esc(g(path))}</textarea>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`;
-  const mini = (path, ph, cls = '') => `<input class="mini ${cls}" data-path="${path}" value="${esc(g(path))}" placeholder="${esc(ph)}">`;
+  /* Contenu d'exemple = simple modèle (v=391) : tant qu'un champ contient encore le texte d'exemple, le champ s'affiche VIDE
+     avec l'exemple en gris (placeholder). Le client tape directement son texte, sans rien effacer. L'aperçu garde l'exemple
+     jusqu'à ce qu'il soit remplacé. Effacer (touche ⌫) dans un champ vide retire l'exemple. */
+  const demoAt = (path) => {
+    const m = /^custom\.(\d+)\.data\.(.+)$/.exec(path);
+    if (m) { const c = (card().custom || [])[+m[1]]; return c && c.ex ? getP(c.ex, m[2]) : undefined; }
+    const s = sec(); return s ? getP(demoOf(s), path) : undefined;
+  };
+  const exOf = (path) => { const v = g(path), d = demoAt(path); return typeof v === 'string' && v !== '' && v === d ? v : ''; };
+  const fv = (path, ph) => { const ex = exOf(path); return ex ? { v: '', ph: ex, cls: ' is-demo' } : { v: g(path), ph: ph || '', cls: '' }; };
+  const inp = (label, path, o = {}) => { const f = fv(path, o.ph); return `<label class="f"><span class="f-l">${label}</span><input type="${o.type || 'text'}" class="${f.cls.trim()}" data-path="${path}" value="${esc(f.v)}" placeholder="${esc(f.ph)}"${o.attrs || ''}>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`; };
+  const area = (label, path, o = {}) => { const f = fv(path, o.ph); return `<label class="f"><span class="f-l">${label}</span><textarea class="${f.cls.trim()}" rows="${o.rows || 4}" data-path="${path}" placeholder="${esc(f.ph)}">${esc(f.v)}</textarea>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`; };
+  const miniArea = (path, ph) => { const f = fv(path, ph); return `<textarea class="mini full${f.cls}" rows="2" data-path="${path}" placeholder="${esc(f.ph)}">${esc(f.v)}</textarea>`; };
+  const mini = (path, ph, cls = '') => { const f = fv(path, ph); return `<input class="mini ${cls}${f.cls}" data-path="${path}" value="${esc(f.v)}" placeholder="${esc(f.ph)}">`; };
   const del = (path, i, label = 'Supprimer') => `<button class="ib" data-act="del" data-path="${path}" data-i="${i}" aria-label="${label}" title="${label}">${ic('trash', 16)}</button>`;
   const add = (path, tpl, label) => `<button class="add" data-act="add" data-path="${path}" data-tpl="${tpl}">${ic('plus', 16)}${label}</button>`;
   /* Loi 25 (Québec) : les personnes citées sur la carte doivent avoir donné leur accord */
@@ -1860,7 +1871,7 @@
     ? 'Le nom, la recommandation et les coordonnées (téléphone, courriel, LinkedIn) d’une personne sont des renseignements personnels. Vous êtes responsable de ce que vous saisissez : vérifiez l’exactitude des informations et obtenez l’accord de chaque personne avant de les publier. La case est décochée par défaut : tant qu’elle n’est pas cochée, la recommandation n’apparaît pas sur votre carte publiée.'
     : 'Le nom et l’avis d’un client sont des renseignements personnels : publiez-les seulement avec son accord. La case est décochée par défaut : tant qu’elle n’est pas cochée, l’avis n’apparaît pas sur votre carte publiée.'}</span></div></div>`;
   const okBox = (p, x, label) => `<label class="ck ok-ck${x.ok === true ? '' : ' wait'}"><input type="checkbox" data-path="${p}.ok" ${x.ok === true ? 'checked' : ''}><span>${label} <small>(Loi 25)</small></span></label>`;
-  const reviewsEd = (b, base) => `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f">${mini(p + '.n', 'Nom du client', 'strong')}${mini(p + '.r', 'Contexte (ex. Client depuis 2021)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Son avis">${esc(x.t)}</textarea>${okBox(p, x, 'Ce client a accepté que son avis et son nom soient publiés sur ma carte.')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter un avis')}`;
+  const reviewsEd = (b, base) => `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f">${mini(p + '.n', 'Nom du client', 'strong')}${mini(p + '.r', 'Contexte (ex. Client depuis 2021)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select>${miniArea(p + '.t', 'Son avis')}${okBox(p, x, 'Ce client a accepté que son avis et son nom soient publiés sur ma carte.')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter un avis')}`;
   const thumbF = (path) => {
     const v = g(path);
     return `<label class="thf" title="${v ? 'Changer la photo' : 'Ajouter une photo'}">${v ? `<img src="${VC.img(v, mdl())}" alt="">` : ic('image', 18)}<input type="file" accept="image/*" hidden data-img="${path}"></label>`;
@@ -2378,7 +2389,7 @@
       case 'reviews':
         if (!def.refs) return `${loi25(false)}${reviewsEd(b, base)}`;
         /* Recommandations (étudiants, stagiaires…) : coordonnées de la personne qui recommande */
-        if (def.refs) return `${loi25(true)}<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f ref-f">${mini(p + '.n', 'Nom de la personne', 'strong')}${mini(p + '.r', 'Fonction (ex. Professeur, Superviseure de stage)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select><textarea class="mini full" rows="2" data-path="${p}.t" placeholder="Sa recommandation">${esc(x.t)}</textarea>
+        if (def.refs) return `${loi25(true)}<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it"><div class="it-f rev-f ref-f">${mini(p + '.n', 'Nom de la personne', 'strong')}${mini(p + '.r', 'Fonction (ex. Professeur, Superviseure de stage)')}<select class="mini" data-path="${p}.s" aria-label="Note">${[5, 4, 3, 2, 1].map((n) => `<option value="${n}" ${+x.s === n ? 'selected' : ''}>${'★'.repeat(n)}</option>`).join('')}</select>${miniArea(p + '.t', 'Sa recommandation')}
             <div class="ref-ct">${mini(p + '.tel', 'Téléphone')}${mini(p + '.mail', 'Courriel')}${mini(p + '.li', 'Profil LinkedIn (https://linkedin.com/in/…)')}</div>${okBox(p, x, 'J’ai obtenu l’accord de cette personne pour publier son nom, sa recommandation et les coordonnées saisies ci-dessus.')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'rev', 'Ajouter une recommandation')}`;
       case 'contact':
         return `${inp('Adresse de réception des messages', base + '.email', { type: 'email' })}${area('Texte d’introduction', base + '.text', { rows: 2 })}
@@ -3029,6 +3040,7 @@
           pics = pics.slice(0, 6);
         }
         const ns = Object.assign(item.make ? item.make(lang() === 'en', pics, card()) : newSection(t.dataset.t), { cid: rid(), on: true });
+        if (ns.data) ns.ex = clone(ns.data); /* exemple de départ : affiché en gris dans les champs */
         cs.push(ns);
         openGroups.add('c-' + ns.cid);
         closeModal();
@@ -3132,6 +3144,13 @@
   });
 
   document.addEventListener('keydown', (e) => {
+    const de = e.target;
+    if (de && de.classList && de.classList.contains('is-demo') && !de.value && (e.key === 'Backspace' || e.key === 'Delete')) {
+      e.preventDefault();
+      if (de.dataset.tellocal) { setP(card(), de.dataset.tellocal, ''); } else if (de.dataset.path) setP(card(), de.dataset.path, '');
+      de.classList.remove('is-demo'); de.placeholder = ''; save(); schedulePv();
+      return;
+    }
     const ci = e.target.closest && e.target.closest('[data-chipadd]');
     if (ci && (e.key === 'Enter' || e.key === ',')) {
       e.preventDefault();
@@ -3412,7 +3431,7 @@
     else { setP(card(), path, raw ? `+${c[1]} ${raw}` : ''); setP(card(), path + 'Cc', c[0]); }
     save(); schedulePv();
   };
-  document.addEventListener('input', (e) => { const p = e.target.dataset && e.target.dataset.tellocal; if (p) telSave(p); });
+  document.addEventListener('input', (e) => { const p = e.target.dataset && e.target.dataset.tellocal; if (p) telSave(p); if (e.target.classList && e.target.classList.contains('is-demo')) e.target.classList.remove('is-demo'); });
   document.addEventListener('change', (e) => { const p = e.target.dataset && (e.target.dataset.telcc || e.target.dataset.tellocal); if (p) { telSave(p); if (e.target.dataset.telcc) { const inl = document.querySelector(`[data-tellocal="${p}"]`); if (inl) inl.focus(); } } });
   /* Écoute dans l'éditeur : un seul lecteur ; le bouton passe de ▶ à ❚❚ */
   const musPrev = {};

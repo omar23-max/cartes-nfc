@@ -1819,3 +1819,6 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .tel-f input { flex: 1 1 auto; min-width: 0; }
 
 @media (max-width: 560px) { .tel-f select { width: 118px; font-size: 13px; } }
+
+/* v=391 : champ qui montre encore le texte d'exemple (en gris, à remplacer) */
+.is-demo::placeholder { color: #8b8b93; opacity: 1; font-style: italic; }
