@@ -1826,6 +1826,27 @@
     </section>`;
   }
 
+  /* Numéro de téléphone : menu « drapeau · pays · indicatif » + numéro local ; enregistré au format international « +1 514 555-0101 »
+     (pays choisi gardé à côté, dans <chemin>Cc : +1 est partagé par le Canada, les États-Unis…) */
+  const TEL_TOP = 8;
+  const TEL_CC = [['CA','1','Canada','Canada'], ['US','1','États-Unis','United States'], ['FR','33','France','France'], ['BE','32','Belgique','Belgium'], ['CH','41','Suisse','Switzerland'], ['MA','212','Maroc','Morocco'], ['DZ','213','Algérie','Algeria'], ['TN','216','Tunisie','Tunisia'], ['ZA','27','Afrique du Sud','South Africa'], ['DE','49','Allemagne','Germany'], ['SA','966','Arabie saoudite','Saudi Arabia'], ['AR','54','Argentine','Argentina'], ['AU','61','Australie','Australia'], ['AT','43','Autriche','Austria'], ['BR','55','Brésil','Brazil'], ['BF','226','Burkina Faso','Burkina Faso'], ['CM','237','Cameroun','Cameroon'], ['CL','56','Chili','Chile'], ['CN','86','Chine','China'], ['CO','57','Colombie','Colombia'], ['KR','82','Corée du Sud','South Korea'], ['CI','225','Côte d’Ivoire','Côte d’Ivoire'], ['HR','385','Croatie','Croatia'], ['CU','53','Cuba','Cuba'], ['DK','45','Danemark','Denmark'], ['EG','20','Égypte','Egypt'], ['AE','971','Émirats arabes unis','United Arab Emirates'], ['ES','34','Espagne','Spain'], ['FI','358','Finlande','Finland'], ['GA','241','Gabon','Gabon'], ['GR','30','Grèce','Greece'], ['GP','590','Guadeloupe','Guadeloupe'], ['GN','224','Guinée','Guinea'], ['HT','509','Haïti','Haiti'], ['HK','852','Hong Kong','Hong Kong'], ['HU','36','Hongrie','Hungary'], ['IN','91','Inde','India'], ['ID','62','Indonésie','Indonesia'], ['IE','353','Irlande','Ireland'], ['IL','972','Israël','Israel'], ['IT','39','Italie','Italy'], ['JP','81','Japon','Japan'], ['JO','962','Jordanie','Jordan'], ['LB','961','Liban','Lebanon'], ['LU','352','Luxembourg','Luxembourg'], ['MG','261','Madagascar','Madagascar'], ['ML','223','Mali','Mali'], ['MQ','596','Martinique','Martinique'], ['MU','230','Maurice','Mauritius'], ['MX','52','Mexique','Mexico'], ['MC','377','Monaco','Monaco'], ['NE','227','Niger','Niger'], ['NG','234','Nigeria','Nigeria'], ['NO','47','Norvège','Norway'], ['NC','687','Nouvelle-Calédonie','New Caledonia'], ['NZ','64','Nouvelle-Zélande','New Zealand'], ['PK','92','Pakistan','Pakistan'], ['NL','31','Pays-Bas','Netherlands'], ['PE','51','Pérou','Peru'], ['PH','63','Philippines','Philippines'], ['PL','48','Pologne','Poland'], ['PF','689','Polynésie française','French Polynesia'], ['PT','351','Portugal','Portugal'], ['QA','974','Qatar','Qatar'], ['CD','243','RD Congo','DR Congo'], ['CG','242','Congo','Congo'], ['DO','1','République dominicaine','Dominican Republic'], ['CZ','420','Tchéquie','Czechia'], ['RE','262','La Réunion','Réunion'], ['RO','40','Roumanie','Romania'], ['GB','44','Royaume-Uni','United Kingdom'], ['RU','7','Russie','Russia'], ['RW','250','Rwanda','Rwanda'], ['SN','221','Sénégal','Senegal'], ['SG','65','Singapour','Singapore'], ['SE','46','Suède','Sweden'], ['SY','963','Syrie','Syria'], ['TW','886','Taïwan','Taiwan'], ['TH','66','Thaïlande','Thailand'], ['TG','228','Togo','Togo'], ['TR','90','Turquie','Türkiye'], ['UA','380','Ukraine','Ukraine'], ['VE','58','Venezuela','Venezuela'], ['VN','84','Viêt Nam','Vietnam']];
+  const flagOf = (iso) => String.fromCodePoint(...iso.split('').map((ch) => 127397 + ch.charCodeAt(0)));
+  const telSplit = (v, iso0) => {
+    const s0 = String(v || '').trim();
+    if (!/^\+/.test(s0)) return { iso: iso0 || 'CA', local: s0 };
+    const dg = s0.replace(/[^\d]/g, '');
+    const hit = TEL_CC.filter((c) => dg.startsWith(c[1])).sort((a, b) => b[1].length - a[1].length);
+    const best = hit.length ? hit.filter((c) => c[1] === hit[0][1]) : [];
+    const c = best.find((x) => x[0] === iso0) || best[0];
+    if (!c) return { iso: iso0 || 'CA', local: s0 };
+    const rest = s0.replace(/^\+\s*/, '').slice(0).replace(new RegExp('^' + c[1].split('').join('\\s*') + '\\s*'), '');
+    return { iso: c[0], local: rest.trim() };
+  };
+  const telF = (label, path, o = {}) => {
+    const v = g(path), sp = telSplit(v, g(path + 'Cc')), en = ui() === 'en';
+    const opt = (c, i) => `${i === TEL_TOP ? '<option disabled>──────────</option>' : ''}<option value="${c[0]}" ${c[0] === sp.iso ? 'selected' : ''}>${flagOf(c[0])} ${esc(en ? c[3] : c[2])} (+${c[1]})</option>`;
+    return `<label class="f"><span class="f-l">${label}</span><span class="tel-f"><select data-telcc="${path}" aria-label="${en ? 'Country code' : 'Indicatif du pays'}">${TEL_CC.map(opt).join('')}</select><input type="tel" data-tellocal="${path}" value="${esc(sp.local)}" placeholder="${esc(o.ph ? telSplit(o.ph).local : (sp.iso === 'CA' || sp.iso === 'US' ? '514 555-0101' : '6 12 34 56 78'))}" autocomplete="tel-national"></span>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`;
+  };
   const inp = (label, path, o = {}) => `<label class="f"><span class="f-l">${label}</span><input type="${o.type || 'text'}" data-path="${path}" value="${esc(g(path))}" placeholder="${esc(o.ph || '')}"${o.attrs || ''}>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`;
   const area = (label, path, o = {}) => `<label class="f"><span class="f-l">${label}</span><textarea rows="${o.rows || 4}" data-path="${path}" placeholder="${esc(o.ph || '')}">${esc(g(path))}</textarea>${o.hint ? `<span class="f-h">${o.hint}</span>` : ''}</label>`;
   const mini = (path, ph, cls = '') => `<input class="mini ${cls}" data-path="${path}" value="${esc(g(path))}" placeholder="${esc(ph)}">`;
@@ -1885,7 +1906,7 @@
         <div class="row2">${coverCaps().photo ? imgF('Photo principale', 'identity.photo') : notShown('Photo principale', TT('de photo principale', 'a main photo'))}</div>
         ${coverEd()}`);
       h += grp('contact', 'Contact des hôtes', 'Pour les questions des invités', `
-        <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('Email', 'contact.email', { type: 'email' })}</div>`);
+        ${telF('Téléphone', 'contact.phone')}${inp('Email', 'contact.email', { type: 'email' })}`);
       return h + sectionsEd();
     }
     let h = grp('identity', 'Identité', est ? TT('Nom, activité, image de couverture, photo de profil, logo', 'Name, business, cover image, profile photo, logo') : TT('Nom, fonction, image de couverture, photo de profil, logo', 'Name, job title, cover image, profile photo, logo'), `
@@ -1895,7 +1916,7 @@
       <div class="row2">${!coverCaps().photo ? notShown(TT('Image principale (photo de profil)', 'Main image (profile photo)'), TT('de photo de profil', 'a profile photo')) : imgF(TT('Image principale (photo de profil)', 'Main image (profile photo)'), 'identity.photo', est ? TT('La photo ronde ou carrée à côté du nom : votre logo ou une photo de l’établissement.', 'The round or square picture next to the name: your logo or a photo of the place.') : TT('La photo ronde ou carrée à côté de votre nom.', 'The round or square photo next to your name.'))}${coverCaps().logo ? imgF(TT('Petit logo (facultatif)', 'Small logo (optional)'), 'identity.logo', TT('Affiché en petit à côté du nom de l’entreprise.', 'Shown small next to the company name.')) : notShown(TT('Petit logo', 'Small logo'), TT('de petit logo', 'a small logo'))}</div>
       ${coverEd()}`);
     h += grp('contact', 'Coordonnées & action principale', 'Téléphone, email, site', `
-      <div class="row2">${inp('Téléphone', 'contact.phone', { type: 'tel' })}${inp('WhatsApp', 'contact.whatsapp', { type: 'tel', hint: 'Format international : +33 6…' })}</div>
+      ${telF('Téléphone', 'contact.phone')}${telF('WhatsApp', 'contact.whatsapp')}
       <div class="row2">${inp('Email', 'contact.email', { type: 'email' })}${inp('Site web', 'contact.website', { ph: 'monsite.fr' })}</div>
       <label class="f"><span class="f-l">Action principale</span><select data-path="primary">${primaryOptions()}</select><span class="f-h">Le gros bouton toujours visible en bas de la carte.</span></label>`);
     normSocials(card());
@@ -2348,7 +2369,7 @@
         }
         if (mode === 'sms') {
           if (!(b.phone || card().contact.phone)) body += `<p class="bk-note">${ic('clock', 15)}<span>Aucun numéro renseigné : vos clients voient une <b>demande de créneau</b> en attendant.</span></p>`;
-          body += `<div class="row2">${inp('Numéro qui reçoit les SMS', base + '.phone', { type: 'tel', ph: card().contact.phone || '', hint: 'Vide = votre téléphone.' })}${inp('Texte du bouton', base + '.smsLabel', { ph: 'Réserver par SMS' })}</div>`;
+          body += `<div class="row2">${telF('Numéro qui reçoit les SMS', base + '.phone', { ph: card().contact.phone || '', hint: 'Vide = votre téléphone.' })}${inp('Texte du bouton', base + '.smsLabel', { ph: 'Réserver par SMS' })}</div>`;
           body += motifChips(base, b) + dayChips(base, b);
           body += area('Message pré-rempli', base + '.tpl', { rows: 2, ph: 'Bonjour, je souhaite prendre rendez-vous{motif}, {jour}. Merci !', hint: '{motif} et {jour} sont remplacés par les choix du client. Un bouton WhatsApp s’ajoute si vous avez renseigné WhatsApp.' });
         }
@@ -2384,7 +2405,7 @@
         return `<div class="items">${(b.items || []).map((x, i) => { const p = `${base}.items.${i}`; return `<div class="it">${thumbF(p + '.img')}<div class="it-f">${mini(p + '.t', 'Nom du produit', 'strong')}${mini(p + '.d', 'Description courte')}${mini(p + '.p', 'Prix (ex. 35 $)', 'price')}</div>${del(base + '.items', i)}</div>`; }).join('')}</div>${add(base + '.items', 'card', 'Ajouter un produit')}
           <div class="f"><span class="f-l">Comment vos clients commandent-ils ?</span><div class="seg">${[['sms', 'Par SMS'], ['email', 'Par email']].map(([v, l]) => `<button type="button" class="${mode === v ? 'on' : ''}" data-act="bkmode" data-path="${base}.order" data-v="${v}">${l}</button>`).join('')}</div>
           <span class="f-h">Le bouton « Commander » ouvre un message déjà rédigé avec le nom et le prix du produit. Le paiement en ligne arrivera avec la boutique.</span></div>
-          ${mode === 'sms' ? inp('Numéro qui reçoit les commandes', base + '.phone', { type: 'tel', ph: card().contact.phone || '', hint: 'Vide = votre téléphone.' }) : inp('Adresse qui reçoit les commandes', base + '.email', { type: 'email', ph: card().contact.email || '', hint: 'Vide = votre email.' })}
+          ${mode === 'sms' ? telF('Numéro qui reçoit les commandes', base + '.phone', { ph: card().contact.phone || '', hint: 'Vide = votre téléphone.' }) : inp('Adresse qui reçoit les commandes', base + '.email', { type: 'email', ph: card().contact.email || '', hint: 'Vide = votre email.' })}
           ${inp('Lien vers votre boutique complète (facultatif)', base + '.shopUrl', { ph: 'https://…', hint: 'Ajoute un bouton « Voir toute la boutique » sous les produits.' })}
           ${area('Texte d’accompagnement', base + '.text', { rows: 2 })}`;
       }
@@ -3381,6 +3402,18 @@
       localStorage.setItem('nextap-consents', JSON.stringify(L.slice(0, 1000)));
     } catch (er) { /* stockage indisponible */ }
   });
+  /* Téléphone : pays (indicatif) + numéro local → « +indicatif numéro » */
+  const telSave = (path) => {
+    const sel = document.querySelector(`[data-telcc="${path}"]`), inl = document.querySelector(`[data-tellocal="${path}"]`);
+    if (!sel || !inl) return;
+    const c = TEL_CC.find((x) => x[0] === sel.value) || TEL_CC[0], raw = inl.value.trim();
+    /* Numéro collé au format international (+33 6…) : le pays se règle tout seul */
+    if (/^\+/.test(raw)) { const sp = telSplit(raw, sel.value); setP(card(), path, raw); setP(card(), path + 'Cc', sp.iso); if (sp.iso !== sel.value) sel.value = sp.iso; if (sp.local && sp.local !== raw) inl.value = sp.local; }
+    else { setP(card(), path, raw ? `+${c[1]} ${raw}` : ''); setP(card(), path + 'Cc', c[0]); }
+    save(); schedulePv();
+  };
+  document.addEventListener('input', (e) => { const p = e.target.dataset && e.target.dataset.tellocal; if (p) telSave(p); });
+  document.addEventListener('change', (e) => { const p = e.target.dataset && (e.target.dataset.telcc || e.target.dataset.tellocal); if (p) { telSave(p); if (e.target.dataset.telcc) { const inl = document.querySelector(`[data-tellocal="${p}"]`); if (inl) inl.focus(); } } });
   /* Écoute dans l'éditeur : un seul lecteur ; le bouton passe de ▶ à ❚❚ */
   const musPrev = {};
   function musPrevUi(on) { document.querySelectorAll('.mus-pp').forEach((x) => { x.classList.toggle('on', on); x.innerHTML = ic(on ? 'pause' : 'play', 16); }); }

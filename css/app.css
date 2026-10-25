@@ -1812,3 +1812,10 @@ html:has(.modal.on), body:has(.modal.on) { overflow: hidden; }
 .cs-ctl .ib.dup.is-one { opacity: .25; cursor: not-allowed; }
 .as-t.one { opacity: .75; }
 .as-t.one .as-has { background: #fef3c7; color: #92400e; }
+
+/* v=388 : téléphone avec indicatif du pays */
+.tel-f { display: flex; gap: 6px; min-width: 0; }
+.tel-f select { flex: 0 0 auto; width: 190px; min-width: 0; height: 44px; padding: 0 6px; border: 1px solid var(--line); border-radius: 10px; background: #fff; font: inherit; font-size: 14px; color: var(--ink); text-overflow: ellipsis; }
+.tel-f input { flex: 1 1 auto; min-width: 0; }
+
+@media (max-width: 560px) { .tel-f select { width: 118px; font-size: 13px; } }
