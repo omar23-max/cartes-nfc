@@ -668,8 +668,13 @@
       return `${rows.length ? `<div class="hours">${rows.map((r) => `<div class="hr"><span>${esc(r.d)}</span><span>${esc(r.h)}</span></div>`).join('')}</div>` : ''}${b.note ? `<p class="note">${ic('clock', 15)}${esc(b.note)}</p>` : ''}`;
     },
     location(def, b, m) {
-      if (!b.address) return '';
-      return `<div class="loc">${b.map !== false ? mapBox(b.address, m) : ''}<p class="addr">${ic('pin')}<span>${esc(b.address)}</span></p>${b.access ? `<p class="acc">${esc(b.access)}</p>` : ''}<a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}" target="_blank" rel="noopener">${ic('nav', 18)}<span>Itinéraire</span></a></div>`;
+      const more = (b.more || []).filter((x) => x && x.address);
+      if (!b.address && !more.length) return '';
+      const go = (a) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a)}`;
+      /* Autres adresses (plusieurs cabinets ou magasins) : nom, adresse, accès, Itinéraire */
+      const extra = more.length ? `<div class="loc-more">${more.map((x) => `<div class="loc-x">${x.name ? `<b>${esc(x.name)}</b>` : ''}<p class="addr">${ic('pin')}<span>${esc(x.address)}</span></p>${x.access ? `<p class="acc">${esc(x.access)}</p>` : ''}<a class="btn ghost sm" href="${go(x.address)}" target="_blank" rel="noopener">${ic('nav', 16)}<span>${L2('Itinéraire', 'Directions')}</span></a></div>`).join('')}</div>` : '';
+      if (!b.address) return extra;
+      return `<div class="loc">${b.name ? `<b class="loc-n">${esc(b.name)}</b>` : ''}${b.map !== false ? mapBox(b.address, m) : ''}<p class="addr">${ic('pin')}<span>${esc(b.address)}</span></p>${b.access ? `<p class="acc">${esc(b.access)}</p>` : ''}<a class="btn ghost" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(b.address)}" target="_blank" rel="noopener">${ic('nav', 18)}<span>Itinéraire</span></a></div>${extra}`;
     },
     action(def, b) {
       if (!b.url) return '';

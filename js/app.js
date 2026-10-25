@@ -2054,6 +2054,19 @@
       make: (en) => blk('playlist', en ? 'My favorite music' : 'Mes musiques préférées', { vol: 70, items: (NFC.EV_MUSIC || []).slice(0, 2).map((z) => ({ t: en ? z.en : z.fr, by: '', src: z.src })) }) },
   ];
   const catOf = (id) => CAT.find((x) => x.id === id);
+  /* Sections qui n'existent qu'une fois par carte (v=387) : pas de bouton « Dupliquer », tuile du catalogue grisée si déjà là */
+  const UNIQ_T = ['greviews', 'booking', 'form', 'contact', 'shop', 'hours', 'music', 'event', 'countdown', 'rsvp', 'envelope', 'location'];
+  const isUniq = (d) => !!d && (UNIQ_T.includes(d.type) || d.key === 'order');
+  const UNIQ_CAT = { google: ['greviews'], booking: ['booking'], form: ['form', 'contact'], hours: ['hours'], location: ['location'] };
+  /* Section unique déjà présente (activée ou non) : renvoie l'identifiant de son panneau */
+  function uniqHit(id) {
+    const T = UNIQ_CAT[id]; if (!T) return null;
+    const s = sec(), c = card();
+    const d = (s.blocks || []).find((b) => T.includes(b.type) && c.blocks[b.key]);
+    if (d) return 'b-' + d.key;
+    const cs = c.custom || [], j = cs.findIndex((x) => x.type === 'block' && T.includes((x.def || {}).type));
+    return j < 0 ? null : 'c-' + (cs[j].cid || j);
+  }
   /* Une section du catalogue est-elle déjà visible sur la carte ? */
   function catPresent(id) {
     const s = sec(), c = card(), defs = s.blocks.filter((b) => (c.blocks[b.key] || {}).on).map((b) => b)
@@ -2086,7 +2099,8 @@
       return d.type === id;
     }).length;
   }
-  const catTile = (x, en) => { const n = catCount(x.id); return `<button type="button" class="as-t${n ? ' has' : ''}" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}${n ? `<span class="as-has">${en ? 'Already on your card' : 'Déjà sur votre carte'}${n > 1 ? ' ×' + n : ''}</span>` : ''}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`; };
+  const catTile = (x, en) => { const n = catCount(x.id), one = !!uniqHit(x.id); if (one) return `<button type="button" class="as-t has one" data-act="addsec" data-t="${x.id}" title="${en ? 'Only one per card: edit the one you have' : 'Une seule par carte : modifiez celle qui existe'}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}<span class="as-has">${en ? 'Only one per card · Edit it' : 'Une seule par carte · La modifier'}</span></span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`;
+    return `<button type="button" class="as-t${n ? ' has' : ''}" data-act="addsec" data-t="${x.id}"><span class="as-ic"><i data-lucide="${x.ic}"></i></span><span class="as-n">${x.n[en ? 1 : 0]}${n ? `<span class="as-has">${en ? 'Already on your card' : 'Déjà sur votre carte'}${n > 1 ? ' ×' + n : ''}</span>` : ''}</span><span class="as-d">${x.d[en ? 1 : 0]}</span></button>`; };
   function catGroups(en, skip) {
     return CAT_GROUPS.map(([g, fr, eng]) => { const L = CAT.filter((x) => x.g === g && catOn(x) && !(skip && skip.includes(x.id))); return L.length ? `<div class="as-g"><span class="as-h">${en ? eng : fr}</span><div class="as-grid">${L.map((x) => catTile(x, en)).join('')}</div></div>` : ''; }).join('');
   }
@@ -2148,17 +2162,17 @@
         if (d0 && d0.type === 'greviews' && !(c.blocks[d0.key] || {}).on) return;
       }
       /* Modifier (crayon), déplacer (flèches groupées), dupliquer : trois rôles bien distincts */
-      const mv = (gid) => `<div class="cs-ctl">
+      const mv = (gid, one) => `<div class="cs-ctl">
           <button class="ib edit-b" data-act="grp" data-id="${gid}" aria-label="Modifier la section" title="Modifier la section">${ic('pen', 15)}</button>
           <span class="mv-g" role="group" aria-label="Déplacer la section">
             <button class="ib" data-act="omove" data-k="${k}" data-d="-1" aria-label="Monter" title="Monter" ${idx === 0 ? 'disabled' : ''}>${ic('arrowup', 15)}</button>
             <button class="ib" data-act="omove" data-k="${k}" data-d="1" aria-label="Descendre" title="Descendre" ${idx === order.length - 1 ? 'disabled' : ''}>${ic('arrowdown', 15)}</button>
           </span>
-          <button class="ib dup" data-act="dup" data-k="${k}" aria-label="Dupliquer la section" title="Dupliquer la section">${ic('copy', 15)}</button>`;
+          ${one ? `<span class="ib dup is-one" title="${TT('Une seule section de ce type par carte', 'Only one section of this type per card')}" aria-hidden="true">${ic('copy', 15)}</span>` : `<button class="ib dup" data-act="dup" data-k="${k}" aria-label="Dupliquer la section" title="Dupliquer la section">${ic('copy', 15)}</button>`}`;
       if (k.startsWith('b:')) {
         const def = s.blocks.find((b) => b.key === k.slice(2)), bt = (c.blocks[def.key] || {}).title;
         const titleF = inp('Titre de la section', `blocks.${def.key}.title`, { ph: def.title, hint: 'Laissez vide pour garder le titre proposé.' });
-        h += grp('b-' + def.key, esc(bt || def.title), def.help || '', titleF + blockEd(def), `blocks.${def.key}.on`, mv('b-' + def.key) + '</div>', k);
+        h += grp('b-' + def.key, esc(bt || def.title), def.help || '', titleF + blockEd(def), `blocks.${def.key}.on`, mv('b-' + def.key, isUniq(def)) + '</div>', k);
       } else {
         const i = cs.findIndex((x, j) => (x.cid || 'i' + j) === k.slice(2));
         if (i < 0) return;
@@ -2168,7 +2182,7 @@
         const body = cc.type === 'block'
           ? inp('Titre de la section', `custom.${i}.title`, { ph: cc.def.title }) + blockEd(cc.def, `custom.${i}.data`)
           : customBody(cc, i);
-        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? (cc.added ? `Section ajoutée · ${esc(cc.def.title)}` : `Copie · ${esc(cc.def.title)}`) : `Section ajoutée · ${label}`, body, `custom.${i}.on`, mv('c-' + (cc.cid || i)) + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
+        h += grp('c-' + (cc.cid || i), esc(cc.title || label), cc.type === 'block' ? (cc.added ? `Section ajoutée · ${esc(cc.def.title)}` : `Copie · ${esc(cc.def.title)}`) : `Section ajoutée · ${label}`, body, `custom.${i}.on`, mv('c-' + (cc.cid || i), cc.type === 'block' && isUniq(cc.def)) + del('custom', i, 'Supprimer la section') + '</div>', k, 'cgrp');
       }
     });
     h += '</div>' + addSecHTML();
@@ -2351,8 +2365,13 @@
       case 'hours':
         return `<div class="items">${(b.rows || []).map((r, i) => `<div class="it"><div class="it-f two">${mini(`${base}.rows.${i}.d`, 'Jour(s)')}${mini(`${base}.rows.${i}.h`, 'Horaires')}</div>${del(base + '.rows', i)}</div>`).join('')}</div>${add(base + '.rows', 'hour', 'Ajouter une ligne')}${inp('Mention spéciale', base + '.note', { ph: 'Ex. Urgences 24h/24' })}`;
       case 'location':
-        return `${inp('Adresse', base + '.address', { ph: 'Numéro, rue, code postal, ville' })}${inp('Accès et informations pratiques', base + '.access', { ph: 'Métro, parking, accès PMR…' })}
-          ${svcOn('google:maps') || b.map !== false ? `<label class="ck"><input type="checkbox" data-path="${base}.map" ${b.map !== false ? 'checked' : ''}><span>Afficher le plan Google Maps</span></label>` : ''}`;
+        if (!Array.isArray(b.more)) b.more = [];
+        return `${inp('Nom du lieu (facultatif)', base + '.name', { ph: 'Ex. Cabinet principal, Magasin du centre-ville' })}${inp('Adresse', base + '.address', { ph: 'Numéro, rue, code postal, ville' })}${inp('Accès et informations pratiques', base + '.access', { ph: 'Métro, parking, accès PMR…' })}
+          ${svcOn('google:maps') || b.map !== false ? `<label class="ck"><input type="checkbox" data-path="${base}.map" ${b.map !== false ? 'checked' : ''}><span>Afficher le plan Google Maps (adresse principale)</span></label>` : ''}
+          <span class="f-l" style="margin-top:12px">Autres adresses</span>
+          <div class="items">${(b.more || []).map((x, i) => { const p = `${base}.more.${i}`; return `<div class="it"><div class="it-f">${mini(p + '.name', 'Nom du lieu', 'strong')}${mini(p + '.address', 'Adresse', 'full')}${mini(p + '.access', 'Accès (facultatif)', 'full')}</div>${del(base + '.more', i)}</div>`; }).join('')}</div>
+          ${(b.more || []).length >= 9 ? '<p class="f-h">10 adresses maximum.</p>' : add(base + '.more', 'addr', 'Ajouter une adresse')}
+          <p class="f-h">Plusieurs cabinets ou magasins : une seule section « Adresse et plan », avec toutes vos adresses. Chacune a son bouton « Itinéraire ».</p>`;
       case 'action':
         return `<div class="row2">${inp('Texte du bouton', base + '.label', { ph: def.cta })}${inp('Lien de réservation', base + '.url', { ph: 'https://…' })}</div>${area('Texte d’accompagnement', base + '.text', { rows: 2 })}`;
       case 'form':
@@ -2446,7 +2465,7 @@
   }
 
   const TPL = X.tpl || {};
-  Object.assign(TPL, { track: { t: '', by: '', src: '' }, member: { t: '', d: '', p: '', img: '', url: '', ok: false }, rev: { n: '', r: '', t: '', s: 5, ok: false }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } }, X.tpl || {});
+  Object.assign(TPL, { addr: { name: '', address: '', access: '' }, track: { t: '', by: '', src: '' }, member: { t: '', d: '', p: '', img: '', url: '', ok: false }, rev: { n: '', r: '', t: '', s: 5, ok: false }, vid: { url: '', src: '', cover: '', cap: '' }, item: { t: '', d: '', p: '' }, card: { t: '', d: '', p: '', img: '', url: '' }, stat: { v: '', l: '' }, cat: { name: '', items: [{ t: '', d: '', p: '' }] }, hour: { d: '', h: '' }, link: { label: '', url: '' } }, X.tpl || {});
 
   function structChanged() {
     save();
@@ -2967,6 +2986,16 @@
       case 'addsec': {
         const cs = card().custom || (card().custom = []), item = catOf(t.dataset.t);
         if (!item) break;
+        { const hit = uniqHit(t.dataset.t);
+          if (hit) {
+            closeModal();
+            if (hit.startsWith('b-')) { const b0 = card().blocks[hit.slice(2)]; if (b0 && !b0.on) b0.on = true; }
+            else { const cc = cs.find((x, j) => 'c-' + (x.cid || j) === hit); if (cc && cc.on === false) cc.on = true; }
+            structChanged();
+            setTimeout(() => { focusGroup(hit); showInPreview(hit); }, 60);
+            toast(TT('Une seule section de ce type par carte : la voici, modifiez-la.', 'Only one section of this type per card: here it is, edit it.'));
+            break;
+          } }
         if (cs.length >= plan().sections) { closeModal(); toast(`Votre forfait permet ${plan().sections} sections ajoutées. Passez au forfait supérieur pour en ajouter d’autres.`); break; }
         const m = mediaNow();
         let pics = (m.gallery || []).map((x) => ({ src: x.src, cap: x.cap })).concat((m.cards || []).map((src) => ({ src, cap: '' })));

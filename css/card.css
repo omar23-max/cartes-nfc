@@ -452,3 +452,10 @@
 .vc .li-im { flex: none; width: 56px; height: 56px; border-radius: 12px; object-fit: cover; }
 .vc .rev-wait { opacity: .55; border-style: dashed; }
 .vc .rev-wt { display: block; margin-bottom: 6px; font-size: 11px; font-weight: 700; color: #b45309; }
+
+/* v=387 : plusieurs adresses dans « Adresse et plan » */
+.vc .loc-n { display: block; margin-bottom: 8px; font-size: 15px; }
+.vc .loc-more { display: grid; gap: 10px; margin-top: 14px; }
+.vc .loc-x { padding: 14px 16px; border: 1px solid var(--ln); border-radius: var(--r, 14px); background: var(--sf); }
+.vc .loc-x b { display: block; margin-bottom: 4px; font-size: 15px; }
+.vc .loc-x .btn { margin-top: 10px; }
